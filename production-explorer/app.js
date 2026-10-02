@@ -586,11 +586,10 @@
   }
 
   if (!window.Plotly) {
-    showError('Could not load the plotting library (Plotly from cdnjs.cloudflare.com). Check the internet connection, ' +
-      'or turn off content blockers for this page, and reload.');
+    showError('Could not load the plotting library (shared/vendor/plotly). Make sure the whole Microvis folder is present, then reload.');
     return;
   }
   if (!M) { showError('Could not load model.js.'); return; }
-  if (!window.katex) showError('Could not load KaTeX from cdnjs.cloudflare.com: formulas are shown as plain TeX.');
+  if (!window.katex) showError('Could not load KaTeX (shared/vendor/katex): formulas are shown as plain TeX.');
   guard('page', init);
 })();
