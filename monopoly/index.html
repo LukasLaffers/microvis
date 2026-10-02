@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monopoly and Product Differentiation · Microvis</title>
+  <meta name="description" content="A monopolist sets marginal revenue equal to marginal cost, p = MC/(1 + 1/η), and earns (AR − AC)q. With differentiated products, entry of substitutes pushes average revenue down until it is tangent to average cost. Lecture 5.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 5 · The firm and the market</p>
+      <h1>Monopoly and Product Differentiation</h1>
+      <p class="subtitle"><span class="tex" data-tex="\max_{q\ge0}\ p(q)\,q-C(w,q)\quad\Rightarrow\quad MR=MC,\qquad p(q)=\frac{MC(w,q)}{1+1/\eta(q)}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p data-show="mono">A monopolist faces the whole demand curve, which is its average revenue <span class="tex" data-tex="AR=p(q)"></span>. Selling one more unit lowers the price on all units, so marginal revenue lies below <span class="tex" data-tex="AR"></span>. The firm produces where <span class="tex" data-tex="MR=MC"></span>, charges the price on the demand curve above that output, and earns the grey rectangle <span class="tex" data-tex="(AR-AC)\,q^\ast"></span>. A price taker facing the same demand would produce more at a lower price (open circle).</p>
+          <p data-show="local">A firm with a product of its own is a local monopolist and earns a profit. Rivals then bring out <em>substitutes</em>: they cannot copy the product, but they take some of its demand, so the firm's average revenue curve shifts down. Entry goes on while there is profit. In the long run <span class="tex" data-tex="AR"></span> just touches <span class="tex" data-tex="AC"></span>: zero profit, at an output where <span class="tex" data-tex="MR=MC"></span> and average cost is still falling.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Situation</h2>
+        <div class="seg" role="group" aria-label="Situation">
+          <button type="button" data-mode="mono" aria-pressed="true">Monopoly</button>
+          <button type="button" data-mode="local" aria-pressed="false">Differentiated products</button>
+        </div>
+      </div>
+      <div class="group" data-show="mono">
+        <h2>Demand</h2>
+        <div class="seg" role="group" aria-label="Demand">
+          <button type="button" data-dem="linear" aria-pressed="true">Linear</button>
+          <button type="button" data-dem="ce" aria-pressed="false">Constant elasticity</button>
+        </div>
+        <div class="formula" id="formula-dem"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="price at q = 0" data-min="4" data-max="20" data-step="0.05" data-show="linear"></div>
+        <div class="ctrl" data-key="B" data-label="B" data-hint="slope" data-min="0.3" data-max="3" data-step="0.05" data-show="linear"></div>
+        <div class="ctrl" data-key="K" data-label="K" data-hint="demand level" data-min="4" data-max="30" data-step="0.1" data-show="ce"></div>
+        <div class="ctrl" data-key="eta" data-label="\eta" data-hint="price elasticity of demand" data-min="-6" data-max="-1.1" data-step="0.05" data-show="ce"></div>
+      </div>
+      <div class="group" data-show="local">
+        <h2>Demand for this firm's product</h2>
+        <div class="formula" id="formula-local"></div>
+        <div class="ctrl" data-key="AL" data-label="A" data-hint="falls as substitutes enter" data-min="3" data-max="16" data-step="0.025"></div>
+        <div class="ctrl" data-key="BL" data-label="B" data-hint="slope" data-min="0.3" data-max="3" data-step="0.05"></div>
+        <div class="btn-row" role="group" aria-label="Entry">
+          <button type="button" id="enter">Substitutes enter</button>
+          <button type="button" id="short">Short run</button>
+        </div>
+      </div>
+      <div class="group">
+        <h2>Cost</h2>
+        <div class="formula" id="formula-cost"></div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="where MC is lowest" data-min="1" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="m" data-label="m" data-hint="height of MC there" data-min="0.3" data-max="2" data-step="0.05"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Revenue and cost curves">
+      <div class="panel-head"><h2 id="head">Profit optimisation of a monopolist</h2></div>
+      <div id="plot" class="plot plot-firm"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Checks" aria-live="polite">
+        <h2>At the optimum</h2>
+        <ul class="checks" id="checks"></ul>
+        <dl id="readouts"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/firm-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
