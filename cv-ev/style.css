@@ -1,0 +1,5 @@
+/* CV, EV and Consumer Surplus: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { touch-action: auto; cursor: default; }
+.hint-line { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.seg-4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+.c-green { color: #4caf50; }

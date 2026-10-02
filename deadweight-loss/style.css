@@ -1,0 +1,14 @@
+/* The Deadweight Loss of a Tax: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { touch-action: auto; cursor: default; }
+.layout > .wide { grid-column: 1 / -1; }
+.dwl-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .dwl-row { grid-template-columns: minmax(0, 1fr); } }
+.table-scroll { overflow-x: auto; position: relative; }
+.plot-groups { height: 420px; }
+table.dw { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+table.dw th, table.dw td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.dw th:first-child, table.dw td:first-child { text-align: left; }
+table.dw th { color: var(--muted); font-weight: 600; }
+table.dw td.calc { color: var(--l2-blue); font-weight: 600; }
+.c-green { color: #4caf50; }
+.c-yellow { color: #c9a400; }
