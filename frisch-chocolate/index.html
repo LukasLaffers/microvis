@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frisch's Chocolate Data · Microvis</title>
+  <meta name="description" content="Ragnar Frisch's 1935 Freia nut chocolate data: a real production function, its isoquants, marginal products and returns to scale. Lecture 1.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <h1>Frisch's Chocolate Data (Freia, 1935)</h1>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>In 1935 Ragnar Frisch recorded how many kilos of nut chocolate the Freia factory got from different amounts of two inputs: <span class="tex" data-tex="z_1"></span> = moulding and cooling work and <span class="tex" data-tex="z_2"></span> = cocoa fat, both measured by their value in kroner (Frisch writes <span class="tex" data-tex="v_1, v_2"></span> and <span class="tex" data-tex="x"></span>). Each number in the table is one point of a real production function <span class="tex" data-tex="q=\phi(z_1,z_2)"></span>.</p>
+          <p>Click a cell. Moving along a row changes only cocoa fat, so the differences are marginal products. Cells on the same ray from the origin show returns to scale. The isoquant plot redraws Frisch's own figure.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Kilos of nut chocolate</h2>
+        <table class="data" id="table" aria-label="Frisch's data: kilos of chocolate"></table>
+        <p class="note">Rows: work <span class="tex" data-tex="z_1"></span> (kr). Columns: cocoa fat <span class="tex" data-tex="z_2"></span> (kr). Source: Frisch (1935), Table 5a.8, as reproduced in the notes.</p>
+      </div>
+
+      <div class="group">
+        <h2>Show</h2>
+        <label class="check"><input type="checkbox" id="show-fit" checked> <span>Fitted Cobb-Douglas <span class="tex" data-tex="q=Az_1^{\alpha}z_2^{\beta}"></span></span></label>
+        <label class="check"><input type="checkbox" id="show-surface" checked> <span>Surface through the data (straight lines between cells)</span></label>
+        <div class="seg" role="group" aria-label="Which input varies in the lower plot">
+          <button type="button" data-vary="2" aria-pressed="true">Vary cocoa fat</button>
+          <button type="button" data-vary="1" aria-pressed="false">Vary work</button>
+        </div>
+        <p class="note" id="fit-line"></p>
+      </div>
+    </section>
+
+    <section class="panel plot3d-panel" aria-label="The data in 3D">
+      <div class="panel-head">
+        <h2>Output over the input plane</h2>
+        <div class="btn-row" role="group" aria-label="Camera">
+          <button type="button" data-cam="3d">3D</button>
+          <button type="button" data-cam="top">Top</button>
+          <button type="button" data-cam="front">Front</button>
+          <button type="button" data-cam="side">Side</button>
+        </div>
+      </div>
+      <div id="plot3d" class="plot plot-3d"></div>
+      <p class="caption"><span class="c-accent-2"><span class="key dot"></span>the 16 cells of the table</span> on the <span class="c-accent">surface through them</span>; the translucent grey surface is the fitted Cobb-Douglas, extended beyond the data like Frisch's isoquants. The <span class="c-accent-3"><span class="key"></span>row and column</span> through the selected cell are the one-input curves.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Isoquants">
+        <h2>Isoquants in the factor diagram</h2>
+        <div id="plotA" class="plot plot-2d"></div>
+        <p class="caption"><span class="c-accent"><span class="key"></span>isoquants through the data</span> (400 to 900 kg, inside the measured rectangle) and <span class="c-muted"><span class="key dash"></span>fitted Cobb-Douglas isoquants</span> at Frisch's levels 250, 500, 750 and 1000 kg. <span class="c-accent-3"><span class="key dash"></span>Rays</span> join cells with the same input mix.</p>
+      </section>
+      <section class="panel" aria-label="One input varies">
+        <h2 id="titleB">Adding cocoa fat, work fixed</h2>
+        <div id="plotB" class="plot plot-2d"></div>
+        <p class="caption" id="capB"></p>
+      </section>
+      <section class="panel readouts" aria-label="Key numbers" aria-live="polite">
+        <h2>Selected cell</h2>
+        <dl id="readouts"></dl>
+        <p class="sentence" id="sentence"></p>
+        <h2 style="margin-top:14px">Returns to scale in the table</h2>
+        <table class="data" id="scale-table" aria-label="Cells on the same ray"></table>
+        <p class="note">Arc elasticity of scale between two cells on one ray: <span class="tex" data-tex="e=\dfrac{\ln(q'/q)}{\ln\lambda}"></span>. Close to 1: roughly constant returns.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Data: R. Frisch, “The Principle of Substitution. An Example of its Application in the Chocolate Industry”, Nordisk Tidsskrift for Teknisk Økonomi, 1935.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

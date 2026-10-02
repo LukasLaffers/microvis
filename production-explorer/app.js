@@ -33,7 +33,7 @@
 
   const state = {
     tech: 'cobb', delta: 0.5, rho: -0.5, ab: true, alpha: 0.5, beta: 0.5,
-    law: 'power', A: 1, nu: 1, qmax: 6, c: 3, kappa: 3, x0: 1,
+    law: 'power', A: 1, k: 1, qmax: 6, c: 3, kappa: 3, x0: 1,
     mode: 'sub', qbar: 2, mix: 1, lambda: 1, z2fix: 2, z1: 2,
     surface: true, opacity: 0.85, contours: true, zmax: 6,
     camera: clone(DEFAULT_CAMERA)
@@ -46,11 +46,11 @@
   function tech() {
     const s = {
       tech: state.tech, delta: state.delta, rho: state.rho, law: state.law,
-      A: state.A, nu: state.nu, qmax: state.qmax, c: state.c, kappa: state.kappa, x0: state.x0
+      A: state.A, k: state.k, qmax: state.qmax, c: state.c, kappa: state.kappa, x0: state.x0
     };
     if (abActive()) {
-      s.nu = state.alpha + state.beta;
-      s.delta = state.alpha / s.nu;
+      s.k = state.alpha + state.beta;
+      s.delta = state.alpha / s.k;
     }
     return s;
   }
@@ -67,17 +67,17 @@
     return Math.abs(Math.log10(v / k)) < 0.015 ? k : v;
   }
 
-  // Keep delta, nu and alpha, beta describing the same Cobb-Douglas when switching between them.
+  // Keep delta, k and alpha, beta describing the same Cobb-Douglas when switching between them.
   function syncAB(turningOn) {
     if (turningOn) {
-      state.alpha = U.clampTo(Number((state.delta * state.nu).toFixed(2)), 0.05, 1.5);
-      state.beta = U.clampTo(Number(((1 - state.delta) * state.nu).toFixed(2)), 0.05, 1.5);
+      state.alpha = U.clampTo(Number((state.delta * state.k).toFixed(2)), 0.05, 1.5);
+      state.beta = U.clampTo(Number(((1 - state.delta) * state.k).toFixed(2)), 0.05, 1.5);
     } else {
-      const nu = state.alpha + state.beta;
-      state.delta = U.clampTo(Number((state.alpha / nu).toFixed(2)), 0.1, 0.9);
-      state.nu = U.clampTo(Number(nu.toFixed(2)), 0.4, 1.6);
+      const k = state.alpha + state.beta;
+      state.delta = U.clampTo(Number((state.alpha / k).toFixed(2)), 0.1, 0.9);
+      state.k = U.clampTo(Number(k.toFixed(2)), 0.4, 1.6);
     }
-    ['alpha', 'beta', 'delta', 'nu'].forEach(k => ctrls[k].sync());
+    ['alpha', 'beta', 'delta', 'k'].forEach(k => ctrls[k].sync());
   }
 
   function setMode(mode) {
@@ -102,9 +102,9 @@
   // The four shapes of Figure 10 in the notes (output as z1 grows, z2 fixed).
   const PRESETS = {
     concave: { tech: 'cobb', law: 'power', ab: true, alpha: 0.5, beta: 0.5, A: 1, z2fix: 2, z1: 2 },
-    leontief: { tech: 'leontief', law: 'power', delta: 0.5, A: 1, nu: 1, z2fix: 2, z1: 0.5 },
+    leontief: { tech: 'leontief', law: 'power', delta: 0.5, A: 1, k: 1, z2fix: 2, z1: 0.5 },
     sshape: { tech: 'cobb', law: 'ultra', delta: 0.5, qmax: 6, c: 3, kappa: 3, z2fix: 3, z1: 2 },
-    threshold: { tech: 'cobb', law: 'threshold', delta: 0.5, A: 1, nu: 0.7, x0: 1, z2fix: 2, z1: 3 }
+    threshold: { tech: 'cobb', law: 'threshold', delta: 0.5, A: 1, k: 0.7, x0: 1, z2fix: 2, z1: 3 }
   };
   function applyPreset(name) {
     Object.assign(state, PRESETS[name], { zmax: 6 });
@@ -112,7 +112,7 @@
     $('law').value = state.law;
     $('ab').checked = state.ab;
     Object.values(ctrls).forEach(c => c.sync());
-    prevAb = abActive(); // the preset sets alpha, beta itself: do not convert from delta, nu
+    prevAb = abActive(); // the preset sets alpha, beta itself: do not convert from delta, k
     schedule();
   }
 
@@ -141,24 +141,24 @@
   }
 
   function renderFormula() {
-    const s = tech(), { A, delta: d, rho, nu } = s;
+    const s = tech(), { A, delta: d, rho, k } = s;
     const a = A === 1 ? '' : num(A) + '\\,';
-    const pow = Math.abs(nu - 1) < 1e-9 ? '' : `^{${num(nu)}}`;
+    const pow = Math.abs(k - 1) < 1e-9 ? '' : `^{${num(k)}}`;
     let general, numbers, extra = '', notes = '', note = techNote(s);
     if (s.law === 'power') {
       switch (s.tech) {
         case 'ces':
-          general = '\\phi(z)=A\\,\\big[\\delta z_1^{\\rho}+(1-\\delta)\\,z_2^{\\rho}\\big]^{\\nu/\\rho}';
+          general = '\\phi(z)=A\\,\\big[\\delta z_1^{\\rho}+(1-\\delta)\\,z_2^{\\rho}\\big]^{k/\\rho}';
           numbers = Math.abs(rho) < 1e-9
-            ? `\\rho=0:\\ \\text{Cobb-Douglas limit}\\ q=${a}z_1^{${num(d * nu)}}z_2^{${num((1 - d) * nu)}}`
-            : `q=${a}\\big[${num(d)}\\,z_1^{${num(rho)}}+${num(1 - d)}\\,z_2^{${num(rho)}}\\big]^{${num(nu / rho)}}`;
+            ? `\\rho=0:\\ \\text{Cobb-Douglas limit}\\ q=${a}z_1^{${num(d * k)}}z_2^{${num((1 - d) * k)}}`
+            : `q=${a}\\big[${num(d)}\\,z_1^{${num(rho)}}+${num(1 - d)}\\,z_2^{${num(rho)}}\\big]^{${num(k / rho)}}`;
           break;
         case 'linear':
-          general = '\\phi(z)=A\\,\\big[\\delta z_1+(1-\\delta)\\,z_2\\big]^{\\nu}';
+          general = '\\phi(z)=A\\,\\big[\\delta z_1+(1-\\delta)\\,z_2\\big]^{k}';
           numbers = `q=${a}\\big[${num(d)}\\,z_1+${num(1 - d)}\\,z_2\\big]${pow}`;
           break;
         case 'leontief':
-          general = '\\phi(z)=A\\,\\min\\Big\\{\\frac{z_1}{\\delta},\\ \\frac{z_2}{1-\\delta}\\Big\\}^{\\nu}';
+          general = '\\phi(z)=A\\,\\min\\Big\\{\\frac{z_1}{\\delta},\\ \\frac{z_2}{1-\\delta}\\Big\\}^{k}';
           numbers = `q=${a}\\min\\Big\\{\\frac{z_1}{${num(d)}},\\ \\frac{z_2}{${num(1 - d)}}\\Big\\}${pow}`;
           break;
         default: {
@@ -166,16 +166,16 @@
           general = '\\phi(z)=A\\,z_1^{\\alpha}z_2^{\\beta}';
           numbers = `q=${a}z_1^{${num(p.alpha)}}\\,z_2^{${num(p.beta)}}`;
           extra = abActive()
-            ? `\\begin{gathered}e=\\alpha+\\beta=${num(nu)}\\\\ \\text{i.e. }\\delta=\\tfrac{\\alpha}{\\alpha+\\beta}=${num(d)},\\ \\nu=\\alpha+\\beta\\end{gathered}`
-            : `\\begin{gathered}\\alpha=\\delta\\nu=${num(p.alpha)},\\quad \\beta=(1-\\delta)\\nu=${num(p.beta)}\\\\ e=\\alpha+\\beta=${num(nu)}\\end{gathered}`;
+            ? `\\begin{gathered}e=\\alpha+\\beta=${num(k)}\\\\ \\text{i.e. }\\delta=\\tfrac{\\alpha}{\\alpha+\\beta}=${num(d)},\\ k=\\alpha+\\beta\\end{gathered}`
+            : `\\begin{gathered}\\alpha=\\delta k=${num(p.alpha)},\\quad \\beta=(1-\\delta)k=${num(p.beta)}\\\\ e=\\alpha+\\beta=${num(k)}\\end{gathered}`;
         }
       }
-      // Linear and Leontief in the form of the notes: (a z1 + b z2)^nu and (min{a z1, b z2})^nu.
+      // Linear and Leontief in the form of the notes: (a z1 + b z2)^k and (min{a z1, b z2})^k.
       if (s.tech === 'linear' || s.tech === 'leontief') {
         const p = M.notesParams(s);
         const inner = s.tech === 'linear' ? `${num(p.a)}\\,z_1+${num(p.b)}\\,z_2` : `\\min\\{${num(p.a)}\\,z_1,\\ ${num(p.b)}\\,z_2\\}`;
         const shape = s.tech === 'linear' ? 'az_1+bz_2' : '\\min\\{az_1,bz_2\\}';
-        notes = pow ? `\\text{Notes: }(${shape})^{\\nu}:\\ q=\\big(${inner}\\big)${pow}` : `\\text{Notes: }${shape}:\\ q=${inner}`;
+        notes = pow ? `\\text{Notes: }(${shape})^{k}:\\ q=\\big(${inner}\\big)${pow}` : `\\text{Notes: }${shape}:\\ q=${inner}`;
       }
     } else {
       general = '\\phi(z)=F\\big(g(z)\\big),\\quad g(z)=' + gTex(s).replace(/\\Big/g, '\\big');
@@ -196,13 +196,13 @@
   function renderScaleLine() {
     const s = tech(), el = $('rts-line');
     if (s.law === 'power') {
-      const lab = M.returnsLabel(s.nu);
-      el.innerHTML = `${texStr(`e=\\nu=${num(s.nu)}`)} everywhere: <span class="badge ${lab}">${lab} returns to scale</span>`;
+      const lab = M.returnsLabel(s.k);
+      el.innerHTML = `${texStr(`e=k=${num(s.k)}`)} everywhere: <span class="badge ${lab}">${lab} returns to scale</span>`;
     } else {
       const xs = M.unitElasticityLevel(s);
       el.innerHTML = s.law === 'ultra'
         ? `${texStr('e(z)')} falls along every ray, from ${texStr(`\\kappa=${num(s.kappa)}`)} towards 0: increasing returns first, decreasing later${xs ? ` (${texStr('e=1')} where ${texStr(`g(z)=${num(xs)}`)})` : ''}.`
-        : `Nothing is produced until ${texStr(`g(z)>${num(s.x0)}`)}. After that ${texStr('e(z)')} falls towards ${texStr(`\\nu=${num(s.nu)}`)}${xs ? ` and equals 1 where ${texStr(`g(z)=${num(xs)}`)}` : ''}.`;
+        : `Nothing is produced until ${texStr(`g(z)>${num(s.x0)}`)}. After that ${texStr('e(z)')} falls towards ${texStr(`k=${num(s.k)}`)}${xs ? ` and equals 1 where ${texStr(`g(z)=${num(xs)}`)}` : ''}.`;
     }
   }
 
@@ -563,12 +563,12 @@
       out.zl.textContent = pt(zl[0], zl[1]);
       out.inputs.textContent = `× ${fmt(lam)}`;
       out.output.innerHTML = s.law === 'power'
-        ? `× ${texStr(`\\lambda^{\\nu}=${num(lam)}^{${num(s.nu)}}`)} = ${fmt(ql)}`
+        ? `× ${texStr(`\\lambda^{k}=${num(lam)}^{${num(s.k)}}`)} = ${fmt(ql)}`
         : `× ${fmt(ql)}`;
-      out.e.textContent = fmt(e) + (s.law === 'power' ? ' (= ν everywhere)' : ' (here)');
+      out.e.textContent = fmt(e) + (s.law === 'power' ? ' (= k everywhere)' : ' (here)');
       out.rts.innerHTML = e === null ? '—' : `<span class="badge ${M.returnsLabel(e)}">${M.returnsLabel(e)}</span>`;
       if (s.law === 'power') {
-        sentence = `Doubling all inputs multiplies output by ${texStr(`2^{\\nu}=2^{${num(s.nu)}}=${Math.pow(2, s.nu).toFixed(2)}`)}, wherever you start.`;
+        sentence = `Doubling all inputs multiplies output by ${texStr(`2^{k}=2^{${num(s.k)}}=${Math.pow(2, s.k).toFixed(2)}`)}, wherever you start.`;
       } else {
         const q2 = M.output(2 * zl[0], 2 * zl[1], s);
         sentence = ql > 0

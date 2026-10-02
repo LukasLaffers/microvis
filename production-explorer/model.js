@@ -6,11 +6,11 @@
  * along a ray). So every technology here is homothetic: the MRTS and sigma depend on g only.
  *
  * Scale laws F (s.law):
- *   'power'     F(x) = A x^nu                          homogeneous of degree nu, e(z) = nu
+ *   'power'     F(x) = A x^k                          homogeneous of degree k, e(z) = k
  *   'ultra'     F(x) = qmax (x/c)^kappa / (1 + (x/c)^kappa)
  *                                                       S-shaped ("regular ultra passum law"):
  *                                                       e falls from kappa towards 0
- *   'threshold' F(x) = A max(0, x - x0)^nu              nothing is produced below a threshold
+ *   'threshold' F(x) = A max(0, x - x0)^k              nothing is produced below a threshold
  *
  * Works in the browser (window.ProductionModel) and in Node (module.exports) for tests.
  */
@@ -75,9 +75,9 @@
         return s.qmax * u / (1 + u);
       }
       case 'threshold':
-        return x > s.x0 ? s.A * Math.pow(x - s.x0, s.nu) : 0;
+        return x > s.x0 ? s.A * Math.pow(x - s.x0, s.k) : 0;
       default:
-        return s.A * Math.pow(x, s.nu);
+        return s.A * Math.pow(x, s.k);
     }
   }
 
@@ -89,9 +89,9 @@
         return x > 0 ? s.qmax * s.kappa * u / (x * (1 + u) * (1 + u)) : (s.kappa > 1 ? 0 : NaN);
       }
       case 'threshold':
-        return x > s.x0 ? s.A * s.nu * Math.pow(x - s.x0, s.nu - 1) : 0;
+        return x > s.x0 ? s.A * s.k * Math.pow(x - s.x0, s.k - 1) : 0;
       default:
-        return s.A * s.nu * Math.pow(x, s.nu - 1);
+        return s.A * s.k * Math.pow(x, s.k - 1);
     }
   }
 
@@ -102,9 +102,9 @@
       case 'ultra':
         return q < s.qmax ? s.c * Math.pow(q / (s.qmax - q), 1 / s.kappa) : NaN;
       case 'threshold':
-        return s.x0 + Math.pow(q / s.A, 1 / s.nu);
+        return s.x0 + Math.pow(q / s.A, 1 / s.k);
       default:
-        return Math.pow(q / s.A, 1 / s.nu);
+        return Math.pow(q / s.A, 1 / s.k);
     }
   }
 
@@ -116,9 +116,9 @@
       case 'ultra':
         return s.kappa / (1 + Math.pow(x / s.c, s.kappa));
       case 'threshold':
-        return s.nu * x / (x - s.x0);
+        return s.k * x / (x - s.x0);
       default:
-        return s.nu;
+        return s.k;
     }
   }
 
@@ -224,7 +224,7 @@
 
   // The same number at every z when phi is homogeneous; null when it varies along the ray.
   function scaleElasticity(s) {
-    return law(s) === 'power' ? s.nu : null;
+    return law(s) === 'power' ? s.k : null;
   }
 
   // Scale factor lambda at which the ray through zb reaches output q (NaN if never).
@@ -238,7 +238,7 @@
       case 'ultra':
         return s.kappa > 1 ? s.c * Math.pow(s.kappa - 1, 1 / s.kappa) : null;
       case 'threshold':
-        return s.nu < 1 ? s.x0 / (1 - s.nu) : null;
+        return s.k < 1 ? s.x0 / (1 - s.k) : null;
       default:
         return null;
     }
@@ -253,16 +253,16 @@
 
   /*
    * Parameters in the form used in the lecture notes (power law only):
-   *   Cobb-Douglas  A z1^alpha z2^beta,       alpha = delta nu, beta = (1 - delta) nu
-   *   Leontief      (min{a z1, b z2})^nu,     a = A^(1/nu) / delta, b = A^(1/nu) / (1 - delta)
-   *   linear        (a z1 + b z2)^nu,         a = A^(1/nu) delta,   b = A^(1/nu) (1 - delta)
+   *   Cobb-Douglas  A z1^alpha z2^beta,       alpha = delta k, beta = (1 - delta) k
+   *   Leontief      (min{a z1, b z2})^k,     a = A^(1/k) / delta, b = A^(1/k) / (1 - delta)
+   *   linear        (a z1 + b z2)^k,         a = A^(1/k) delta,   b = A^(1/k) (1 - delta)
    */
   function notesParams(s) {
-    const k = Math.pow(s.A, 1 / s.nu), d = s.delta;
+    const r = Math.pow(s.A, 1 / s.k), d = s.delta;
     switch (s.tech) {
-      case 'leontief': return { a: k / d, b: k / (1 - d) };
-      case 'linear': return { a: k * d, b: k * (1 - d) };
-      case 'cobb': return { alpha: d * s.nu, beta: (1 - d) * s.nu };
+      case 'leontief': return { a: r / d, b: r / (1 - d) };
+      case 'linear': return { a: r * d, b: r * (1 - d) };
+      case 'cobb': return { alpha: d * s.k, beta: (1 - d) * s.k };
       default: return null;
     }
   }

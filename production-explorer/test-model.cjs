@@ -12,10 +12,10 @@ const zmax = 6;
 
 for (const tech of techs) {
   for (const delta of [0.1, 0.3, 0.5, 0.8, 0.9]) {
-    for (const nu of [0.5, 0.8, 1, 1.3, 1.6]) {
+    for (const k of [0.5, 0.8, 1, 1.3, 1.6]) {
       for (const A of [0.5, 1, 2.5]) {
         for (const rho of tech === 'ces' ? [-5, -1, -0.3, 0, 0.4, 0.9] : [0]) {
-          const s = { tech, delta, nu, A, rho };
+          const s = { tech, delta, k, A, rho };
           const label = JSON.stringify(s);
 
           // 1. Every isoquant point produces exactly q.
@@ -35,10 +35,10 @@ for (const tech of techs) {
             checks++;
           }
 
-          // 3. Homogeneity of degree nu, and elasticity of scale = nu (numerical).
+          // 3. Homogeneity of degree k, and elasticity of scale = k (numerical).
           for (const [z1, z2] of [[1, 1], [0.7, 2.3], [3, 0.4]]) {
             for (const lam of [0.5, 2, 3]) {
-              close(M.output(lam * z1, lam * z2, s), Math.pow(lam, nu) * M.output(z1, z2, s), 1e-9, 'homog ' + label);
+              close(M.output(lam * z1, lam * z2, s), Math.pow(lam, k) * M.output(z1, z2, s), 1e-9, 'homog ' + label);
             }
             const h = 1e-6;
             const e = (Math.log(M.output((1 + h) * z1, (1 + h) * z2, s)) - Math.log(M.output((1 - h) * z1, (1 - h) * z2, s))) / (Math.log(1 + h) - Math.log(1 - h));
@@ -73,7 +73,7 @@ for (const tech of techs) {
 
 // Leontief: MRTS is infinite above the kink, zero below it, undefined at it.
 {
-  const s = { tech: 'leontief', delta: 0.4, nu: 1, A: 1, rho: 0 };
+  const s = { tech: 'leontief', delta: 0.4, k: 1, A: 1, rho: 0 };
   const k = M.kinkMix(s);
   assert.equal(M.mrts(...M.pointOnIsoquant(1, k * 2, s), s), Infinity);
   assert.equal(M.mrts(...M.pointOnIsoquant(1, k / 2, s), s), 0);
@@ -81,9 +81,9 @@ for (const tech of techs) {
   checks += 3;
 }
 
-// Known values: Cobb-Douglas with delta = 0.5, nu = 1, A = 1 at z = (1, 3).
+// Known values: Cobb-Douglas with delta = 0.5, k = 1, A = 1 at z = (1, 3).
 {
-  const s = { tech: 'cobb', delta: 0.5, nu: 1, A: 1, rho: 0 };
+  const s = { tech: 'cobb', delta: 0.5, k: 1, A: 1, rho: 0 };
   close(M.mrts(1, 3, s), 3);
   close(M.output(1, 3, s), Math.sqrt(3));
   assert.equal(M.returnsLabel(0.8), 'decreasing');
@@ -94,12 +94,12 @@ for (const tech of techs) {
 
 // ---------- homothetic scale laws F(g(z)) ----------
 const laws = [
-  { law: 'power', A: 1.7, nu: 1.3 },
-  { law: 'power', A: 0.8, nu: 0.6 },
+  { law: 'power', A: 1.7, k: 1.3 },
+  { law: 'power', A: 0.8, k: 0.6 },
   { law: 'ultra', qmax: 6, c: 3, kappa: 3 },
   { law: 'ultra', qmax: 4, c: 1.5, kappa: 1.6 },
-  { law: 'threshold', A: 1, nu: 0.7, x0: 1 },
-  { law: 'threshold', A: 2, nu: 1.2, x0: 0.5 }
+  { law: 'threshold', A: 1, k: 0.7, x0: 1 },
+  { law: 'threshold', A: 2, k: 1.2, x0: 0.5 }
 ];
 const numD = (f, x, h = 1e-6) => (f(x + h) - f(x - h)) / (2 * h);
 
@@ -186,23 +186,23 @@ for (const L of laws) {
 
 // Diminishing marginal product does not mean decreasing returns: alpha = beta = 0.6.
 {
-  const s = { tech: 'cobb', delta: 0.5, nu: 1.2, A: 1, rho: 0 };
+  const s = { tech: 'cobb', delta: 0.5, k: 1.2, A: 1, rho: 0 };
   assert.ok(M.mp1Slope(2, 1, s) < 0 && M.elasticityOfScale(2, 1, s) > 1);
   checks++;
 }
 
 // Parameters in the notation of the lecture notes reproduce phi.
-for (const nu of [0.6, 1, 1.4]) {
+for (const k of [0.6, 1, 1.4]) {
   for (const A of [0.7, 1, 2]) {
     for (const delta of [0.2, 0.5, 0.75]) {
-      const base = { A, nu, delta, rho: 0 };
+      const base = { A, k, delta, rho: 0 };
       for (const [z1, z2] of [[1, 3], [2.2, 0.4], [0.5, 0.5]]) {
         let s = { ...base, tech: 'cobb' }, p = M.notesParams(s);
         close(M.output(z1, z2, s), A * Math.pow(z1, p.alpha) * Math.pow(z2, p.beta), 1e-9, 'notes CD');
         s = { ...base, tech: 'leontief' }; p = M.notesParams(s);
-        close(M.output(z1, z2, s), Math.pow(Math.min(p.a * z1, p.b * z2), nu), 1e-9, 'notes Leontief');
+        close(M.output(z1, z2, s), Math.pow(Math.min(p.a * z1, p.b * z2), k), 1e-9, 'notes Leontief');
         s = { ...base, tech: 'linear' }; p = M.notesParams(s);
-        close(M.output(z1, z2, s), Math.pow(p.a * z1 + p.b * z2, nu), 1e-9, 'notes linear');
+        close(M.output(z1, z2, s), Math.pow(p.a * z1 + p.b * z2, k), 1e-9, 'notes linear');
         checks += 3;
       }
     }
@@ -211,7 +211,7 @@ for (const nu of [0.6, 1, 1.4]) {
 
 // Exercise 2 of the notes: Cobb-Douglas at z = (1, 3) has MRTS = 3 alpha / beta and e = alpha + beta.
 {
-  const alpha = 0.3, beta = 0.6, s = { tech: 'cobb', A: 2, delta: alpha / (alpha + beta), nu: alpha + beta, rho: 0 };
+  const alpha = 0.3, beta = 0.6, s = { tech: 'cobb', A: 2, delta: alpha / (alpha + beta), k: alpha + beta, rho: 0 };
   close(M.mrts(1, 3, s), 3 * alpha / beta);
   close(M.elasticityOfScale(1, 3, s), alpha + beta);
   checks += 2;

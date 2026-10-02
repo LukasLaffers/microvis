@@ -30,7 +30,7 @@
             <strong>Substitution</strong> means walking along one contour line: output stays at <span class="tex" data-tex="\bar q"></span> while the input mix changes. The slope of the isoquant is <span class="tex" data-tex="-MRTS_{21}"></span>, and <span class="tex" data-tex="\sigma"></span> measures how strongly the input mix reacts to the <span class="tex" data-tex="MRTS"></span> (how flat the isoquant is).
             <strong>Scale</strong> means walking straight up the hill along a ray from the origin: all inputs grow by the same factor <span class="tex" data-tex="\lambda"></span>. The elasticity of scale <span class="tex" data-tex="e(\bar z)"></span> says by how many percent output grows when all inputs grow by 1%.
             <strong>One input</strong> walks parallel to an axis: only <span class="tex" data-tex="z_1"></span> changes, and the slope is the marginal product <span class="tex" data-tex="\phi_1"></span>.</p>
-          <p>Every technology here is <span class="tex" data-tex="\phi(z)=F\big(g(z)\big)"></span> with <span class="tex" data-tex="g"></span> homogeneous of degree one: <span class="tex" data-tex="g"></span> shapes the isoquants (substitution), <span class="tex" data-tex="F"></span> labels them (scale). With <span class="tex" data-tex="F(x)=Ax^{\nu}"></span> the function is homogeneous and <span class="tex" data-tex="e=\nu"></span> everywhere; the other choices are homothetic, and <span class="tex" data-tex="e(\bar z)"></span> changes along the ray.</p>
+          <p>Every technology here is <span class="tex" data-tex="\phi(z)=F\big(g(z)\big)"></span> with <span class="tex" data-tex="g"></span> homogeneous of degree one: <span class="tex" data-tex="g"></span> shapes the isoquants (substitution), <span class="tex" data-tex="F"></span> labels them (scale). With <span class="tex" data-tex="F(x)=Ax^{k}"></span> the function is homogeneous and <span class="tex" data-tex="e=k"></span> everywhere; the other choices are homothetic, and <span class="tex" data-tex="e(\bar z)"></span> changes along the ray.</p>
         </details>
       </div>
 
@@ -61,12 +61,12 @@
       <div class="group">
         <h2>Output along a ray</h2>
         <select id="law" aria-label="Scale law">
-          <option value="power">Homogeneous: F(x) = A·x^ν</option>
+          <option value="power">Homogeneous: F(x) = A·x^k</option>
           <option value="ultra">S-shaped (ultra passum)</option>
           <option value="threshold">Set-up threshold</option>
         </select>
         <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="power|threshold"></div>
-        <div class="ctrl" data-key="nu" data-label="\nu" data-hint="degree of homogeneity" data-min="0.4" data-max="1.6" data-step="0.05" data-show="noab power|threshold"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.4" data-max="1.6" data-step="0.05" data-show="noab power|threshold"></div>
         <div class="ctrl" data-key="qmax" data-label="q_{\max}" data-hint="output ceiling" data-min="1.5" data-max="10" data-step="0.1" data-show="ultra"></div>
         <div class="ctrl" data-key="c" data-label="c" data-hint="scale of half the ceiling" data-min="0.5" data-max="6" data-step="0.1" data-show="ultra"></div>
         <div class="ctrl" data-key="kappa" data-label="\kappa" data-hint="steepness" data-min="1.1" data-max="6" data-step="0.1" data-show="ultra"></div>
