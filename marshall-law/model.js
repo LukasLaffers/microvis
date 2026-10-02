@@ -8,7 +8,7 @@
  *   Marshall   (-eps^u_11) = sigma (1 - sh_1) + (-eps^D_p) sh_1
  * Industry demand: Dem(p) = B p^eps with constant price elasticity eps < 0.
  *
- * Works in the browser (window.DerivedDemandModel, needs window.FirmModel) and in Node.
+ * Works in the browser (window.MarshallModel, needs window.FirmModel) and in Node.
  */
 (function (root) {
   'use strict';
@@ -72,7 +72,14 @@
     return { before: a, after: b, D0, D1, pct: D1 / D0 - 1, approx: elasticities(w, s, dem).epsU * r };
   }
 
-  const api = { crs, demand, unitCost, equilibrium, industryDemand1, conditional1, sigmaTheorem1, elasticities, sigmaFormula, marshall, whatIf };
+  // A technology with elasticity of substitution sigma and the same delta: CES, or Cobb-Douglas at sigma = 1.
+  const withSigma = (s, sigma) => Math.abs(sigma - 1) < 1e-9 ? { ...s, tech: 'cobb' } : { ...s, tech: 'ces', rho: 1 - 1 / sigma };
+  // Marshall's rules: |eps^u_11| as sigma, -eps^D_p, or the wage (and with it sh_1) varies, the rest fixed.
+  const ruleSigma = (w, s, dem, sigmas) => sigmas.map(sg => [sg, -marshall(w, withSigma(s, sg), dem).epsU]);
+  const ruleEta = (w, s, dem, etas) => etas.map(e => [e, -marshall(w, s, { ...dem, eps: -e }).epsU]);
+  const ruleShare = (w, s, dem, w1s) => w1s.map(v => { const m = marshall([v, w[1]], s, dem); return [m.sh1, -m.epsU, v]; });
+
+  const api = { withSigma, ruleSigma, ruleEta, ruleShare, crs, demand, unitCost, equilibrium, industryDemand1, conditional1, sigmaTheorem1, elasticities, sigmaFormula, marshall, whatIf };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else root.DerivedDemandModel = api;
+  else root.MarshallModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

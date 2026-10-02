@@ -3,3 +3,5 @@
 .main-panel .panel-head + .plot { margin-top: 4px; }
 .main-panel .caption + .panel-head { margin-top: 18px; }
 @media (max-width: 800px) { .plot-lever { height: 260px; } }
+.plot-rules { height: 230px; }
+.hint-line { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
