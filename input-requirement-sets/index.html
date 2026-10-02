@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Input Requirement Sets · Microvis</title>
+  <meta name="description" content="Input requirement sets and isoquants: test free disposal, convexity and constant returns to scale by moving points. Lecture 1.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <h1>Input Requirement Sets</h1>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The shaded area is the input requirement set <span class="tex" data-tex="Z(q)=\{z:\phi(z)\ge q\}"></span>: all input bundles that can produce at least <span class="tex" data-tex="q"></span>. Its lower boundary is the isoquant <span class="tex" data-tex="I(q)"></span>.</p>
+          <p>Drag the points <span class="c-accent-2"><span class="tex" data-tex="z"></span></span> and <span class="c-accent-4"><span class="tex" data-tex="z'"></span></span> (or tap to move the nearer one) and watch the three assumptions of the notes being checked: <strong>free disposal</strong> (more inputs never hurt), <strong>convexity</strong> (mixing two bundles that work also works) and <strong>constant returns to scale</strong> (doubling inputs doubles what can be produced).</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <select id="preset" aria-label="Technology">
+          <option value="smooth">Smooth and convex</option>
+          <option value="activities">Kinked: a few activities</option>
+          <option value="nonconvex">Not convex</option>
+          <option value="leontief">Leontief (fixed proportions)</option>
+          <option value="congestion">Congestion: no free disposal</option>
+          <option value="exercise">Exercise 1 of the notes</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <p class="note" id="preset-note"></p>
+      </div>
+
+      <div class="group" data-show="notex">
+        <h2>Output level</h2>
+        <div class="ctrl" data-key="q" data-label="q" data-hint="the set Z(q)" data-min="0.5" data-max="3" data-step="0.05"></div>
+      </div>
+
+      <div class="group" data-show="ex">
+        <h2>Exercise 1</h2>
+        <label class="check"><input type="checkbox" id="mix" checked> Activities can be mixed (divisibility)</label>
+        <label class="check"><input type="checkbox" id="ex-q2"> <span>(ii) Show <span class="tex" data-tex="I(2)"></span> under constant returns</span></label>
+        <p class="note">Activities <span class="tex" data-tex="z^1=(0.2,0.5),\ z^2=(0.3,0.2),\ z^3=(0.5,0.1)"></span> each produce one unit. (iii) asks whether <span class="tex" data-tex="z^4=(0.25,0.5)"></span> is on <span class="tex" data-tex="I(1)"></span>.</p>
+      </div>
+
+      <div class="group">
+        <h2>Points</h2>
+        <div class="pair-row"><span class="who c-accent-2"><span class="tex" data-tex="z"></span></span>(<input type="number" id="z-1" step="0.05" aria-label="z, first input"> , <input type="number" id="z-2" step="0.05" aria-label="z, second input">)</div>
+        <div class="pair-row"><span class="who c-accent-4"><span class="tex" data-tex="z'"></span></span>(<input type="number" id="zp-1" step="0.05" aria-label="z prime, first input"> , <input type="number" id="zp-2" step="0.05" aria-label="z prime, second input">)</div>
+        <div class="ctrl" data-key="lambda" data-label="\lambda" data-hint="position of the mixed point" data-min="0" data-max="1" data-step="0.01"></div>
+        <p class="note">Drag a point in the plot, or tap anywhere to move the nearer one there.</p>
+      </div>
+
+      <div class="group">
+        <h2>Show</h2>
+        <label class="check"><input type="checkbox" id="show-fd" checked> <span>Free disposal: everything above and to the right of <span class="tex" data-tex="z"></span></span></label>
+        <label class="check"><input type="checkbox" id="show-cv" checked> <span>Convexity: the segment from <span class="tex" data-tex="z"></span> to <span class="tex" data-tex="z'"></span></span></label>
+        <label class="check"><input type="checkbox" id="show-rs"> <span>Returns to scale: <span class="tex" data-tex="2\cdot I(q)"></span> against <span class="tex" data-tex="I(2q)"></span></span></label>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Input requirement set">
+      <div class="panel-head">
+        <h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2>
+      </div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption"><span class="c-accent">shaded: <span class="tex" data-tex="Z(q)"></span>, <span class="key"></span>boundary: the isoquant <span class="tex" data-tex="I(q)"></span></span>;
+        <span class="c-accent-2"><span class="key dot"></span><span class="tex" data-tex="z"></span></span>, <span class="c-accent-4"><span class="key dot"></span><span class="tex" data-tex="z'"></span></span>, <span class="c-muted"><span class="key dot"></span><span class="tex" data-tex="z^{\lambda}"></span></span>; a red ✕ marks a point that breaks an assumption.
+        <span data-show="rs"><span class="c-accent-2"><span class="key dash"></span><span class="tex" data-tex="2\cdot I(q)"></span></span> (every point of <span class="tex" data-tex="I(q)"></span> doubled) and <span class="c-accent"><span class="key dash"></span><span class="tex" data-tex="I(2q)"></span></span>: they coincide exactly under constant returns.</span></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Checks" aria-live="polite">
+        <h2>Assumptions at these points</h2>
+        <ul class="checks" id="checks"></ul>
+      </section>
+      <section class="panel readouts" aria-label="This technology">
+        <h2>This technology overall</h2>
+        <ul class="checks" id="global"></ul>
+        <p class="sentence" id="sentence"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
