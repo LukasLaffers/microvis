@@ -314,3 +314,17 @@ details.howto p { margin: 8px 0 0; }
   .plot-2d { height: 300px; }
   .site-header h1 { font-size: 22px; }
 }
+
+.status-banner {
+  max-width: 1600px;
+  margin: 0 auto 14px;
+  padding: 10px 16px;
+  border: 1px solid var(--dec);
+  border-radius: var(--radius);
+  color: var(--dec);
+  background: var(--panel);
+  font-size: 14px;
+}
+.status-banner p { margin: 0; }
+.status-banner p + p { margin-top: 4px; }
+@media (max-width: 1632px) { .status-banner { margin-left: 16px; margin-right: 16px; } }

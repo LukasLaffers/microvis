@@ -523,11 +523,32 @@
     renderFormula();
     renderBadge();
     const th = theme();
-    draw3d(th);
-    drawA(th);
-    drawB(th);
-    renderReadouts();
+    // Draw each panel on its own, so one failing plot does not blank the others.
+    guard('3D plot', () => draw3d(th));
+    guard('input-space plot', () => drawA(th));
+    guard('second plot', () => drawB(th));
+    guard('readouts', renderReadouts);
   }
+
+  // ---------- errors: show them on the page, not only in the console ----------
+
+  const reported = new Set();
+  function showError(msg) {
+    if (reported.has(msg)) return;
+    reported.add(msg);
+    const box = $('status');
+    box.hidden = false;
+    box.insertAdjacentHTML('beforeend', `<p></p>`);
+    box.lastElementChild.textContent = msg;
+  }
+  function guard(what, fn) {
+    try { fn(); } catch (err) { showError(`Could not draw the ${what}: ${err && err.message ? err.message : err}`); }
+  }
+  window.addEventListener('error', ev => { if (ev.message) showError(`Error: ${ev.message}`); });
+  window.addEventListener('unhandledrejection', ev => {
+    const r = ev.reason;
+    showError(`Error: ${r && r.message ? r.message : r}`);
+  });
 
   // ---------- init ----------
 
@@ -564,10 +585,12 @@
     }
   }
 
-  if (!M || !window.Plotly) {
-    document.querySelector('main').insertAdjacentHTML('afterbegin',
-      '<p class="warn">Could not load the plotting library. Check the internet connection and reload the page.</p>');
+  if (!window.Plotly) {
+    showError('Could not load the plotting library (Plotly from cdnjs.cloudflare.com). Check the internet connection, ' +
+      'or turn off content blockers for this page, and reload.');
     return;
   }
-  init();
+  if (!M) { showError('Could not load model.js.'); return; }
+  if (!window.katex) showError('Could not load KaTeX from cdnjs.cloudflare.com: formulas are shown as plain TeX.');
+  guard('page', init);
 })();
