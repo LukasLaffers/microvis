@@ -38,3 +38,6 @@ $w_E=2$ (with $\eta\approx4.923$): $c^E=5$, $c^K=4$, $q_E=5$, $q_K=15$; firms $(
 
 ## Done when
 The notes' numbers are reproduced exactly; firm bundles stay on their rays while the aggregate ray rotates; $\hat\sigma$ shown and tested; no console errors; works at 375 px.
+
+## As built
+As specified. The default $\eta$ is exactly $\ln3/\ln(5/4)$, so "Notes example" (animates $w_E$ from 1 to 2) lands on outputs 5 and 15 and totals $(25,35)$. Open circles mark the bundles at $w_E=w_K=1$; arrows show the moves. The econometrician's panel uses 11 energy prices from 0.5 to 3. Test: `node substitution-or-composition/test-model.cjs` (382 checks; also the closed form $\hat\sigma=\eta/9$ at equal prices, 0.547 for the notes' $\eta$). The Translog tool's small two-firm demo links here.
