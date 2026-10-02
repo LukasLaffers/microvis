@@ -1,0 +1,3 @@
+/* From Firms to Market Supply: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-three { height: 420px; }
+@media (max-width: 800px) { .plot-three { height: 340px; } }
