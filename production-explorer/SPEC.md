@@ -1,6 +1,6 @@
 # Production Explorer — specification
 
-Lecture: ECO401 Lecture 1, *Production theory: substitution and scale properties*.
+Lecture: Lecture 1, *Production theory: substitution and scale properties*.
 Goal: let students see the difference between **substitution** (walking along a contour line of the production "hill") and **scale** (walking straight up the hill along a ray from the origin).
 
 ## Status
@@ -29,7 +29,7 @@ API: `g, output, gLevel, pointOnIsoquant(q, r, s), kinkMix(s), isoquant(q, s, zm
 
 ## Page layout
 
-Header: eyebrow "ECO401 · Lecture 1 · Theory of the firm", title "Production Explorer", a link back to the Microvis index.
+Header: eyebrow "Lecture 1 · Theory of the firm", title "Production Explorer", a link back to the Microvis index.
 
 Three areas (desktop): controls on the left, 3D plot in the middle, two stacked 2D panels + readouts on the right. On a phone everything stacks.
 
