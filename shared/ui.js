@@ -65,17 +65,24 @@
       el, range, box, min, max, hintEl: el.querySelector('.hint'),
       sync() {
         const v = state[key];
-        range.value = log ? Math.log10(clampTo(v, min, max)) : clampTo(v, min, max);
+        range.value = log ? Math.log10(clampTo(v, c.min, c.max)) : clampTo(v, c.min, c.max);
         if (document.activeElement !== box) box.value = v.toFixed(dec);
       },
       // Set from the user: rounded to the step and kept inside [min, max].
       set(v) {
         if (!Number.isFinite(v)) return;
-        v = round(clampTo(v, min, max));
+        v = round(clampTo(v, c.min, c.max));
         if (opts.adjust) v = opts.adjust(key, v);
         state[key] = v;
         c.sync();
         if (opts.onChange) opts.onChange(key);
+      },
+      // Change the slider range (e.g. a price range that depends on other parameters).
+      setRange(lo, hi) {
+        c.min = lo; c.max = hi;
+        range.min = log ? Math.log10(lo) : lo; range.max = log ? Math.log10(hi) : hi;
+        box.min = lo; box.max = hi;
+        c.sync();
       },
       // Set exactly (e.g. "go to this point"), even outside the slider range.
       setExact(v) {
@@ -125,6 +132,7 @@
     return {
       ink: v('--ink'), muted: v('--muted'), line: v('--line'), grid: v('--grid'), panel: v('--panel'),
       accent: v('--accent'), accentSoft: v('--accent-soft'), accent2: v('--accent-2'), accent3: v('--accent-3'), accent4: v('--accent-4'), dec: v('--dec'), inc: v('--inc'),
+      blue: v('--l2-blue'), red: v('--l2-red'), orange: v('--l2-orange'), grey: v('--l2-grey'), profitFill: v('--l2-profit'),
       font: v('--font'),
       dark: v('color-scheme') === 'dark'
     };
