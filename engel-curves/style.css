@@ -1,0 +1,9 @@
+/* Income Expansion Paths and Engel Curves: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { touch-action: auto; cursor: default; aspect-ratio: 1 / 1; height: auto; max-height: 640px; }
+.seg-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+table.effects td { cursor: default; }
+table.effects td:hover { outline: 0; }
+.kind { font-size: 12px; font-weight: 700; }
+.kind.luxury { color: var(--l2-red); }
+.kind.necessity { color: var(--l2-blue); }
+.kind.inferior { color: var(--l2-orange); }

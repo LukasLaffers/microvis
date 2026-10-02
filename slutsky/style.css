@@ -1,0 +1,10 @@
+/* Substitution and Income Effects: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { touch-action: auto; cursor: default; aspect-ratio: 1 / 1; height: auto; max-height: 640px; }
+.hint-line { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+table.effects { cursor: default; }
+table.effects td { cursor: default; }
+table.effects td:hover { outline: 0; }
+.row-sub th, .row-sub td { color: var(--l2-blue); }
+.row-inc th, .row-inc td { color: var(--l2-red); }
+.badge-kind { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; border: 1px solid currentColor; }
+.c-inc { color: var(--inc); }
