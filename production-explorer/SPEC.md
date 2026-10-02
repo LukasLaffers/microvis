@@ -1,16 +1,16 @@
 # Production Explorer — specification
 
-Lecture: ECO401 Lecture 1, *Production theory: substitution and scale properties*.
+Lecture: Lecture 1, *Production theory: substitution and scale properties*.
 Goal: let students see the difference between **substitution** (walking along a contour line of the production "hill") and **scale** (walking straight up the hill along a ray from the origin).
 
 ## Status
 
-- `model.js` — done and tested (`node production-explorer/test-model.cjs`, ~750k checks pass).
-- `index.html`, `app.js`, `shared/style.css`, root `index.html` — **to build**.
+- Built: `model.js` (tested, `node production-explorer/test-model.cjs`), `index.html`, `app.js`.
+- Second round (from the lecture notes): a **One input** mode (Figure 10–11), homothetic scale laws with a local elasticity of scale (Figure 14, section 7), and the notation of the notes (α, β; a, b). See "Additions" at the end.
 
-## Model (already in `model.js`)
+## Model (`model.js`)
 
-Every technology is $\phi(z) = A\, g(z)^{\nu}$ with $g$ homogeneous of degree one, so $\phi$ is homogeneous of degree $\nu$:
+Every technology is $\phi(z) = F(g(z))$ with $g$ homogeneous of degree one. With the default scale law $F(x)=A x^{k}$, $\phi$ is homogeneous of degree $k$:
 
 | Technology | $g(z_1,z_2)$ | $\sigma$ |
 |---|---|---|
@@ -19,23 +19,23 @@ Every technology is $\phi(z) = A\, g(z)^{\nu}$ with $g$ homogeneous of degree on
 | Linear (`linear`) | $\delta z_1 + (1-\delta) z_2$ | $\infty$ |
 | Leontief (`leontief`) | $\min\{z_1/\delta,\ z_2/(1-\delta)\}$ | 0 |
 
-Parameters: `A` (0.5–3, default 1), `delta` (0.1–0.9, default 0.5), `rho` (CES only, −5 to 0.9, default −0.5), `nu` (0.4–1.6, step 0.05, default 1).
+Parameters: `A` (0.5–3, default 1), `delta` (0.1–0.9, default 0.5), `rho` (CES only, −5 to 0.9, default −0.5), `k` (0.4–1.6, step 0.05, default 1).
 Key teaching facts the UI should make visible:
-- $MRTS_{21} = g_1/g_2$ does **not** depend on $A$ or $\nu$: scale does not change substitution.
-- $e(z) = \nu$ everywhere; $\nu<1,=1,>1$ ⇔ decreasing, constant, increasing returns to scale.
-- For Cobb-Douglas show the exponents as $\alpha = \delta\nu$, $\beta = (1-\delta)\nu$ (the lecture writes $A z_1^\alpha z_2^\beta$, and $e = \alpha+\beta$).
+- $MRTS_{21} = g_1/g_2$ does **not** depend on $A$ or $k$: scale does not change substitution.
+- $e(z) = k$ everywhere; $k<1,=1,>1$ ⇔ decreasing, constant, increasing returns to scale.
+- For Cobb-Douglas show the exponents as $\alpha = \delta k$, $\beta = (1-\delta)k$ (the lecture writes $A z_1^\alpha z_2^\beta$, and $e = \alpha+\beta$).
 
-API: `g, output, gLevel, pointOnIsoquant(q, r, s), kinkMix(s), isoquant(q, s, zmax), mrts(z1, z2, s)` (number, `Infinity`, `0`, or `null` at the Leontief kink), `sigma(s), scaleElasticity(s), returnsLabel(nu)`. State object `s = {tech, A, delta, rho, nu}`.
+API: `g, gGrad, F, Fprime, gLevel, elasticityF, output, pointOnIsoquant(q, r, s), kinkMix(s), isoquant(q, s, zmax), marginalProducts(z1, z2, s), mrts(z1, z2, s)` (number, `Infinity`, `0`, or `null` at the Leontief kink), `sigma(s), elasticityOfScale(z1, z2, s), scaleElasticity(s)` (k, or null when it varies), `lambdaForOutput(q, zb, s), unitElasticityLevel(s), mp1Slope(z1, z2, s), notesParams(s), returnsLabel(e)`. State object `s = {tech, delta, rho, law, A, k, qmax, c, kappa, x0}`.
 
 ## Page layout
 
-Header: eyebrow "ECO401 · Lecture 1 · Theory of the firm", title "Production Explorer", a link back to the Microvis index.
+Header: eyebrow "Lecture 1 · Theory of the firm", title "Production Explorer", a link back to the Microvis index.
 
 Three areas (desktop): controls on the left, 3D plot in the middle, two stacked 2D panels + readouts on the right. On a phone everything stacks.
 
 ### Controls
 1. **Technology**: select + formula rendered with KaTeX, with current numbers substituted.
-2. **Parameters**: sliders with numeric inputs for $A$, $\delta$, $\rho$ (CES only), $\nu$. Next to $\nu$ a badge: "decreasing / constant / increasing returns to scale".
+2. **Parameters**: sliders with numeric inputs for $A$, $\delta$, $\rho$ (CES only), $k$. Next to $k$ a badge: "decreasing / constant / increasing returns to scale".
 3. **Mode** toggle: **Substitution** | **Scale**.
 4. Mode controls:
    - Substitution: output level $\bar q$ (default 2); input mix $z_2/z_1$ on a log slider from 0.1 to 10 (default 1) that moves the point $\bar z$ along the isoquant.
@@ -51,21 +51,32 @@ Three areas (desktop): controls on the left, 3D plot in the middle, two stacked 
 
 ### 2D panel A: input space $(z_1, z_2)$
 - Substitution: the isoquant $\bar q$, point $\bar z$, tangent line with slope $-MRTS_{21}$ (vertical at MRTS = ∞, horizontal at 0, none at the kink); faint ray through $\bar z$.
-- Scale: isoquants $q = 1,\dots,5$ labelled; the ray; dots where the ray crosses each isoquant (at $\lambda_k = k^{1/\nu}$, so they are evenly spaced under CRS, spread out under DRS, bunched under IRS); current point $\lambda\bar z$.
+- Scale: isoquants $q = 1,\dots,5$ labelled; the ray; dots where the ray crosses each isoquant (at $\lambda_k = k^{1/k}$, so they are evenly spaced under CRS, spread out under DRS, bunched under IRS); current point $\lambda\bar z$.
 
 ### 2D panel B
 - Substitution: "How the input mix responds to the MRTS" — log–log plot of $z_2/z_1$ (y) against $MRTS_{21}$ (x) for mixes 0.1–10 along the isoquant. Slope = $\sigma$. Linear: vertical line; Leontief: horizontal line at the kink mix. Mark the current point.
-- Scale: output along the ray, $\phi(\lambda\bar z) = \lambda^{\nu}$ against $\lambda$, with the dashed CRS reference line $q=\lambda$. Mark the current $\lambda$.
+- Scale: output along the ray, $\phi(\lambda\bar z) = \lambda^{k}$ against $\lambda$, with the dashed CRS reference line $q=\lambda$. Mark the current $\lambda$.
 
 ### Readouts (live)
 - Substitution: $\bar z = (z_1, z_2)$, $\bar q$, $MRTS_{21}$ (∞ / 0 / "undefined at the kink"), $\sigma$, $z_2/z_1$.
-- Scale: $\lambda$, inputs ×$\lambda$, output ×$\lambda^\nu$, elasticity of scale $e = \nu$, returns-to-scale label. One sentence such as "Doubling all inputs multiplies output by 2^ν = 1.74."
+- Scale: $\lambda$, inputs ×$\lambda$, output ×$\lambda^k$, elasticity of scale $e = k$, returns-to-scale label. One sentence such as "Doubling all inputs multiplies output by 2^k = 1.74."
 
 ### "How to read this" (collapsible)
-Three or four sentences connecting to the lecture: contour lines = isoquants; substitution = moving along one; scale = moving along a ray; MRTS is the slope; σ measures curvature; ν is the elasticity of scale.
+Three or four sentences connecting to the lecture: contour lines = isoquants; substitution = moving along one; scale = moving along a ray; MRTS is the slope; σ measures curvature; k is the elasticity of scale.
 
 ## Root `index.html`
 Title "Microvis — Visualizations for Microeconomic theory", one card for Production Explorer ("Lecture 1: scale and substitution properties of production functions") linking to `production-explorer/`.
 
 ## Done when
-- Tests pass; page loads with no console errors; all four technologies and both modes work; $\nu$ slider visibly changes isoquant spacing in Scale mode but not the MRTS in Substitution mode; works at 375 px width.
+- Tests pass; page loads with no console errors; all four technologies and both modes work; $k$ slider visibly changes isoquant spacing in Scale mode but not the MRTS in Substitution mode; works at 375 px width.
+
+## Additions (second round, from the lecture notes)
+
+### Scale laws (Figure 14 and section 7: homothetic functions, local elasticity of scale)
+Select "Output along a ray": `power` $F(x)=Ax^k$ (homogeneous, $e=k$ everywhere); `ultra` $F(x)=q_{\max}\frac{(x/c)^\kappa}{1+(x/c)^\kappa}$ (S-shaped, Frisch's "regular ultra passum law": $e$ falls from $\kappa$ to 0, increasing then decreasing returns along the same ray); `threshold` $F(x)=A\max\{0,x-x_0\}^k$. All are homothetic, so MRTS and σ never change with the law. Scale mode plots $e(\lambda\bar z)$ on a second axis and marks where $e=1$ (output per unit of scale peaks).
+
+### One input mode (Figures 10 and 11)
+$z_2=\bar z_2$ fixed, $z_1$ varies. 3D: vertical plane $z_2=\bar z_2$ with the curve on the hill and the tangent of slope $\phi_1$. Input space: the path and the isoquants it crosses at $z_1=1,2,\dots$ with their output labels. Second panel: total product with tangent (top), marginal product $\phi_1$ and average product $\phi/z_1$ (bottom). Readouts: $\phi_1$, $\phi/z_1$, $\phi_{11}$, $e(\bar z)$, and the sentence contrasting diminishing marginal product with returns to scale (e.g. $\alpha=\beta=0.6$). Buttons reproduce the four shapes of Figure 10 (concave, linear-then-flat, S-shaped, threshold).
+
+### Notation of the notes
+Cobb-Douglas can be entered as $A z_1^\alpha z_2^\beta$ directly (checkbox, on by default). Linear and Leontief show the notes' form $(az_1+bz_2)^k$, $(\min\{az_1,bz_2\})^k$ with the numbers. "Go to $\bar z$" places the point exactly, e.g. $(1,3)$ for Exercise 2.

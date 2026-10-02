@@ -1,0 +1,3 @@
+/* Cost Minimisation: tool-specific styles (shared look is in ../shared/style.css). */
+#cbar-num { width: 80px; }
+.plot-main { touch-action: auto; cursor: default; }

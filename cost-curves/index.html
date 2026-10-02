@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cost Curves and Supply · Microvis</title>
+  <meta name="description" content="Step 2 of profit maximisation: choose output where price equals marginal cost, above minimum average cost. The supply curve S(w,p). Lecture 2.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 2 · Theory of the firm</p>
+      <h1>Cost Curves and Supply</h1>
+      <p class="subtitle"><span class="tex" data-tex="\max_{q\ge0}\ pq-C(w,q)\qquad\text{(PM')}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The <span class="c-l2-red">red curve</span> is marginal cost <span class="tex" data-tex="MC=C_q"></span>, the black curve average cost <span class="tex" data-tex="AC=C/q"></span>. For a price <span class="tex" data-tex="p"></span> the firm produces where <span class="tex" data-tex="p=MC"></span> on the rising part of <span class="tex" data-tex="MC"></span>. It produces only if <span class="tex" data-tex="p\ge AC"></span>; otherwise it shuts down. The <span class="c-l2-orange">orange curve</span> is therefore the supply curve <span class="tex" data-tex="S(w,p)"></span>.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Returns to scale</h2>
+        <div class="seg" role="group" aria-label="Returns to scale">
+          <button type="button" data-profile="ushape" aria-pressed="true">U-shaped average cost</button>
+          <button type="button" data-profile="homog" aria-pressed="false">Homogeneous of degree k</button>
+        </div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="where increasing returns turn into decreasing" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="m" data-label="m" data-hint="lowest marginal cost / c(w)" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="" data-min="0.3" data-max="1.6" data-step="0.05" data-show="homog"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="homog"></div>
+        <div class="formula" id="formula-G"></div>
+      </div>
+
+      <div class="group">
+        <h2>Output price</h2>
+        <div class="ctrl" data-key="p" data-label="p" data-hint="price of output" data-min="0" data-max="20" data-step="0.05"></div>
+      </div>
+
+      <div class="group">
+        <details class="sub-details">
+          <summary>Input prices and technology — only shift the curves up or down</summary>
+          <div class="ctrl" data-key="w1" data-label="w_1" data-hint="price of input 1" data-min="0.2" data-max="5" data-step="0.05"></div>
+          <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
+          <select id="tech" aria-label="Technology">
+            <option value="cobb">Cobb-Douglas</option>
+            <option value="ces">CES</option>
+            <option value="linear">Linear (perfect substitutes)</option>
+            <option value="leontief">Leontief (perfect complements)</option>
+          </select>
+          <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+          <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+          <p class="note" id="unit-cost"></p>
+          <p class="note">These only change <span class="tex" data-tex="c(w)"></span> in <span class="tex" data-tex="C(w,q)=c(w)\,G(q)"></span>: all cost curves are stretched vertically by the same factor. The shape of the curves comes from returns to scale.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Plot range</h2>
+        <div class="ctrl" data-key="qmax" data-label="q_{\max}" data-hint="output axis" data-min="2" data-max="15" data-step="0.5"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Marginal and average cost">
+      <div class="panel-head"><h2>Marginal and average cost</h2></div>
+      <div id="plot" class="plot plot-main plot-cost"></div>
+      <p class="caption"><span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="MC=C_q"></span></span>, <span class="c-ink"><span class="key"></span><span class="tex" data-tex="AC=C/q"></span></span>, <span class="c-l2-orange"><span class="key"></span>supply curve <span class="tex" data-tex="S(w,p)"></span></span>, <span class="c-muted"><span class="key dash"></span>price <span class="tex" data-tex="p"></span></span>; the green rectangle is the profit <span class="tex" data-tex="\Pi(w,p)=q^\ast\,(p-AC(q^\ast))"></span>.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Revenue and cost">
+        <h2>Revenue and cost</h2>
+        <div id="plotR" class="plot plot-2d"></div>
+        <p class="caption"><span class="c-ink"><span class="key dash"></span>revenue <span class="tex" data-tex="pq"></span></span> and <span class="c-l2-red"><span class="key"></span>cost <span class="tex" data-tex="C(w,q)"></span></span>; the arrow is the largest gap, the profit.</p>
+      </section>
+      <section class="panel" aria-label="Profit">
+        <h2>Profit</h2>
+        <div id="plotP" class="plot plot-2d"></div>
+        <p class="caption"><span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="pq-C(w,q)"></span></span> against the outside option 0 (producing nothing).</p>
+      </section>
+      <section class="panel readouts" aria-label="Key numbers" aria-live="polite">
+        <h2>Key numbers</h2>
+        <dl id="readouts"></dl>
+        <p class="sentence" id="sentence"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/firm-ui.js"></script>
+  <script src="../shared/firm-model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
