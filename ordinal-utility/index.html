@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Utility Is Ordinal · Microvis</title>
+  <meta name="description" content="Two utility functions represent the same preferences when one is an increasing transformation of the other: same rankings, same indifference curves. Quasi-concavity, Theorem 1 and the marginal rate of substitution. Lecture 5.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 5 · Consumer preferences</p>
+      <h1>Utility Is Ordinal</h1>
+      <p class="subtitle"><span class="tex" data-tex="x\succcurlyeq y\iff U(x)\ge U(y)\iff f\big(U(x)\big)\ge f\big(U(y)\big)\quad\text{when } f'>0"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Left, a utility function <span class="tex" data-tex="U"></span>; right, <span class="tex" data-tex="V=f(U)"></span>. The surfaces have different heights, but the black indifference curve through <span class="tex" data-tex="x^\circ"></span> is the same curve in both, and every pair of bundles is ranked the same way, as long as <span class="tex" data-tex="f"></span> is increasing. Utility only orders bundles; how much higher a number is means nothing. On the right side: the indifference curve, the gradient <span class="tex" data-tex="\nabla U(x^\circ)"></span> and the tangent line. Along the tangent, a quasi-concave <span class="tex" data-tex="U"></span> is highest at <span class="tex" data-tex="x^\circ"></span> (Theorem 1).</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Utility function</h2>
+        <select id="type" aria-label="Utility function">
+          <option value="cobb">Cobb-Douglas</option>
+          <option value="ces">CES</option>
+          <option value="subs">Perfect substitutes</option>
+          <option value="concave">Bowed out (not quasi-concave)</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="curvature (ρ < 1, ρ ≠ 0)" data-min="-4" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+      <div class="group">
+        <h2>Transformation</h2>
+        <select id="transform" aria-label="Transformation">
+          <option value="log">V = log U</option>
+          <option value="sqrt">V = √U</option>
+          <option value="exp">V = exp(U/3)</option>
+          <option value="affine">V = 10 + 5U</option>
+          <option value="id">V = U</option>
+          <option value="neg">V = −U (decreasing)</option>
+        </select>
+      </div>
+      <div class="group">
+        <h2>Bundles</h2>
+        <div class="ctrl" data-key="a1" data-label="x^\circ_1" data-hint="" data-min="0.5" data-max="9.5" data-step="0.1"></div>
+        <div class="ctrl" data-key="a2" data-label="x^\circ_2" data-hint="" data-min="0.5" data-max="9.5" data-step="0.1"></div>
+        <div class="ctrl" data-key="b1" data-label="x'_1" data-hint="" data-min="0.5" data-max="9.5" data-step="0.1"></div>
+        <div class="ctrl" data-key="b2" data-label="x'_2" data-hint="" data-min="0.5" data-max="9.5" data-step="0.1"></div>
+      </div>
+    </section>
+
+    <section class="panel plot3d-panel" aria-label="Two utility functions">
+      <div class="panel-head"><h2>Two different utility functions representing the same preferences</h2></div>
+      <div id="plot" class="plot plot-two3d"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Ranking" aria-live="polite">
+        <h2>Ranking</h2>
+        <dl id="rank"></dl>
+        <ul class="checks" id="rankCheck"></ul>
+      </section>
+      <section class="panel" aria-label="Theorem 1">
+        <h2>Convexity, Theorem 1 and the MRS</h2>
+        <div id="plotB" class="plot plot-2d"></div>
+        <div id="plotC" class="plot plot-small"></div>
+        <ul class="checks" id="thm"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

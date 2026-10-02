@@ -1,0 +1,4 @@
+/* Utility Is Ordinal: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-two3d { height: 560px; }
+.plot-small { height: 190px; }
+@media (max-width: 800px) { .plot-two3d { height: 440px; } }

@@ -1,0 +1,6 @@
+/* Budget Sets: tool-specific styles (shared look is in ../shared/style.css). */
+/* Segmented buttons on a 2-column grid; the 1px gaps show the line colour as separators. */
+.seg-4, .seg-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
+.seg-4 button + button, .seg-3 button + button { border-left: 0; }
+.seg-3 button:last-child { grid-column: 1 / -1; }
+.plot-main { cursor: crosshair; touch-action: manipulation; }
