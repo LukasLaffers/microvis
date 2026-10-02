@@ -1,0 +1,30 @@
+/* Translog Cost Shares: tool-specific styles (shared look is in ../shared/style.css). */
+.main-panel .caption + .panel-head { margin-top: 18px; }
+.subtitle .tex { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; vertical-align: middle; }
+.subtitle .arrow { margin: 0 8px; }
+
+/* Full-width row under the plots: the published results and the aggregation example. */
+.layout > .wide { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .layout > .wide { grid-template-columns: minmax(0, 1fr); } }
+
+.ab-tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.ab-tables > div { min-width: 0; }
+.ab-tables h3 { font-size: 14px; margin: 8px 0 6px; }
+.table-scroll { overflow-x: auto; position: relative; }  /* relative: keeps KaTeX's hidden MathML inside the scroll box */
+
+table.tl { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+table.tl th, table.tl td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.tl th { color: var(--muted); font-weight: 600; }
+table.tl th:first-child, table.tl td:first-child { text-align: left; }
+table.tl .se { color: var(--muted); font-size: 11px; display: block; }
+table.tl sup { font-size: 10px; }
+table.tl tr.sum td { color: var(--muted); border-bottom: 0; }
+
+/* Colours as in the notes: own-price green, small substitution blue, complements red. */
+.ab-own { color: var(--inc); font-weight: 600; }
+.ab-sub { color: var(--l2-blue); font-weight: 600; }
+.ab-comp { color: var(--l2-red); font-weight: 600; }
+
+.plot-agg { height: 260px; }
+.elas-table td.ok { color: var(--inc); }
+.key.dotted { border-top-style: dotted; }
