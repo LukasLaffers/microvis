@@ -69,7 +69,20 @@
     }).filter(Boolean);
   }
 
-  const api = { output, decompose, decomposeDerivative, isoquantArc };
+  /*
+   * Lecture 4, (*) and (**): the marginal scale effect in closed form. By Shephard's lemma MC shifts up by
+   * dMC/dw1 = dH^1/dq per unit of w1; output falls by shift / slope of MC: d q_star / d w1 = -(dH^1/dq) / C_qq, and the
+   * scale effect on input 1 is -(1/C_qq) (dH^1/dq)^2.
+   */
+  function scaleClosedForm(w, p, s, rel = 1e-5) {
+    const q = output(w, p, s), hq = rel * Math.max(q, 1e-3), h = rel * w[0];
+    const Cqq = (FM.MC(w, q + hq, s) - FM.MC(w, Math.max(q - hq, 0), s)) / (q + hq - Math.max(q - hq, 0));
+    const dHdq = (FM.condDemand(w, q + hq, s).H[0] - FM.condDemand(w, Math.max(q - hq, 0), s).H[0]) / (q + hq - Math.max(q - hq, 0));
+    const dMCdw1 = (FM.MC([w[0] + h, w[1]], q, s) - FM.MC([w[0] - h, w[1]], q, s)) / (2 * h);
+    return { q, Cqq, dHdq, dMCdw1, dqdw1: -dHdq / Cqq, scale: -dHdq * dHdq / Cqq };
+  }
+
+  const api = { output, decompose, decomposeDerivative, isoquantArc, scaleClosedForm };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SubScaleModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

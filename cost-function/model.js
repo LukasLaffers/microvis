@@ -44,7 +44,30 @@
   // [dH/dw^t] w: zero by Euler's theorem, because H is homogeneous of degree zero in w (H3).
   const timesPrices = (M, w) => [M[0][0] * w[0] + M[0][1] * w[1], M[1][0] * w[0] + M[1][1] * w[1]];
 
-  const api = { priceEffects, fixedInputCost, costCurveInW1, linearSwitchW1, timesPrices };
+  /*
+   * Lecture 4: the area to the left of the conditional demand curve H^1(w1, w2, q) between two prices is the change
+   * in cost, because H^1 = dC/dw1 (Shephard's lemma). Simpson's rule on each smooth piece; for the linear technology
+   * H^1 jumps at the switch price, so the integral is split there.
+   */
+  function areaLeftOfH1(w2, q, s, wa, wb, n = 400) {
+    const lo = Math.min(wa, wb), hi = Math.max(wa, wb), cuts = [lo];
+    if (s.tech === 'linear') { const sw = linearSwitchW1(w2, s); if (sw > lo && sw < hi) cuts.push(sw); }
+    cuts.push(hi);
+    const H1 = w1 => FM.condDemand([w1, w2], q, s).H[0];
+    let total = 0;
+    for (let k = 0; k + 1 < cuts.length; k++) {
+      const a = cuts[k], b = cuts[k + 1], eps = 1e-7 * (b - a), h = (b - a) / n;   // eps: clear of the tie tolerance of firm-model
+      let sum = 0;
+      for (let i = 0; i <= n; i++) {
+        const x = i === 0 ? a + eps : i === n ? b - eps : a + i * h;   // stay inside the piece at a jump
+        sum += (i === 0 || i === n ? 1 : i % 2 ? 4 : 2) * H1(x);
+      }
+      total += sum * h / 3;
+    }
+    return total;
+  }
+
+  const api = { priceEffects, fixedInputCost, costCurveInW1, linearSwitchW1, timesPrices, areaLeftOfH1 };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.CostFunctionModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

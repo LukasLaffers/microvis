@@ -4,13 +4,17 @@ Lecture 4: *Comparative statics.* Content: $\mathrm{d}q^\ast/\mathrm{d}p=1/C_{qq
 
 | Folder | Title | Type | Lecture idea |
 |---|---|---|---|
-| `marshall-law/` | Marshall's Law of Derived Demand | new | $(-\varepsilon^u_{11})=\sigma(1-sh_1)+(-\varepsilon^D_p)\,sh_1$ as a weighted average |
+| `comparative-statics/` | What If? Comparative Statics | new | $\mathrm dq^\ast/\mathrm dp=1/C_{qq}$, (∗), (∗∗) checked against finite differences; both Cowell figures in the $(z_1,w_1)$ plane ($z_1^\ast\to z_1^o\to z_1^{\ast\ast}$; area left of $H^1$ = change in cost) |
+| `marshall-law/` | Marshall's Law of Derived Demand | new | $(-\varepsilon^u_{11})=\sigma(1-sh_1)+(-\varepsilon^D_p)\,sh_1$ as a weighted average (lever), inside the firm, the product market, Marshall's rules |
 | `substitution-or-composition/` | Substitution or Composition? | new | two Leontief firms: no substitution inside firms, apparent substitution in the aggregate |
+| `translog/` | Translog Cost Shares | new | translog as a second-order approximation of a CES cost function, (&), (%), (#), ($), restrictions 1–4, the Arnberg–Bjørner (2007) tables (data only) |
 | `substitution-scale-effects/` | (extension) | extend | lecture 4 formulas (∗), (∗∗): the scale effect $=-(1/C_{qq})(\partial H^1/\partial q)^2$; output response as "shift ÷ slope" |
 | `cost-function/` | (extension) | extend | area left of $H^1(w,q)$ between two prices $=$ change in cost |
-| `translog-lab/` | Translog Elasticities | optional, later | elasticities $\varepsilon^c_{ij}$, $\sigma_{ij}$ from the estimated $\beta_{ij}$ |
+| `translog-lab/` | Translog Elasticities | optional, later | elasticities $\varepsilon^c_{ij}$, $\sigma_{ij}$ from the estimated $\beta_{ij}$ with user-set shares |
 
-Specs: `marshall-law/SPEC.md`, `substitution-or-composition/SPEC.md`; extensions and the optional tool in sections 3–4 below.
+Status: all rows except the optional `translog-lab/` are built and tested. Two plans were merged here: this one (marshall-law, substitution-or-composition, the two extensions) and an earlier one (comparative-statics, derived-demand, translog); `derived-demand/` was renamed `marshall-law/` and given the panels of `marshall-law/SPEC.md`. The comparative-statics tool and the two extensions overlap on purpose: the extensions add the lecture 4 formulas to the lecture 3 pages, the new tool collects all of section 1 on one page with its own link.
+
+Specs: `comparative-statics/SPEC.md`, `marshall-law/SPEC.md`, `substitution-or-composition/SPEC.md`, `translog/SPEC.md`; extensions and the optional tool in sections 3–4 below.
 
 ## 1. Order of work
 All sessions independent; run in parallel. New-tool sessions must not edit `index.html`, `shared/*` or other tools; extension sessions edit only their tool. One small final session adds the two cards to `index.html`.
@@ -36,9 +40,9 @@ Do not build anything that solves the lecture 4 exercise (convexity of $\Pi$ in 
 **3.1 `substitution-scale-effects/` (lecture 3 tool) — add a "Lecture 4: comparative statics" panel**
 - Under the existing "Why output falls" plot, show the marginal version of (∗): the $MC$ curve shifts up by $\dfrac{\partial MC}{\partial w_1}=\dfrac{\partial H^1}{\partial q}$ per unit of $w_1$ (Shephard's lemma), and output falls by *shift ÷ slope of MC*: $\dfrac{\mathrm{d}q^\ast}{\mathrm{d}w_1}=-\dfrac{\partial H^1/\partial q}{C_{qq}}$. Draw a small right triangle at $q^\ast$: vertical side = shift (red), slope = $C_{qq}$, horizontal side = $\mathrm{d}q^\ast$.
 - In the readout table (marginal version) add the closed form (∗∗): scale effect $=-(1/C_{qq})(\partial H^1/\partial q)^2$, and check it equals the finite-difference scale effect already shown. Defaults (Cobb-Douglas $\delta=0.5$, 'ushape' $a=2,m=1$, $w=(1,1)$, $p=8$): $\partial H^1/\partial q=4$, $C_{qq}=c\,G''(q^\ast)=2\cdot2\sqrt3\approx6.928$, scale effect $=-16/6.928\approx-2.309$ ✓.
-- Eyebrow becomes "Lecture 3 · Lecture 4 · Theory of the firm".
+- Eyebrow becomes "Lecture 3 · Lecture 4 · Theory of the firm". (Done: the triangle is drawn on the "Why output falls" plot with the explanation in its caption; tests in `substitution-scale-effects/test-model.cjs`.)
 
-**3.2 `cost-function/` (lecture 3 tool) — add "Area = change in cost" panel** (lecture 4 figure, Cowell 2.14)
+**3.2 `cost-function/` (lecture 3 tool) — add "Area = change in cost" panel** (lecture 4 figure, Cowell 2.14). Done: side panel "Lecture 4: area = change in cost" with a slider and click for $w_1^o$; `areaLeftOfH1` splits the integral at the linear switch price.
 - Plot $H^1(w_1,\bar w_2,q)$ against $w_1$ (blue). Two price markers $w_1^\ast$ (= $\bar w_1$) and $w_1^o$ (draggable, default $0.5\,\bar w_1$). Shade the area to the left of the curve between them.
 - Readouts: $\int_{w_1^{*}}^{w_1^{o}}H^1(w_1,\bar w_2,q)\,\mathrm{d}w_1$ (numerical integral) and $C(w_1^o,\bar w_2,q)-C(w_1^\ast,\bar w_2,q)$ — equal (✓). Caption from the notes: "Because $H^1(w,q)=\partial C(w,q)/\partial w_1$, the shaded area … reflects the change in cost that the price fall in $w_1$ induces."
 - Test: integral equals the cost difference (all technologies; linear: integrate across the kink).

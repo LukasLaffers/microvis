@@ -123,6 +123,17 @@
       annotations.push({ x: r.qC, y: p, ax: r.qA, ay: p, axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2, arrowcolor: th.red, text: '' });
       annotations.push({ x: (r.qA + r.qC) / 2, y: p, text: `${fmt(r.qA)} → ${fmt(r.qC)}`, showarrow: false, yanchor: 'bottom', yshift: 8, font: { size: 12, color: th.red } });
     }
+    // Lecture 4, (*): to first order MC shifts up by (dH1/dq) dw1 and output falls by shift / C_qq (the triangle).
+    let tri = null;
+    if (r.qA > 0 && Math.abs(r.wNew[0] - w[0]) > 1e-9 && FM.unitDemand(w, s).kind !== 'multiple') {
+      const c = SS.scaleClosedForm(w, p, s), shift = c.dHdq * (r.wNew[0] - w[0]), dq = shift / c.Cqq;
+      if (Number.isFinite(dq) && c.Cqq > 0) {
+        tri = { shift, dq, c };
+        traces.push({ type: 'scatter', mode: 'lines', x: [r.qA, r.qA, r.qA - dq, r.qA], y: [p, p + shift, p, p], fill: 'toself', fillcolor: 'rgba(208,2,27,0.25)', line: { color: th.red, width: 2 }, hoverinfo: 'skip', name: 'first-order triangle' });
+        // (labelled in the caption below; the plot already carries the q* -> q** label)
+      }
+    }
+    $('capTri').innerHTML = tri ? `Lecture 4, (∗): by Shephard's lemma ${texStr('\\partial MC/\\partial w_1=\\partial H^1/\\partial q')} ${texStr(`=${fmt(tri.c.dHdq, 3)}`)}, so MC rises by about ${fmt(tri.shift, 3)} at ${texStr('q^\\ast')} (red side); with slope ${texStr(`C_{qq}=${fmt(tri.c.Cqq, 3)}`)} output falls by about shift ÷ slope ${texStr(`=${fmt(tri.dq, 3)}`)}: ${texStr('\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=-\\frac{\\partial H^1/\\partial q}{C_{qq}}')}.` : '';
     Plotly.react('plotB', traces, U.base2d(th, {
       xt: 'q', yt: 'p', x: { range: [0, qmax] }, y: { range: [0, yMax] }, annotations,
       shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: p, y1: p, line: { color: th.muted, width: 1.5, dash: 'dash' } }]
@@ -146,6 +157,8 @@
         const d = SS.decomposeDerivative(w, state.p, s), e = d.input1, ok = Math.abs(e.substitution + e.scale - e.total) <= 1e-4 * Math.max(1, Math.abs(e.total));
         box.innerHTML = texStr(`\\frac{\\partial D^1}{\\partial w_1}=${f(e.total)}=\\color{#4a90e2}{${f(e.substitution)}}\\color{#d0021b}{${e.scale < 0 ? '' : '+'}${f(e.scale)}}`) +
           ` <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓ sum = total' : '✗'}</span>` +
+          (() => { const c = SS.scaleClosedForm(w, state.p, s), ok2 = Math.abs(c.scale - e.scale) <= 1e-4 * Math.max(1, Math.abs(e.scale));
+            return `<p class="note">Lecture 4, (∗∗): scale effect ${texStr(`\\color{#d0021b}{-\\tfrac{1}{C_{qq}}\\big(\\tfrac{\\partial H^1}{\\partial q}\\big)^2=-\\tfrac{1}{${f(c.Cqq)}}(${f(c.dHdq)})^2=${f(c.scale)}}`)} <span class="${ok2 ? 'ok-mark' : 'no-mark'}">${ok2 ? '✓ = finite difference' : '✗'}</span></p>`; })() +
           `<p class="note">${texStr(`\\partial S/\\partial w_1=${f(d.dSdw1)}`)}, ${texStr(`\\partial H^1/\\partial q=${f(e.dHdq)}`)}. Cross effect: ${texStr(`\\partial D^2/\\partial w_1=${f(d.input2.total)}=\\color{#4a90e2}{${f(d.input2.substitution)}}\\color{#d0021b}{${d.input2.scale < 0 ? '' : '+'}${f(d.input2.scale)}}`)}</p>`;
       }
     } else box.innerHTML = '';
