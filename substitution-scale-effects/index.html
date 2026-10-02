@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Substitution and Scale Effects · Microvis</title>
+  <meta name="description" content="When an input price rises, input demand changes through a substitution effect (along the isoquant) and a scale effect (along the expansion path). Lecture 3.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 3 · Theory of the firm</p>
+      <h1>Substitution and Scale Effects</h1>
+      <p class="subtitle"><span class="tex" data-tex="\frac{\partial D^1(w,p)}{\partial w_1}=\color{#4a90e2}{\underbrace{\frac{\partial H^1(w,q^\ast)}{\partial w_1}}_{\text{substitution}}}+\color{#d0021b}{\underbrace{\frac{\partial H^1(w,q^\ast)}{\partial q}\,\frac{\partial S(w,p)}{\partial w_1}}_{\text{scale}}}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The firm starts at <span class="tex" data-tex="A=D(w,p)"></span>. When <span class="tex" data-tex="w_1"></span> rises it first substitutes along the old isoquant to <span class="tex" data-tex="B"></span>, the cheapest way to produce the same output at the new prices (<span class="c-l2-blue">blue: substitution</span>). Because producing has become more expensive, it then produces less and moves down the new expansion path to <span class="tex" data-tex="C=D(w',p)"></span> (<span class="c-l2-red">red: scale</span>). The total change in input 1 is the sum of the two.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <select id="tech" aria-label="Technology">
+          <option value="cobb">Cobb-Douglas</option>
+          <option value="ces">CES</option>
+          <option value="leontief">Leontief (perfect complements)</option>
+          <option value="linear">Linear (perfect substitutes)</option>
+        </select>
+        <div class="formula" id="formula-general"></div>
+        <div class="formula" id="formula-numbers"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+
+      <div class="group">
+        <h2>Returns to scale</h2>
+        <div class="seg" role="group" aria-label="Returns to scale">
+          <button type="button" data-profile="ushape" aria-pressed="true">U-shaped average cost</button>
+          <button type="button" data-profile="homog" aria-pressed="false">Homogeneous of degree k</button>
+        </div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="increasing → decreasing returns" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="m" data-label="m" data-hint="" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="0.95" data-step="0.05" data-show="homog"></div>
+        <p class="note" data-show="homog"><span class="tex" data-tex="k\ge1"></span> has no profit maximum — see <a href="../cost-curves/index.html">Cost Curves and Supply</a>.</p>
+      </div>
+
+      <div class="group">
+        <h2>Prices</h2>
+        <div class="ctrl" data-key="p" data-label="p" data-hint="output price" data-min="0.5" data-max="20" data-step="0.05"></div>
+        <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="before" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w1n" data-label="w_1'" data-hint="after" data-min="0.1" data-max="15" data-step="0.05"></div>
+      </div>
+
+      <div class="group">
+        <button type="button" class="big-button" id="animate">▶ Show the effects</button>
+        <label class="check"><input type="checkbox" id="marginal"> <span>Marginal (derivative) version in the table</span></label>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Input space">
+      <div class="panel-head"><h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap-main"></p>
+      <p class="caption"><span class="c-muted"><span class="key"></span>isoquants for <span class="tex" data-tex="q^\ast"></span> and <span class="tex" data-tex="S(w',p)"></span></span>; <span class="c-ink"><span class="key dash"></span>old</span> and <span class="c-ink"><span class="key"></span>new isocost line</span>; dotted rays: old and new expansion paths. The bars on the <span class="tex" data-tex="z_1"></span> axis add up: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Why output falls">
+        <h2>Why output falls</h2>
+        <div id="plotB" class="plot plot-2d"></div>
+        <p class="caption">A higher input price shifts marginal cost up, so the profit-maximising output falls. <span class="c-l2-red"><span class="key"></span>MC after</span>, <span class="c-l2-red">thin: MC before</span>, <span class="c-ink"><span class="key"></span>AC after</span>.</p>
+      </section>
+      <section class="panel readouts" aria-label="The two effects" aria-live="polite">
+        <h2>The two effects</h2>
+        <table class="data effects" id="table"></table>
+        <div id="marginal-box"></div>
+        <dl id="readouts"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/firm-ui.js"></script>
+  <script src="../shared/firm-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

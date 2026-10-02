@@ -27,7 +27,7 @@
   function techFormula(s) {
     if (s.profile === 'ushape') {
       return {
-        general: `\\phi(z)=F\\big(g(z)\\big),\\ \\ g(z)=${gTex(s)}`,
+        general: `\\begin{gathered}\\phi(z)=F\\big(g(z)\\big)\\\\ g(z)=${gTex(s)}\\end{gathered}`,
         numbers: `F^{-1}(q)=G(q)=\\tfrac13q^3-${num(s.a)}q^2+${num(s.a * s.a + s.m)}q`
       };
     }

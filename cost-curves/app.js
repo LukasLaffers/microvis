@@ -163,6 +163,11 @@
       ['C_{qq}(w,q^\\ast)\\ge0?', soc === null ? '—' : soc >= -1e-9 ? `<span class="ok-mark">✓</span> ${fmt(soc, 3)}` : `<span class="no-mark">✗</span> ${fmt(soc, 3)}`],
       ['e(H(w,q^\\ast))=AC/MC', e === null ? '—' : `${fmt(e, 3)} <span class="badge ${rtsLabel}">${rtsLabel}</span>`]
     ];
+    // Lecture 3, homogeneous case: AC/MC = k at every q (shown at q*, or at q = 1 when there is no optimum).
+    if (isHomog()) {
+      const qe = has ? qs : 1;
+      rows.push(['AC/MC=k', `${fmt(FM.AC(w, qe, s) / FM.MC(w, qe, s), 3)} = k = ${fmt(s.k)}${has ? '' : ' <span class="c-muted">(at q = 1)</span>'}`]);
+    }
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     let sentence;
     if (S.kind === 'unbounded') sentence = 'Profit has no maximum: with constant or increasing returns to scale and a fixed price, producing more always pays. Price taking and increasing returns do not fit together.';
@@ -190,6 +195,13 @@
       ? `\\begin{gathered}C(w,q)=c(w)\\,G(q)\\\\ G(q)=\\tfrac13q^3-${U.num(s.a)}q^2+${U.num(s.a * s.a + s.m)}q\\end{gathered}`
       : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}\\\\ =c(w)\\,(q/${U.num(s.A)})^{${U.num(1 / s.k)}}\\end{gathered}`, true);
     const P = solve(), th = U.theme();
+    // Lecture 3 corollary with the current numbers (homogeneous profile only).
+    if (isHomog()) {
+      const c = U.num(P.c), e = U.num((1 - s.k) / s.k), inv = U.num(1 / s.k), Aterm = s.A === 1 ? '' : `\\,${U.num(s.A)}^{-${inv}}`;
+      tex($('homog-formulas'), s.A === 1
+        ? `\\begin{gathered}C(w,q)=c(w)\\,q^{1/k}=${c}\\,q^{${inv}}\\\\ AC=c(w)\\,q^{\\frac{1-k}{k}}=${c}\\,q^{${e}},\\quad MC=\\tfrac1k c(w)\\,q^{\\frac{1-k}{k}}=${U.num(P.c / s.k)}\\,q^{${e}}\\end{gathered}`
+        : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}=${c}\\,(q/${U.num(s.A)})^{${inv}}\\\\ AC=c(w)A^{-1/k}q^{\\frac{1-k}{k}}=${c}${Aterm}\\,q^{${e}},\\quad MC=\\tfrac1k\\,AC\\end{gathered}`, true);
+    }
     guard('cost plot', () => drawMain(th, P));
     guard('side plots', () => drawSide(th, P));
     guard('readouts', () => renderReadouts(P));
