@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Production Explorer · Microvis</title>
+  <meta name="description" content="Interactive production function: substitution along an isoquant versus scale along a ray. ECO401 Lecture 1.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">ECO401 · Lecture 1 · Theory of the firm</p>
+      <h1>Production Explorer</h1>
+    </div>
+    <a class="back-link" href="../">← All Microvis tools</a>
+  </header>
+
+  <main class="layout">
+    <!-- Controls -->
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The 3D surface is the production function <span class="tex" data-tex="q=\phi(z_1,z_2)"></span>, a hill over the input plane. Its contour lines are the <strong>isoquants</strong>.
+            <strong>Substitution</strong> means walking along one contour line: output stays at <span class="tex" data-tex="\bar q"></span> while the input mix changes. The slope of the isoquant is <span class="tex" data-tex="-MRTS_{21}"></span>, and <span class="tex" data-tex="\sigma"></span> measures how strongly the input mix reacts to the <span class="tex" data-tex="MRTS"></span> (how flat the isoquant is).
+            <strong>Scale</strong> means walking straight up the hill along a ray from the origin: all inputs grow by the same factor <span class="tex" data-tex="\lambda"></span>, and output grows by <span class="tex" data-tex="\lambda^{\nu}"></span>, so <span class="tex" data-tex="\nu"></span> is the elasticity of scale <span class="tex" data-tex="e"></span>.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <select id="tech" aria-label="Technology">
+          <option value="cobb">Cobb-Douglas</option>
+          <option value="ces">CES</option>
+          <option value="linear">Linear (perfect substitutes)</option>
+          <option value="leontief">Leontief (perfect complements)</option>
+        </select>
+        <div class="formula" id="formula-general"></div>
+        <div class="formula" id="formula-numbers"></div>
+        <div class="formula" id="formula-extra" hidden></div>
+        <p class="note" id="tech-note"></p>
+      </div>
+
+      <div class="group">
+        <h2>Parameters</h2>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+        <div class="ctrl" data-key="nu" data-label="\nu" data-hint="" data-min="0.4" data-max="1.6" data-step="0.05"></div>
+      </div>
+
+      <div class="group">
+        <h2>Mode</h2>
+        <div class="seg" role="group" aria-label="Mode">
+          <button type="button" data-mode="sub" aria-pressed="true">Substitution</button>
+          <button type="button" data-mode="scale" aria-pressed="false">Scale</button>
+        </div>
+        <p class="note" data-show="sub">Walk along the isoquant <span class="tex" data-tex="\phi(z)=\bar q"></span>: change the input mix, keep output fixed.</p>
+        <p class="note" data-show="scale">Walk along the ray: multiply both inputs by <span class="tex" data-tex="\lambda"></span>, keep the input mix fixed.</p>
+        <div class="ctrl" data-key="qbar" data-label="\bar q" data-hint="output level" data-min="0.25" data-max="6" data-step="0.05" data-show="sub"></div>
+        <div class="ctrl" data-key="mix" data-label="z_2/z_1" data-hint="input mix (log scale)" data-min="0.1" data-max="10" data-log="1"></div>
+        <div class="ctrl" data-key="lambda" data-label="\lambda" data-hint="scale factor" data-min="0.25" data-max="3" data-step="0.01" data-show="scale"></div>
+      </div>
+
+      <div class="group">
+        <h2>Layers</h2>
+        <label class="check"><input type="checkbox" id="surface" checked> Surface</label>
+        <div class="ctrl" data-key="opacity" data-label="\text{opacity}" data-hint="surface" data-min="0.1" data-max="1" data-step="0.05"></div>
+        <label class="check"><input type="checkbox" id="contours" checked> Contour lines on surface</label>
+      </div>
+
+      <div class="group">
+        <h2>Plot range</h2>
+        <div class="ctrl" data-key="zmax" data-label="z_{\max}" data-hint="both axes" data-min="2" data-max="15" data-step="0.5"></div>
+      </div>
+    </section>
+
+    <!-- 3D plot -->
+    <section class="panel plot3d-panel" aria-label="Production function in 3D">
+      <div class="panel-head">
+        <h2>The production hill <span class="tex" data-tex="q=\phi(z_1,z_2)"></span></h2>
+        <div class="btn-row" role="group" aria-label="Camera">
+          <button type="button" data-cam="3d">3D</button>
+          <button type="button" data-cam="top">Top</button>
+          <button type="button" data-cam="front">Front</button>
+          <button type="button" data-cam="side">Side</button>
+          <button type="button" data-cam="reset">Reset view</button>
+        </div>
+      </div>
+      <div id="plot3d" class="plot plot-3d"></div>
+      <p class="caption" data-show="sub"><span class="c-accent"><span class="key"></span>isoquant <span class="tex" data-tex="\bar q"></span> on the hill</span> and <span class="c-accent"><span class="key dash"></span>its shadow on the floor</span>; the translucent plane is the height <span class="tex" data-tex="\bar q"></span>; <span class="c-accent-3"><span class="key"></span>tangent</span> at <span class="tex" data-tex="\bar z"></span>.</p>
+      <p class="caption" data-show="scale"><span class="c-accent-2"><span class="key"></span>output along the ray</span> (the vertical plane cuts the hill along it); <span class="c-accent"><span class="key"></span>isoquants <span class="tex" data-tex="q=1,\dots,5"></span></span>; dots at <span class="tex" data-tex="\bar z"></span> and <span class="tex" data-tex="\lambda\bar z"></span>.</p>
+    </section>
+
+    <!-- 2D panels and readouts -->
+    <div class="side">
+      <section class="panel" aria-label="Input space">
+        <h2>Input space <span class="tex" data-tex="(z_1, z_2)"></span></h2>
+        <div id="plotA" class="plot plot-2d"></div>
+        <p class="caption" data-show="sub"><span class="c-accent"><span class="key"></span>isoquant <span class="tex" data-tex="\bar q"></span></span>, <span class="c-accent-3"><span class="key dash"></span>tangent, slope <span class="tex" data-tex="-MRTS_{21}"></span></span>, <span class="c-muted"><span class="key dash"></span>ray through <span class="tex" data-tex="\bar z"></span></span>.</p>
+        <p class="caption" data-show="scale"><span class="c-accent"><span class="key"></span>isoquants <span class="tex" data-tex="q=1,\dots,5"></span></span>; the <span class="c-accent-2">ray crosses them at <span class="tex" data-tex="\lambda_k=k^{1/\nu}"></span></span>: evenly spaced under constant returns, spreading out under decreasing returns, bunching up under increasing returns.</p>
+      </section>
+
+      <section class="panel" aria-label="Second panel">
+        <h2 data-show="sub">How the input mix responds to the MRTS</h2>
+        <h2 data-show="scale">Output along the ray</h2>
+        <div id="plotB" class="plot plot-2d"></div>
+        <p class="caption" data-show="sub">Both axes are logarithmic, so the slope of the <span class="c-accent">curve</span> is the elasticity of substitution <span class="tex" data-tex="\sigma"></span>. <span class="c-muted"><span class="key dash"></span>Cobb-Douglas reference, slope 1.</span></p>
+        <p class="caption" data-show="scale"><span class="c-accent-2"><span class="key"></span><span class="tex" data-tex="\phi(\lambda\bar z)=\lambda^{\nu}"></span></span> against <span class="c-muted"><span class="key dash"></span>constant returns <span class="tex" data-tex="q=\lambda"></span></span>.</p>
+      </section>
+
+      <section class="panel readouts" aria-label="Key numbers" aria-live="polite">
+        <h2>Key numbers</h2>
+        <dl id="readouts"></dl>
+        <p class="sentence" id="sentence"></p>
+        <p class="warn" id="warning" hidden></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    ECO401 Microeconomic theory, NHH · Lukáš Lafférs · <a href="../">Microvis</a>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
