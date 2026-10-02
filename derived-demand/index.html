@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marshall's Law of Derived Demand · Microvis</title>
+  <meta name="description" content="With constant returns to scale the elasticity of an industry's demand for labour is a weighted average of the elasticity of substitution and the price elasticity of product demand. Lecture 4.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 4 · Theory of the firm</p>
+      <h1>Marshall's Law of Derived Demand</h1>
+      <p class="subtitle"><span class="tex" data-tex="(-\varepsilon^u_{11})=\color{#4a90e2}{\sigma\,(1-sh_1)}+\color{#d0021b}{(-\varepsilon^D_p)\,sh_1}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>With constant returns to scale, <span class="tex" data-tex="C(w,q)=c(w)\,q"></span>, the industry supply curve is flat at <span class="tex" data-tex="p=c(w)"></span> and the demand schedule <span class="tex" data-tex="Dem(p)"></span> decides how much is produced. When the wage <span class="tex" data-tex="w_1"></span> rises, the industry uses less labour for two reasons: firms <span class="c-l2-blue">substitute capital for labour</span> (how easily: <span class="tex" data-tex="\sigma"></span>), and the product gets dearer so <span class="c-l2-red">consumers buy less</span> (how strongly: <span class="tex" data-tex="-\varepsilon^D_p"></span>). The industry's labour demand elasticity is a weighted average of the two, with labour's cost share <span class="tex" data-tex="sh_1"></span> as the weight on product demand. Move the shares and watch the balance point of the lever.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology (constant returns)</h2>
+        <select id="tech" aria-label="Technology">
+          <option value="cobb">Cobb-Douglas</option>
+          <option value="ces">CES</option>
+          <option value="leontief">Leontief (perfect complements)</option>
+        </select>
+        <div class="formula" id="formula-general"></div>
+        <div class="formula" id="formula-numbers"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on labour z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.8" data-step="0.05" data-show="ces"></div>
+      </div>
+
+      <div class="group">
+        <h2>Prices and product demand</h2>
+        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="wage" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of capital" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="eps" data-label="\varepsilon^D_p" data-hint="price elasticity of Dem(p)" data-min="-4" data-max="-0.1" data-step="0.05"></div>
+      </div>
+
+      <div class="group">
+        <h2>What if the wage rises?</h2>
+        <div class="ctrl" data-key="r" data-label="\Delta w_1/w_1" data-hint="wage rise, %" data-min="1" data-max="50" data-step="1"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="The weighted average">
+      <div class="panel-head"><h2>The weighted average</h2></div>
+      <div id="plot" class="plot plot-lever"></div>
+      <p class="caption" id="capA"></p>
+      <div class="panel-head"><h2>The industry's demand for labour</h2></div>
+      <div id="plotD" class="plot plot-2d"></div>
+      <p class="caption" id="capD"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="The product market">
+        <h2>The product market</h2>
+        <div id="plotC" class="plot plot-2d"></div>
+        <p class="caption" id="capC"></p>
+      </section>
+      <section class="panel readouts" aria-label="Formulas" aria-live="polite">
+        <h2>Formulas, checked</h2>
+        <ul class="checks" id="checks"></ul>
+        <dl id="readouts"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Industry demand <span class="tex" data-tex="Dem(p)=100\,p^{\varepsilon^D_p}"></span> with a constant price elasticity.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/firm-ui.js"></script>
+  <script src="../shared/firm-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

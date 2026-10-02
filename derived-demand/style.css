@@ -1,0 +1,5 @@
+/* Marshall's Law of Derived Demand: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-lever { height: 300px; }
+.main-panel .panel-head + .plot { margin-top: 4px; }
+.main-panel .caption + .panel-head { margin-top: 18px; }
+@media (max-width: 800px) { .plot-lever { height: 260px; } }
