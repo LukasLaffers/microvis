@@ -8,10 +8,10 @@ So labour demand is a **weighted average** of two forces: firms substitute away 
 
 ## Model (`marshall-law/model.js`, tested)
 - Technology CES with $\rho\in[-5,0.9]$ (so $\sigma=1/(1-\rho)\in[0.17,10]$), $\delta\in[0.1,0.9]$; also Cobb-Douglas ($\sigma=1$) via $\rho=0$.
-- Product demand $Dem(p)=B\,p^{-\eta}$ with $\eta=-\varepsilon^D_p\in[0,4]$ (default 2), $B=10$.
-- `industry(w, s, eta)` → $p=c(w)$, $Q=Dem(p)$, $D=\widetilde H(w)\,Q$, $sh_1=w_1\widetilde H^1/c$.
-- `elasticities(w, s, eta)` → $\varepsilon^c_{11}=-\sigma(1-sh_1)$, $\varepsilon^u_{11}$ from the formula, and $\varepsilon^u_{11}$ from a central finite difference of $\log D^1$ in $\log w_1$.
-- Tests: formula = finite difference (all $\rho$, $\delta$, $\eta$, several $w$); $\varepsilon^c_{11}$ formula = finite difference of $\log\widetilde H^1$.
+- Product demand $Dem(p)=B\,p^{\varepsilon^D_p}$ with constant elasticity $\varepsilon^D_p\in[-4,0]$ (default $-2$), $B=10$. (Do not call it $\eta$: lecture 5 uses $\eta(q)$ for the demand elasticity of a monopolist.)
+- `industry(w, s, epsD)` → $p=c(w)$, $Q=Dem(p)$, $D=\widetilde H(w)\,Q$, $sh_1=w_1\widetilde H^1/c$.
+- `elasticities(w, s, epsD)` → $\varepsilon^c_{11}=-\sigma(1-sh_1)$, $\varepsilon^u_{11}$ from the formula, and $\varepsilon^u_{11}$ from a central finite difference of $\log D^1$ in $\log w_1$.
+- Tests: formula = finite difference (all $\rho$, $\delta$, $\varepsilon^D_p$, several $w$); $\varepsilon^c_{11}$ formula = finite difference of $\log\widetilde H^1$.
 
 ## Header
 Eyebrow "Lecture 4 · Theory of the firm", title "Marshall's Law of Derived Demand", subtitle with the formula above (KaTeX, coloured). Back link.
@@ -19,15 +19,15 @@ Eyebrow "Lecture 4 · Theory of the firm", title "Marshall's Law of Derived Dema
 ## Controls
 1. **How to read this** (open): 4 sentences on the two channels and the weighted average.
 2. **Substitution**: $\sigma$ via $\rho$ slider (show $\sigma$ big next to it), $\delta$.
-3. **Product demand**: $-\varepsilon^D_p=\eta$ slider.
+3. **Product demand**: $\varepsilon^D_p$ slider (shown as $|\varepsilon^D_p|$ in the picture).
 4. **Prices**: $w_1$ (labour), $w_2$ (capital), 0.2–5, defaults 1, 1. Note: "$w_1$ changes labour's cost share $sh_1$ (unless $\sigma=1$)."
 5. Button **Raise $w_1$ by 10 %** — animates the two channels in panels 2–3 and shows the discrete change next to the elasticity prediction.
 
 ## Panel 1 (main): "A weighted average"
-A horizontal number line from 0 to $\max(\sigma,\eta)+0.5$.
-- Blue dot at $\sigma$ labelled "substitution $\sigma$"; red dot at $\eta$ labelled "product demand $|\varepsilon^D_p|$".
-- A black marker at $(1-sh_1)\sigma+sh_1\eta$ on the segment between them, labelled "$|\varepsilon^u_{11}|$"; draw the segment as a lever with the weights $1-sh_1$ and $sh_1$ written on each side.
-- Under it a stacked horizontal bar of length $|\varepsilon^u_{11}|$: blue part $\sigma(1-sh_1)$, red part $\eta\,sh_1$.
+A horizontal number line from 0 to $\max(\sigma,|\varepsilon^D_p|)+0.5$.
+- Blue dot at $\sigma$ labelled "substitution $\sigma$"; red dot at $|\varepsilon^D_p|$ labelled "product demand $|\varepsilon^D_p|$".
+- A black marker at $(1-sh_1)\sigma+sh_1|\varepsilon^D_p|$ on the segment between them, labelled "$|\varepsilon^u_{11}|$"; draw the segment as a lever with the weights $1-sh_1$ and $sh_1$ written on each side.
+- Under it a stacked horizontal bar of length $|\varepsilon^u_{11}|$: blue part $\sigma(1-sh_1)$, red part $|\varepsilon^D_p|\,sh_1$.
 - Check line: "finite-difference elasticity = formula ✓".
 
 ## Panel 2: "Inside the firm" — input space
@@ -37,9 +37,9 @@ Unit isoquant $g(z)=1$ (as in Cost Minimisation), isocost line, $\widetilde H(w)
 Demand curve $Dem(p)$; horizontal supply at $p=c(w)$ (flat $MC=AC$, as the notes say); equilibrium $Q=Dem(c(w))$. When $w_1$ is raised, supply shifts up to $c(w')$ and $Q$ falls (red arrow). Caption: "Higher labour cost raises unit cost and price; consumers buy less, so firms need less of every input."
 
 ## Panel 4: "Marshall's rules" (small multiples)
-Three mini line plots of $|\varepsilon^u_{11}|$ against (a) $\sigma$, (b) $\eta$, (c) $sh_1$ (varying $w_1$), each with the current value marked. Caption for (c): "Increases with $sh_1$ only if $|\varepsilon^D_p|>\sigma$."
+Three mini line plots of $|\varepsilon^u_{11}|$ against (a) $\sigma$, (b) $|\varepsilon^D_p|$, (c) $sh_1$ (varying $w_1$), each with the current value marked. Caption for (c): "Increases with $sh_1$ only if $|\varepsilon^D_p|>\sigma$."
 
-## Defaults and expected numbers ($\rho=-1$ so $\sigma=0.5$; $\delta=0.5$; $w=(1,1)$; $\eta=2$)
+## Defaults and expected numbers ($\rho=-1$ so $\sigma=0.5$; $\delta=0.5$; $w=(1,1)$; $\varepsilon^D_p=-2$)
 $sh_1=0.5$; $\varepsilon^c_{11}=-0.25$; $(-\varepsilon^u_{11})=0.5\cdot0.5+2\cdot0.5=1.25$.
 At $w_1=2$: $sh_1\approx0.586$, $\varepsilon^u_{11}\approx-1.379$; at $w_1=0.5$: $sh_1\approx0.414$, $\varepsilon^u_{11}\approx-1.121$.
 
