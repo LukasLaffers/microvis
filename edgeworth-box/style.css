@@ -1,0 +1,3 @@
+/* The Edgeworth Box: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-box { height: auto; aspect-ratio: 1 / 1; max-height: 680px; }
+.c-green { color: #3d9a40; }
