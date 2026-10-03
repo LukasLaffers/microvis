@@ -1,0 +1,3 @@
+/* Monopoly and Product Differentiation: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-firm { height: 480px; }
+@media (max-width: 800px) { .plot-firm { height: 360px; } }

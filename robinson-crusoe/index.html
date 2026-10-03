@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robinson Crusoe's Economy · Microvis</title>
+  <meta name="description" content="A one-person economy with leisure and coconuts: the planner's optimum MRS = MRT, its decentralisation by a real wage w/p, why it fails when the production set is not convex, and how opening the economy to trade helps. Lecture 8.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 8 · Decentralisation in a simple economy</p>
+      <h1>Robinson Crusoe's Economy</h1>
+      <p class="subtitle"><span class="tex" data-tex="\frac{U_1(x^\ast)}{U_2(x^\ast)}=\phi'(L^\ast)=\frac wp,\qquad \max_{L}\ pq_2-wL,\qquad \max_x U(x)\ \text{s.t.}\ px_2+wx_1\le wT+\pi^{\ast\ast}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Robinson has <span class="tex" data-tex="T"></span> hours. Every hour of labour <span class="tex" data-tex="L=T-x_1"></span> yields coconuts <span class="tex" data-tex="q_2=\phi(L)"></span>, so the red frontier is what he can consume. In the morning he picks the best point on it, <span class="tex" data-tex="x^\ast"></span>, where his indifference curve touches the frontier. Then he splits into a firm manager who maximises profit at the real wage <span class="tex" data-tex="w/p"></span> and a consumer who spends his wage and the profit. If <span class="tex" data-tex="w/p"></span> is the slope at <span class="tex" data-tex="x^\ast"></span> and the production set is convex, both halves choose <span class="tex" data-tex="x^\ast"></span> again. With a non-convex technology the manager may hire a different amount of labour, and the two markets do not clear.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Example</h2>
+        <select id="example" aria-label="Example">
+          <option value="convex">Convex: decentralisation works</option>
+          <option value="inc">Increasing returns at x*</option>
+          <option value="loss">Loss at x*: firm shuts down</option>
+          <option value="custom" hidden>Custom</option>
+        </select>
+      </div>
+      <div class="group">
+        <h2>Technology</h2>
+        <div class="seg seg-2" role="group" aria-label="Technology">
+          <button type="button" data-tech="concave" aria-pressed="true">Concave φ</button>
+          <button type="button" data-tech="sshape" aria-pressed="false">S-shaped φ</button>
+        </div>
+        <div class="formula" id="formulaT"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="1" data-max="60" data-step="0.5"></div>
+        <div class="ctrl" data-key="beta" data-label="\beta" data-hint="curvature, &lt; 1" data-min="0.1" data-max="0.95" data-step="0.01" data-show="concave"></div>
+        <div class="ctrl" data-key="K" data-label="K" data-hint="hours for half the maximum" data-min="1" data-max="12" data-step="0.1" data-show="sshape"></div>
+        <div class="ctrl" data-key="g" data-label="\gamma" data-hint="steepness, &gt; 1" data-min="1.2" data-max="6" data-step="0.1" data-show="sshape"></div>
+        <div class="ctrl" data-key="T" data-label="T" data-hint="hours available" data-min="4" data-max="16" data-step="0.5"></div>
+      </div>
+      <div class="group">
+        <h2>Preferences</h2>
+        <div class="formula" id="formulaU"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on leisure" data-min="0.05" data-max="0.95" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.05" data-min="-4" data-max="0.8" data-step="0.05"></div>
+      </div>
+      <div class="group">
+        <h2>Markets</h2>
+        <div class="seg seg-2" role="group" aria-label="Closed or open">
+          <button type="button" data-open="closed" aria-pressed="true">Closed economy</button>
+          <button type="button" data-open="open" aria-pressed="false">Open economy</button>
+        </div>
+        <div class="ctrl" data-key="wp" data-label="w/p" data-hint="world price of an hour, in coconuts" data-min="0.05" data-max="20" data-step="0.001" data-log="1" data-show="open"></div>
+        <p class="note" data-show="closed">In the closed economy the price is set to <span class="tex" data-tex="w/p=MRS(x^\ast)"></span>.</p>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Robinson's choices">
+      <div class="panel-head"><h2 id="mainTitle">Leisure and coconuts</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="The firm">
+        <h2>The firm: profit at the real wage</h2>
+        <div id="plotF" class="plot plot-2d"></div>
+        <p class="caption" id="capF"></p>
+      </section>
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>Numbers</h2>
+        <dl id="readouts"></dl>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

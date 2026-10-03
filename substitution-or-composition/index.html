@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Substitution or Composition? · Microvis</title>
+  <meta name="description" content="Two firms that cannot substitute at all can make aggregate data look as if energy was replaced by capital: why Arnberg and Bjørner (2007) use variation within firms. Lecture 4.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 4 · Theory of the firm</p>
+      <h1>Substitution or Composition?</h1>
+      <p class="subtitle">Why Arnberg and Bjørner (2007) use variation within firms</p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Two firms use energy <span class="tex" data-tex="E"></span> and capital <span class="tex" data-tex="K"></span> in fixed proportions: they <em>cannot</em> substitute one for the other. When energy gets dearer, the energy-intensive firm's product gets dearer too, consumers switch to the other product, and output moves to the capital-intensive firm. Each firm slides along its own ray, but the industry total turns towards capital. Someone looking only at aggregate data would see substitution that does not happen inside any firm: it is a change in composition.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Prices</h2>
+        <div class="ctrl" data-key="wE" data-label="w_E" data-hint="price of energy (w_K = 1)" data-min="0.5" data-max="3" data-step="0.01"></div>
+        <div class="btn-row"><button type="button" id="notes">Notes example: w_E from 1 to 2</button></div>
+      </div>
+      <div class="group">
+        <h2>Consumers</h2>
+        <div class="ctrl" data-key="eta" data-label="\eta" data-hint="how easily consumers switch products" data-min="0" data-max="8" data-step="0.01"></div>
+        <p class="hint-line">The notes' numbers need <span class="tex" data-tex="\eta=\ln3/\ln(5/4)\approx4.923"></span>; with <span class="tex" data-tex="\eta=0"></span> nobody switches and nothing moves.</p>
+      </div>
+      <div class="group">
+        <label class="check"><input type="checkbox" id="econ" checked> <span>Show what an econometrician sees</span></label>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Input space">
+      <div class="panel-head"><h2>Input space: each firm stays on its ray</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Who produces">
+        <h2>Who produces?</h2>
+        <div id="plotB" class="plot plot-bar"></div>
+        <dl class="readouts-inline" id="costs"></dl>
+      </section>
+      <section class="panel" aria-label="What an econometrician sees" id="econPanel">
+        <h2>What an econometrician sees</h2>
+        <div id="plotC" class="plot plot-2d"></div>
+        <p class="caption" id="capC"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Example from the notes, after S. Arnberg and T. B. Bjørner (2007), <i>Resource and Energy Economics</i> 29, 122–136.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

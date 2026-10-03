@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Edgeworth Box · Microvis</title>
+  <meta name="description" content="A two-person exchange economy: offer curves, competitive equilibria (one or several), the contract curve and the core, excess demand with Walras' law, and the second welfare theorem with a lump-sum transfer. Lecture 9.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 9 · General equilibrium</p>
+      <h1>The Edgeworth Box</h1>
+      <p class="subtitle"><span class="tex" data-tex="E(p)=x^a(p)+x^b(p)-R,\qquad p_1E_1(p)+p_2E_2(p)=0,\qquad MRS^a_{21}=\frac{p_1}{p_2}=MRS^b_{21}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Every point of the box is a division of the total endowment between Alf (<span class="c-l2-blue">a</span>, measured from the bottom left) and Bill (<span class="c-l2-red">b</span>, from the top right). Both start at <span class="tex" data-tex="R"></span> and face the grey price line through it. At most prices their wishes (the two dots) do not match: one good is in excess demand. Each offer curve collects one person's wishes at all prices; where the two offer curves cross, both markets clear. Every equilibrium lies on the contract curve inside the lens of mutually better trades, the core. Drag <span class="tex" data-tex="R"></span> to change the endowments.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Economy</h2>
+        <div class="seg seg-2" role="group" aria-label="Example">
+          <button type="button" data-ex="one" aria-pressed="true">One equilibrium</button>
+          <button type="button" data-ex="three" aria-pressed="false">Three equilibria</button>
+        </div>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="da" data-label="\delta^a" data-hint="Alf's weight on good 1" data-min="0.02" data-max="0.98" data-step="0.01"></div>
+        <div class="ctrl" data-key="ra" data-label="\rho^a" data-hint="Alf: σ = 1/(1 − ρ)" data-min="-10" data-max="0.8" data-step="0.1"></div>
+        <div class="ctrl" data-key="db" data-label="\delta^b" data-hint="Bill's weight on good 1" data-min="0.02" data-max="0.98" data-step="0.01"></div>
+        <div class="ctrl" data-key="rb" data-label="\rho^b" data-hint="Bill: σ = 1/(1 − ρ)" data-min="-10" data-max="0.8" data-step="0.1"></div>
+        <div class="ctrl" data-key="R1" data-label="R^a_1" data-hint="Alf's endowment of good 1" data-min="0.2" data-max="9.8" data-step="0.1"></div>
+        <div class="ctrl" data-key="R2" data-label="R^a_2" data-hint="Alf's endowment of good 2" data-min="0.2" data-max="9.8" data-step="0.1"></div>
+      </div>
+      <div class="group">
+        <h2>Mechanism</h2>
+        <div class="seg seg-2" role="group" aria-label="Mode">
+          <button type="button" data-mode="market" aria-pressed="true">Market</button>
+          <button type="button" data-mode="swt" aria-pressed="false">Second welfare theorem</button>
+        </div>
+        <div class="ctrl" data-key="p" data-label="p_1/p_2" data-hint="relative price of good 1" data-min="0.05" data-max="20" data-step="0.001" data-log="1" data-show="market"></div>
+        <div class="go-row" data-show="market"><button type="button" id="toEq">Go to an equilibrium</button><span id="eqCount" class="c-muted"></span></div>
+        <div class="ctrl" data-key="t" data-label="x^a_1" data-hint="target on the contract curve" data-min="0.3" data-max="9.7" data-step="0.01" data-show="swt"></div>
+      </div>
+      <div class="group">
+        <h2>Show</h2>
+        <label class="check"><input type="checkbox" id="showOffer" checked> <span>Offer curves (market)</span></label>
+        <label class="check"><input type="checkbox" id="showCore" checked> <span>Contract curve, lens and core</span></label>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Edgeworth box">
+      <div class="panel-head"><h2 id="mainTitle">The Edgeworth box</h2></div>
+      <div id="plot" class="plot plot-main plot-box"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Excess demand">
+        <h2>Excess demand</h2>
+        <div id="plotE" class="plot plot-2d"></div>
+        <p class="caption" id="capE"></p>
+      </section>
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>Numbers</h2>
+        <dl id="readouts"></dl>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="../shared/exchange-model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

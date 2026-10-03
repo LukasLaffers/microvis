@@ -71,8 +71,8 @@
       shapes.push({ type: 'line', x0: 0, x1: hat.qHat, y0: hat.pHat, y1: hat.pHat, line: { color: th.orange, width: 1, dash: 'dash' } });
       shapes.push({ type: 'line', x0: hat.qHat, x1: hat.qHat, y0: 0, y1: hat.pHat, line: { color: th.orange, width: 1, dash: 'dash' } });
       traces.push(U.dot2([[hat.qHat, hat.pHat]], th.orange, 'min AC: (q̂, p̂)', 12));
-      annotations.push({ x: 0, y: hat.pHat, text: 'p̂', showarrow: false, xanchor: 'right', xshift: -6, font: { color: th.orange, size: 14 } });
-      annotations.push({ x: hat.qHat, y: 0, text: 'q̂', showarrow: false, yanchor: 'top', yshift: -16, font: { color: th.orange, size: 14 } });
+      annotations.push({ x: 0, y: hat.pHat, text: 'p̂', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { color: th.orange, size: 14 } });
+      annotations.push({ x: hat.qHat, y: 0, text: 'q̂', showarrow: false, xanchor: 'right', yanchor: 'bottom', xshift: -4, yshift: 2, font: { color: th.orange, size: 14 } });
       const qn = (state.a + hat.qHat) / 2;
       annotations.push({ x: qn, y: FM.MC(w, qn, s), ax: 50, ay: 40, showarrow: true, arrowhead: 0, arrowcolor: th.muted, text: 'this part of the MC curve<br>is not observed', align: 'left', font: { size: 11, color: th.muted } });
     }
@@ -163,6 +163,11 @@
       ['C_{qq}(w,q^\\ast)\\ge0?', soc === null ? '—' : soc >= -1e-9 ? `<span class="ok-mark">✓</span> ${fmt(soc, 3)}` : `<span class="no-mark">✗</span> ${fmt(soc, 3)}`],
       ['e(H(w,q^\\ast))=AC/MC', e === null ? '—' : `${fmt(e, 3)} <span class="badge ${rtsLabel}">${rtsLabel}</span>`]
     ];
+    // Lecture 3, homogeneous case: AC/MC = k at every q (shown at q*, or at q = 1 when there is no optimum).
+    if (isHomog()) {
+      const qe = has ? qs : 1;
+      rows.push(['AC/MC=k', `${fmt(FM.AC(w, qe, s) / FM.MC(w, qe, s), 3)} = k = ${fmt(s.k)}${has ? '' : ' <span class="c-muted">(at q = 1)</span>'}`]);
+    }
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     let sentence;
     if (S.kind === 'unbounded') sentence = 'Profit has no maximum: with constant or increasing returns to scale and a fixed price, producing more always pays. Price taking and increasing returns do not fit together.';
@@ -190,6 +195,13 @@
       ? `\\begin{gathered}C(w,q)=c(w)\\,G(q)\\\\ G(q)=\\tfrac13q^3-${U.num(s.a)}q^2+${U.num(s.a * s.a + s.m)}q\\end{gathered}`
       : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}\\\\ =c(w)\\,(q/${U.num(s.A)})^{${U.num(1 / s.k)}}\\end{gathered}`, true);
     const P = solve(), th = U.theme();
+    // Lecture 3 corollary with the current numbers (homogeneous profile only).
+    if (isHomog()) {
+      const c = U.num(P.c), e = U.num((1 - s.k) / s.k), inv = U.num(1 / s.k), Aterm = s.A === 1 ? '' : `\\,${U.num(s.A)}^{-${inv}}`;
+      tex($('homog-formulas'), s.A === 1
+        ? `\\begin{gathered}C(w,q)=c(w)\\,q^{1/k}=${c}\\,q^{${inv}}\\\\ AC=c(w)\\,q^{\\frac{1-k}{k}}=${c}\\,q^{${e}},\\quad MC=\\tfrac1k c(w)\\,q^{\\frac{1-k}{k}}=${U.num(P.c / s.k)}\\,q^{${e}}\\end{gathered}`
+        : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}=${c}\\,(q/${U.num(s.A)})^{${inv}}\\\\ AC=c(w)A^{-1/k}q^{\\frac{1-k}{k}}=${c}${Aterm}\\,q^{${e}},\\quad MC=\\tfrac1k\\,AC\\end{gathered}`, true);
+    }
     guard('cost plot', () => drawMain(th, P));
     guard('side plots', () => drawSide(th, P));
     guard('readouts', () => renderReadouts(P));

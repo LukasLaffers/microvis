@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Cost Function · Microvis</title>
+  <meta name="description" content="The minimal cost function as a function of input prices: concavity, Shephard's lemma, homogeneity and the matrix of price effects. Lecture 3.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lectures 3 and 4 · Theory of the firm</p>
+      <h1>The Cost Function</h1>
+      <p class="subtitle"><span class="tex" data-tex="C(w,q)=\min_z\{w^tz:\ \phi(z)\ge q\}"></span> as a function of input prices</p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Start at the reference prices <span class="tex" data-tex="\bar w"></span>, where the cheapest bundle is <span class="tex" data-tex="\bar z=H(\bar w,q)"></span>. If the firm kept <span class="tex" data-tex="\bar z"></span> while <span class="tex" data-tex="w_1"></span> changes, its cost would be the black straight line <span class="tex" data-tex="w_1\bar z_1+\bar w_2\bar z_2"></span>. Because it can substitute, the true cost <span class="tex" data-tex="C(w,q)"></span> (blue) lies below that line and touches it at <span class="tex" data-tex="\bar w_1"></span>, with slope <span class="tex" data-tex="H^1(\bar w,q)"></span>: Shephard's lemma (C5). A function that lies below all its tangent lines is concave (C4).</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <select id="tech" aria-label="Technology">
+          <option value="cobb">Cobb-Douglas</option>
+          <option value="ces">CES</option>
+          <option value="linear">Linear (perfect substitutes)</option>
+          <option value="leontief">Leontief (perfect complements)</option>
+        </select>
+        <div class="formula" id="formula-general"></div>
+        <div class="formula" id="formula-numbers"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+        <details class="sub-details">
+          <summary>Scale</summary>
+          <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05"></div>
+          <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="1.6" data-step="0.05"></div>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Reference prices and output</h2>
+        <div class="ctrl" data-key="w1" data-label="\bar w_1" data-hint="drag in the plot too" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w2" data-label="\bar w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="q" data-label="q" data-hint="output" data-min="0.5" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="probe" data-label="w_1" data-hint="another price to compare" data-min="0.2" data-max="5" data-step="0.05"></div>
+      </div>
+
+      <div class="group">
+        <h2>Price scaling</h2>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="multiplies both prices" data-min="0.25" data-max="3" data-step="0.05"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Cost as a function of w1">
+      <div class="panel-head"><h2>Cost as a function of <span class="tex" data-tex="w_1"></span></h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap-main"></p>
+      <p class="caption"><span class="c-l2-blue"><span class="key"></span><span class="tex" data-tex="C(w,q)"></span>: inputs adjust</span>; <span class="c-ink"><span class="key"></span>cost if inputs stay at <span class="tex" data-tex="H(\bar w,q)"></span></span>; the shaded gap is the saving from substitution. Move the pointer over the plot to compare prices; drag (or tap) to move <span class="tex" data-tex="\bar w_1"></span>.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="The firm adjusts its inputs">
+        <h2>The firm adjusts its inputs</h2>
+        <div id="plotA" class="plot plot-2d"></div>
+        <p class="caption" id="capA"></p>
+      </section>
+      <section class="panel" aria-label="Scaling all prices">
+        <h2>(C3) and (H3): scaling all prices by <span class="tex" data-tex="\alpha"></span></h2>
+        <div id="plotB" class="plot plot-2d plot-small"></div>
+        <dl class="mini" id="scale-readouts"></dl>
+      </section>
+      <section class="panel" aria-label="Area equals change in cost">
+        <h2>Lecture 4: area = change in cost</h2>
+        <div class="ctrl" data-key="w1o" data-label="w_1^o" data-hint="second price (click the plot to move it)" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div id="plotArea" class="plot plot-2d"></div>
+        <p class="caption" id="capArea"></p>
+      </section>
+      <section class="panel readouts" aria-label="Matrix of price effects" aria-live="polite">
+        <h2>(H4) the matrix of price effects</h2>
+        <div class="formula" id="matrix"></div>
+        <ul class="checks" id="checks"></ul>
+        <dl id="readouts"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/firm-ui.js"></script>
+  <script src="../shared/firm-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

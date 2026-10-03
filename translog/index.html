@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Translog Cost Shares · Microvis</title>
+  <meta name="description" content="The translog cost function as a second-order approximation, cost shares linear in log prices, elasticities (%), (#), ($), the parameter restrictions, and the Arnberg and Bjørner (2007) results. Lecture 4.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 4 · Theory of the firm</p>
+      <h1>Translog Cost Shares</h1>
+      <p class="subtitle"><span class="tex" data-tex="\log c=\alpha_0+\sum_i\alpha_i\log w_i+\tfrac12\sum_i\sum_j\beta_{ij}\log w_i\log w_j"></span> <span class="arrow">⇒</span> <span class="tex" data-tex="sh_i=\alpha_i+\sum_j\beta_{ij}\log w_j\quad(\&)"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>With constant returns, <span class="tex" data-tex="C=c(w)\,q"></span>. The translog is a second-order Taylor approximation of <span class="tex" data-tex="\log c"></span> in the log prices, so it fits any unit cost function near a reference price <span class="tex" data-tex="\bar w"></span>. Shephard's lemma turns it into cost-share equations that are <em>linear</em> in log prices (&amp;) and can be estimated by OLS; the elasticities then follow from (%), (#) and ($). Compare the translog with a true CES cost function, or enter your own parameters and see which restrictions from economic theory they break.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Parameters</h2>
+        <div class="seg" role="group" aria-label="Where the parameters come from">
+          <button type="button" data-mode="ces" aria-pressed="true">Approximate a CES</button>
+          <button type="button" data-mode="own" aria-pressed="false">Your own parameters</button>
+        </div>
+        <div data-show="ces">
+          <div class="formula" id="formula-ces"></div>
+          <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on input 1" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+          <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ)" data-min="-4" data-max="0.8" data-step="0.05"></div>
+          <div class="ctrl" data-key="wb1" data-label="\bar w_1" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
+          <div class="ctrl" data-key="wb2" data-label="\bar w_2" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
+        </div>
+        <div data-show="own">
+          <div class="ctrl" data-key="a1" data-label="\alpha_1" data-hint="" data-min="-0.5" data-max="1.5" data-step="0.01"></div>
+          <div class="ctrl" data-key="a2" data-label="\alpha_2" data-hint="" data-min="-0.5" data-max="1.5" data-step="0.01"></div>
+          <div class="ctrl" data-key="b11" data-label="\beta_{11}" data-hint="" data-min="-0.5" data-max="0.5" data-step="0.01"></div>
+          <div class="ctrl" data-key="b12" data-label="\beta_{12}" data-hint="" data-min="-0.5" data-max="0.5" data-step="0.01"></div>
+          <div class="ctrl" data-key="b21" data-label="\beta_{21}" data-hint="" data-min="-0.5" data-max="0.5" data-step="0.01"></div>
+          <div class="ctrl" data-key="b22" data-label="\beta_{22}" data-hint="" data-min="-0.5" data-max="0.5" data-step="0.01"></div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Current prices</h2>
+        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="price of input 1" data-min="0.25" data-max="4" data-log="1"></div>
+        <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.25" data-max="4" data-log="1"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Approximation and shares">
+      <div class="panel-head"><h2 id="headA">A second-order approximation</h2></div>
+      <div id="plotA" class="plot plot-2d"></div>
+      <p class="caption" id="capA"></p>
+      <div class="panel-head"><h2>Cost shares are linear in log prices</h2></div>
+      <div id="plotS" class="plot plot-2d"></div>
+      <p class="caption" id="capS"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Elasticities" aria-live="polite">
+        <h2>Elasticities at the current prices</h2>
+        <div id="elas"></div>
+        <p class="caption" id="capE"></p>
+      </section>
+      <section class="panel readouts" aria-label="Restrictions" aria-live="polite">
+        <h2>Restrictions from economic theory</h2>
+        <ul class="checks" id="restr"></ul>
+      </section>
+    </div>
+
+    <div class="wide">
+      <section class="panel" aria-label="Results of Arnberg and Bjørner (2007)">
+        <h2>Results: Arnberg and Bjørner (2007)</h2>
+        <p class="caption">Danish industrial companies, firm-level panel, <span class="tex" data-tex="N=2375"></span>. Inputs: 1 electricity, 2 other energy, 3 labour, 4 machine capital. Reported numbers only; nothing is re-estimated here.</p>
+        <div class="ab-tables">
+          <div>
+            <h3>Price elasticities <span class="tex" data-tex="\varepsilon^c_{ij}"></span> (part of their Table 5)</h3>
+            <div class="table-scroll" id="abElas"></div>
+            <p class="caption">Row: input whose demand responds; column: price <span class="tex" data-tex="P_j"></span> that changes. At sample-mean cost shares; standard errors in parentheses; * 10 %, ** 5 %, *** 1 %. <span class="ab-own">Own-price elasticities</span> are small; substitution between <span class="ab-sub">electricity and other energy</span> is small; energy and machines are <span class="ab-comp">complements</span> (negative cross-price elasticities).</p>
+          </div>
+          <div>
+            <h3>Translog parameters (part of their Table 3)</h3>
+            <div class="table-scroll" id="abPar"></div>
+            <p class="caption" id="abParCap"></p>
+          </div>
+        </div>
+      </section>
+      <section class="panel" aria-label="Why firm-level panel data">
+        <h2>Why firm-level panel data?</h2>
+        <p class="caption">Two firms with Leontief technologies, so <em>no</em> substitution inside either firm: energy intensive <span class="tex" data-tex="\phi^E=\min\{E/2,\,K\}"></span> and capital intensive <span class="tex" data-tex="\phi^K=\min\{E,\,K/2\}"></span>. Energy gets dearer and output moves from the first firm to the second.</p>
+        <div class="ctrl" data-key="yE" data-label="\phi^E" data-hint="output of the energy-intensive firm (the other makes 20 − φᴱ)" data-min="2" data-max="10" data-step="0.5"></div>
+        <div id="plotAgg" class="plot plot-agg"></div>
+        <p class="caption" id="capAgg"></p>
+        <p class="caption"><a href="../substitution-or-composition/index.html">More in “Substitution or Composition?” →</a> (prices, consumers' choice and the econometrician's view)</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Data: S. Arnberg and T. B. Bjørner (2007), Substitution between energy, capital and labour within industrial companies: A micro panel data analysis, <i>Resource and Energy Economics</i> 29, 122–136, as reported in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/firm-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

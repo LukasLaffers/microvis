@@ -1,0 +1,3 @@
+/* Robinson Crusoe's Economy: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { touch-action: auto; cursor: default; }
+#example { width: 100%; }

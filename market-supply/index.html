@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Firms to Market Supply · Microvis</title>
+  <meta name="description" content="Market supply as the horizontal sum of firms' supply curves; fixed costs make supply jump, so a market may have no equilibrium; with many identical firms the average supply fills the gap. Lecture 5.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 5 · The firm and the market</p>
+      <h1>From Firms to Market Supply</h1>
+      <p class="subtitle">Market supply is the horizontal sum of the firms' supply curves, <span class="tex" data-tex="q^1+q^2"></span> at every price. With fixed costs the sum can jump over the demand curve.</p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Each firm has cost <span class="tex" data-tex="C(q)=F+cq+q^2/(2\alpha)"></span> for <span class="tex" data-tex="q>0"></span>, and <span class="tex" data-tex="C(0)=0"></span>: the fixed cost <span class="tex" data-tex="F"></span> is avoided by not producing. So a firm supplies nothing until the price reaches its minimum average cost <span class="tex" data-tex="p'"></span>, then jumps to <span class="tex" data-tex="\hat q"></span> and moves up its marginal cost curve. Add the firms' outputs at each price to get market supply. If demand passes through a jump, no price clears the market. Below, many identical firms: the <em>average</em> firm's supply has no gap in the limit.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Examples from the notes</h2>
+        <div class="btn-row" role="group" aria-label="Examples">
+          <button type="button" data-preset="zero">Zero fixed costs</button>
+          <button type="button" data-preset="fixed">Fixed costs, same MC</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Firm 1 (low cost)</h2>
+        <div class="ctrl" data-key="a1" data-label="\alpha_1" data-hint="slope of supply (1/slope of MC)" data-min="0.5" data-max="8" data-step="0.1"></div>
+        <div class="ctrl" data-key="F1" data-label="F_1" data-hint="fixed cost" data-min="0" data-max="60" data-step="0.5"></div>
+      </div>
+      <div class="group">
+        <h2>Firm 2 (high cost)</h2>
+        <div class="ctrl" data-key="a2" data-label="\alpha_2" data-hint="slope of supply" data-min="0.5" data-max="8" data-step="0.1"></div>
+        <div class="ctrl" data-key="F2" data-label="F_2" data-hint="fixed cost" data-min="0" data-max="60" data-step="0.5"></div>
+      </div>
+      <div class="group">
+        <h2>Both firms and the market</h2>
+        <div class="ctrl" data-key="c" data-label="c" data-hint="MC at q = 0 (both firms)" data-min="0" data-max="5" data-step="0.1"></div>
+        <div class="ctrl" data-key="K" data-label="K" data-hint="demand D(p) = K p^−1.5" data-min="20" data-max="1200" data-step="5"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Firms and market supply">
+      <div class="panel-head"><h2>Two firms and the market</h2></div>
+      <div id="plot" class="plot plot-three"></div>
+      <p class="caption" id="capMain"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="The average firm">
+        <h2>Many identical firms: the average firm</h2>
+        <div class="ctrl" data-key="N" data-label="N" data-hint="number of identical firms (like firm 2)" data-min="1" data-max="64" data-step="1"></div>
+        <div class="ctrl" data-key="Kd" data-label="K_d" data-hint="demand per firm d(p) = K_d p^−1.5" data-min="10" data-max="300" data-step="1"></div>
+        <label class="check"><input type="checkbox" id="limit"> <span>Limit <span class="tex" data-tex="N\to\infty"></span></span></label>
+        <div id="plotB" class="plot plot-2d"></div>
+        <p class="caption" id="capB"></p>
+      </section>
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>Numbers</h2>
+        <dl id="readouts"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

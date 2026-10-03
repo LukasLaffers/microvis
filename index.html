@@ -8,7 +8,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="shared/style.css">
 </head>
-<body>
+<body class="home">
   <header class="site-header">
     <div>
       <h1>Microvis — Visualizations for Microeconomic theory</h1>
@@ -17,8 +17,20 @@
 
   <main>
     <p class="intro">Interactive companions to the lecture notes. Each tool lets you move the parameters of a model and watch its key objects respond. They work in any browser, on a laptop or a phone, and also offline.</p>
+    <nav class="lecture-nav" aria-label="Lectures">
+      <a href="#l1"><b>1</b> Production</a>
+      <a href="#l2"><b>2</b> Firm optimisation</a>
+      <a href="#l3"><b>3</b> Optimal behaviour</a>
+      <a href="#l4"><b>4</b> Comparative statics</a>
+      <a href="#l5-firm"><b>5</b> Firm and market</a>
+      <a href="#l5-consumer"><b>5</b> Preferences</a>
+      <a href="#l6"><b>6</b> Demand</a>
+      <a href="#l7"><b>7</b> Welfare</a>
+      <a href="#l8"><b>8</b> Decentralisation</a>
+      <a href="#l9"><b>9</b> General equilibrium</a>
+    </nav>
 
-    <h2 class="lecture-title">Lecture 1 · Production theory: substitution and scale properties</h2>
+    <h2 class="lecture-title" id="l1">Lecture 1 · Production theory: substitution and scale properties</h2>
     <div class="cards">
       <a class="card" href="production-explorer/index.html">
         <p class="lecture">Lecture 1: scale and substitution properties of production functions</p>
@@ -37,22 +49,157 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 2 · Firm optimisation: one step and two step approach</h2>
+    <h2 class="lecture-title" id="l2">Lecture 2 · Firm optimisation: one step and two step approach</h2>
     <div class="cards">
-      <a class="card card-l2-blue" href="cost-minimisation/index.html">
+      <a class="card" href="cost-minimisation/index.html">
         <p class="lecture">Lecture 2: Step 1 (CM), cost minimisation</p>
         <h2>Cost Minimisation</h2>
         <p>Slide the isocost line down until it touches the isoquant: conditional input demand H(w,q), the cost function C(w,q) and MRTS = w₁/w₂.</p>
       </a>
-      <a class="card card-l2-red" href="cost-curves/index.html">
+      <a class="card" href="cost-curves/index.html">
         <p class="lecture">Lecture 2: Step 2 (PM'), output choice and supply</p>
         <h2>Cost Curves and Supply</h2>
-        <p>Marginal and average cost, the shutdown price p̂ and the supply curve S(w,p); why increasing returns to scale and price taking do not mix.</p>
+        <p>Marginal and average cost, the shutdown price p̂ and the supply curve S(w,p); why increasing returns to scale and price taking do not mix. With a homogeneous technology: AC/MC = k (lecture 3).</p>
       </a>
       <a class="card" href="profit-two-ways/index.html">
         <p class="lecture">Lecture 2: one step and two step profit maximisation</p>
         <h2>One Step vs Two Steps</h2>
         <p>The profit surface over input bundles: its peak (one step) lies on the expansion path at the best output (two steps). D(w,p) = H(w,S(w,p)).</p>
+      </a>
+    </div>
+
+    <h2 class="lecture-title" id="l3">Lecture 3 · Properties of the firm's optimal behaviour</h2>
+    <div class="cards">
+      <a class="card" href="cost-function/index.html">
+        <p class="lecture">Lecture 3: properties (C1)–(C5) and (H1)–(H4) · Lecture 4: area = change in cost</p>
+        <h2>The Cost Function</h2>
+        <p>C(w,q) as a function of input prices: concave because the firm substitutes (C4), Shephard's lemma (C5), scaling all prices (C3, H3) and the symmetric matrix of price effects (H4).</p>
+      </a>
+      <a class="card" href="substitution-scale-effects/index.html">
+        <p class="lecture">Lecture 3: one-step vs two-step approach · Lecture 4: (∗), (∗∗)</p>
+        <h2>Substitution and Scale Effects</h2>
+        <p>When w₁ rises, the demand for input 1 falls twice: along the isoquant (substitution) and down the expansion path as output falls (scale). The two always add up to the total.</p>
+      </a>
+    </div>
+
+    <h2 class="lecture-title" id="l4">Lecture 4 · Comparative statics: "what if" questions</h2>
+    <div class="cards">
+      <a class="card" href="comparative-statics/index.html">
+        <p class="lecture">Lecture 4: dq*/dp = 1/C_qq and (**)</p>
+        <h2>What If? Comparative Statics</h2>
+        <p>How output and input demand respond to prices. A fall in w₁ moves z₁ twice, substitution then scale, so ordinary demand is flatter than conditional demand; the area left of H¹ is the change in cost.</p>
+      </a>
+      <a class="card" href="marshall-law/index.html">
+        <p class="lecture">Lecture 4: Marshall's law, (†)</p>
+        <h2>Marshall's Law of Derived Demand</h2>
+        <p>With constant returns, an industry's labour demand elasticity is a weighted average of the elasticity of substitution and the price elasticity of product demand, weighted by labour's cost share.</p>
+      </a>
+      <a class="card" href="translog/index.html">
+        <p class="lecture">Lecture 4: translog, (&amp;), (%), (#), ($)</p>
+        <h2>Translog Cost Shares</h2>
+        <p>The translog as a second-order approximation of a CES cost function, share equations linear in log prices, elasticities, the parameter restrictions, and the Arnberg and Bjørner (2007) results.</p>
+      </a>
+      <a class="card" href="substitution-or-composition/index.html">
+        <p class="lecture">Lecture 4: Arnberg and Bjørner (2007)</p>
+        <h2>Substitution or Composition?</h2>
+        <p>Two Leontief firms that cannot substitute at all still make aggregate data look as if energy was replaced by capital: why the study uses variation within firms.</p>
+      </a>
+    </div>
+
+    <h2 class="lecture-title" id="l5-firm">Lecture 5 · The firm and the market</h2>
+    <div class="cards">
+      <a class="card" href="market-supply/index.html">
+        <p class="lecture">Lecture 5: more firms</p>
+        <h2>From Firms to Market Supply</h2>
+        <p>Add the firms' supply curves. Fixed costs make supply jump, so demand can miss it: no equilibrium. With many identical firms the average firm's supply fills the gap.</p>
+      </a>
+      <a class="card" href="firm-externalities/index.html">
+        <p class="lecture">Lecture 5: interaction between firms</p>
+        <h2>Firms That Affect Each Other</h2>
+        <p>When one firm's output raises the other's marginal cost, market supply is steeper than MC₁ + MC₂; when it lowers it, flatter.</p>
+      </a>
+      <a class="card" href="free-entry/index.html">
+        <p class="lecture">Lecture 5: industry size</p>
+        <h2>Free Entry and Industry Size</h2>
+        <p>Profits attract entrants, the price falls, and entry stops when Π(q_N) ≥ 0 but Π(q_N+1) &lt; 0. In the long run, zero profit at minimum average cost.</p>
+      </a>
+      <a class="card" href="monopoly/index.html">
+        <p class="lecture">Lecture 5: market power, product differentiation</p>
+        <h2>Monopoly and Product Differentiation</h2>
+        <p>MR = MC and p = MC/(1 + 1/η): less output at a higher price. Substitutes push a local monopolist's average revenue down until it is tangent to average cost.</p>
+      </a>
+    </div>
+
+    <h2 class="lecture-title" id="l5-consumer">Lecture 5 · Consumer preferences</h2>
+    <div class="cards">
+      <a class="card" href="budget-sets/index.html">
+        <p class="lecture">Lecture 5: consumption opportunities</p>
+        <h2>Budget Sets</h2>
+        <p>Income (B1), endowment (B2), both (B3) and a two-part tariff. A price change turns the budget line about different points; fees and whole units make the set non-convex.</p>
+      </a>
+      <a class="card" href="preference-axioms/index.html">
+        <p class="lecture">Lecture 5: axioms on preferences</p>
+        <h2>Better, Worse, Indifferent</h2>
+        <p>B(x), W(x) and I(x) for five preference relations, which axioms each satisfies, and why lexicographic preferences are not continuous.</p>
+      </a>
+      <a class="card" href="ordinal-utility/index.html">
+        <p class="lecture">Lecture 5: utility, quasi-concavity, MRS</p>
+        <h2>Utility Is Ordinal</h2>
+        <p>U and f(U) rank bundles the same way and share their indifference curves. Quasi-concavity and Theorem 1 along the tangent; MRS₂₁ = U₁/U₂.</p>
+      </a>
+    </div>
+    <h2 class="lecture-title" id="l6">Lecture 6 · Demand theory</h2>
+    <div class="cards">
+      <a class="card" href="demand-duality/index.html">
+        <p class="lecture">Lecture 6: (UMP) and (EMP), duality, Roy and Shephard</p>
+        <h2>UMP and EMP: Two Sides of One Tangency</h2>
+        <p>Maximising utility on a budget and minimising spending for a utility level pick the same bundle: D(p,y) = H(p,V(p,y)), Roy's identity and Shephard's lemma.</p>
+      </a>
+      <a class="card" href="slutsky/index.html">
+        <p class="lecture">Lecture 6: (M3) the Slutsky equation, Giffen goods</p>
+        <h2>Substitution and Income Effects</h2>
+        <p>A price change splits into a move along the indifference curve and a parallel shift of the budget line. Marshallian against Hicksian demand, and a Giffen good whose demand slopes up.</p>
+      </a>
+      <a class="card" href="engel-curves/index.html">
+        <p class="lecture">Lecture 6: income effects, elasticities, Engel and Cournot</p>
+        <h2>Income Expansion Paths and Engel Curves</h2>
+        <p>How demand moves with income: necessities, luxuries and inferior goods, budget shares, and the conditions of Engel and Cournot.</p>
+      </a>
+    </div>
+
+    <h2 class="lecture-title" id="l7">Lecture 7 · Welfare measurement</h2>
+    <div class="cards">
+      <a class="card" href="cv-ev/index.html">
+        <p class="lecture">Lecture 7: CV, EV and consumer surplus</p>
+        <h2>CV, EV and Consumer Surplus</h2>
+        <p>Three money measures of a price change as areas to the left of demand curves. The income effect decides their order; without it they coincide.</p>
+      </a>
+      <a class="card" href="deadweight-loss/index.html">
+        <p class="lecture">Lecture 7: the deadweight loss of a tax</p>
+        <h2>The Deadweight Loss of a Tax</h2>
+        <p>The consumer loses more than the tax raises. The loss grows with the square of the tax, and the notes' table of 14 commodity groups shows where each krone of tax costs most.</p>
+      </a>
+    </div>
+    <h2 class="lecture-title" id="l8">Lecture 8 · Decentralisation in a simple economy</h2>
+    <div class="cards">
+      <a class="card" href="robinson-crusoe/index.html">
+        <p class="lecture">Lecture 8: planner, prices and the (C1), (C2) conditions</p>
+        <h2>Robinson Crusoe's Economy</h2>
+        <p>Robinson's best mix of leisure and coconuts, MRS = MRT, and the real wage that lets a profit-maximising firm and a utility-maximising consumer find it on their own. Why it fails with increasing returns, and what trade does.</p>
+      </a>
+    </div>
+
+    <h2 class="lecture-title" id="l9">Lecture 9 · General equilibrium</h2>
+    <div class="cards">
+      <a class="card" href="edgeworth-box/index.html">
+        <p class="lecture">Lecture 9: offer curves, core, Walras' law, welfare theorems</p>
+        <h2>The Edgeworth Box</h2>
+        <p>Trade between Alf and Bill: offer curves, one or three competitive equilibria, the contract curve and the core, excess demand, and any efficient allocation reached by a lump-sum transfer.</p>
+      </a>
+      <a class="card" href="core-replica/index.html">
+        <p class="lecture">Lecture 9: replica economies</p>
+        <h2>The Core Shrinks</h2>
+        <p>Copy the economy N times: coalitions of N Alfs and M Bills block every core allocation that is not competitive, once the economy is large enough.</p>
       </a>
     </div>
   </main>

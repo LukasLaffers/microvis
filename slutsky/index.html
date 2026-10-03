@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Substitution and Income Effects · Microvis</title>
+  <meta name="description" content="The Slutsky equation: a price change splits into a substitution effect along the indifference curve and an income effect; Marshallian versus Hicksian demand; inferior and Giffen goods. Lecture 6.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 6 · Demand theory</p>
+      <h1>Substitution and Income Effects</h1>
+      <p class="subtitle"><span class="tex" data-tex="\frac{\partial D^j(p,y)}{\partial p_k}=\color{#4a90e2}{\frac{\partial H^j(p,v)}{\partial p_k}}\color{#d0021b}{-\frac{\partial D^j(p,y)}{\partial y}D^k(p,y)}\qquad(\text{M3})"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Start at <span class="tex" data-tex="E_1"></span>. When the price of good 1 changes, first keep the consumer on the same indifference curve and let only the relative price change: she moves to <span class="tex" data-tex="E_2"></span> (<span class="c-l2-blue">substitution effect</span>, always towards the good that got cheaper). Then give her the real income change: she moves along parallel budget lines to <span class="tex" data-tex="E_3"></span> (<span class="c-l2-red">income effect</span>). For a normal good both effects point the same way. For an inferior good the income effect works against substitution; if it wins, as in the Giffen example, she buys <em>less</em> of the good that got cheaper.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Examples</h2>
+        <div class="btn-row" role="group" aria-label="Examples">
+          <button type="button" data-preset="normal">Normal good</button>
+          <button type="button" data-preset="giffen">Giffen good</button>
+        </div>
+      </div>
+      <div class="group">
+        <h2>Preferences</h2>
+        <select id="type" aria-label="Utility function">
+          <option value="ces">CES</option>
+          <option value="stonegeary">Stone–Geary (subsistence)</option>
+          <option value="giffen">Giffen example</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="stonegeary"></div>
+        <div class="ctrl" data-key="g1" data-label="\gamma_1" data-hint="subsistence of good 1" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
+        <div class="ctrl" data-key="g2" data-label="\gamma_2" data-hint="subsistence of good 2" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
+        <p class="hint-line" data-show="giffen">Defined for <span class="tex" data-tex="x_1>1"></span>, <span class="tex" data-tex="x_2<4"></span>. Good 1 is inferior; with <span class="tex" data-tex="y>4p_2"></span> it is a Giffen good.</p>
+      </div>
+      <div class="group">
+        <h2>Prices and income</h2>
+        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="before" data-min="0.5" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="p1n" data-label="p_1'" data-hint="after" data-min="0.5" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="2" data-max="30" data-step="0.05"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="The decomposition">
+      <div class="panel-head"><h2 id="head">A price change in two steps</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Demand curves">
+        <h2>Marshallian and Hicksian demand for good 1</h2>
+        <div id="plotB" class="plot plot-2d"></div>
+        <p class="caption" id="capB"></p>
+      </section>
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>The effects</h2>
+        <table class="data effects" id="table"></table>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Real-world Giffen behaviour: R. Jensen and N. Miller (2008), <i>American Economic Review</i> 98(4), 1553–1577.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="../shared/consumer-ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

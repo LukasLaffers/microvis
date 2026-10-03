@@ -1,0 +1,5 @@
+/* The Cost Function: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-small { height: 260px; }
+dl.mini { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 8px 0 0; font-size: 14px; }
+dl.mini dt { color: var(--muted); }
+dl.mini dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }

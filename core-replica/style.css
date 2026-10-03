@@ -1,0 +1,5 @@
+/* The Core Shrinks: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-box { height: auto; aspect-ratio: 1 / 1; max-height: 680px; }
+.c-green { color: #3d9a40; }
+.plot-box { touch-action: auto; cursor: default; }
+#nButtons { margin-top: 4px; }

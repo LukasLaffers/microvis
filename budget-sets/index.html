@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Budget Sets · Microvis</title>
+  <meta name="description" content="Technically feasible and budget-feasible choices: income (B1), endowment (B2), both (B3) and a two-part tariff, and what a price change does to each. Lecture 5.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 5 · Consumer preferences</p>
+      <h1>Budget Sets</h1>
+      <p class="subtitle"><span class="tex" data-tex="p^tx\le y\ \ (B1),\qquad p^tx\le p^tR\ \ (B2),\qquad p^tx\le p^tR+y\ \ (B3)"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The grey area is what the consumer can choose: bundles that are technically feasible (in <span class="tex" data-tex="X"></span>) and affordable. With an income <span class="tex" data-tex="y"></span> (B1) or an endowment <span class="tex" data-tex="R"></span> sold at market prices (B2), the set can look the same, but a price change works differently: under (B1) the budget line turns about the point where all money goes on good 2, under (B2) about <span class="tex" data-tex="R"></span>, which always stays affordable. The blue line is the budget line after <span class="tex" data-tex="p_1"></span> changes to <span class="tex" data-tex="p_1'"></span>. Click the plot to test a bundle.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Where the budget comes from</h2>
+        <div class="seg seg-4" role="group" aria-label="Budget constraint">
+          <button type="button" data-b="B1" aria-pressed="true">(B1) income</button>
+          <button type="button" data-b="B2" aria-pressed="false">(B2) endowment</button>
+          <button type="button" data-b="B3" aria-pressed="false">(B3) both</button>
+          <button type="button" data-b="tariff" aria-pressed="false">Two-part tariff</button>
+        </div>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="0" data-max="24" data-step="0.5" data-show="B1|B3|tariff"></div>
+        <div class="ctrl" data-key="R1" data-label="R_1" data-hint="endowment of good 1" data-min="0" data-max="10" data-step="0.25" data-show="B2|B3"></div>
+        <div class="ctrl" data-key="R2" data-label="R_2" data-hint="endowment of good 2" data-min="0" data-max="10" data-step="0.25" data-show="B2|B3"></div>
+        <div class="ctrl" data-key="F" data-label="F" data-hint="entrance fee for good 2" data-min="0" data-max="10" data-step="0.25" data-show="tariff"></div>
+      </div>
+      <div class="group">
+        <h2>Prices</h2>
+        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="price of good 1" data-min="0.5" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="price of good 2" data-min="0.5" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="p1n" data-label="p_1'" data-hint="p₁ after a change (blue line)" data-min="0.5" data-max="5" data-step="0.05"></div>
+      </div>
+      <div class="group">
+        <h2>Technically feasible set X</h2>
+        <div class="seg seg-3" role="group" aria-label="Feasible set">
+          <button type="button" data-x="all" aria-pressed="true">Any x ≥ 0</button>
+          <button type="button" data-x="cap" aria-pressed="false">At most x̄₂ of good 2</button>
+          <button type="button" data-x="integer" aria-pressed="false">Whole units of good 2</button>
+        </div>
+        <div class="ctrl" data-key="cap" data-label="\bar x_2" data-hint="upper limit on good 2" data-min="0.5" data-max="20" data-step="0.5" data-show="cap"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Budget set">
+      <div class="panel-head"><h2>A set of budget-feasible choices</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>Numbers</h2>
+        <dl id="readouts"></dl>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

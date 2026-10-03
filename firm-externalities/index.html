@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firms That Affect Each Other · Microvis</title>
+  <meta name="description" content="When one firm's output raises (or lowers) the other's marginal cost, market supply is steeper (or flatter) than the sum of the marginal cost curves. Lecture 5.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 5 · The firm and the market</p>
+      <h1>Firms That Affect Each Other</h1>
+      <p class="subtitle"><span class="tex" data-tex="MC_1(q^1;q^2)=c+q^1/\alpha+e\,q^2"></span>: with a negative externality (<span class="tex" data-tex="e>0"></span>) market supply reacts less to the price than <span class="tex" data-tex="MC_1+MC_2"></span>, with a positive one (<span class="tex" data-tex="e<0"></span>) more.</p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Each firm's supply curve depends on how much the <em>other</em> firm produces: with pollution or congestion, more <span class="tex" data-tex="q^2"></span> raises firm 1's marginal cost and shifts <span class="tex" data-tex="S^1"></span> up. Adding the firms' supply curves for a fixed output of the other firm gives the dotted <span class="tex" data-tex="MC_1+MC_2"></span> lines. But when the price rises both firms expand, which pushes up each other's costs, so the true market supply <span class="tex" data-tex="S"></span> (solid) cuts across the dotted lines and is steeper. Training, networking or infrastructure work the other way.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Externality</h2>
+        <div class="btn-row" role="group" aria-label="Examples">
+          <button type="button" data-preset="0.5">Negative</button>
+          <button type="button" data-preset="0">None</button>
+          <button type="button" data-preset="-0.5">Positive</button>
+        </div>
+        <div class="ctrl" data-key="e" data-label="e" data-hint="effect of the other firm's output on MC" data-min="-0.8" data-max="0.8" data-step="0.05"></div>
+      </div>
+      <div class="group">
+        <h2>Firms (identical)</h2>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="slope of own supply" data-min="0.5" data-max="1.2" data-step="0.05"></div>
+        <div class="ctrl" data-key="c" data-label="c" data-hint="MC at zero output" data-min="0" data-max="3" data-step="0.1"></div>
+        <div class="ctrl" data-key="qa" data-label="\bar q_a" data-hint="other firm's output (low)" data-min="0" data-max="8" data-step="0.5"></div>
+        <div class="ctrl" data-key="qb" data-label="\bar q_b" data-hint="other firm's output (high)" data-min="0" data-max="8" data-step="0.5"></div>
+      </div>
+      <div class="group">
+        <h2>Price</h2>
+        <div class="ctrl" data-key="p" data-label="p" data-hint="output price" data-min="0" data-max="12" data-step="0.05"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Firms and market supply">
+      <div class="panel-head"><h2 id="head">Negative externality</h2></div>
+      <div id="plot" class="plot plot-three"></div>
+      <p class="caption" id="capMain"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>At the price p</h2>
+        <ul class="checks" id="checks"></ul>
+        <dl id="readouts"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

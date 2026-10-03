@@ -22,6 +22,7 @@
   --dec: #b4462b;
   --const: #4b5563;
   --inc: #2b8452;
+  --on-accent: #ffffff;
   --radius: 10px;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color-scheme: light;
@@ -46,6 +47,7 @@
     --dec: #f08a6c;
     --const: #b7beca;
     --inc: #5cc08a;
+    --on-accent: #0f1520;
     color-scheme: dark;
   }
 }
@@ -68,6 +70,7 @@
   --dec: #f08a6c;
   --const: #b7beca;
   --inc: #5cc08a;
+  --on-accent: #0f1520;
   color-scheme: dark;
 }
 
@@ -215,7 +218,7 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
   font-size: 14px;
 }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
 :root[data-mode="scale"] .seg button[aria-pressed="true"] { background: var(--accent-2); }
 
 .btn-row { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -399,5 +402,17 @@ details.sub-details summary { cursor: pointer; color: var(--muted); font-weight:
 /* ---------- landing page: one section per lecture ---------- */
 .lecture-title { font-size: 17px; font-weight: 650; margin: 26px 0 12px; color: var(--ink); }
 .lecture-title:first-of-type { margin-top: 8px; }
-.card.card-l2-blue h2 { color: var(--l2-blue); }
-.card.card-l2-red h2 { color: var(--l2-red); }
+
+/* landing page: centred column, lecture navigation, section headings with an accent bar */
+.home .site-header, .home main, .home .site-footer { max-width: 1240px; }
+.home .cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); }
+.lecture-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.lecture-nav a {
+  font-size: 13px; text-decoration: none; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; white-space: nowrap;
+}
+.lecture-nav a b { color: var(--accent); margin-right: 2px; }
+.lecture-nav a:hover { border-color: var(--accent); }
+.home .lecture-title { border-left: 3px solid var(--accent); padding-left: 10px; scroll-margin-top: 12px; margin-top: 30px; }
+.home .lecture-title:first-of-type { margin-top: 18px; }
+.btn-row button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 650; }
