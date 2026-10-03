@@ -96,4 +96,14 @@ for (const s of smooth) for (const w of prices) for (const alpha of [0.25, 1.7, 
   checks += 10;
 }
 
+// Lecture 4: area to the left of H^1 between two prices = change in cost (all technologies; linear across its kink).
+for (const tech of ['cobb', 'ces', 'linear', 'leontief']) for (const delta of [0.3, 0.5, 0.7]) for (const [w2, q] of [[1, 1], [2, 2], [0.7, 3.5]]) {
+  const s = { tech, delta, rho: -0.8, profile: 'homog', A: 1.2, k: 0.8 };
+  for (const [wa, wb] of [[0.5, 2], [1.7, 0.3], [0.2, 4.5]]) {
+    const area = M.areaLeftOfH1(w2, q, s, wa, wb), dC = Math.abs(FM.cost([wa, w2], q, s) - FM.cost([wb, w2], q, s));
+    close(area, dC, 1e-6, `area ${tech} ${JSON.stringify({ delta, w2, q, wa, wb })}`);
+    checks++;
+  }
+}
+
 console.log(`All ${checks} cost-function checks passed.`);

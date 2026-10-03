@@ -85,4 +85,23 @@ for (const s of cases) {
   checks += 15;
 }
 
+// Lecture 4 (*) and (**): MC shifts by dH^1/dq per unit of w1 (Shephard), dq*/dw1 = -(dH^1/dq)/C_qq, and the
+// closed-form scale effect -(1/C_qq)(dH^1/dq)^2 equals the finite-difference scale effect.
+for (const tech of ['cobb', 'ces', 'leontief']) for (const [a, m] of [[2, 1], [1.5, 0.6]]) for (const w of [[1, 1], [1.7, 0.8]]) for (const p of [6, 9, 14]) {
+  const s = { tech, delta: 0.45, rho: -0.6, profile: 'ushape', A: 1, k: 0.6, a, m };
+  if (!(M.output(w, p, s) > 0)) continue;
+  const c = M.scaleClosedForm(w, p, s), d = M.decomposeDerivative(w, p, s), label = JSON.stringify({ s, w, p });
+  close(c.dMCdw1, c.dHdq, 1e-5, 'MC shift = dH1/dq ' + label);
+  close(c.dqdw1, d.dSdw1, 1e-4, '(*) ' + label);
+  close(c.scale, d.input1.scale, 1e-4, '(**) scale ' + label);
+  assert.ok(c.Cqq > 0 && c.scale <= 0);
+  checks += 4;
+}
+// Defaults: dH^1/dq = 4, C_qq = 2 * 2 sqrt(3) = 6.928, scale effect -16 / 6.928 = -2.309.
+{
+  const s = { tech: 'cobb', delta: 0.5, rho: -0.5, profile: 'ushape', A: 1, k: 0.6, a: 2, m: 1 }, c = M.scaleClosedForm([1, 1], 8, s);
+  close(c.dHdq, 4, 1e-6); close(c.Cqq, 4 * Math.sqrt(3), 1e-6); close(c.scale, -16 / (4 * Math.sqrt(3)), 1e-6);
+  checks += 3;
+}
+
 console.log(`All ${checks} decomposition checks passed.`);

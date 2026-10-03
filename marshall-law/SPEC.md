@@ -45,3 +45,12 @@ At $w_1=2$: $sh_1\approx0.586$, $\varepsilon^u_{11}\approx-1.379$; at $w_1=0.5$:
 
 ## Done when
 Formula and finite difference agree everywhere; the lever picture moves correctly; the 10 % animation works; tests pass; no console errors; works at 375 px; numbers reproduced.
+
+## As built (merged with the first version of the tool)
+Everything above, plus the panels of the earlier `derived-demand/` version:
+- Technology choice CES (default) / Cobb-Douglas / Leontief; $\sigma$ from Theorem 1 ($C_{12}C/(C_1C_2)$, finite differences) checked against the formula value.
+- "The industry's demand for labour": log-log $D^1(w_1)=\widetilde H^1(w)\,Dem(c(w))$ and the conditional $H^1$ at today's output, tangent slopes $\varepsilon^u_{11}$ and $\varepsilon^c_{11}$.
+- "The product market" (panel 3 above) with the discrete what-if: the wage rise is a slider $\Delta w_1/w_1$ (default 10 %); the button "Raise $w_1$ and watch both channels" animates panels 2 and 3.
+- Readouts: corollary, (†) and Marshall's law each against a finite difference (✓); the exact change in $D^1$ against $\varepsilon^u_{11}\times\Delta w_1/w_1$.
+- Marshall's rules: (c) is drawn by moving $w_1$; along it $(-\varepsilon^u_{11})=\sigma+(\eta-\sigma)\,sh_1$, tested.
+Model: `equilibrium`, `industryDemand1`, `conditional1`, `sigmaTheorem1`, `elasticities`, `sigmaFormula`, `marshall`, `whatIf`, `withSigma`, `ruleSigma`, `ruleEta`, `ruleShare`. Test: `node marshall-law/test-model.cjs` (3,309 checks, including the defaults above: $sh_1=0.5$, $\varepsilon^c_{11}=-0.25$, $1.25$; $w_1=2$: $0.586$, $-1.379$; $w_1=0.5$: $0.414$, $-1.121$).

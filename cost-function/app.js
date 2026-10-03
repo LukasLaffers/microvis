@@ -12,7 +12,7 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { tech: 'cobb', delta: 0.5, rho: -0.5, A: 1, k: 1, w1: 1, w2: 2, q: 2, probe: 2, alpha: 1 };
+  const state = { tech: 'cobb', delta: 0.5, rho: -0.5, A: 1, k: 1, w1: 1, w2: 2, q: 2, probe: 2, alpha: 1, w1o: 0.5 };
   const tech = () => ({ tech: state.tech, delta: state.delta, rho: state.rho, profile: 'homog', A: state.A, k: state.k, a: 2, m: 1 });
 
   let ctrls = {};
@@ -147,6 +147,32 @@
     ].map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
   }
 
+  // ---------- lecture 4: the area to the left of H^1 between two prices is the change in cost ----------
+
+  function drawArea(th, P) {
+    const { s, wbar, q } = P, w2 = wbar[1], wa = wbar[0], wb = state.w1o, lo = Math.min(wa, wb), hi = Math.max(wa, wb);
+    const H1 = w1 => FM.condDemand([w1, w2], q, s).H[0];
+    const ws = U.linspace(W1[0], W1[1], 300);
+    const band = U.linspace(lo, hi, 120);
+    if (s.tech === 'linear') { const sw = CF.linearSwitchW1(w2, s); if (sw > lo && sw < hi) band.push(sw - 1e-7 * (hi - lo), sw + 1e-7 * (hi - lo)); band.sort((x, y) => x - y); }
+    const zTop = 1.15 * Math.max(...ws.map(H1).filter(Number.isFinite), 1e-3);
+    const poly = [[0, lo], ...band.map(w => [H1(w), w]), [0, hi]];
+    const traces = [
+      { type: 'scatter', mode: 'lines', x: poly.map(v => v[0]), y: poly.map(v => v[1]), fill: 'toself', fillcolor: 'rgba(74,144,226,0.22)', line: { width: 0 }, hoverinfo: 'skip', name: 'area' },
+      U.line2(ws.map(w => [H1(w), w]), th.blue, 2.5, 'H¹(w₁, w̄₂, q)'),
+      U.dot2([[H1(wa), wa]], th.ink, 'w₁* = w̄₁', 10),
+      U.dot2([[H1(wb), wb]], th.blue, 'w₁°', 10)
+    ];
+    const ann = [
+      { x: 0, y: wa, text: 'w<sub>1</sub>*', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 12, color: th.ink } },
+      { x: 0, y: wb, text: 'w<sub>1</sub><sup>o</sup>', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 12, color: th.blue } }
+    ];
+    Plotly.react('plotArea', traces, U.base2d(th, { xt: 'z<sub>1</sub> = H<sup>1</sup>(w<sub>1</sub>, w̄<sub>2</sub>, q)', yt: 'w<sub>1</sub>', x: { range: [0, zTop] }, y: { range: [0, W1[1]] }, annotations: ann }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    const area = CF.areaLeftOfH1(w2, q, s, wa, wb), dC = FM.cost([wb, w2], q, s) - FM.cost([wa, w2], q, s);
+    const ok = Math.abs(area - Math.abs(dC)) <= 1e-4 * Math.max(1, Math.abs(dC));
+    $('capArea').innerHTML = `Because ${texStr('H^1(w,q)=\\partial C(w,q)/\\partial w_1')}, the shaded area to the left of the conditional demand curve, ${texStr(`\\int_{${fmt(lo, 2)}}^{${fmt(hi, 2)}}H^1(w_1,\\bar w_2,q)\\,\\mathrm dw_1=${fmt(area, 4)}`)}, reflects the change in cost that the price change induces: ${texStr(`C(w_1^o,\\bar w_2,q)-C(w_1^\\ast,\\bar w_2,q)=${fmt(dC, 4)}`)} <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓' : '✗'}</span>`;
+  }
+
   // ---------- render loop ----------
 
   function render() {
@@ -158,6 +184,7 @@
     guard('input plot', () => drawInputs(th, P));
     guard('scaling plot', () => drawScaling(th, P));
     guard('matrix', () => renderMatrix(P));
+    guard('area plot', () => drawArea(th, P));
   }
 
   // Pointer on the cost plot: hover compares a price, press or drag moves the reference price.
@@ -178,6 +205,8 @@
     $('tech').addEventListener('change', e => { state.tech = e.target.value; schedule(); });
     render();
     setupPointer();
+    const ga = $('plotArea');
+    ga.addEventListener('click', ev => { const d = U.eventToData(ga, ev); if (d) ctrls.w1o.set(U.clampTo(d[1], W1[0], W1[1])); });
     U.watchColorScheme(schedule);
   }
 

@@ -11,6 +11,10 @@ shared/style.css        common look (colors, typography, layout, controls)
 shared/ui.js            small helpers every tool uses (controls, KaTeX, plot styling, error banner); no economics
 shared/firm-model.js    firm model for the lecture 2+ tools: phi = F(g(z)), costs, supply, profit (UMD)
 shared/test-firm-model.cjs  `node shared/test-firm-model.cjs` must pass
+shared/consumer-model.js  consumer model for the lecture 6+ tools: D, V, C, H, Slutsky, elasticities (UMD)
+shared/consumer-ui.js     KaTeX formulas for the consumer utility functions
+shared/exchange-model.js  two-person exchange economy for the lecture 9 tools: equilibria, contract curve, core, replicas (UMD)
+shared/test-consumer-model.cjs, shared/test-exchange-model.cjs  must pass
 shared/vendor/          bundled third-party libraries (Plotly, KaTeX) with their licenses
 plans/                  plans for groups of tools, e.g. plans/lecture-2.md
 <tool-name>/            one folder per tool, kebab-case, e.g. production-explorer/
@@ -56,4 +60,4 @@ plans/                  plans for groups of tools, e.g. plans/lecture-2.md
 | elasticity of scale | $e(z)$; at the cost-minimising bundle $e=AC/MC$ |
 | elasticity of substitution | $\sigma=1/(1-\rho)$ for CES |
 
-Colours in the lecture 2 tools, as in the notes' figures: Step 1 / (CM) / substitution blue `#4a90e2`; Step 2 / (PM') / scale red `#d0021b`; supply orange `#f5a623`; isocost lines grey `#9b9b9b`. Page eyebrow "Lecture N · Theory of the firm"; no course code or university name on pages.
+Colours in the lecture 2 tools, as in the notes' figures: Step 1 / (CM) / substitution blue `#4a90e2`; Step 2 / (PM') / scale red `#d0021b`; supply orange `#f5a623`; isocost lines grey `#9b9b9b`. Page eyebrow "Lecture N · Theory of the firm" (lecture 5: "Lecture 5 · The firm and the market" and "Lecture 5 · Consumer preferences"; then "Lecture 6 · Demand theory", "Lecture 7 · Welfare measurement", "Lecture 8 · Decentralisation in a simple economy", "Lecture 9 · General equilibrium"); no course code or university name on pages. Consumer notation (goods $x$, prices $p$, income $y$, endowment $R$, (B1)–(B3), $B(x)$, $W(x)$, $I(x)$, $MRS_{21}=U_1/U_2$) is listed in `plans/lecture-5.md`.

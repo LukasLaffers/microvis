@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Better, Worse, Indifferent · Microvis</title>
+  <meta name="description" content="The better-than set B(x), the worse-than set W(x) and the indifference set I(x) for several preferences, which axioms they satisfy, and why lexicographic preferences are not continuous. Lecture 5.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 5 · Consumer preferences</p>
+      <h1>Better, Worse, Indifferent</h1>
+      <p class="subtitle"><span class="tex" data-tex="B(x)=\{x'\in X:x'\succcurlyeq x\},\quad W(x)=\{x'\in X:x\succcurlyeq x'\},\quad I(x)=\{x'\in X:x'\sim x\}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Pick a preference relation and a reference bundle <span class="tex" data-tex="x^\circ"></span>. Blue: bundles at least as good as <span class="tex" data-tex="x^\circ"></span>, the set <span class="tex" data-tex="B(x^\circ)"></span>. Grey: bundles no better, <span class="tex" data-tex="W(x^\circ)"></span>. The curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. Click anywhere to place a test bundle <span class="tex" data-tex="x'"></span>: the page tells you how it compares with <span class="tex" data-tex="x^\circ"></span> and whether the segment between them stays in <span class="tex" data-tex="B(x^\circ)"></span>, which convexity requires. The table lists which axioms hold.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Preferences</h2>
+        <select id="type" aria-label="Preferences">
+          <option value="cobb">Cobb-Douglas</option>
+          <option value="subs">Perfect substitutes</option>
+          <option value="concave">Indifference curves bowed out</option>
+          <option value="bliss">A bliss point</option>
+          <option value="lex">Lexicographic</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="cobb|subs|concave"></div>
+        <div class="ctrl" data-key="b1" data-label="b_1" data-hint="bliss point" data-min="2" data-max="9" data-step="0.1" data-show="bliss"></div>
+        <div class="ctrl" data-key="b2" data-label="b_2" data-hint="bliss point" data-min="2" data-max="9" data-step="0.1" data-show="bliss"></div>
+      </div>
+      <div class="group">
+        <h2>Bundles</h2>
+        <div class="ctrl" data-key="x1" data-label="x^\circ_1" data-hint="reference bundle" data-min="0" data-max="10" data-step="0.1"></div>
+        <div class="ctrl" data-key="x2" data-label="x^\circ_2" data-hint="reference bundle" data-min="0" data-max="10" data-step="0.1"></div>
+        <p class="hint-line">Click the plot to move the test bundle <span class="tex" data-tex="x'"></span>.</p>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Better and worse sets">
+      <div class="panel-head"><h2>'Better than' and 'worse than' sets</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Axioms" aria-live="polite">
+        <h2>Axioms</h2>
+        <ul class="checks" id="axioms"></ul>
+        <p class="caption" id="repr"></p>
+      </section>
+      <section class="panel readouts" aria-label="Comparisons" aria-live="polite">
+        <h2>Comparisons</h2>
+        <dl id="readouts"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figure after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

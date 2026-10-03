@@ -1,0 +1,4 @@
+/* Better, Worse, Indifferent: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { cursor: crosshair; touch-action: manipulation; aspect-ratio: 1 / 1; height: auto; max-height: 640px; }
+.hint-line { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.checks .why { display: block; color: var(--muted); font-size: 13px; }

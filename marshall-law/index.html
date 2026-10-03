@@ -34,8 +34,8 @@
       <div class="group">
         <h2>Technology (constant returns)</h2>
         <select id="tech" aria-label="Technology">
-          <option value="cobb">Cobb-Douglas</option>
           <option value="ces">CES</option>
+          <option value="cobb">Cobb-Douglas</option>
           <option value="leontief">Leontief (perfect complements)</option>
         </select>
         <div class="formula" id="formula-general"></div>
@@ -48,12 +48,14 @@
         <h2>Prices and product demand</h2>
         <div class="ctrl" data-key="w1" data-label="w_1" data-hint="wage" data-min="0.2" data-max="5" data-step="0.05"></div>
         <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of capital" data-min="0.2" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="eps" data-label="\varepsilon^D_p" data-hint="price elasticity of Dem(p)" data-min="-4" data-max="-0.1" data-step="0.05"></div>
+        <div class="ctrl" data-key="eta" data-label="-\varepsilon^D_p" data-hint="product demand elasticity (absolute)" data-min="0" data-max="4" data-step="0.05"></div>
+        <p class="hint-line">Raising <span class="tex" data-tex="w_1"></span> changes labour's cost share <span class="tex" data-tex="sh_1"></span> (unless <span class="tex" data-tex="\sigma=1"></span>).</p>
       </div>
 
       <div class="group">
         <h2>What if the wage rises?</h2>
         <div class="ctrl" data-key="r" data-label="\Delta w_1/w_1" data-hint="wage rise, %" data-min="1" data-max="50" data-step="1"></div>
+        <div class="btn-row"><button type="button" id="raise">Raise w₁ and watch both channels</button></div>
       </div>
     </section>
 
@@ -72,6 +74,16 @@
         <div id="plotC" class="plot plot-2d"></div>
         <p class="caption" id="capC"></p>
       </section>
+      <section class="panel" aria-label="Inside the firm">
+        <h2>Inside the firm</h2>
+        <div id="plotF" class="plot plot-2d"></div>
+        <p class="caption" id="capF"></p>
+      </section>
+      <section class="panel" aria-label="Marshall's rules">
+        <h2>Marshall's rules</h2>
+        <div id="plotR" class="plot plot-rules"></div>
+        <p class="caption" id="capR"></p>
+      </section>
       <section class="panel readouts" aria-label="Formulas" aria-live="polite">
         <h2>Formulas, checked</h2>
         <ul class="checks" id="checks"></ul>
@@ -81,7 +93,7 @@
   </main>
 
   <footer class="site-footer">
-    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Industry demand <span class="tex" data-tex="Dem(p)=100\,p^{\varepsilon^D_p}"></span> with a constant price elasticity.
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Industry demand <span class="tex" data-tex="Dem(p)=10\,p^{\varepsilon^D_p}"></span> with a constant price elasticity.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>

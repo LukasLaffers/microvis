@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Deadweight Loss of a Tax · Microvis</title>
+  <meta name="description" content="A commodity tax costs the consumer more than it raises: the deadweight loss as the area between the Hicksian demand curve and the tax rectangle, its approximation, and DWL per krone for 14 commodity groups. Lecture 7.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 7 · Welfare measurement</p>
+      <h1>The Deadweight Loss of a Tax</h1>
+      <p class="subtitle"><span class="tex" data-tex="DWL=\int_{p_1^0}^{p_1^1}H^1(p_1,1,v^1)\,\mathrm dp_1-T\ \approx\ -\tfrac12\,\frac{\partial H^1}{\partial p_1}\,(p_1^1-p_1^0)^2>0"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>A tax raises the price of good 1 from <span class="tex" data-tex="p_1^0"></span> to <span class="tex" data-tex="p_1^1"></span>. The government collects the yellow rectangle <span class="tex" data-tex="T"></span>. The consumer loses <span class="tex" data-tex="|EV|"></span>, the whole area to the left of the Hicksian demand curve at her new utility between the two prices. The difference, the triangle-like area, is lost to everybody: the deadweight loss. It exists because the Hicksian curve slopes down, whether the good is normal or inferior, and it grows with the square of the tax.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Preferences</h2>
+        <select id="type" aria-label="Utility function">
+          <option value="ces">CES</option>
+          <option value="stonegeary">Stone–Geary (subsistence)</option>
+          <option value="quasilinear">Quasilinear</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="stonegeary"></div>
+        <div class="ctrl" data-key="g1" data-label="\gamma_1" data-hint="subsistence of good 1" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
+        <div class="ctrl" data-key="kappa" data-label="\kappa" data-hint="weight of good 1" data-min="1" data-max="12" data-step="0.1" data-show="quasilinear"></div>
+      </div>
+      <div class="group">
+        <h2>The tax</h2>
+        <div class="ctrl" data-key="p10" data-label="p_1^0" data-hint="price without tax" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="tau" data-label="\tau" data-hint="value added tax, %" data-min="0" data-max="100" data-step="1"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income (p₂ = 1)" data-min="4" data-max="30" data-step="0.1"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Deadweight loss">
+      <div class="panel-head"><h2>Tax revenue and deadweight loss</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>Numbers</h2>
+        <dl id="readouts"></dl>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+
+    <section class="panel wide" aria-label="Commodity groups">
+      <h2>DWL per krone of tax for 14 commodity groups (1999 data, as in the notes)</h2>
+      <div class="dwl-row">
+        <div class="table-scroll" id="groups"></div>
+        <div id="plotG" class="plot plot-groups"></div>
+      </div>
+      <p class="caption">The last column recomputes <span class="tex" data-tex="DWL/T\approx-\tfrac12\varepsilon^c_{ii}\cdot\frac{p_i^1-p_i^0}{p_i^1}"></span> from the table's own compensated elasticity and effective tax rate: it matches the reported value up to rounding. Alcohol and tobacco and private transport are taxed heavily and react strongly, so each krone collected there costs most.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="../shared/consumer-ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

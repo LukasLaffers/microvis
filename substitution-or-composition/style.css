@@ -1,0 +1,7 @@
+/* Substitution or Composition?: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { touch-action: auto; cursor: default; aspect-ratio: 1 / 1; height: auto; max-height: 620px; }
+.plot-bar { height: 170px; }
+.hint-line { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.readouts-inline { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 8px 0 0; font-size: 14px; }
+.readouts-inline dt { color: var(--muted); }
+.readouts-inline dd { margin: 0; font-weight: 600; }

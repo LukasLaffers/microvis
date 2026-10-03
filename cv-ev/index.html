@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CV, EV and Consumer Surplus · Microvis</title>
+  <meta name="description" content="Compensating and equivalent variation as areas to the left of Hicksian demand curves, the change in consumer surplus to the left of the Marshallian curve, and how they are ordered. Lecture 7.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 7 · Welfare measurement</p>
+      <h1>CV, EV and Consumer Surplus</h1>
+      <p class="subtitle"><span class="tex" data-tex="CV=C(p^0,v^0)-C(p^1,v^0),\qquad EV=C(p^0,v^1)-C(p^1,v^1)"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The price of good 1 falls from <span class="tex" data-tex="p_1^0"></span> to <span class="tex" data-tex="p_1^1"></span>. How much better off is the consumer, in money? <b>CV</b>: how much we could take away after the change and leave her as well off as before (utility <span class="tex" data-tex="v^0"></span>). <b>EV</b>: how much we would have to give her before the change to make her as well off as after (<span class="tex" data-tex="v^1"></span>). Both are areas to the left of a Hicksian demand curve; the old measure, the change in consumer surplus, is the area to the left of the Marshallian curve, which lies between them.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Preferences</h2>
+        <select id="type" aria-label="Utility function">
+          <option value="ces">CES: good 1 normal</option>
+          <option value="quasilinear">Quasilinear: no income effect</option>
+          <option value="giffen">Inferior good 1</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
+        <div class="ctrl" data-key="kappa" data-label="\kappa" data-hint="weight of good 1" data-min="1" data-max="12" data-step="0.1" data-show="quasilinear"></div>
+      </div>
+      <div class="group">
+        <h2>The price change</h2>
+        <div class="ctrl" data-key="p10" data-label="p_1^0" data-hint="before" data-min="0.5" data-max="4" data-step="0.01"></div>
+        <div class="ctrl" data-key="p11" data-label="p_1^1" data-hint="after" data-min="0.5" data-max="4" data-step="0.01"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="2" data-max="30" data-step="0.1" data-show="ces|quasilinear"></div>
+        <p class="hint-line">Good 2 is the numéraire: <span class="tex" data-tex="p_2=1"></span>.</p>
+      </div>
+      <div class="group">
+        <h2>Show the area</h2>
+        <div class="seg seg-4" role="group" aria-label="Area">
+          <button type="button" data-area="CV" aria-pressed="false">CV</button>
+          <button type="button" data-area="CS" aria-pressed="false">ΔCS</button>
+          <button type="button" data-area="EV" aria-pressed="false">EV</button>
+          <button type="button" data-area="all" aria-pressed="true">all</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Areas">
+      <div class="panel-head"><h2>Areas to the left of demand curves</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="In the goods space">
+        <h2>CV and EV in the goods space</h2>
+        <div id="plotB" class="plot plot-2d"></div>
+        <p class="caption" id="capB"></p>
+      </section>
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>Welfare measures</h2>
+        <dl id="readouts"></dl>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="../shared/consumer-ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

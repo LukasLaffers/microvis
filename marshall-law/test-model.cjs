@@ -1,5 +1,5 @@
 // Checks Marshall's law of derived demand (lecture 4, section 2) against independent calculations.
-// Run with:  node derived-demand/test-model.cjs
+// Run with:  node marshall-law/test-model.cjs
 const assert = require('node:assert/strict');
 const FM = require('../shared/firm-model.js');
 const M = require('./model.js');
@@ -79,4 +79,31 @@ for (const s of techs) for (const w of prices) {
   checks += 11;
 }
 
-console.log(`All ${checks} derived-demand checks passed.`);
+// The defaults of the specification: CES rho = -1 (sigma = 0.5), delta = 0.5, w = (1, 1), -eps^D_p = 2, B = 10.
+{
+  const s = { tech: 'ces', delta: 0.5, rho: -1 }, dem = { B: 10, eps: -2 };
+  const e = M.elasticities([1, 1], s, dem), m = M.marshall([1, 1], s, dem);
+  close(e.sh1, 0.5, 1e-12); close(e.epsC, -0.25, 1e-6); close(-e.epsU, 1.25, 1e-6); close(m.weighted, 1.25, 1e-12);
+  const e2 = M.elasticities([2, 1], s, dem), e05 = M.elasticities([0.5, 1], s, dem);
+  close(e2.sh1, Math.SQRT2 / (Math.SQRT2 + 1), 1e-12); close(e2.epsU, -1.379, 1e-3);
+  close(e05.sh1, 1 / (1 + Math.SQRT2), 1e-12); close(e05.epsU, -1.121, 1e-3);
+  checks += 8;
+}
+
+// Marshall's rules: |eps^u_11| rises with sigma and with -eps^D_p; along the wage it is sigma + (eta - sigma) sh_1,
+// so it rises with sh_1 exactly when -eps^D_p > sigma (Hicks' qualification).
+for (const [rho, eta] of [[-1, 2], [-1, 0.2], [0.5, 1], [0.5, 3]]) {
+  const s = { tech: 'ces', delta: 0.5, rho }, dem = { B: 10, eps: -eta }, w = [1.3, 1], sigma = 1 / (1 - rho);
+  const a = M.ruleSigma(w, s, dem, [0.2, 0.5, 1, 2, 4]);
+  // At the current sigma the curve passes through the current elasticity.
+  close(M.ruleSigma(w, s, dem, [sigma])[0][1], -M.elasticities(w, s, dem).epsU, 1e-6);
+  const b = M.ruleEta(w, s, dem, [0, 1, 2, 3, 4]);
+  for (let i = 1; i < b.length; i++) assert.ok(b[i][1] > b[i - 1][1], 'rises with eta');
+  const c = M.ruleShare(w, s, dem, [0.3, 0.7, 1.5, 3]);
+  for (const [sh, v] of c) close(v, sigma + (eta - sigma) * sh, 1e-9, 'linear in sh1');
+  assert.equal(c[3][1] > c[0][1], (c[3][0] > c[0][0]) === (eta > sigma), 'Hicks');
+  checks += 3 + b.length + c.length;
+  assert.ok(a.length === 5);
+}
+
+console.log(`All ${checks} Marshall's law checks passed.`);

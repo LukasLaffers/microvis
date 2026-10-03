@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Core Shrinks · Microvis</title>
+  <meta name="description" content="Replica economies: an allocation in the core that is not competitive is blocked by a coalition of N people of one type and M of the other once the economy is large enough, so the core shrinks to the competitive equilibrium. Lecture 9.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 9 · General equilibrium</p>
+      <h1>The Core Shrinks</h1>
+      <p class="subtitle"><span class="tex" data-tex="N\cdot\big(\theta y^a+(1-\theta)R^a\big)+M\cdot y^b=N R^a+M R^b,\qquad \theta=\tfrac{M}{N}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Replicate the Edgeworth box economy: <span class="tex" data-tex="N"></span> people like Alf and <span class="tex" data-tex="N"></span> like Bill. Take an allocation <span class="tex" data-tex="y"></span> in the core that gives everyone of a type the same bundle. If it is not competitive, the price line through <span class="tex" data-tex="R"></span> and <span class="tex" data-tex="y"></span> cuts one person's indifference curve, so a point <span class="tex" data-tex="\theta y+(1-\theta)R"></span> on that line, close to <span class="tex" data-tex="y"></span>, is better for that person. All <span class="tex" data-tex="N"></span> people of that type and <span class="tex" data-tex="M"></span> of the other type can share their endowments that way: they block <span class="tex" data-tex="y"></span>. The closer <span class="tex" data-tex="y"></span> is to the competitive equilibrium, the closer <span class="tex" data-tex="\theta=M/N"></span> must be to 1, so the larger the economy must be.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Size of the economy</h2>
+        <div class="ctrl" data-key="N" data-label="N" data-hint="copies of Alf and of Bill" data-min="1" data-max="60" data-step="1"></div>
+        <div class="btn-row" id="nButtons"><button type="button" data-n="1">1</button><button type="button" data-n="2">2</button><button type="button" data-n="5">5</button><button type="button" data-n="20">20</button><button type="button" data-n="60">60</button></div>
+      </div>
+      <div class="group">
+        <h2>Allocation in the core</h2>
+        <div class="ctrl" data-key="s" data-label="y" data-hint="0: Alf's worst end of the core, 1: Bill's" data-min="0" data-max="1" data-step="0.005"></div>
+      </div>
+      <div class="group">
+        <h2>Economy</h2>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="da" data-label="\delta^a" data-hint="Alf's weight on good 1" data-min="0.05" data-max="0.95" data-step="0.01"></div>
+        <div class="ctrl" data-key="ra" data-label="\rho^a" data-hint="Alf: σ = 1/(1 − ρ)" data-min="-4" data-max="0.8" data-step="0.1"></div>
+        <div class="ctrl" data-key="db" data-label="\delta^b" data-hint="Bill's weight on good 1" data-min="0.05" data-max="0.95" data-step="0.01"></div>
+        <div class="ctrl" data-key="rb" data-label="\rho^b" data-hint="Bill: σ = 1/(1 − ρ)" data-min="-4" data-max="0.8" data-step="0.1"></div>
+        <div class="ctrl" data-key="R1" data-label="R^a_1" data-hint="Alf's endowment of good 1" data-min="0.5" data-max="9.5" data-step="0.1"></div>
+        <div class="ctrl" data-key="R2" data-label="R^a_2" data-hint="Alf's endowment of good 2" data-min="0.5" data-max="9.5" data-step="0.1"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Edgeworth box">
+      <div class="panel-head"><h2 id="mainTitle">The core of the N-replica economy</h2></div>
+      <div id="plot" class="plot plot-main plot-box"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Core against N">
+        <h2>What survives as the economy grows</h2>
+        <div id="plotN" class="plot plot-2d"></div>
+        <p class="caption" id="capN"></p>
+      </section>
+      <section class="panel readouts" aria-label="Numbers" aria-live="polite">
+        <h2>The blocking coalition</h2>
+        <dl id="readouts"></dl>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="../shared/exchange-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

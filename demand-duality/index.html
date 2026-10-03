@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UMP and EMP · Microvis</title>
+  <meta name="description" content="Utility maximisation and expenditure minimisation find the same tangency: the four duality identities, Roy's identity, Shephard's lemma and the properties of V and C. Lecture 6.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 6 · Demand theory</p>
+      <h1>UMP and EMP: Two Sides of One Tangency</h1>
+      <p class="subtitle"><span class="tex" data-tex="\max_x U(x)\ \text{s.t.}\ p^tx\le y\ \ (\text{UMP})\qquad\min_x p^tx\ \text{s.t.}\ U(x)\ge v\ \ (\text{EMP})"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The tangency between a budget line and an indifference curve can be read two ways. (UMP): with income <span class="tex" data-tex="y"></span>, reach the highest indifference curve; the answer is Marshallian demand <span class="tex" data-tex="D(p,y)"></span> and the utility is <span class="tex" data-tex="V(p,y)"></span>. (EMP): to reach utility <span class="tex" data-tex="v"></span>, find the cheapest expenditure line; the answer is Hicksian demand <span class="tex" data-tex="H(p,v)"></span> at cost <span class="tex" data-tex="C(p,v)"></span>. Switch between the two views: when <span class="tex" data-tex="v=V(p,y)"></span> they are the same point.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>View</h2>
+        <div class="seg" role="group" aria-label="Problem">
+          <button type="button" data-view="ump" aria-pressed="true">Maximise utility (UMP)</button>
+          <button type="button" data-view="emp" aria-pressed="false">Minimise expenditure (EMP)</button>
+        </div>
+      </div>
+      <div class="group">
+        <h2>Preferences</h2>
+        <select id="type" aria-label="Utility function">
+          <option value="ces">CES</option>
+          <option value="stonegeary">Stone–Geary (subsistence)</option>
+          <option value="quasilinear">Quasilinear</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="stonegeary"></div>
+        <div class="ctrl" data-key="g1" data-label="\gamma_1" data-hint="subsistence of good 1" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
+        <div class="ctrl" data-key="g2" data-label="\gamma_2" data-hint="subsistence of good 2" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
+        <div class="ctrl" data-key="kappa" data-label="\kappa" data-hint="weight of good 1" data-min="1" data-max="12" data-step="0.1" data-show="quasilinear"></div>
+      </div>
+      <div class="group">
+        <h2>Prices and the target</h2>
+        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="" data-min="0.3" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="" data-min="0.3" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income (UMP)" data-min="2" data-max="30" data-step="0.1" data-show="ump"></div>
+        <div class="ctrl" data-key="v" data-label="v" data-hint="utility to reach (EMP)" data-min="0.5" data-max="12" data-step="0.05" data-show="emp"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="The tangency">
+      <div class="panel-head"><h2 id="head">Reach the highest indifference curve</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Duality" aria-live="polite">
+        <h2>Duality: four identities</h2>
+        <ul class="checks" id="ident"></ul>
+      </section>
+      <section class="panel readouts" aria-label="Properties" aria-live="polite">
+        <h2>Properties, checked</h2>
+        <ul class="checks" id="props"></ul>
+      </section>
+      <section class="panel" aria-label="V and C">
+        <h2>(I2) and (E4): <span class="tex" data-tex="V"></span> and <span class="tex" data-tex="C"></span> as <span class="tex" data-tex="p_1"></span> changes</h2>
+        <div id="plotV" class="plot plot-small"></div>
+        <div id="plotC" class="plot plot-small"></div>
+        <p class="caption" id="capVC"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figure after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="../shared/consumer-ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

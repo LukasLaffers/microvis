@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Income Expansion Paths and Engel Curves · Microvis</title>
+  <meta name="description" content="How demand moves with income at fixed prices: income expansion paths, Engel curves, income elasticities, necessities, luxuries and inferior goods, and the conditions of Engel and Cournot. Lecture 6.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 6 · Demand theory</p>
+      <h1>Income Expansion Paths and Engel Curves</h1>
+      <p class="subtitle"><span class="tex" data-tex="\eta_j=\frac{\partial D^j}{\partial y}\frac{y}{D^j},\qquad b_j=\frac{p_jD^j}{y},\qquad \sum_j b_j\eta_j=1\ \ \text{(Engel)}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Keep the prices fixed and give the consumer more income: the budget line shifts out in parallel and the best bundle moves along the <em>income expansion path</em> (orange). The demand for each good as a function of income is its <em>Engel curve</em>. In A the path is a ray: income does not change the ratio of the goods. In B good 2 is a luxury, so the consumer buys relatively more of it as she gets richer. In C good 1 is inferior: she buys less of it.</p>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Panels of the notes</h2>
+        <div class="seg seg-3" role="group" aria-label="Panel">
+          <button type="button" data-panel="A" aria-pressed="true">A: same ratio</button>
+          <button type="button" data-panel="B" aria-pressed="false">B: luxury</button>
+          <button type="button" data-panel="C" aria-pressed="false">C: inferior</button>
+        </div>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="A"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="A"></div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="B"></div>
+        <div class="ctrl" data-key="g1" data-label="\gamma_1" data-hint="subsistence of good 1" data-min="0" data-max="6" data-step="0.1" data-show="B"></div>
+      </div>
+      <div class="group">
+        <h2>Prices and income</h2>
+        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="1" data-max="25" data-step="0.05"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Income expansion path">
+      <div class="panel-head"><h2>Income expansion path</h2></div>
+      <div id="plot" class="plot plot-main"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Engel curves">
+        <h2>Engel curves</h2>
+        <div id="plotB" class="plot plot-2d"></div>
+        <p class="caption" id="capB"></p>
+      </section>
+      <section class="panel readouts" aria-label="Elasticities" aria-live="polite">
+        <h2>Budget shares and income elasticities</h2>
+        <table class="data effects" id="table"></table>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/consumer-model.js"></script>
+  <script src="../shared/consumer-ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
