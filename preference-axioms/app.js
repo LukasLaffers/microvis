@@ -79,7 +79,7 @@
     const A = PM.AXIOMS[P.type];
     $('axioms').innerHTML = NAMES.map(([k, name]) => `<li><span class="mark ${A[k] ? 'ok' : 'no'}">${A[k] ? '✓' : '✗'}</span><span><b>${name}</b><span class="why">${WHY[k](A[k])}</span></span></li>`).join('');
     $('repr').innerHTML = P.type === 'lex'
-      ? 'No utility function represents lexicographic preferences: Proposition 1 needs continuity, and here it fails.'
+      ? 'Continuity fails, so Proposition 1 does not apply. In fact no utility function represents lexicographic preferences (a classical result).'
       : `Complete, transitive and continuous${A.strongMonotone ? ' and strongly monotone' : ''}: the utility function ${texStr(FORMULA[P.type](P.alpha))} represents the preferences.`;
     const rel = c => c > 0 ? '\\succ' : c < 0 ? '\\prec' : '\\sim';
     const c = PM.compare(xp, x0, P);
@@ -91,7 +91,7 @@
     rows.push(['\\text{segment}\\ x^\\circ x\'', inB ? (seg.allIn ? 'stays in B(x°)' : '<span class="c-l2-red">leaves B(x°): not convex</span>') : 'x′ is not in B(x°)']);
     rows.push(['x^\\circ+(1,1)', step([1, 1])], ['x^\\circ+(1,0)', step([1, 0])], ['x^\\circ+(0,1)', step([0, 1])]);
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
-    $('cap').innerHTML = `<span class="c-l2-blue">Blue: ${texStr('B(x^\\circ)')}</span> (strictly better), <span class="c-l2-grey">grey: ${texStr('W(x^\\circ)')}</span> (strictly worse), ${P.type === 'lex' ? `${texStr('I(x^\\circ)=\\{x^\\circ\\}')}. On the line ${texStr('x_1=x_1^\\circ')} the part above ${texStr('x^\\circ')} is better, the part below is worse.` : `<span class="c-ink"><span class="key"></span>${texStr('I(x^\\circ)')}</span> belongs to both.`}`;
+    $('cap').innerHTML = `<span class="c-l2-blue">Blue: strictly better than ${texStr('x^\\circ')}</span>, <span class="c-l2-grey">grey: strictly worse</span>; ${texStr('B(x^\\circ)')} is the blue set with ${texStr('I(x^\\circ)')}, ${texStr('W(x^\\circ)')} the grey set with ${texStr('I(x^\\circ)')}. ${P.type === 'lex' ? `${texStr('I(x^\\circ)=\\{x^\\circ\\}')}. On the line ${texStr('x_1=x_1^\\circ')} the part above ${texStr('x^\\circ')} is better, the part below is worse.` : `<span class="c-ink"><span class="key"></span>the indifference curve ${texStr('I(x^\\circ)')}</span>.`}`;
   }
 
   function render() {

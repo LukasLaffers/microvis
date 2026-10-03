@@ -174,7 +174,7 @@
     else if (S.kind === 'indeterminate') sentence = `With constant returns and ${texStr('p=c(w)/A')}, every output gives zero profit.`;
     else if (S.kind === 'zero') sentence = `The price is below the lowest average cost ${texStr(`\\hat p=${fmt(hat.pHat === null ? 0 : hat.pHat)}`)}: every positive output loses money, so the firm shuts down.`;
     else if (S.kind === 'indifferent') sentence = `At ${texStr('p=\\hat p')} the firm earns zero profit both at ${texStr('q=0')} and at ${texStr('\\hat q')}: the supply curve jumps here.`;
-    else sentence = `At ${texStr('q^\\ast')} the elasticity of scale is ${fmt(e)} ${e < 1 ? '< 1: decreasing returns to scale, as the second order condition and p ≥ AC require.' : '≥ 1: this cannot be a profit maximum.'}`;
+    else sentence = `At ${texStr('q^\\ast')} the elasticity of scale is ${texStr(`e=AC/MC=${fmt(e, 3)}`)} ${e < 1 ? '< 1: decreasing returns to scale. It must be: the firm produces only if p = MC ≥ AC, that is AC/MC ≤ 1.' : '≥ 1: this cannot be a profit maximum, because p = MC would then be below AC.'}`;
     $('sentence').innerHTML = sentence;
     $('unit-cost').innerHTML = `Unit cost ${texStr(`c(w)=${fmt(c, 3)}`)}.`;
   }
@@ -193,14 +193,17 @@
     const s = tech();
     tex($('formula-G'), s.profile === 'ushape'
       ? `\\begin{gathered}C(w,q)=c(w)\\,G(q)\\\\ G(q)=\\tfrac13q^3-${U.num(s.a)}q^2+${U.num(s.a * s.a + s.m)}q\\end{gathered}`
-      : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}\\\\ =c(w)\\,(q/${U.num(s.A)})^{${U.num(1 / s.k)}}\\end{gathered}`, true);
+      : `C(w,q)=c(w)\\,(q/A)^{1/k},\\quad k=${U.num(s.k)},\\ A=${U.num(s.A)}`, true);
     const P = solve(), th = U.theme();
     // Lecture 3 corollary with the current numbers (homogeneous profile only).
     if (isHomog()) {
       const c = U.num(P.c), e = U.num((1 - s.k) / s.k), inv = U.num(1 / s.k), Aterm = s.A === 1 ? '' : `\\,${U.num(s.A)}^{-${inv}}`;
+      // "=" only when the two-decimal numbers are exact, otherwise "≈".
+      const exact = (...xs) => xs.every(x => Math.abs(100 * x - Math.round(100 * x)) < 1e-7);
+      const eqC = exact(P.c, 1 / s.k) ? '=' : '\\approx', eqAC = exact(P.c, (1 - s.k) / s.k) ? '=' : '\\approx', eqMC = exact(P.c / s.k, (1 - s.k) / s.k) ? '=' : '\\approx';
       tex($('homog-formulas'), s.A === 1
-        ? `\\begin{gathered}C(w,q)=c(w)\\,q^{1/k}=${c}\\,q^{${inv}}\\\\ AC=c(w)\\,q^{\\frac{1-k}{k}}=${c}\\,q^{${e}},\\quad MC=\\tfrac1k c(w)\\,q^{\\frac{1-k}{k}}=${U.num(P.c / s.k)}\\,q^{${e}}\\end{gathered}`
-        : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}=${c}\\,(q/${U.num(s.A)})^{${inv}}\\\\ AC=c(w)A^{-1/k}q^{\\frac{1-k}{k}}=${c}${Aterm}\\,q^{${e}},\\quad MC=\\tfrac1k\\,AC\\end{gathered}`, true);
+        ? `\\begin{gathered}C(w,q)=c(w)\\,q^{1/k}${eqC}${c}\\,q^{${inv}}\\\\ AC=c(w)\\,q^{\\frac{1-k}{k}}${eqAC}${c}\\,q^{${e}},\\quad MC=\\tfrac1k c(w)\\,q^{\\frac{1-k}{k}}${eqMC}${U.num(P.c / s.k)}\\,q^{${e}}\\end{gathered}`
+        : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}${eqC}${c}\\,(q/${U.num(s.A)})^{${inv}}\\\\ AC=c(w)A^{-1/k}q^{\\frac{1-k}{k}}${eqAC}${c}${Aterm}\\,q^{${e}},\\quad MC=\\tfrac1k\\,AC\\end{gathered}`, true);
     }
     guard('cost plot', () => drawMain(th, P));
     guard('side plots', () => drawSide(th, P));

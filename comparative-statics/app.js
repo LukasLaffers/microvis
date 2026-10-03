@@ -82,7 +82,9 @@
       xt: 'z<sub>1</sub>', yt: 'w<sub>1</sub>', x: { range: [0, zMax] }, y: { range: [0, wTop] },
       annotations: [{ x: Math.min(zA, zB) / 2, y: (lo + hi) / 2, text: 'change in cost', showarrow: false, font: { size: 12, color: th.ink } }]
     }), U.PLOT_CONFIG);
-    $('capB').innerHTML = `Because ${texStr('H^1(w,q)=\\partial C(w,q)/\\partial w_1')}, the shaded area ${texStr(`\\int_{${fmt(lo)}}^{${fmt(hi)}}H^1(w_1,w_2,q^\\ast)\\,\\mathrm dw_1=${fmt(area, 4)}`)} equals the change in cost ${texStr(`|C(w,q^\\ast)-C(w',q^\\ast)|=${fmt(dC, 4)}`)} ${ok(same(area, dC))}`;
+    // As in the notes: the integral from the old to the new price is the change in cost; the shaded area is its size.
+    const dCsigned = FM.cost([w1b, w2], q, s) - FM.cost([w1a, w2], q, s);
+    $('capB').innerHTML = `Because ${texStr('H^1(w,q)=\\partial C(w,q)/\\partial w_1')}, the integral along the conditional demand curve from the old price ${texStr(`w_1=${fmt(w1a)}`)} to the new price ${texStr(`w_1'=${fmt(w1b)}`)} is the change in cost at the output ${texStr(`q^\\ast=${fmt(q, 3)}`)}: ${texStr(`\\int_{w_1}^{w_1'}H^1(w_1,w_2,q^\\ast)\\,\\mathrm dw_1=C(w',q^\\ast)-C(w,q^\\ast)=${fmt(dCsigned, 4)}`)}. The shaded area is its size, ${fmt(area, 4)} ${ok(same(area, dC))}`;
   }
 
   // ---------- formulas with numerical checks ----------

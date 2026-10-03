@@ -138,7 +138,7 @@
     $('capB').innerHTML = state.tech === 'leontief'
       ? 'No substitution possible: the demand does not react to prices.'
       : state.tech === 'linear'
-        ? `Perfect substitutes: the firm uses only the cheaper input (per unit of ${texStr('g')}), so the demand jumps when ${texStr('w_1/\\delta')} passes ${texStr('w_2/(1-\\delta)')}.`
+        ? `Perfect substitutes: the firm uses only the input that is cheaper per unit of output it delivers, so the demand jumps when ${texStr('w_1/\\delta')} passes ${texStr('w_2/(1-\\delta)')}.`
         : `Holding ${texStr('q')} fixed, a higher price of input 1 makes the firm substitute away from it.`;
   }
 
@@ -163,8 +163,8 @@
     $('sentence').innerHTML = {
       interior: `At ${texStr('z^\\ast')} the isoquant and the isocost line have the same slope: ${texStr(`MRTS_{21}=w_1/w_2=${fmt(ratio)}`)}. Change ${texStr('A')} or ${texStr('k')}: ${texStr('z^\\ast')} moves along the expansion path, but the slope there stays the same.`,
       kink: `Leontief: the isocost line touches only the corner of the isoquant. The MRTS is undefined there, and every price ratio gives the same ${texStr('z^\\ast')}.`,
-      corner: `Linear: per unit of ${texStr('g')}, input ${which} is cheaper (${texStr(`w_1/\\delta=${fmt(w[0] / s.delta)}`)} against ${texStr(`w_2/(1-\\delta)=${fmt(w[1] / (1 - s.delta))}`)}), so only input ${which} is used: a corner solution.`,
-      multiple: `Linear with ${texStr('w_1/\\delta=w_2/(1-\\delta)')}: the isocost line lies on top of the isoquant, so every bundle on it costs the same.`
+      corner: `Linear: per unit of output it delivers, input ${which} is cheaper (${texStr(`w_1/\\delta=${fmt(w[0] / s.delta)}`)} against ${texStr(`w_2/(1-\\delta)=${fmt(w[1] / (1 - s.delta))}`)}), so only input ${which} is used: a corner solution.`,
+      multiple: `Linear with ${texStr('w_1/\\delta=w_2/(1-\\delta)')}: the isocost line lies on top of the isoquant, so every bundle on the isoquant costs the same and all of them minimise cost.`
     }[kind];
   }
 

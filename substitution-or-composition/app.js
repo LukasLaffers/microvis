@@ -43,7 +43,7 @@
     lab(e.firmK, `capital-intensive (${f1(e.firmK[0])}, ${f1(e.firmK[1])})`, cK, 'left', 'bottom', 6, 6);
     lab([e.E, e.K], `aggregate (${f1(e.E)}, ${f1(e.K)})`, th.ink, 'left', 'top', 8, -6);
     Plotly.react('plot', traces, U.base2d(th, { xt: 'Energy E', yt: 'Capital K', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('cap').innerHTML = `Open circles: ${texStr('w_E=w_K=1')}, both firms produce 10, total ${texStr('(E,K)=(30,30)')}. Now ${texStr(`w_E=${f2(state.wE)}`)}: the firms produce ${f1(e.qE)} and ${f1(e.qK)} and the total is ${texStr(`(${f1(e.E)},${f1(e.K)})`)}. Each firm's input ratio is fixed (½ and 2), yet the aggregate ${texStr('K/E')} moved from 1 to ${f2(e.K / e.E)}.`;
+    $('cap').innerHTML = `Open circles: ${texStr('w_E=w_K=1')}, both firms produce 10, total ${texStr('(E,K)=(30,30)')}. Now ${texStr(`w_E=${f2(state.wE)}`)}: the firms produce ${f1(e.qE)} and ${f1(e.qK)} and the total is ${texStr(`(${f1(e.E)},${f1(e.K)})`)}. Each firm's input ratio ${texStr('K/E')} is fixed (½ and 2)${Math.abs(e.K / e.E - 1) < 5e-3 ? `, and so is the aggregate ${texStr('K/E')} = 1 while both firms produce the same. Raise ${texStr('w_E')} to see it move.` : `, yet the aggregate ${texStr('K/E')} moved from 1 to ${f2(e.K / e.E)}.`}`;
     return e;
   }
 

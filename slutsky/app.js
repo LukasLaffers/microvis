@@ -103,7 +103,7 @@
 
   function init() {
     U.renderStaticTex();
-    ctrls = U.controls(document, state, { onChange: schedule });
+    ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
     document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
       const P = PRESETS[b.dataset.preset];
