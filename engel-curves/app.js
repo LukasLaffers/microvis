@@ -48,13 +48,17 @@
 
   function drawEngel(th, S) {
     const { u, p, lo, hi, x } = S, c = EM.engelCurves(p, u, U.linspace(lo, hi, 120));
+    // When the two Engel curves coincide (e.g. equal weights in A), draw D¹ dashed on top of D² and label them once.
+    const top = Math.max(...c.map(r => Math.max(r[1], r[2]))), same = c.every(r => Math.abs(r[1] - r[2]) < 1e-3 * top);
+    const end = c[c.length - 1];
+    const annotations = same
+      ? [{ x: end[0], y: end[1], text: 'D<sup>1</sup> = D<sup>2</sup>', showarrow: false, xanchor: 'right', yanchor: 'bottom', yshift: 4, font: { size: 13, color: th.ink } }]
+      : [{ x: end[0], y: end[1], text: 'D<sup>1</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.blue } },
+         { x: end[0], y: end[2], text: 'D<sup>2</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.red } }];
     Plotly.react('plotB', [
-      U.line2(c.map(r => [r[0], r[1]]), th.blue, 2.5, 'D¹(p, y)'), U.line2(c.map(r => [r[0], r[2]]), th.red, 2.5, 'D²(p, y)'),
+      U.line2(c.map(r => [r[0], r[2]]), th.red, 2.5, 'D²(p, y)'), U.line2(c.map(r => [r[0], r[1]]), th.blue, 2.5, 'D¹(p, y)', same ? 'dash' : 'solid'),
       U.dot2([[state.y, x[0]], [state.y, x[1]]], th.ink, 'now', 8)
-    ], U.base2d(th, { xt: 'y', yt: 'demand', annotations: [
-      { x: c[c.length - 1][0], y: c[c.length - 1][1], text: 'D<sup>1</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.blue } },
-      { x: c[c.length - 1][0], y: c[c.length - 1][2], text: 'D<sup>2</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.red } }
-    ], margin: { l: 52, r: 28, t: 8, b: 44 } }), U.PLOT_CONFIG);
+    ], U.base2d(th, { xt: 'y', yt: 'demand', annotations, margin: { l: 52, r: 28, t: 8, b: 44 } }), U.PLOT_CONFIG);
     $('capB').innerHTML = `Demand for each good as income grows, prices fixed. The slope of ${texStr('\\log D^j')} in ${texStr('\\log y')} is the income elasticity ${texStr('\\eta_j')}.`;
   }
 

@@ -192,7 +192,7 @@
     U.applyVisibility({ market: state.mode === 'market', swt: state.mode === 'swt' });
     $('mainTitle').textContent = state.mode === 'market' ? 'The Edgeworth box: trade at a given price' : 'Second welfare theorem: any efficient point with a transfer';
     const S = solve(), th = U.theme();
-    tex($('formula'), `\\begin{gathered}U^h(x)=\\left(\\delta^h x_1^{\\rho^h}+(1-\\delta^h)x_2^{\\rho^h}\\right)^{1/\\rho^h},\\ h=a,b\\\\ R^a+R^b=(${OMEGA[0]},\\ ${OMEGA[1]})\\end{gathered}`, true);
+    tex($('formula'), `\\begin{gathered}U^h(x)=\\left(\\delta^h x_1^{\\rho^h}+(1-\\delta^h)x_2^{\\rho^h}\\right)^{1/\\rho^h}\\\\ h=a,b,\\quad R^a+R^b=(${OMEGA[0]},\\ ${OMEGA[1]})\\end{gathered}`, true);
     guard('box', () => draw(th, S));
     guard('excess demand', () => drawE(th, S));
     guard('numbers', () => renderText(S));

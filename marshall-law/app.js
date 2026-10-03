@@ -22,6 +22,14 @@
   const f = x => fmt(x, 4);
   const pct = x => `${x >= 0 ? '+' : '−'}${fmt(Math.abs(100 * x), 2)} %`;
 
+  // Tick marks 1, 2, 5 per decade between lo and hi, labelled in full (no abbreviated minor labels).
+  function logTicks(lo, hi) {
+    const vals = [];
+    for (let e = Math.floor(Math.log10(lo)) - 1; e <= Math.ceil(Math.log10(hi)); e++)
+      for (const m of [1, 2, 5]) { const v = m * Math.pow(10, e); if (v >= lo && v <= hi) vals.push(v); }
+    return { tickvals: vals, ticktext: vals.map(v => String(Number(v.toPrecision(3)))) };
+  }
+
   function solve() {
     const s = tech(), w = [state.w1, state.w2], dem = { B, eps: epsD() }, r = state.r / 100;
     // wiT: the wage rise so far while the "raise w1" animation runs (t from 0 to 1); wi: the full rise.
@@ -86,8 +94,8 @@
     const yLo = Math.min(...all), yHi = Math.max(...all);
     Plotly.react('plotD', traces, U.base2d(th, {
       xt: 'w<sub>1</sub> (log scale)', yt: 'z<sub>1</sub> (log scale)',
-      x: { type: 'log', dtick: 'D2', range: [Math.log10(w1 / 4), Math.log10(w1 * 4)] },
-      y: { type: 'log', dtick: 'D2', range: [Math.log10(yLo) - 0.05, Math.log10(yHi) + 0.05] },
+      x: { type: 'log', range: [Math.log10(w1 / 4), Math.log10(w1 * 4)], ...logTicks(w1 / 4, w1 * 4) },
+      y: { type: 'log', range: [Math.log10(yLo) - 0.05, Math.log10(yHi) + 0.05], ...logTicks(yLo / 1.13, yHi * 1.13) },
       annotations: [
         { x: Math.log10(w1 * 1.9), y: Math.log10(z1 * Math.pow(1.9, el.epsU)), text: `slope ε<sup>u</sup><sub>11</sub> = ${fmt(el.epsU, 2)}`, showarrow: false, xanchor: 'left', yanchor: 'top', font: { size: 12, color: th.red } },
         { x: Math.log10(w1 * 4), y: Math.log10(DM.conditional1([w1 * 4, w[1]], s, q)), text: `slope ε<sup>c</sup><sub>11</sub> = ${fmt(el.epsC, 2)}`, showarrow: false, xanchor: 'right', yanchor: 'top', yshift: -4, font: { size: 12, color: th.blue } }

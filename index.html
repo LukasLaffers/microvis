@@ -8,7 +8,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="shared/style.css">
 </head>
-<body>
+<body class="home">
   <header class="site-header">
     <div>
       <h1>Microvis — Visualizations for Microeconomic theory</h1>
@@ -17,8 +17,20 @@
 
   <main>
     <p class="intro">Interactive companions to the lecture notes. Each tool lets you move the parameters of a model and watch its key objects respond. They work in any browser, on a laptop or a phone, and also offline.</p>
+    <nav class="lecture-nav" aria-label="Lectures">
+      <a href="#l1"><b>1</b> Production</a>
+      <a href="#l2"><b>2</b> Firm optimisation</a>
+      <a href="#l3"><b>3</b> Optimal behaviour</a>
+      <a href="#l4"><b>4</b> Comparative statics</a>
+      <a href="#l5-firm"><b>5</b> Firm and market</a>
+      <a href="#l5-consumer"><b>5</b> Preferences</a>
+      <a href="#l6"><b>6</b> Demand</a>
+      <a href="#l7"><b>7</b> Welfare</a>
+      <a href="#l8"><b>8</b> Decentralisation</a>
+      <a href="#l9"><b>9</b> General equilibrium</a>
+    </nav>
 
-    <h2 class="lecture-title">Lecture 1 · Production theory: substitution and scale properties</h2>
+    <h2 class="lecture-title" id="l1">Lecture 1 · Production theory: substitution and scale properties</h2>
     <div class="cards">
       <a class="card" href="production-explorer/index.html">
         <p class="lecture">Lecture 1: scale and substitution properties of production functions</p>
@@ -37,14 +49,14 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 2 · Firm optimisation: one step and two step approach</h2>
+    <h2 class="lecture-title" id="l2">Lecture 2 · Firm optimisation: one step and two step approach</h2>
     <div class="cards">
-      <a class="card card-l2-blue" href="cost-minimisation/index.html">
+      <a class="card" href="cost-minimisation/index.html">
         <p class="lecture">Lecture 2: Step 1 (CM), cost minimisation</p>
         <h2>Cost Minimisation</h2>
         <p>Slide the isocost line down until it touches the isoquant: conditional input demand H(w,q), the cost function C(w,q) and MRTS = w₁/w₂.</p>
       </a>
-      <a class="card card-l2-red" href="cost-curves/index.html">
+      <a class="card" href="cost-curves/index.html">
         <p class="lecture">Lecture 2: Step 2 (PM'), output choice and supply</p>
         <h2>Cost Curves and Supply</h2>
         <p>Marginal and average cost, the shutdown price p̂ and the supply curve S(w,p); why increasing returns to scale and price taking do not mix. With a homogeneous technology: AC/MC = k (lecture 3).</p>
@@ -56,9 +68,9 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 3 · Properties of the firm's optimal behaviour</h2>
+    <h2 class="lecture-title" id="l3">Lecture 3 · Properties of the firm's optimal behaviour</h2>
     <div class="cards">
-      <a class="card card-l2-blue" href="cost-function/index.html">
+      <a class="card" href="cost-function/index.html">
         <p class="lecture">Lecture 3: properties (C1)–(C5) and (H1)–(H4) · Lecture 4: area = change in cost</p>
         <h2>The Cost Function</h2>
         <p>C(w,q) as a function of input prices: concave because the firm substitutes (C4), Shephard's lemma (C5), scaling all prices (C3, H3) and the symmetric matrix of price effects (H4).</p>
@@ -70,7 +82,7 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 4 · Comparative statics: "what if" questions</h2>
+    <h2 class="lecture-title" id="l4">Lecture 4 · Comparative statics: "what if" questions</h2>
     <div class="cards">
       <a class="card" href="comparative-statics/index.html">
         <p class="lecture">Lecture 4: dq*/dp = 1/C_qq and (**)</p>
@@ -94,7 +106,7 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 5 · The firm and the market</h2>
+    <h2 class="lecture-title" id="l5-firm">Lecture 5 · The firm and the market</h2>
     <div class="cards">
       <a class="card" href="market-supply/index.html">
         <p class="lecture">Lecture 5: more firms</p>
@@ -118,7 +130,7 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 5 · Consumer preferences</h2>
+    <h2 class="lecture-title" id="l5-consumer">Lecture 5 · Consumer preferences</h2>
     <div class="cards">
       <a class="card" href="budget-sets/index.html">
         <p class="lecture">Lecture 5: consumption opportunities</p>
@@ -136,7 +148,7 @@
         <p>U and f(U) rank bundles the same way and share their indifference curves. Quasi-concavity and Theorem 1 along the tangent; MRS₂₁ = U₁/U₂.</p>
       </a>
     </div>
-    <h2 class="lecture-title">Lecture 6 · Demand theory</h2>
+    <h2 class="lecture-title" id="l6">Lecture 6 · Demand theory</h2>
     <div class="cards">
       <a class="card" href="demand-duality/index.html">
         <p class="lecture">Lecture 6: (UMP) and (EMP), duality, Roy and Shephard</p>
@@ -155,7 +167,7 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 7 · Welfare measurement</h2>
+    <h2 class="lecture-title" id="l7">Lecture 7 · Welfare measurement</h2>
     <div class="cards">
       <a class="card" href="cv-ev/index.html">
         <p class="lecture">Lecture 7: CV, EV and consumer surplus</p>
@@ -168,7 +180,7 @@
         <p>The consumer loses more than the tax raises. The loss grows with the square of the tax, and the notes' table of 14 commodity groups shows where each krone of tax costs most.</p>
       </a>
     </div>
-    <h2 class="lecture-title">Lecture 8 · Decentralisation in a simple economy</h2>
+    <h2 class="lecture-title" id="l8">Lecture 8 · Decentralisation in a simple economy</h2>
     <div class="cards">
       <a class="card" href="robinson-crusoe/index.html">
         <p class="lecture">Lecture 8: planner, prices and the (C1), (C2) conditions</p>
@@ -177,7 +189,7 @@
       </a>
     </div>
 
-    <h2 class="lecture-title">Lecture 9 · General equilibrium</h2>
+    <h2 class="lecture-title" id="l9">Lecture 9 · General equilibrium</h2>
     <div class="cards">
       <a class="card" href="edgeworth-box/index.html">
         <p class="lecture">Lecture 9: offer curves, core, Walras' law, welfare theorems</p>

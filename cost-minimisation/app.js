@@ -66,8 +66,9 @@
       const poly = iso.concat([[last[0], zmax], [zmax, zmax], [zmax, first[1]]]);
       traces.push({ type: 'scatter', mode: 'lines', x: poly.map(p => p[0]), y: poly.map(p => p[1]), fill: 'toself', fillcolor: 'rgba(74, 144, 226, 0.12)', line: { width: 0 }, hoverinfo: 'skip' });
       traces.push(U.line2(iso, th.blue, 3, `isoquant q = ${fmt(state.q)}`));
-      const lp = iso[Math.floor(iso.length * 0.88)];
-      annotations.push({ x: lp[0], y: lp[1], text: `q = ${fmt(state.q)}`, showarrow: false, xanchor: 'left', xshift: 8, font: { color: th.blue, size: 13 } });
+      // Label the isoquant near its lower right end, below the curve (away from the isocost lines' tangency).
+      const lp = iso.reduce((best, q) => Math.abs(q[0] - 0.9 * zmax) < Math.abs(best[0] - 0.9 * zmax) ? q : best, iso[0]);
+      annotations.push({ x: lp[0], y: lp[1], text: `q = ${fmt(state.q)}`, showarrow: false, xanchor: 'center', yanchor: 'top', yshift: -6, font: { color: th.blue, size: 13 } });
     }
 
     // Grey isocost lines and the "reducing cost" arrow towards the origin.

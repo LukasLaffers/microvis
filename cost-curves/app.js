@@ -71,8 +71,8 @@
       shapes.push({ type: 'line', x0: 0, x1: hat.qHat, y0: hat.pHat, y1: hat.pHat, line: { color: th.orange, width: 1, dash: 'dash' } });
       shapes.push({ type: 'line', x0: hat.qHat, x1: hat.qHat, y0: 0, y1: hat.pHat, line: { color: th.orange, width: 1, dash: 'dash' } });
       traces.push(U.dot2([[hat.qHat, hat.pHat]], th.orange, 'min AC: (q̂, p̂)', 12));
-      annotations.push({ x: 0, y: hat.pHat, text: 'p̂', showarrow: false, xanchor: 'right', xshift: -6, font: { color: th.orange, size: 14 } });
-      annotations.push({ x: hat.qHat, y: 0, text: 'q̂', showarrow: false, yanchor: 'top', yshift: -16, font: { color: th.orange, size: 14 } });
+      annotations.push({ x: 0, y: hat.pHat, text: 'p̂', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { color: th.orange, size: 14 } });
+      annotations.push({ x: hat.qHat, y: 0, text: 'q̂', showarrow: false, xanchor: 'right', yanchor: 'bottom', xshift: -4, yshift: 2, font: { color: th.orange, size: 14 } });
       const qn = (state.a + hat.qHat) / 2;
       annotations.push({ x: qn, y: FM.MC(w, qn, s), ax: 50, ay: 40, showarrow: true, arrowhead: 0, arrowcolor: th.muted, text: 'this part of the MC curve<br>is not observed', align: 'left', font: { size: 11, color: th.muted } });
     }

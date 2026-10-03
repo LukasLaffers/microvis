@@ -30,7 +30,7 @@
     const traces = [];
     if (p11 > p10) {
       const band = U.linspace(p10, p11, 60), x1 = r.x1[0];
-      traces.push({ type: 'scatter', mode: 'lines', x: [0, x1, x1, 0, 0], y: [p10, p10, p11, p11, p10], fill: 'toself', fillcolor: 'rgba(248,231,28,0.65)', line: { color: '#c9a400', width: 1 }, hoverinfo: 'skip', name: 'tax revenue T' });
+      traces.push({ type: 'scatter', mode: 'lines', x: [0, x1, x1, 0, 0], y: [p10, p10, p11, p11, p10], fill: 'toself', fillcolor: th.dark ? 'rgba(240,210,40,0.38)' : 'rgba(248,231,28,0.65)', line: { color: '#c9a400', width: 1 }, hoverinfo: 'skip', name: 'tax revenue T' });
       const dwl = [[x1, p10], ...band.map(p => [H1(p), p]), [x1, p11]];
       traces.push({ type: 'scatter', mode: 'lines', x: dwl.map(q => q[0]), y: dwl.map(q => q[1]), fill: 'toself', fillcolor: 'rgba(74,144,226,0.35)', line: { width: 0 }, hoverinfo: 'skip', name: 'DWL' });
     }
@@ -45,7 +45,7 @@
     ];
     if (p11 > p10) {
       annotations.push({ x: xMax, y: p11, text: `p<sub>1</sub><sup>1</sup> = ${f3(p11)}`, showarrow: false, xanchor: 'right', yanchor: 'bottom', font: { size: 12, color: th.muted } });
-      annotations.push({ x: r.x1[0] / 2, y: (p10 + p11) / 2, text: '<b>T</b>', showarrow: false, font: { size: 14, color: '#7a6400' } });
+      annotations.push({ x: r.x1[0] / 2, y: (p10 + p11) / 2, text: '<b>T</b>', showarrow: false, font: { size: 14, color: th.dark ? '#ffe45c' : '#7a6400' } });
       const xm = (r.x1[0] + H1((p10 + p11) / 2)) / 2;
       annotations.push({ x: xm, y: p10 + 0.3 * (p11 - p10), ax: 40, ay: 46, text: '<b>DWL</b>', showarrow: true, arrowhead: 2, arrowwidth: 1.5, font: { size: 13, color: th.blue }, arrowcolor: th.blue });
     }

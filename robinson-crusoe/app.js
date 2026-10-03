@@ -39,7 +39,7 @@
     const xLo = Math.min(0, prod[0]) - 0.03 * P.T, xHi = P.T * 1.04;
     const yTop = Math.max(RM.phi(P.T, P.tech), pl.x[1], d.x[1], prod[1]) * 1.25;
     // Attainable set in the closed economy.
-    traces.push({ ...U.line2([[0, 0], ...fr, [P.T, 0]], 'rgba(0,0,0,0)', 0), fill: 'toself', fillcolor: th.dark ? 'rgba(208,2,27,0.12)' : 'rgba(208,2,27,0.07)', hoverinfo: 'skip' });
+    traces.push({ ...U.line2([[0, 0], ...fr, [P.T, 0]], 'rgba(0,0,0,0)', 0), fill: 'toself', fillcolor: th.dark ? 'rgba(255,77,94,0.07)' : 'rgba(208,2,27,0.07)', hoverinfo: 'skip' });
     traces.push(U.line2(fr, th.red, 2.6, 'production possibility frontier x₂ = φ(T − x₁)'));
     const icPts = v => RM.indifference(P, v, U.linspace(Math.max(0.02, xLo), xHi, 300)).filter(q => q[1] !== null && q[1] <= yTop * 1.5);
     const line = (pt, w) => [[xLo, pt[1] + w * (pt[0] - xLo)], [P.T, pt[1] + w * (pt[0] - P.T)]];
