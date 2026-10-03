@@ -133,7 +133,8 @@
         // (labelled in the caption below; the plot already carries the q* -> q** label)
       }
     }
-    $('capTri').innerHTML = tri ? `Lecture 4, (∗): by Shephard's lemma ${texStr('\\partial MC/\\partial w_1=\\partial H^1/\\partial q')} ${texStr(`=${fmt(tri.c.dHdq, 3)}`)}, so MC rises by about ${fmt(tri.shift, 3)} at ${texStr('q^\\ast')} (red side); with slope ${texStr(`C_{qq}=${fmt(tri.c.Cqq, 3)}`)} output falls by about shift ÷ slope ${texStr(`=${fmt(tri.dq, 3)}`)}: ${texStr('\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=-\\frac{\\partial H^1/\\partial q}{C_{qq}}')}.` : '';
+    const dw = r.wNew[0] - w[0];
+    $('capTri').innerHTML = tri ? `Lecture 4, (∗): by Shephard's lemma ${texStr(`\\partial MC/\\partial w_1=\\partial H^1/\\partial q=${fmt(tri.c.dHdq, 3)}`)}. A change of ${texStr(`w_1`)} by ${fmt(dw, 2)} shifts MC at ${texStr('q^\\ast')} by about ${fmt(tri.c.dHdq, 3)} × ${fmt(dw, 2)} = ${fmt(tri.shift, 3)} (the vertical side of the red triangle). MC has slope ${texStr(`C_{qq}=${fmt(tri.c.Cqq, 3)}`)}, so output changes by about ${fmt(tri.shift, 3)} / ${fmt(tri.c.Cqq, 3)} = ${fmt(tri.dq, 3)} (the horizontal side): ${texStr('\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=\\left(-\\frac{1}{C_{qq}}\\right)\\frac{\\partial H^1}{\\partial q}')}. This is a first-order estimate; the actual change is ${fmt(Math.abs(r.qA - r.qC), 3)}.` : '';
     Plotly.react('plotB', traces, U.base2d(th, {
       xt: 'q', yt: 'p', x: { range: [0, qmax] }, y: { range: [0, yMax] }, annotations,
       shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: p, y1: p, line: { color: th.muted, width: 1.5, dash: 'dash' } }]

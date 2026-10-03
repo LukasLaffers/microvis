@@ -6,6 +6,12 @@
   'use strict';
 
   const num = x => String(Number(x.toFixed(2)));
+  // The exponent a/b exactly: as a number when two decimals are exact, otherwise as the fraction (no rounded decimals).
+  function ratio(a, b) {
+    const r = a / b;
+    if (Math.abs(100 * r - Math.round(100 * r)) < 1e-7) return num(r);
+    return `${num(a)}/${b < 0 ? `(${num(b)})` : num(b)}`;
+  }
 
   // g(z) with the current numbers.
   function gTex(s) {
@@ -13,7 +19,7 @@
     switch (s.tech) {
       case 'ces':
         return Math.abs(s.rho) < 1e-6 ? `z_1^{${num(d)}}z_2^{${num(1 - d)}}`
-          : `\\big[${num(d)}\\,z_1^{${num(s.rho)}}+${num(1 - d)}\\,z_2^{${num(s.rho)}}\\big]^{${num(1 / s.rho)}}`;
+          : `\\big[${num(d)}\\,z_1^{${num(s.rho)}}+${num(1 - d)}\\,z_2^{${num(s.rho)}}\\big]^{${ratio(1, s.rho)}}`;
       case 'linear': return `${num(d)}\\,z_1+${num(1 - d)}\\,z_2`;
       case 'leontief': return `\\min\\{z_1/${num(d)},\\ z_2/${num(1 - d)}\\}`;
       default: return `z_1^{${num(d)}}\\,z_2^{${num(1 - d)}}`;
@@ -37,7 +43,7 @@
         return {
           general: '\\phi(z)=A\\big[\\delta z_1^{\\rho}+(1-\\delta)z_2^{\\rho}\\big]^{k/\\rho}',
           numbers: Math.abs(s.rho) < 1e-6 ? `q=${A}z_1^{${num(d * k)}}z_2^{${num((1 - d) * k)}}`
-            : `q=${A}\\big[${num(d)}\\,z_1^{${num(s.rho)}}+${num(1 - d)}\\,z_2^{${num(s.rho)}}\\big]^{${num(k / s.rho)}}`
+            : `q=${A}\\big[${num(d)}\\,z_1^{${num(s.rho)}}+${num(1 - d)}\\,z_2^{${num(s.rho)}}\\big]^{${ratio(k, s.rho)}}`
         };
       case 'linear':
         return { general: '\\phi(z)=A\\big[\\delta z_1+(1-\\delta)z_2\\big]^{k}', numbers: `q=${A}\\big[${num(d)}\\,z_1+${num(1 - d)}\\,z_2\\big]${pow}` };

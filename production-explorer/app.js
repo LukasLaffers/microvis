@@ -118,13 +118,20 @@
 
   // ---------- technology formula ----------
 
+  // The exponent a/b exactly: as a number when two decimals are exact, otherwise as the fraction (no rounded decimals).
+  function ratio(a, b) {
+    const r = a / b;
+    if (Math.abs(100 * r - Math.round(100 * r)) < 1e-7) return num(r);   // exact to two decimals, e.g. -2 or 0.9
+    return `${num(a)}/${b < 0 ? `(${num(b)})` : num(b)}`;
+  }
+
   // g(z) with the current numbers.
   function gTex(s) {
     const d = s.delta;
     switch (s.tech) {
       case 'ces':
         return Math.abs(s.rho) < 1e-9 ? `z_1^{${num(d)}}z_2^{${num(1 - d)}}`
-          : `\\big[${num(d)}\\,z_1^{${num(s.rho)}}+${num(1 - d)}\\,z_2^{${num(s.rho)}}\\big]^{${num(1 / s.rho)}}`;
+          : `\\big[${num(d)}\\,z_1^{${num(s.rho)}}+${num(1 - d)}\\,z_2^{${num(s.rho)}}\\big]^{${ratio(1, s.rho)}}`;
       case 'linear': return `${num(d)}\\,z_1+${num(1 - d)}\\,z_2`;
       case 'leontief': return `\\min\\Big\\{\\frac{z_1}{${num(d)}},\\ \\frac{z_2}{${num(1 - d)}}\\Big\\}`;
       default: return `z_1^{${num(d)}}\\,z_2^{${num(1 - d)}}`;
@@ -151,7 +158,7 @@
           general = '\\phi(z)=A\\,\\big[\\delta z_1^{\\rho}+(1-\\delta)\\,z_2^{\\rho}\\big]^{k/\\rho}';
           numbers = Math.abs(rho) < 1e-9
             ? `\\rho=0:\\ \\text{Cobb-Douglas limit}\\ q=${a}z_1^{${num(d * k)}}z_2^{${num((1 - d) * k)}}`
-            : `q=${a}\\big[${num(d)}\\,z_1^{${num(rho)}}+${num(1 - d)}\\,z_2^{${num(rho)}}\\big]^{${num(k / rho)}}`;
+            : `q=${a}\\big[${num(d)}\\,z_1^{${num(rho)}}+${num(1 - d)}\\,z_2^{${num(rho)}}\\big]^{${ratio(k, rho)}}`;
           break;
         case 'linear':
           general = '\\phi(z)=A\\,\\big[\\delta z_1+(1-\\delta)\\,z_2\\big]^{k}';
@@ -166,7 +173,7 @@
           general = '\\phi(z)=A\\,z_1^{\\alpha}z_2^{\\beta}';
           numbers = `q=${a}z_1^{${num(p.alpha)}}\\,z_2^{${num(p.beta)}}`;
           extra = abActive()
-            ? `\\begin{gathered}e=\\alpha+\\beta=${num(k)}\\\\ \\text{i.e. }\\delta=\\tfrac{\\alpha}{\\alpha+\\beta}=${num(d)},\\ k=\\alpha+\\beta\\end{gathered}`
+            ? `\\begin{gathered}e=\\alpha+\\beta=${num(k)}\\\\ \\text{as }F(g(z)):\\ \\delta=\\tfrac{\\alpha}{\\alpha+\\beta}=${num(d)},\\ k=\\alpha+\\beta=${num(k)}\\end{gathered}`
             : `\\begin{gathered}\\alpha=\\delta k=${num(p.alpha)},\\quad \\beta=(1-\\delta)k=${num(p.beta)}\\\\ e=\\alpha+\\beta=${num(k)}\\end{gathered}`;
         }
       }

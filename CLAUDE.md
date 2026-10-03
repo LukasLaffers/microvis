@@ -22,7 +22,6 @@ plans/                  plans for groups of tools, e.g. plans/lecture-2.md
   model.js              pure math, no DOM; UMD so Node tests can require it
   app.js                interface and plotting
   test-model.cjs        `node <tool-name>/test-model.cjs` must pass
-  SPEC.md               what the tool must show and why (optional but recommended)
 ```
 
 ## Rules
