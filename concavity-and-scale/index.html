@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Concavity and Returns to Scale · Microvis</title>
+  <meta name="description" content="A quasi-concave production function with no increasing returns to scale that is not concave: the chord between two bundles on different rays lies above the surface. With homotheticity, concavity returns (Friedman 1973). Lecture 1, Exercise 3.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <h1>Concavity and Returns to Scale</h1>
+      <p class="subtitle">Exercise 3: quasi-concave and no increasing returns to scale <span class="tex" data-tex="\overset{?}{\Longrightarrow}"></span> concave</p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Returns to scale compare <span class="tex" data-tex="\phi(\alpha z)"></span> with <span class="tex" data-tex="\alpha\phi(z)"></span>: they only look along a ray from the origin. Concavity compares any two bundles, also on different rays: is <span class="tex" data-tex="\phi(z^\lambda)\ge\lambda\phi(z)+(1-\lambda)\phi(z')"></span> for <span class="tex" data-tex="z^\lambda=\lambda z+(1-\lambda)z'"></span>?</p>
+          <p>Every isoquant here is a straight line, so every input requirement set is convex and <span class="tex" data-tex="\phi"></span> is quasi-concave. Along each ray the returns to scale are constant or decreasing. Still, above the segment from <span class="tex" data-tex="z'"></span> to <span class="tex" data-tex="z"></span> the surface sags below the straight chord (the <span class="c-l2-red">red curtain</span>): <span class="tex" data-tex="\phi"></span> is not concave. Press <b>Make it homothetic</b>: the isoquants become parallel and the red curtain disappears: the surface now lies on or above every chord (a thin <span class="c-l2-blue">blue</span> curtain where it is above).</p>
+          <p>Drag the 3D plot to turn it around.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="k1" data-label="k_1" data-hint="returns along the z₁ axis" data-min="0.3" data-max="1.5" data-step="0.05"></div>
+        <div class="ctrl" data-key="k2" data-label="k_2" data-hint="returns along the z₂ axis" data-min="0.3" data-max="1.5" data-step="0.05"></div>
+        <div class="btn-row" role="group" aria-label="Technology presets">
+          <button type="button" id="preset-ce">Counterexample</button>
+          <button type="button" id="preset-homo">Make it homothetic</button>
+        </div>
+        <p class="note" id="tech-note"></p>
+      </div>
+
+      <div class="group">
+        <h2>Two bundles on different rays</h2>
+        <div class="ctrl" data-key="a1" data-label="z_1" data-hint="" data-min="0" data-max="8" data-step="0.1"></div>
+        <div class="ctrl" data-key="a2" data-label="z_2" data-hint="" data-min="0" data-max="8" data-step="0.1"></div>
+        <div class="ctrl" data-key="b1" data-label="z'_1" data-hint="" data-min="0" data-max="8" data-step="0.1"></div>
+        <div class="ctrl" data-key="b2" data-label="z'_2" data-hint="" data-min="0" data-max="8" data-step="0.1"></div>
+        <div class="ctrl" data-key="lam" data-label="\lambda" data-hint="weight on z" data-min="0" data-max="1" data-step="0.01"></div>
+        <div class="btn-row" role="group" aria-label="Bundle presets">
+          <button type="button" id="pair-axes">One input each</button>
+          <button type="button" id="pair-worst">Largest gap</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel plot3d-panel" aria-label="The production function in 3D">
+      <div class="panel-head">
+        <h2>Output <span class="tex" data-tex="q=\phi(z_1,z_2)"></span> over the input plane</h2>
+        <div class="btn-row" role="group" aria-label="Camera">
+          <button type="button" data-cam="3d">3D</button>
+          <button type="button" data-cam="face">Face the chord</button>
+          <button type="button" data-cam="top">Top</button>
+        </div>
+      </div>
+      <div id="plot3d" class="plot plot-3d"></div>
+      <p class="caption"><span class="c-l2-orange"><span class="key dot"></span><span class="tex" data-tex="z"></span></span> and <span class="c-accent-4"><span class="key dot"></span><span class="tex" data-tex="z'"></span></span> with their <span class="c-muted"><span class="key dash"></span>rays</span> on the floor and the output along each ray on the surface. The <span class="c-ink"><span class="key"></span>thick curve</span> is <span class="tex" data-tex="\phi(z^\lambda)"></span> above the segment, the <span class="c-l2-red"><span class="key"></span>chord</span> joins <span class="tex" data-tex="\phi(z')"></span> and <span class="tex" data-tex="\phi(z)"></span>. Thin lines: isoquants, on the surface and on the floor.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Along the segment">
+        <h2>Mixing <span class="tex" data-tex="z'"></span> and <span class="tex" data-tex="z"></span>: concavity</h2>
+        <div id="plotSeg" class="plot plot-side"></div>
+        <p class="caption" id="capSeg"></p>
+      </section>
+      <section class="panel" aria-label="Along the rays">
+        <h2>Scaling <span class="tex" data-tex="z"></span> and <span class="tex" data-tex="z'"></span>: returns to scale</h2>
+        <div id="plotRay" class="plot plot-side"></div>
+        <p class="caption" id="capRay"></p>
+      </section>
+      <section class="panel readouts" aria-label="The three conditions" aria-live="polite">
+        <h2>Exercise 3, checked</h2>
+        <ul class="checks" id="checks"></ul>
+        <dl id="nums"></dl>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · J.W. Friedman, “Concavity of Production Functions and Non-Increasing Returns to Scale”, Econometrica 41(5), 1973.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

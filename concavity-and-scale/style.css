@@ -1,0 +1,3 @@
+/* Concavity and Returns to Scale: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-side { height: 270px; }
+@media (max-width: 800px) { .plot-side { height: 250px; } }
