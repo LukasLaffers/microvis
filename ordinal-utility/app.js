@@ -14,20 +14,12 @@
   const state = { type: 'cobb', alpha: 0.5, rho: -1, t: 'log', a1: 3, a2: 6, b1: 6, b2: 4 };
   const L = 10, LO = 0.25;
   const schedule = U.scheduler(render);
-<<<<<<< HEAD
-  const pref = () => ({ type: state.type, alpha: state.alpha, rho: Math.abs(state.rho) < 0.02 ? 0.02 : state.rho });
-=======
   const pref = () => ({ type: state.type, alpha: state.alpha, rho: state.rho });
->>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
   const f3 = v => fmt(v, 3);
 
   const FORMULA = {
     cobb: P => `U(x)=x_1^{${U.num(P.alpha)}}\\,x_2^{${U.num(1 - P.alpha)}}`,
-<<<<<<< HEAD
-    ces: P => `U(x)=\\big(${U.num(P.alpha)}\\,x_1^{${U.num(P.rho)}}+${U.num(1 - P.alpha)}\\,x_2^{${U.num(P.rho)}}\\big)^{1/${U.num(P.rho)}}`,
-=======
     ces: P => `\\begin{gathered}U(x)=\\big(\\alpha x_1^{\\rho}+(1-\\alpha)x_2^{\\rho}\\big)^{1/\\rho}\\\\ \\alpha=${U.num(P.alpha)},\\ \\rho=${U.num(P.rho)}\\end{gathered}`,
->>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     subs: P => `U(x)=${U.num(P.alpha)}\\,x_1+${U.num(1 - P.alpha)}\\,x_2`,
     concave: P => `U(x)=${U.num(P.alpha)}\\,x_1^2+${U.num(1 - P.alpha)}\\,x_2^2`
   };
@@ -123,12 +115,8 @@
 
   function init() {
     U.renderStaticTex();
-<<<<<<< HEAD
-    U.controls(document, state, { onChange: schedule });
-=======
     // rho = 0 is the Cobb-Douglas limit (its own option): the slider skips it so that the number shown is the number used.
     U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: schedule });
->>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
     $('transform').addEventListener('change', e => { state.t = e.target.value; schedule(); });
     render();

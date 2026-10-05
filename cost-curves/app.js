@@ -198,18 +198,12 @@
     // Lecture 3 corollary with the current numbers (homogeneous profile only).
     if (isHomog()) {
       const c = U.num(P.c), e = U.num((1 - s.k) / s.k), inv = U.num(1 / s.k), Aterm = s.A === 1 ? '' : `\\,${U.num(s.A)}^{-${inv}}`;
-<<<<<<< HEAD
-      tex($('homog-formulas'), s.A === 1
-        ? `\\begin{gathered}C(w,q)=c(w)\\,q^{1/k}=${c}\\,q^{${inv}}\\\\ AC=c(w)\\,q^{\\frac{1-k}{k}}=${c}\\,q^{${e}},\\quad MC=\\tfrac1k c(w)\\,q^{\\frac{1-k}{k}}=${U.num(P.c / s.k)}\\,q^{${e}}\\end{gathered}`
-        : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}=${c}\\,(q/${U.num(s.A)})^{${inv}}\\\\ AC=c(w)A^{-1/k}q^{\\frac{1-k}{k}}=${c}${Aterm}\\,q^{${e}},\\quad MC=\\tfrac1k\\,AC\\end{gathered}`, true);
-=======
       // "=" only when the two-decimal numbers are exact, otherwise "≈".
       const exact = (...xs) => xs.every(x => Math.abs(100 * x - Math.round(100 * x)) < 1e-7);
       const eqC = exact(P.c, 1 / s.k) ? '=' : '\\approx', eqAC = exact(P.c, (1 - s.k) / s.k) ? '=' : '\\approx', eqMC = exact(P.c / s.k, (1 - s.k) / s.k) ? '=' : '\\approx';
       tex($('homog-formulas'), s.A === 1
         ? `\\begin{gathered}C(w,q)=c(w)\\,q^{1/k}${eqC}${c}\\,q^{${inv}}\\\\ AC=c(w)\\,q^{\\frac{1-k}{k}}${eqAC}${c}\\,q^{${e}},\\quad MC=\\tfrac1k c(w)\\,q^{\\frac{1-k}{k}}${eqMC}${U.num(P.c / s.k)}\\,q^{${e}}\\end{gathered}`
         : `\\begin{gathered}C(w,q)=c(w)\\,(q/A)^{1/k}${eqC}${c}\\,(q/${U.num(s.A)})^{${inv}}\\\\ AC=c(w)A^{-1/k}q^{\\frac{1-k}{k}}${eqAC}${c}${Aterm}\\,q^{${e}},\\quad MC=\\tfrac1k\\,AC\\end{gathered}`, true);
->>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     }
     guard('cost plot', () => drawMain(th, P));
     guard('side plots', () => drawSide(th, P));
