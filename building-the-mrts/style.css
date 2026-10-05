@@ -1,0 +1,19 @@
+/* Building the MRTS: tool-specific styles (shared look is in ../shared/style.css). */
+.layout > .main-col { grid-area: main; display: grid; gap: 14px; min-width: 0; }
+.plot-main { height: 560px; }
+.plot-mrts { height: 300px; }
+.plot-mini { height: 240px; }
+@media (max-width: 800px) {
+  .plot-main { height: 380px; }
+  .plot-mrts { height: 260px; }
+}
+.eqs { overflow-x: auto; overflow-y: hidden; font-size: 13.5px; }
+.eqs .katex-display { margin: 6px 0; }
+.eqs .sentence { margin: 8px 0 10px; }
+table.pins { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; margin-top: 4px; }
+table.pins th, table.pins td { padding: 4px 4px; text-align: right; border-bottom: 1px solid var(--line); }
+table.pins th { color: var(--muted); font-weight: 600; }
+table.pins td:first-child, table.pins th:first-child { text-align: left; }
+.pin-0 { color: var(--l2-orange); }
+.pin-1 { color: var(--l2-blue); }
+.pin-2 { color: var(--l2-red); }

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building the MRTS · Microvis</title>
+  <meta name="description" content="How the marginal rate of technical substitution is built from the two marginal products: the slope of the isoquant, 0 = phi_1 dz_1 + phi_2 dz_2, a finite step along the isoquant, diminishing MRTS and the factor intensity. Lecture 1.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <h1>Building the MRTS</h1>
+      <p class="subtitle"><span class="tex" data-tex="MRTS_{21}(\bar z)\overset{\text{def}}{=}-\frac{dz_2}{dz_1}\Big|_{d\phi=0}=\frac{\phi_1(\bar z)}{\phi_2(\bar z)}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Move the point <span class="tex" data-tex="\bar z"></span> along the isoquant (drag it, or use the input-mix slider). On the right, two cuts through the production function at <span class="tex" data-tex="\bar z"></span>: output as <span class="tex" data-tex="z_1"></span> alone changes and as <span class="tex" data-tex="z_2"></span> alone changes. Their slopes are the marginal products <span class="tex" data-tex="\phi_1"></span> and <span class="tex" data-tex="\phi_2"></span>.</p>
+          <p>To stay on the isoquant, the output gained from <span class="tex" data-tex="dz_1"></span> more of input 1 must be lost by giving up input 2: <span class="tex" data-tex="0=\phi_1dz_1+\phi_2dz_2"></span>. So the isoquant falls by <span class="tex" data-tex="\phi_1/\phi_2"></span> units of <span class="tex" data-tex="z_2"></span> per unit of <span class="tex" data-tex="z_1"></span>: that is <span class="tex" data-tex="MRTS_{21}"></span>, the slope of the tangent.</p>
+          <p>Pin a few points (or press <b>Three points</b>) to compare: high up the isoquant <span class="tex" data-tex="\phi_1"></span> is large and <span class="tex" data-tex="\phi_2"></span> small, so the MRTS is high; further down it is low.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <select id="tech" aria-label="Technology">
+          <option value="cd">Cobb-Douglas</option>
+          <option value="linear">Linear</option>
+          <option value="leontief">Leontief</option>
+          <option value="ces">CES</option>
+        </select>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="" data-min="0.5" data-max="3" data-step="0.05" data-show="cd|ces"></div>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="" data-min="0.1" data-max="1.5" data-step="0.05" data-show="cd"></div>
+        <div class="ctrl" data-key="beta" data-label="\beta" data-hint="" data-min="0.1" data-max="1.5" data-step="0.05" data-show="cd"></div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="" data-min="0.2" data-max="3" data-step="0.05" data-show="linear|leontief"></div>
+        <div class="ctrl" data-key="b" data-label="b" data-hint="" data-min="0.2" data-max="3" data-step="0.05" data-show="linear|leontief"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="ρ < 1, ρ ≠ 0" data-min="-4" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+
+      <div class="group">
+        <h2>The point on the isoquant</h2>
+        <div class="ctrl" data-key="q" data-label="\bar q" data-hint="output on the isoquant" data-min="0.5" data-max="6" data-step="0.1"></div>
+        <div class="ctrl" data-key="r" data-label="\bar z_2/\bar z_1" data-hint="input mix (factor intensity)" data-min="0.05" data-max="20" data-log="1"></div>
+        <div class="ctrl" data-key="dz" data-label="dz_1" data-hint="step in the triangle" data-min="0.05" data-max="2" data-step="0.05"></div>
+        <div class="btn-row" role="group" aria-label="Pins">
+          <button type="button" id="pin">Pin this point</button>
+          <button type="button" id="three">Three points</button>
+          <button type="button" id="clear">Clear pins</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Plot range</h2>
+        <div class="ctrl" data-key="R" data-label="\max z_1,\ z_2" data-hint="" data-min="2" data-max="20" data-step="0.5"></div>
+      </div>
+    </section>
+
+    <div class="main-col">
+      <section class="panel" aria-label="Input space">
+        <div class="panel-head"><h2>The isoquant <span class="tex" data-tex="\phi(z)=\bar q"></span> and its slope</h2></div>
+        <div id="plot" class="plot plot-main" aria-label="Isoquant: drag the point"></div>
+        <p class="caption">The <span class="c-ink"><span class="key"></span>isoquant</span>, the point <span class="c-accent-3"><span class="key dot"></span><span class="tex" data-tex="\bar z"></span></span> and its <span class="c-accent-3"><span class="key dash"></span>tangent</span> with slope <span class="tex" data-tex="-MRTS_{21}"></span>. The triangle: <span class="c-accent"><span class="key"></span><span class="tex" data-tex="dz_1"></span> more of input 1</span>, then down to the isoquant (<span class="c-accent-2"><span class="key"></span>what you can give up</span>) or to the tangent (<span class="c-accent-3"><span class="key dash"></span><span class="tex" data-tex="MRTS_{21}\cdot dz_1"></span></span>). Drag the point along the isoquant.</p>
+      </section>
+      <section class="panel" aria-label="MRTS along the isoquant">
+        <div class="panel-head">
+          <h2>The MRTS along the isoquant</h2>
+          <div class="seg" role="group" aria-label="Horizontal axis">
+            <button type="button" data-x="z1" aria-pressed="true">against z₁</button>
+            <button type="button" data-x="ratio" aria-pressed="false">against z₂/z₁</button>
+          </div>
+        </div>
+        <div id="plotM" class="plot plot-mrts"></div>
+        <p class="caption" id="capM"></p>
+      </section>
+    </div>
+
+    <div class="side">
+      <section class="panel" aria-label="Marginal product of input 1">
+        <h2>Change <span class="tex" data-tex="z_1"></span> only: slope <span class="tex" data-tex="\phi_1"></span></h2>
+        <div id="plot1" class="plot plot-mini"></div>
+        <p class="caption" id="cap1"></p>
+      </section>
+      <section class="panel" aria-label="Marginal product of input 2">
+        <h2>Change <span class="tex" data-tex="z_2"></span> only: slope <span class="tex" data-tex="\phi_2"></span></h2>
+        <div id="plot2" class="plot plot-mini"></div>
+        <p class="caption" id="cap2"></p>
+      </section>
+      <section class="panel readouts" aria-label="The MRTS step by step" aria-live="polite">
+        <h2>Step by step at <span class="tex" data-tex="\bar z"></span></h2>
+        <div class="eqs" id="eqs"></div>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
