@@ -130,7 +130,11 @@
       const imp = d.x[1] - d.firm.q2, lab = d.firm.L - d.labourSupply;
       $('checks').innerHTML = [
         item(d.v >= pl.v - 1e-9, `Trade never hurts: ${texStr(`U(x^{\\ast\\ast})=${f3(d.v)}\\ge U(x^\\ast)=${f3(pl.v)}`)}`),
+<<<<<<< HEAD
         info(`Trade: Robinson ${imp >= 0 ? 'imports' : 'exports'} ${f2(Math.abs(imp))} coconuts and ${lab >= 0 ? 'hires' : 'sells'} ${f2(Math.abs(lab))} hours of labour ${lab >= 0 ? 'from' : 'to'} the traders. The value balances: ${texStr(`(w/p)\\cdot${f2(lab)}+(${f2(imp)})=${f3(Math.abs(omega * lab + imp) < 1e-9 ? 0 : omega * lab + imp)}`)}.`),
+=======
+        info(`Trade: Robinson ${imp >= 0 ? 'imports' : 'exports'} ${f2(Math.abs(imp))} coconuts and ${lab >= 0 ? 'hires' : 'sells'} ${f2(Math.abs(lab))} hours of labour ${lab >= 0 ? 'from' : 'to'} the traders. The value balances: ${texStr(`(w/p)\\cdot(${f2(lab)})+(${f2(imp)})=${f3(Math.abs(omega * lab + imp) < 1e-9 ? 0 : omega * lab + imp)}`)}.`),
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
         info(P.tech.type === 'sshape' ? 'The frontier is not concave, but the world price line makes the consumption possibilities a straight line: trade convexifies the technology.' : `At ${texStr(`w/p=MRS(x^\\ast)=${f3(pl.omega)}`)} there is no trade and ${texStr('x^{\\ast\\ast}=x^\\ast')}.`)
       ].join('');
       $('cap').innerHTML = `Robinson produces where the world price line touches the <span class="c-l2-red"><span class="key"></span>frontier</span> (red diamond, maximal profit at world prices) and then trades along that line to his best bundle (blue dot). The dashed triangle is the trade. The open star is the autarky optimum.`;
@@ -161,7 +165,11 @@
 
   function init() {
     U.renderStaticTex();
+<<<<<<< HEAD
     ctrls = U.controls(document, state, { onChange: key => { if (key !== 'wp') state.example = 'custom'; schedule(); } });
+=======
+    ctrls = U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: key => { if (key !== 'wp') state.example = 'custom'; schedule(); } });
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     $('example').addEventListener('change', e => setExample(e.target.value));
     document.querySelectorAll('[data-tech]').forEach(b => b.addEventListener('click', () => { state.tech = b.dataset.tech; state.example = 'custom'; schedule(); }));
     document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {

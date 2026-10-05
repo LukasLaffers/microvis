@@ -50,7 +50,11 @@
       annotations.push({ x: xm, y: p10 + 0.3 * (p11 - p10), ax: 40, ay: 46, text: '<b>DWL</b>', showarrow: true, arrowhead: 2, arrowwidth: 1.5, font: { size: 13, color: th.blue }, arrowcolor: th.blue });
     }
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: [0, xMax] }, y: { range: [0, pTop] }, annotations, shapes, margin: { l: 56, r: 12, t: 8, b: 44 } }), U.PLOT_CONFIG);
+<<<<<<< HEAD
     $('cap').innerHTML = `<span class="c-green"><span class="key"></span>${texStr('D^1(p_1,1,y)')}</span>, <span class="c-l2-blue"><span class="key"></span>${texStr('H^1(p_1,1,v^1)')}</span> (utility after the tax), <span class="c-l2-red"><span class="key dot"></span></span>${texStr('H^1(p_1,1,v^0)')} dotted. ${texStr('D^1(p_1^1,1,y)=H^1(p_1^1,1,v^1)')}: the curves meet at the taxed price. <span class="c-yellow">Yellow: tax revenue</span> ${texStr(`T=${f3(r.T)}`)}; <span class="c-l2-blue">blue: deadweight loss</span> ${texStr(`DWL=${f3(r.DWL)}`)}.` +
+=======
+    $('cap').innerHTML = `<span class="c-green"><span class="key"></span>${texStr('D^1(p_1,1,y)')}</span>, <span class="c-l2-blue"><span class="key"></span>${texStr('H^1(p_1,1,v^1)')}</span> (utility after the tax), <span class="c-l2-red"><span class="key dash"></span>${texStr('H^1(p_1,1,v^0)')}</span> (dotted, utility before the tax). ${texStr('D^1(p_1^1,1,y)=H^1(p_1^1,1,v^1)')}: the curves meet at the taxed price. <span class="c-yellow">Yellow: tax revenue</span> ${texStr(`T=${f3(r.T)}`)}; <span class="c-l2-blue">blue: deadweight loss</span> ${texStr(`DWL=${f3(r.DWL)}`)}.` +
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
       (state.type === 'quasilinear' ? ' Quasilinear utility has no income effect on good 1, so all three curves coincide and the deadweight loss is the familiar triangle under the demand curve.' : '');
   }
 
@@ -70,7 +74,11 @@
 
   function renderGroups(th) {
     const G = DM.GROUPS;
+<<<<<<< HEAD
     $('groups').innerHTML = `<table class="dw"><thead><tr><th>Commodity group</th><th>${texStr('b_i')}</th><th>${texStr('\\eta_i')}</th><th>${texStr('\\varepsilon^u_{ii}')}</th><th>${texStr('\\varepsilon^c_{ii}')}</th><th>tax rate</th><th>${texStr('DWL/T')}</th><th>${texStr('-\\tfrac12\\varepsilon^c_{ii}\\cdot')}rate</th></tr></thead><tbody>` +
+=======
+    $('groups').innerHTML = `<table class="dw"><thead><tr><th>Commodity group</th><th>${texStr('b_i')}</th><th>${texStr('\\eta_i')}</th><th>${texStr('\\varepsilon^u_{ii}')}</th><th>${texStr('\\varepsilon^c_{ii}')}</th><th>effective tax rate</th><th>${texStr('DWL/T')}</th><th>${texStr('-\\tfrac12\\varepsilon^c_{ii}\\cdot')}rate</th></tr></thead><tbody>` +
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
       G.map(g => `<tr><td>${g.name}</td><td>${g.b.toFixed(3)}</td><td>${g.eta.toFixed(2)}</td><td>${g.eu.toFixed(2)}</td><td>${g.ec.toFixed(2)}</td><td>${g.rate.toFixed(2)}</td><td>${g.dwlT.toFixed(3)}</td><td class="calc">${g.approx.toFixed(3)}</td></tr>`).join('') + '</tbody></table>';
     const order = G.slice().sort((a, b) => a.dwlT - b.dwlT);
     Plotly.react('plotG', [
@@ -90,7 +98,11 @@
 
   function init() {
     U.renderStaticTex();
+<<<<<<< HEAD
     U.controls(document, state, { onChange: schedule });
+=======
+    U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
     render();
     U.watchColorScheme(schedule);

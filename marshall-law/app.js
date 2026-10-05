@@ -125,7 +125,11 @@
       { x: qMax, y: c1, text: 'c(w′)', showarrow: false, xanchor: 'right', yanchor: 'bottom', yshift: 2, font: { size: 12, color: th.orange } }
     ];
     Plotly.react('plotC', traces, U.base2d(th, { xt: 'q (industry output)', yt: 'p', x: { range: [0, qMax] }, y: { range: [0, pTop] }, shapes, annotations }), U.PLOT_CONFIG);
+<<<<<<< HEAD
     $('capC').innerHTML = `Supply is flat at ${texStr('p=c(w)')}. A ${fmt(state.r, 0)} % wage rise lifts it to ${texStr(`c(w')=${fmt(c1, 3)}`)} (by ${pct(c1 / c0 - 1)} = ${texStr('sh_1')} × ${fmt(state.r, 0)} % to first order), and output falls along ${texStr('Dem(p)')} from ${fmt(q0, 2)} to ${fmt(q1, 2)} (${pct(q1 / q0 - 1)}).`;
+=======
+    $('capC').innerHTML = `Supply is flat at ${texStr('p=c(w)')}. A ${fmt(state.r, 0)} % wage rise lifts it to ${texStr(`c(w')=${fmt(c1, 3)}`)} (by ${pct(c1 / c0 - 1)}; to first order by ${texStr('sh_1')} × ${fmt(state.r, 0)} % = ${pct(P.m.sh1 * state.r / 100)}), and output falls along ${texStr('Dem(p)')} from ${fmt(q0, 2)} to ${fmt(q1, 2)} (${pct(q1 / q0 - 1)}).`;
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
   }
 
   // ---------- inside the firm: the unit isoquant and the cost-minimising unit input requirement ----------

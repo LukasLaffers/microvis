@@ -170,7 +170,12 @@
     Plotly.react('plotArea', traces, U.base2d(th, { xt: 'z<sub>1</sub> = H<sup>1</sup>(w<sub>1</sub>, w̄<sub>2</sub>, q)', yt: 'w<sub>1</sub>', x: { range: [0, zTop] }, y: { range: [0, W1[1]] }, annotations: ann }), { ...U.PLOT_CONFIG, displayModeBar: false });
     const area = CF.areaLeftOfH1(w2, q, s, wa, wb), dC = FM.cost([wb, w2], q, s) - FM.cost([wa, w2], q, s);
     const ok = Math.abs(area - Math.abs(dC)) <= 1e-4 * Math.max(1, Math.abs(dC));
+<<<<<<< HEAD
     $('capArea').innerHTML = `Because ${texStr('H^1(w,q)=\\partial C(w,q)/\\partial w_1')}, the shaded area to the left of the conditional demand curve, ${texStr(`\\int_{${fmt(lo, 2)}}^{${fmt(hi, 2)}}H^1(w_1,\\bar w_2,q)\\,\\mathrm dw_1=${fmt(area, 4)}`)}, reflects the change in cost that the price change induces: ${texStr(`C(w_1^o,\\bar w_2,q)-C(w_1^\\ast,\\bar w_2,q)=${fmt(dC, 4)}`)} <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓' : '✗'}</span>`;
+=======
+    // As in the notes: the integral from w1* (= the reference price) to w1^o equals the change in cost; the shaded area is its size.
+    $('capArea').innerHTML = `Because ${texStr('H^1(w,q)=\\partial C(w,q)/\\partial w_1')}, the integral along the conditional demand curve from ${texStr(`w_1^\\ast=\\bar w_1=${fmt(wa, 2)}`)} to ${texStr(`w_1^o=${fmt(wb, 2)}`)} is the change in cost the price change induces: ${texStr(`\\int_{w_1^\\ast}^{w_1^o}H^1(w_1,\\bar w_2,q)\\,\\mathrm dw_1=C(w_1^o,\\bar w_2,q)-C(w_1^\\ast,\\bar w_2,q)=${fmt(dC, 4)}`)}. The shaded area to the left of the curve is its size, ${fmt(area, 4)} <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓' : '✗'}</span>`;
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
   }
 
   // ---------- render loop ----------

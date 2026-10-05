@@ -173,7 +173,11 @@
     ];
     const layout = U.base2d(th, { yt: 'input use', y: { range: [0, 45] }, margin: { l: 48, r: 8, t: 8, b: 48 } });
     Plotly.react('plotAgg', traces, { ...layout, barmode: 'group', showlegend: true, legend: { orientation: 'h', x: 0, y: 1.02, yanchor: 'bottom', font: { color: th.ink } }, xaxis: { ...layout.xaxis, type: 'category', tickangle: 0 } }, U.PLOT_CONFIG);
+<<<<<<< HEAD
     $('capAgg').innerHTML = `Outputs ${fmt(yE, 1)} and ${fmt(yK, 1)}. Industry totals: energy ${fmt(a0.E, 0)} → <b>${fmt(a.E, 1)}</b>, capital ${fmt(a0.K, 0)} → <b>${fmt(a.K, 1)}</b>, so ${texStr('E/K')} falls from 1 to ${fmt(a.E / a.K, 2)}, which looks like substitution away from energy. Yet inside each firm ${texStr('E/K')} stays at 2 and ½. Only data on individual firms over time can tell the two apart.`;
+=======
+    $('capAgg').innerHTML = `Outputs ${fmt(yE, 1)} and ${fmt(yK, 1)}. Industry totals: energy ${fmt(a0.E, 0)} → <b>${fmt(a.E, 1)}</b>, capital ${fmt(a0.K, 0)} → <b>${fmt(a.K, 1)}</b>, ${(() => { const r = a.E / a.K; return Math.abs(r - 1) < 5e-3 ? `so ${texStr('E/K')} stays at 1. Move the slider: as output shifts to the capital-intensive firm, the industry's ${texStr('E/K')} falls, which would look like substitution away from energy.` : `so ${texStr('E/K')} ${r < 1 ? 'falls' : 'rises'} from 1 to ${fmt(r, 2)}, which looks like substitution ${r < 1 ? 'away from' : 'towards'} energy.`; })()} Yet inside each firm ${texStr('E/K')} stays at 2 and ½. Only data on individual firms over time can tell the two apart.`;
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
   }
 
   // ---------- render loop ----------

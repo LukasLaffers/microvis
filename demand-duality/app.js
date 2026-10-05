@@ -98,7 +98,11 @@
 
   function init() {
     U.renderStaticTex();
+<<<<<<< HEAD
     ctrls = U.controls(document, state, { onChange: schedule });
+=======
+    ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
     // Switching view keeps the same tangency: the EMP target is the current V(p,y), the UMP income the current C(p,v).
     document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {

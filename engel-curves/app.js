@@ -90,7 +90,11 @@
 
   function init() {
     U.renderStaticTex();
+<<<<<<< HEAD
     ctrls = U.controls(document, state, { onChange: schedule });
+=======
+    ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     document.querySelectorAll('[data-panel]').forEach(b => b.addEventListener('click', () => {
       state.panel = b.dataset.panel;
       const p = [state.p1, state.p2], [lo, hi] = EM.incomeRange(p, pref());

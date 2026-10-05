@@ -110,6 +110,10 @@
   function renderText(S) {
     const { e, b, c } = S;
     const who = b.side === 'a' ? 'Alf' : 'Bill', other = b.side === 'a' ? 'Bill' : 'Alf';
+<<<<<<< HEAD
+=======
+    const h = b.side, o = b.side === 'a' ? 'b' : 'a';
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     const rows = [['y^a', vec(b.xa)], ['y^b', vec(b.xb)]];
     if (b.N < Infinity) rows.push(['\\theta\\ \\text{must exceed}', f3(b.theta)], ['\\text{blocked from}', `N=${b.N}`]);
     else rows.push(['\\text{blocked}', '\\text{never}']);
@@ -128,9 +132,15 @@
     const lhs = [c.N * c.get[0] + c.M * c.other[0], c.N * c.get[1] + c.M * c.other[1]], rhs = [c.N * R[0] + c.M * Ro[0], c.N * R[1] + c.M * Ro[1]];
     $('checks').innerHTML = [
       item(true, `Coalition: all ${c.N} ${who}s and ${c.M} of the ${other}s, ${texStr(`\\theta=\\tfrac{${c.M}}{${c.N}}=${f3(c.theta)}`)}`),
+<<<<<<< HEAD
       item(true, `Each ${who} gets ${texStr(`\\theta y+(1-\\theta)R=${vec(c.get)}`)}, each ${other} in it keeps ${texStr(vec(c.other))}`),
       item(Math.abs(lhs[0] - rhs[0]) < 1e-9 && Math.abs(lhs[1] - rhs[1]) < 1e-9, `Feasible: they use exactly their own endowments, ${texStr(vec(rhs))}`),
       item(gain > 0, `Better for every ${who}: ${texStr(`U(\\theta y+(1-\\theta)R)-U(y)=${fmt(gain, 4)}>0`)}. Passing a crumb to the ${other}s makes them strictly better off too.`)
+=======
+      item(true, `Each ${who} gets ${texStr(`\\theta y^${h}+(1-\\theta)R^${h}=${vec(c.get)}`)}, each ${other} in it keeps ${texStr(`y^${o}=${vec(c.other)}`)}`),
+      item(Math.abs(lhs[0] - rhs[0]) < 1e-9 && Math.abs(lhs[1] - rhs[1]) < 1e-9, `Feasible: they use exactly their own endowments, ${texStr(vec(rhs))}`),
+      item(gain > 0, `Better for every ${who}: ${texStr(`U^${h}(\\theta y^${h}+(1-\\theta)R^${h})-U^${h}(y^${h})=${fmt(gain, 4)}>0`)}. Passing a crumb to the ${other}s makes them strictly better off too.`)
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     ].join('');
   }
 

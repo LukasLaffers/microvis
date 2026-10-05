@@ -85,7 +85,11 @@
     if (comp) rows.push(['\\text{price taker}', `${texStr(`q=${fmt(comp.q, 3)}`)}, ${texStr(`p=${fmt(comp.p, 3)}`)}`]);
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     $('cap').innerHTML = `<span class="c-l2-blue"><span class="key"></span>${texStr('AR=p(q)')}</span>, <span class="c-l2-blue"><span class="key dash"></span>${texStr('MR')}</span>, <span class="c-l2-red"><span class="key"></span>${texStr('MC')}</span>, <span class="c-ink"><span class="key"></span>${texStr('AC')}</span>. ` +
+<<<<<<< HEAD
       (local ? (Math.abs(o.profit) < 0.02 ? 'Entry of substitutes has pushed average revenue down until it just touches average cost: the firm still sets MR = MC, but earns nothing.' : `The firm earns ${texStr(`\\Pi=${fmt(o.profit, 2)}`)}. Press "Substitutes enter" to let rivals take its demand.`)
+=======
+      (local ? (Math.abs(o.profit) < 0.02 ? 'Entry of substitutes has pushed average revenue down until it just touches average cost: the firm still sets MR = MC, but earns zero profit.' : `The firm earns ${texStr(`\\Pi=${fmt(o.profit, 2)}`)}. Press "Substitutes enter" to let rivals take its demand.`)
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
         : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.`);
   }
 
@@ -93,8 +97,16 @@
     U.applyVisibility({ mono: state.mode === 'mono', local: state.mode === 'local', linear: state.dem === 'linear', ce: state.dem === 'ce' });
     document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
     document.querySelectorAll('[data-dem]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.dem === state.dem)));
+<<<<<<< HEAD
     tex($('formula-dem'), state.dem === 'linear' ? `p(q)=${U.num(state.A)}-${U.num(state.B)}\\,q` : `p(q)=${U.num(state.K)}\\,q^{1/(${U.num(state.eta)})}`, true);
     tex($('formula-local'), `AR=p(q)=${U.num(state.AL)}-${U.num(state.BL)}\\,q`, true);
+=======
+    // A - Bq with the numbers (no "1q"); the constant-elasticity exponent 1/eta exactly (a number only when exact).
+    const lin = (A, B) => `${U.num(A)}-${B === 1 ? '' : U.num(B) + '\\,'}q`;
+    const inv = 1 / state.eta, invTex = Math.abs(100 * inv - Math.round(100 * inv)) < 1e-7 ? U.num(inv) : `1/(${U.num(state.eta)})`;
+    tex($('formula-dem'), state.dem === 'linear' ? `p(q)=A-Bq=${lin(state.A, state.B)}` : `p(q)=K\\,q^{1/\\eta}=${U.num(state.K)}\\,q^{${invTex}}`, true);
+    tex($('formula-local'), `AR=p(q)=${lin(state.AL, state.BL)}`, true);
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     tex($('formula-cost'), `\\begin{gathered}C(w,q)=c(w)\\,G(q),\\ c(w)=2\\\\ G(q)=\\tfrac13q^3-${U.num(state.a)}q^2+${U.num(state.a * state.a + state.m)}q\\end{gathered}`, true);
     const th = U.theme();
     let R = null;

@@ -168,7 +168,11 @@
       const clear = Math.abs(E[0]) < 2e-3;
       $('checks').innerHTML = [
         item(true, `Walras' law: ${texStr(`p_1E_1+p_2E_2=${f3(tiny(state.p * E[0] + E[1]))}`)} at any price, not only in equilibrium`),
+<<<<<<< HEAD
         item(Math.abs(E2p[0] - E[0]) < 1e-9, `Homogeneity: doubling both prices, ${texStr(`E_1(2p_1,2p_2)=${f3(E2p[0])}`)}`),
+=======
+        item(Math.abs(E2p[0] - E[0]) < 1e-9, `Homogeneity: doubling both prices changes nothing, ${texStr(`E_1(2p_1,2p_2)=${f3(E2p[0])}=E_1(p_1,p_2)`)}`),
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
         item(clear, clear ? 'Both markets clear: a competitive equilibrium' : `Not an equilibrium: excess ${E[0] > 0 ? 'demand' : 'supply'} for good 1, so ${texStr('p')} should ${E[0] > 0 ? 'rise' : 'fall'}`)
       ].join('');
       $('cap').innerHTML = `<span class="c-l2-blue"><span class="key dot"></span>Alf</span> and <span class="c-l2-red"><span class="key dot"></span>Bill</span> choose on the grey price line through ${texStr('R')}; their dashed offer curves trace these choices for every price. ${state.showCore ? `<span class="c-green"><span class="key"></span>Core</span>: the contract curve (dotted) inside the shaded lens. ` : ''}Stars: competitive equilibria, where the two offer curves cross. Drag ${texStr('R')} in the box.`;
@@ -180,7 +184,11 @@
         item(Math.abs(X.mrs(swt.xa, e.ua) - X.mrs(swt.xb, e.ub)) < 1e-6, `Pareto efficient: ${texStr(`MRS^a_{21}=MRS^b_{21}=${f3(swt.p)}`)}`),
         item(!!hit, hit ? `After the transfer, ${texStr(`p^*=${f3(swt.p)}`)} clears both markets and both choose the target` : 'The target is not reached'),
         item(true, `The transfers balance: ${texStr(`T^a+T^b=${f3(swt.T)}+(${f3(-swt.T)})=0`)}`),
+<<<<<<< HEAD
         `<li><span class="mark na">·</span><span>${Math.abs(swt.T) < 1e-3 ? 'No transfer needed: the target is a competitive equilibrium from R.' : Rn ? `Lump sum: move ${f2(Math.abs(Rn.amount))} units of good ${Rn.good} from ${swt.T > 0 ? 'Bill to Alf' : 'Alf to Bill'}${Rn.good === 2 ? ' (good 1 alone would not be enough)' : ''}.` : 'The transfer is larger than what can be moved in one good: pay it as income.'} ${inCore ? 'The target is in the core, so even trade from R could reach it, but the market from R would not.' : 'The target is outside the core: one of them is worse off than at R, which only a transfer can bring about.'}</span></li>`
+=======
+        `<li><span class="mark na">·</span><span>${Math.abs(swt.T) < 1e-3 ? 'No transfer needed: the target is a competitive equilibrium from R.' : Rn ? `Lump sum: move ${f2(Math.abs(Rn.amount))} units of good ${Rn.good} from ${swt.T > 0 ? 'Bill to Alf' : 'Alf to Bill'}${Rn.good === 2 ? ' (good 1 alone would not be enough)' : ''}.` : 'The transfer is larger than what can be moved in one good: pay it as income.'} ${inCore ? 'The target is in the core, so no coalition blocks it from R; but the market from R ends at a different point, so a transfer is still needed.' : 'The target is outside the core: one of them is worse off than at R, which only a transfer can bring about.'}</span></li>`
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
       ].join('');
       $('cap').innerHTML = `Pick any Pareto-efficient point <span class="c-green">(star)</span> on the contract curve. The common tangent of the two indifference curves there gives the supporting price ${texStr(`p^*=${f3(swt.p)}`)}. A balancing lump-sum transfer moves the endowment from ${texStr('R')} to ${texStr("R'")} on that price line; from ${texStr("R'")} the market reaches the target.`;
     }

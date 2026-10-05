@@ -80,7 +80,11 @@
       { x: 0, y: y + b.EV / 2, text: 'EV', showarrow: false, xanchor: 'left', xshift: 20, font: { size: 12, color: th.blue } }
     ];
     Plotly.react('plotB', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub> (income, p<sub>2</sub> = 1)', x: { range: [0, Lx] }, y: { range: [0, Ly] }, annotations }), U.PLOT_CONFIG);
+<<<<<<< HEAD
     $('capB').innerHTML = `With ${texStr('p_2=1')} the ${texStr('x_2')}-axis measures income. CV: the line with the new prices that just reaches ${texStr('v^0')} starts ${f3(b.CV)} below ${texStr('y')}. EV: the line with the old prices that just reaches ${texStr('v^1')} starts ${f3(b.EV)} above ${texStr('y')}.`;
+=======
+    $('capB').innerHTML = `With ${texStr('p_2=1')} the ${texStr('x_2')}-axis measures income. CV: the line with the new prices that just reaches ${texStr('v^0')} starts ${f3(Math.abs(b.CV))} ${b.CV >= 0 ? 'below' : 'above'} ${texStr('y')}. EV: the line with the old prices that just reaches ${texStr('v^1')} starts ${f3(Math.abs(b.EV))} ${b.EV >= 0 ? 'above' : 'below'} ${texStr('y')}.`;
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
   }
 
   function renderNumbers(S) {
@@ -96,7 +100,11 @@
     $('checks').innerHTML = [
       item(same(CM.indirect([state.p11, 1], y - w.CV, u), w.v0), `(CVeq) ${texStr(`V(p^1,y-CV)=v^0`)}`),
       item(same(CM.indirect([state.p10, 1], y + w.EV, u), w.v1), `(EVeq) ${texStr(`V(p^0,y+EV)=v^1`)}`),
+<<<<<<< HEAD
       item(same(w.CVarea, w.CV) && same(w.EVarea, w.EV), `Areas: ${texStr(`\\int H^1(p_1,1,v^0)\\,\\mathrm dp_1=${f3(w.CVarea)}`)}, ${texStr(`\\int H^1(p_1,1,v^1)\\,\\mathrm dp_1=${f3(w.EVarea)}`)}`),
+=======
+      item(same(w.CVarea, w.CV) && same(w.EVarea, w.EV), `Areas: ${texStr(`\\int_{p_1^1}^{p_1^0}H^1(p_1,1,v^0)\\,\\mathrm dp_1=${f3(w.CVarea)}=CV`)}, ${texStr(`\\int_{p_1^1}^{p_1^0}H^1(p_1,1,v^1)\\,\\mathrm dp_1=${f3(w.EVarea)}=EV`)}`),
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
       item(ordered, `${orderTxt}${fall ? '' : ' (a price rise: the inequalities turn round)'}`)
     ].join('');
   }
@@ -105,7 +113,11 @@
     U.applyVisibility({ ces: state.type === 'ces', quasilinear: state.type === 'quasilinear', giffen: state.type === 'giffen' });
     document.querySelectorAll('[data-area]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.area === state.area)));
     const S = solve(), th = U.theme();
+<<<<<<< HEAD
     tex($('formula'), CU.formula(S.u) + (state.type === 'giffen' ? `,\\ y=${INFERIOR.y}` : ''), true);
+=======
+    tex($('formula'), CU.formula(S.u, state.type === 'giffen' ? `,\\ y=${INFERIOR.y}` : ''), true);
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     guard('areas', () => drawAreas(th, S));
     guard('goods space', () => drawGoods(th, S));
     guard('numbers', () => renderNumbers(S));
@@ -113,7 +125,11 @@
 
   function init() {
     U.renderStaticTex();
+<<<<<<< HEAD
     ctrls = U.controls(document, state, { onChange: schedule });
+=======
+    ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
+>>>>>>> 40baa6a22a6e5f3bc4b11bbf79b9556039b5218a
     $('type').addEventListener('change', e => {
       state.type = e.target.value;
       // The inferior example is defined only for some prices: start it where good 1 is inferior but not Giffen.
