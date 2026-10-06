@@ -423,89 +423,81 @@ details.sub-details summary { cursor: pointer; color: var(--muted); font-weight:
 .wip b { color: var(--ink); }
 
 /* =====================================================================
-   Design: modern and clean. Cool grey page, white tiles and panels with a
-   soft shadow, Helvetica/Arial, one UI colour (--brand) and a colour per
-   lecture on the start page. The economics colours (--accent, --l2-*) stay.
+   Design: minimal. Helvetica/Arial, square corners, hairlines instead of
+   shadows, black and white with one blue for what you can click or move.
+   On the start page the tiles form a clean grid separated by hairlines.
+   The economics colours (--accent, --l2-*) stay as they are.
    ===================================================================== */
 
 :root {
-  --bg: #eef1f5;
+  --bg: #f7f7f8;
   --panel: #ffffff;
-  --ink: #141a24;
-  --muted: #5a6475;
-  --line: #e2e6ed;
-  --grid: #edf0f4;
-  --brand: #1f5fd6;
-  --radius: 10px;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
-  --shadow-hover: 0 6px 16px rgba(16, 24, 40, 0.12), 0 2px 4px rgba(16, 24, 40, 0.06);
+  --ink: #111318;
+  --muted: #5d6370;
+  --line: #e1e3e8;
+  --grid: #eceef2;
+  --brand: #1d5bd8;
+  --radius: 0px;
+  --on-accent: #ffffff;
   --font: "Helvetica Neue", Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --bg: #0e1116; --panel: #171b22; --ink: #e8ebf0; --muted: #9aa3b2; --line: #272d38; --grid: #232934; --brand: #6ea0ff; --shadow: 0 0 0 1px #272d38; --shadow-hover: 0 0 0 1px #3a4250, 0 6px 16px rgba(0, 0, 0, 0.4); }
+  :root:not([data-theme="light"]) { --bg: #0d0f12; --panel: #14171c; --ink: #e9ecf1; --muted: #9aa1ad; --line: #272b33; --grid: #20242b; --brand: #7aa7ff; --on-accent: #0d0f12; }
 }
-:root[data-theme="dark"] { --bg: #0e1116; --panel: #171b22; --ink: #e8ebf0; --muted: #9aa3b2; --line: #272d38; --grid: #232934; --brand: #6ea0ff; --shadow: 0 0 0 1px #272d38; --shadow-hover: 0 0 0 1px #3a4250, 0 6px 16px rgba(0, 0, 0, 0.4); }
+:root[data-theme="dark"] { --bg: #0d0f12; --panel: #14171c; --ink: #e9ecf1; --muted: #9aa1ad; --line: #272b33; --grid: #20242b; --brand: #7aa7ff; --on-accent: #0d0f12; }
 
 body { font-size: 15px; -webkit-font-smoothing: antialiased; }
 a { color: var(--brand); }
 
 /* header */
-.site-header { padding-top: 26px; padding-bottom: 16px; }
+.site-header { padding-top: 28px; padding-bottom: 18px; }
 .site-header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
-.eyebrow { color: var(--brand); font-weight: 700; font-size: 11.5px; letter-spacing: 0.09em; }
-.back-link { color: var(--muted); font-weight: 600; }
+.eyebrow { color: var(--muted); font-weight: 500; font-size: 13px; letter-spacing: 0; text-transform: none; }
+.back-link { color: var(--ink); font-weight: 500; }
 .back-link:hover { color: var(--brand); }
-/* formulas in the header stay on one line; on a narrow screen the line scrolls instead of breaking */
+/* formulas in the header stay on one line (a narrow screen scrolls); a little room so tall fractions are not clipped */
+.subtitle { padding: 3px 0 4px; }
 .subtitle .katex, .subtitle .katex-html { white-space: nowrap; }
 .site-header > div { min-width: 0; max-width: 100%; }
 
-/* panels: white sheets with a soft shadow instead of a border */
-.panel { border: 0; box-shadow: var(--shadow); border-radius: var(--radius); padding: 16px 18px; }
+/* panels: flat white sheets with a hairline */
+.panel { border: 1px solid var(--line); border-radius: 0; box-shadow: none; padding: 16px 18px; }
 .panel > h2, .panel-head h2 { font-size: 15px; font-weight: 700; letter-spacing: -0.005em; }
-.group > h2 { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.09em; }
+.group > h2 { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; }
 details.howto summary { font-weight: 700; }
+.status-banner { border-radius: 0; }
+.badge { border-radius: 0; }
 
-/* controls */
-select, input[type="number"], .ctrl-row input[type="number"], .go-row input[type="number"], .pair-row input[type="number"] { border-radius: 7px; background: var(--panel); border-color: var(--line); }
+/* controls: square; black when chosen, blue when you can drag */
+select, input[type="number"], .ctrl-row input[type="number"], .go-row input[type="number"], .pair-row input[type="number"] { border-radius: 0; background: var(--panel); border-color: var(--line); }
 input[type="range"], input[type="checkbox"] { accent-color: var(--brand); }
-.seg { border-radius: 8px; border-color: var(--line); background: var(--bg); padding: 2px; gap: 2px; }
-.seg button { background: transparent; border-radius: 6px; font-weight: 600; color: var(--muted); }
-.seg button + button { border-left: 0; }
-.seg button[aria-pressed="true"], :root[data-mode="scale"] .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
-.btn-row button, .go-row button { border-radius: 7px; background: var(--panel); border-color: var(--line); font-weight: 600; }
-.btn-row button:hover, .go-row button:hover, .seg button:hover:not([aria-pressed="true"]) { border-color: var(--brand); color: var(--brand); }
-.btn-row button[aria-pressed="true"] { border-color: var(--brand); color: var(--brand); }
+.seg { border: 1px solid var(--ink); border-radius: 0; }
+.seg button { background: transparent; border-radius: 0; font-weight: 600; color: var(--ink); }
+.seg button + button { border-left: 1px solid var(--ink); }
+.seg button[aria-pressed="true"], :root[data-mode="scale"] .seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+.btn-row button, .go-row button { border-radius: 0; background: var(--panel); border-color: var(--line); font-weight: 500; }
+.btn-row button:hover, .go-row button:hover, .seg button:hover:not([aria-pressed="true"]) { border-color: var(--ink); }
+.btn-row button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--panel); }
 button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline-color: var(--brand); }
 
 /* ---------- start page ---------- */
-.home .site-header { padding-top: 40px; }
-.home .site-header h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.025em; }
+.home .site-header { padding-top: 44px; padding-bottom: 10px; }
+.home .site-header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.025em; }
 .intro { color: var(--muted); font-size: 16px; }
-.wip { display: flex; gap: 10px; align-items: baseline; max-width: 860px; margin: 0 0 18px; padding: 12px 16px; border: 0; border-radius: var(--radius); background: var(--ink); color: var(--bg); box-shadow: var(--shadow); }
+.wip { max-width: 860px; margin: 0 0 18px; padding: 10px 14px; border: 1px solid var(--ink); border-radius: 0; background: var(--panel); }
 .wip p { margin: 0; font-size: 14.5px; }
-.wip b { color: inherit; }
-
-/* one colour per lecture */
-#l1, #l1 + .cards { --tone: #2f6fde; }
-#l2, #l2 + .cards { --tone: #d6453d; }
-#l3, #l3 + .cards { --tone: #e08a1e; }
-#l4, #l4 + .cards { --tone: #1f9d74; }
-#l5-firm, #l5-firm + .cards { --tone: #7c4dcc; }
-#l5-consumer, #l5-consumer + .cards { --tone: #c2418b; }
-#l6, #l6 + .cards { --tone: #1595a8; }
-#l7, #l7 + .cards { --tone: #b8641a; }
-#l8, #l8 + .cards { --tone: #4b5bd6; }
-#l9, #l9 + .cards { --tone: #2b8a3e; }
-.lecture-nav a { border: 0; box-shadow: var(--shadow); border-radius: 7px; padding: 5px 11px; font-weight: 600; background: var(--panel); }
-.lecture-nav a:hover { box-shadow: var(--shadow-hover); }
-.lecture-nav a b { color: var(--brand); }
-.home .lecture-title { border-left: 0; padding-left: 0; display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-top: 36px; }
-.home .lecture-title::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--tone, var(--brand)); flex: none; }
-.home .cards { gap: 16px; }
-.card { position: relative; border: 0; box-shadow: var(--shadow); border-radius: var(--radius); padding: 20px 20px 18px; overflow: hidden; transition: box-shadow 0.15s, transform 0.15s; }
-.card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--tone, var(--brand)); }
-.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+.lecture-nav { gap: 6px 20px; margin-bottom: 4px; }
+.lecture-nav a { border: 0; border-radius: 0; background: none; padding: 2px 0; font-weight: 500; color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+.lecture-nav a:hover { color: var(--brand); border-bottom-color: var(--brand); }
+.lecture-nav a b { color: var(--muted); font-weight: 500; margin-right: 4px; }
+.home .lecture-title { border-left: 0; padding-left: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-top: 38px; margin-bottom: 12px; }
+/* the tiles: one grid, cells separated by hairlines */
+/* hairlines between the tiles; an incomplete last row leaves the empty cells blank */
+.home .cards { gap: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.card { border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; box-shadow: none; background: var(--panel); padding: 20px 20px 22px; transition: background-color 0.12s; }
+.card:hover { transform: none; background: var(--bg); }
 .card h2 { color: var(--ink); font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px; }
-.card:hover h2 { color: var(--tone, var(--brand)); }
-.card .lecture { color: var(--tone, var(--muted)); font-size: 12.5px; font-weight: 600; letter-spacing: 0; text-transform: none; margin-bottom: 8px; }
+.card:hover h2 { color: var(--brand); }
+.card .lecture { color: var(--muted); font-size: 12.5px; font-weight: 500; margin-bottom: 8px; }
 .card p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+.card p:last-child { color: var(--ink); opacity: 0.82; }

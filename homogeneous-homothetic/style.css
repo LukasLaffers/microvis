@@ -4,7 +4,7 @@
 @media (max-width: 800px) { .plot-iso { height: 380px; } .plot-side { height: 240px; } }
 .formula + div[data-show] select, div[data-show] > select { margin-top: 6px; }
 .keynums { display: flex; flex-wrap: wrap; gap: 6px; }
-.keynums .kn { padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--bg); }
+.keynums .kn { padding: 3px 10px; border: 1px solid var(--line); border-radius: 0; font-size: 13px; font-weight: 600; background: var(--bg); }
 .keynums .kn.yes { border-color: var(--inc); color: var(--inc); }
 .keynums .kn.no { border-color: var(--dec); color: var(--dec); }
 .seg button { font-size: 12px; padding: 8px 2px; }

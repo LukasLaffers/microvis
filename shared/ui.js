@@ -190,6 +190,36 @@
     if (mq.addEventListener) mq.addEventListener('change', cb);
   }
 
+  /*
+   * Keep every figure as large as its box. Plotly measures its box when it first draws; if the page
+   * layout changes afterwards (fonts and formulas finish loading, a panel opens, the window or phone
+   * turns), some browsers, Safari in particular, leave the figure at the old size. Watch each .plot
+   * and resize the figure whenever its box changes.
+   */
+  function fitPlots() {
+    if (!root.Plotly || !root.ResizeObserver) return;
+    const pending = new Set();
+    let frame = 0;
+    const flush = () => {
+      frame = 0;
+      pending.forEach(gd => { if (gd._fullLayout && gd.offsetWidth > 0) root.Plotly.Plots.resize(gd); });
+      pending.clear();
+    };
+    const ro = new root.ResizeObserver(entries => {
+      entries.forEach(e => pending.add(e.target));
+      if (!frame) frame = root.requestAnimationFrame(flush);
+    });
+    document.querySelectorAll('.plot').forEach(el => ro.observe(el));
+    // and once more when everything (fonts included) has loaded
+    const all = () => {
+      document.querySelectorAll('.plot').forEach(el => pending.add(el));
+      if (!frame) frame = root.requestAnimationFrame(flush);
+    };
+    if (document.readyState === 'complete') all(); else root.addEventListener('load', all);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(all);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fitPlots); else fitPlots();
+
   // ---------- errors: show them on the page, not only in the console ----------
 
   const reported = new Set();
@@ -205,7 +235,8 @@
   function guard(what, fn) {
     try { fn(); } catch (err) { showError(`Could not draw the ${what}: ${err && err.message ? err.message : err}`); }
   }
-  root.addEventListener('error', ev => { if (ev.message) showError(`Error: ${ev.message}`); });
+  // A ResizeObserver notice is not an error of the page.
+  root.addEventListener('error', ev => { if (ev.message && !/ResizeObserver/.test(ev.message)) showError(`Error: ${ev.message}`); });
   root.addEventListener('unhandledrejection', ev => {
     const r = ev.reason;
     showError(`Error: ${r && r.message ? r.message : r}`);
