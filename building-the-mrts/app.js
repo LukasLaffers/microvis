@@ -226,7 +226,7 @@
     if (g) {
       lines.push(`\\begin{aligned}0=dq&=\\phi_1(\\bar z)\\,dz_1+\\phi_2(\\bar z)\\,dz_2\\\\ &=${f3(g[0])}\\,dz_1+${f3(g[1])}\\,dz_2\\end{aligned}`);
       if (g[1] > 0) {
-        lines.push(`MRTS_{21}(\\bar z)=-\\frac{dz_2}{dz_1}\\Big|_{d\\phi=0}=\\frac{\\phi_1(\\bar z)}{\\phi_2(\\bar z)}=\\frac{${f3(g[0])}}{${f3(g[1])}}=${f3(S.m)}`);
+        lines.push(`\\begin{aligned}MRTS_{21}(\\bar z)&=-\\frac{dz_2}{dz_1}\\Big|_{d\\phi=0}=\\frac{\\phi_1(\\bar z)}{\\phi_2(\\bar z)}\\\\ &=\\frac{${f3(g[0])}}{${f3(g[1])}}=${f3(S.m)}\\end{aligned}`);
         text = `A step of ${texStr(`\\Delta z_1=${f2(dz)}`)}: the tangent says ${texStr(`MRTS_{21}\\cdot\\Delta z_1=${f3(S.m * dz)}`)} units of ${texStr('z_2')} can go; staying exactly on the isoquant, ${texStr(`-\\Delta z_2=${f3(st.giveUp)}`)}. ` +
           (t.tech === 'linear' ? 'They are equal: the isoquant is its own tangent.' : Math.abs(S.m * dz - st.giveUp) < 1e-9 ? '' : 'The smaller the step, the closer the two: the MRTS is the rate for small steps.') +
           (t.tech === 'linear' && st.z2new === 0 ? ` (Here the step uses up all of ${texStr('z_2')}.)` : '');
@@ -241,7 +241,7 @@
     }
     if (t.tech === 'cd' || t.tech === 'ces') {
       const [p1, p2] = MM.mrtsPartials(z, t);
-      lines.push(`\\begin{aligned}\\frac{dMRTS_{21}}{dz_1}\\Big|_{d\\phi=0}&=\\frac{\\partial MRTS_{21}}{\\partial z_1}-\\frac{\\partial MRTS_{21}}{\\partial z_2}MRTS_{21}\\\\ &=${f3(p1)}-(${f3(p2)})(${f3(S.m)})=${f3(MM.dMrtsAlong(z, t))}\\end{aligned}`);
+      lines.push(`\\begin{aligned}\\frac{dMRTS_{21}}{dz_1}\\Big|_{d\\phi=0}&=\\frac{\\partial MRTS_{21}}{\\partial z_1}\\\\ &\\quad-\\frac{\\partial MRTS_{21}}{\\partial z_2}MRTS_{21}\\\\ &=${f3(p1)}-(${f3(p2)})(${f3(S.m)})=${f3(MM.dMrtsAlong(z, t))}\\end{aligned}`);
     }
     const block = l => (window.katex ? window.katex.renderToString(l, { throwOnError: false, displayMode: true }) : l);
     $('eqs').innerHTML = lines.map(l => `<div class="eq">${block(l)}</div>`).join('') + `<p class="sentence">${text}</p>`;

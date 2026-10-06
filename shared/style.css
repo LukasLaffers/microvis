@@ -250,7 +250,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-v
 .badge.constant { color: var(--const); }
 .badge.increasing { color: var(--inc); }
 
-.formula { overflow-x: auto; overflow-y: hidden; padding: 4px 0; font-size: 14px; }
+.formula { overflow-x: hidden; overflow-y: hidden; padding: 4px 0; font-size: 14px; }
 .formula .katex-display { margin: 4px 0; }
 
 details.howto { font-size: 14px; }
@@ -455,10 +455,13 @@ a { color: var(--brand); }
 .eyebrow { color: var(--muted); font-weight: 500; font-size: 13px; letter-spacing: 0; text-transform: none; }
 .back-link { color: var(--ink); font-weight: 500; }
 .back-link:hover { color: var(--brand); }
-/* formulas in the header stay on one line (a narrow screen scrolls); a little room so tall fractions are not clipped */
-.subtitle { padding: 3px 0 4px; }
+/* Header formulas: each piece stays on one line, pieces wrap on a narrow screen, and there is room above
+   and below for tall fractions, so no scrollbar appears unless a single piece is wider than the screen. */
+.subtitle { padding: 5px 0 8px; overflow-x: hidden; overflow-y: hidden; line-height: 1.9; }
 .subtitle .katex, .subtitle .katex-html { white-space: nowrap; }
-.site-header > div { min-width: 0; max-width: 100%; }
+.subtitle .tex-piece { display: inline-block; margin-right: 2.2em; }
+.subtitle .tex-piece:last-child { margin-right: 0; }
+.site-header > div { flex: 1 1 auto; min-width: 0; max-width: 100%; }
 
 /* panels: flat white sheets with a hairline */
 .panel { border: 1px solid var(--line); border-radius: 0; box-shadow: none; padding: 16px 18px; }
@@ -501,3 +504,6 @@ button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-v
 .card .lecture { color: var(--muted); font-size: 12.5px; font-weight: 500; margin-bottom: 8px; }
 .card p { color: var(--muted); font-size: 14px; line-height: 1.5; }
 .card p:last-child { color: var(--ink); opacity: 0.82; }
+
+/* set by shared/ui.js when a formula box really is too wide: then, and only then, it scrolls */
+.scrolls { overflow-x: auto !important; }

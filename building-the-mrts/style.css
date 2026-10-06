@@ -7,7 +7,7 @@
   .plot-main { height: 380px; }
   .plot-mrts { height: 260px; }
 }
-.eqs { overflow-x: auto; overflow-y: hidden; font-size: 13.5px; }
+.eqs { overflow-x: hidden; overflow-y: hidden; font-size: 13.5px; }
 .eqs .katex-display { margin: 6px 0; }
 .eqs .sentence { margin: 8px 0 10px; }
 table.pins { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; margin-top: 4px; }

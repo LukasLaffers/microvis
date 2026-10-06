@@ -173,7 +173,7 @@
           general = '\\phi(z)=A\\,z_1^{\\alpha}z_2^{\\beta}';
           numbers = `q=${a}z_1^{${num(p.alpha)}}\\,z_2^{${num(p.beta)}}`;
           extra = abActive()
-            ? `\\begin{gathered}e=\\alpha+\\beta=${num(k)}\\\\ \\text{as }F(g(z)):\\ \\delta=\\tfrac{\\alpha}{\\alpha+\\beta}=${num(d)},\\ k=\\alpha+\\beta=${num(k)}\\end{gathered}`
+            ? `\\begin{gathered}e=\\alpha+\\beta=${num(k)}\\\\ \\text{as }F(g(z)):\\\\ \\delta=\\tfrac{\\alpha}{\\alpha+\\beta}=${num(d)},\\ k=\\alpha+\\beta=${num(k)}\\end{gathered}`
             : `\\begin{gathered}\\alpha=\\delta k=${num(p.alpha)},\\quad \\beta=(1-\\delta)k=${num(p.beta)}\\\\ e=\\alpha+\\beta=${num(k)}\\end{gathered}`;
         }
       }

@@ -11,4 +11,4 @@ table.effects th:first-child { text-align: left; }
 .row-sub, .row-sub th { color: var(--l2-blue); }
 .row-scale, .row-scale th { color: var(--l2-red); }
 .row-total th, .row-total td { font-weight: 700; }
-#marginal-box { margin-top: 10px; font-size: 14px; overflow-x: auto; }
+#marginal-box { margin-top: 10px; font-size: 14px; overflow-x: hidden; overflow-y: hidden; }

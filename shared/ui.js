@@ -30,7 +30,21 @@
     else el.textContent = src;
   }
   const texStr = src => root.katex ? root.katex.renderToString(src, { throwOnError: false }) : src;
-  const renderStaticTex = (scope = document) => scope.querySelectorAll('.tex[data-tex]').forEach(el => tex(el, el.dataset.tex));
+  // In the page header, formulas separated by \qquad become separate pieces: each piece stays on one
+  // line, and on a narrow screen the pieces wrap instead of the whole line scrolling.
+  function renderStaticTex(scope = document) {
+    scope.querySelectorAll('.tex[data-tex]').forEach(el => {
+      const src = el.dataset.tex;
+      if (!el.closest('.subtitle') || !src.includes('\\qquad')) { tex(el, src); return; }
+      el.textContent = '';
+      src.split('\\qquad').map(t => t.trim()).filter(Boolean).forEach(part => {
+        const piece = document.createElement('span');
+        piece.className = 'tex-piece';
+        el.appendChild(piece);
+        tex(piece, part);
+      });
+    });
+  }
 
   // ---------- numbers ----------
 
@@ -219,6 +233,28 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(all);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fitPlots); else fitPlots();
+
+  /*
+   * Formula boxes scroll sideways only when their content really is too wide. KaTeX often draws a pixel
+   * or two beyond its box; with plain overflow:auto, Safari (scroll bars always shown) then puts a
+   * scrollbar under a formula that fits. Such boxes clip by default and get the class "scrolls"
+   * (overflow-x: auto) only when the content is more than 3px wider than the box.
+   */
+  const SCROLL_BOXES = '.formula, .subtitle, .eqs, #marginal-box';
+  function watchScrollBoxes() {
+    const boxes = [...document.querySelectorAll(SCROLL_BOXES)];
+    if (!boxes.length) return;
+    const check = el => el.classList.toggle('scrolls', el.scrollWidth - el.clientWidth > 3);
+    let frame = 0;
+    const checkAll = () => { frame = 0; boxes.forEach(check); };
+    const later = () => { if (!frame) frame = root.requestAnimationFrame(checkAll); };
+    if (root.ResizeObserver) { const ro = new root.ResizeObserver(later); boxes.forEach(el => ro.observe(el)); }
+    if (root.MutationObserver) { const mo = new root.MutationObserver(later); boxes.forEach(el => mo.observe(el, { childList: true, subtree: true, characterData: true })); }
+    root.addEventListener('load', later);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
+    later();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchScrollBoxes); else watchScrollBoxes();
 
   // ---------- errors: show them on the page, not only in the console ----------
 
