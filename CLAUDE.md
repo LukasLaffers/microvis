@@ -37,6 +37,7 @@ plans/                  plans for groups of tools, e.g. plans/lecture-2.md
 - Write all code ourselves. Do not copy code from other repositories without a compatible license (in particular not from qgallea/utility-explorer, which has no license).
 - Add a card for each new tool to `index.html`.
 - `.nojekyll` must stay in the root so GitHub Pages serves files as they are.
+- Our own CSS and JS are linked with a version tag, e.g. `../shared/style.css?v=2`. Raise the number in all pages (a one-line script) whenever a shared CSS/JS file changes, so that browsers never combine a new page with an old cached stylesheet. Vendor files are not tagged.
 
 ## Notation (must match the lecture notes)
 
