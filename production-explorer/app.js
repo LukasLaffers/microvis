@@ -367,6 +367,14 @@
   function drawA(th) {
     const s = tech(), zmax = state.zmax, r = state.mix, E = rayEnd(r, zmax);
     const traces = [], annotations = [];
+    // The hill seen from above: the same heights and colours as the 3D surface, filled between its contour levels.
+    const surf = surfaceData(), step = niceStep(surf.max), lines = state.mode === 'sub';
+    traces.push({
+      type: 'contour', x: surf.x, y: surf.y, z: surf.z, zmin: 0, zmax: surf.max || 1, colorscale: U.SURFACE_SCALE, showscale: false, opacity: 0.6,
+      contours: { start: step, end: surf.max, size: step, coloring: 'fill', showlines: lines, showlabels: lines, labelfont: { size: 10, color: th.ink } },
+      line: { color: th.dark ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.95)', width: 1.2, smoothing: 0.8 },
+      hovertemplate: 'z₁ = %{x:.2f}<br>z₂ = %{y:.2f}<br>q = %{z:.2f}<extra></extra>'
+    });
     const label = (p, text) => annotations.push({ x: p[0], y: p[1], text, showarrow: false, font: { size: 11, color: th.accent }, bgcolor: th.panel, borderpad: 1 });
     if (state.mode === 'sub') {
       const q = state.qbar, zb = M.pointOnIsoquant(q, r, s);
