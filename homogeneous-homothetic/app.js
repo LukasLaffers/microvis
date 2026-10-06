@@ -20,16 +20,16 @@
 
   // ---------- formula ----------
 
+  // General form in symbols, then the current values (as in the other tools).
   function formula() {
-    const gTex = state.shape === 'cd'
-      ? `g(z)=z_1^{${n(state.delta)}}z_2^{${n(1 - state.delta)}}`
-      : `g(z)=\\big(${n(state.delta)}z_1^{${n(state.rho)}}+${n(1 - state.delta)}z_2^{${n(state.rho)}}\\big)^{1/${state.rho < 0 ? `(${n(state.rho)})` : n(state.rho)}}`;
+    const gTex = state.shape === 'cd' ? 'g(z)=z_1^{\\delta}z_2^{1-\\delta}' : 'g(z)=\\big(\\delta z_1^{\\rho}+(1-\\delta)z_2^{\\rho}\\big)^{1/\\rho}';
+    const gVals = state.shape === 'cd' ? `\\delta=${n(state.delta)}` : `\\delta=${n(state.delta)},\\ \\rho=${n(state.rho)}`;
     let src;
-    if (state.cls === 'homogeneous') src = `\\phi(z)=g(z)^{${n(state.k)}}\\\\ ${gTex}`;
+    if (state.cls === 'homogeneous') src = `\\phi(z)=g(z)^{k}\\\\ ${gTex}\\\\ ${gVals},\\ k=${n(state.k)}`;
     else if (state.cls === 'homothetic') {
-      const F = state.Fh === 'log' ? `F(x)=${n(state.c)}\\ln(1+x)` : `F(x)=\\frac{${n(state.s * state.s)}\\,x^2}{${n(state.s * state.s)}+x^2}`;
-      src = `\\phi(z)=F\\big(g(z)\\big),\\quad ${F}\\\\ ${gTex}`;
-    } else src = `\\phi(z)=${n(state.a)}\\sqrt{z_1}+z_2`;
+      const F = state.Fh === 'log' ? 'F(x)=c\\ln(1+x)' : 'F(x)=\\frac{s^2x^2}{s^2+x^2}';
+      src = `\\phi(z)=F\\big(g(z)\\big),\\quad ${F}\\\\ ${gTex}\\\\ ${gVals},\\ ${state.Fh === 'log' ? `c=${n(state.c)}` : `s=${n(state.s)}`}`;
+    } else src = `\\phi(z)=a\\sqrt{z_1}+z_2\\\\ a=${n(state.a)}`;
     tex($('formula'), `\\begin{gathered}${src}\\end{gathered}`, true);
   }
 

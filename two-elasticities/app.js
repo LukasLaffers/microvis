@@ -21,14 +21,21 @@
 
   // ---------- formula ----------
 
+  // General form in symbols, then the current values (as in the other tools).
   function formula() {
-    const d = n(state.delta), d1 = n(1 - state.delta), r = n(state.rho), rr = state.rho < 0 ? `(${r})` : r;
-    const ces = `\\big(${d}z_1^{${r}}+${d1}z_2^{${r}}\\big)^{1/${rr}}`;
-    const x = { cd: `x=z_1^{${d}}z_2^{${d1}}`, ces: `x=${ces}`, mix: `\\begin{aligned}x=\\ &${n(state.m)}${ces}\\\\ &+${n(1 - state.m)}(${d}z_1+${d1}z_2)\\end{aligned}` }[state.g];
-    const F = state.F === 'power' ? `\\phi(z)=x^{${n(state.k)}}` : `\\phi(z)=\\frac{${n(state.s * state.s)}\\,x^2}{${n(state.s * state.s)}+x^2}`;
+    const ces = '\\big(\\delta z_1^{\\rho}+(1-\\delta)z_2^{\\rho}\\big)^{1/\\rho}';
+    const x = {
+      cd: 'x=z_1^{\\delta}z_2^{1-\\delta}',
+      ces: `x=${ces}`,
+      mix: `\\begin{aligned}x=\\ &m${ces}\\\\ &+(1-m)\\big(\\delta z_1+(1-\\delta)z_2\\big)\\end{aligned}`
+    }[state.g];
+    const F = state.F === 'power' ? '\\phi(z)=x^{k}' : '\\phi(z)=\\frac{s^2x^2}{s^2+x^2}';
+    const vals = [state.F === 'power' ? `k=${n(state.k)}` : `s=${n(state.s)}`, `\\delta=${n(state.delta)}`];
+    if (state.g !== 'cd') vals.push(`\\rho=${n(state.rho)}`);
+    if (state.g === 'mix') vals.push(`m=${n(state.m)}`);
     const T = state.tr === 'B' ? `\\\\ \\phi_B(z)=h\\big(\\phi(z)\\big),\\ ${H_TEX[state.h]}`
-      : state.tr === 'C' ? `\\\\ \\phi_C(z)=\\phi\\big(f(z_1),g(z_2)\\big)\\\\ =\\phi\\big(z_1^{${n(state.b1)}},z_2^{${n(state.b2)}}\\big)` : '';
-    tex($('formula'), `\\begin{gathered}${F}\\\\ ${x}${T}\\end{gathered}`, true);
+      : state.tr === 'C' ? `\\\\ \\phi_C(z)=\\phi\\big(f(z_1),g(z_2)\\big)\\\\ f(z_1)=z_1^{b_1},\\ g(z_2)=z_2^{b_2}\\\\ b_1=${n(state.b1)},\\ b_2=${n(state.b2)}` : '';
+    tex($('formula'), `\\begin{gathered}${F}\\\\ ${x}\\\\ ${vals.join(',\\ ')}${T}\\end{gathered}`, true);
   }
 
   // ---------- the input space ----------
