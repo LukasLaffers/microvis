@@ -1,4 +1,4 @@
-/* Elasticity of Scale and Substitution: tool-specific styles (shared look is in ../shared/style.css). */
+/* Two Elasticities: tool-specific styles (shared look is in ../shared/style.css). */
 .plot-main { height: 600px; }
 .plot-side { height: 250px; }
 @media (max-width: 800px) { .plot-main { height: 380px; } .plot-side { height: 230px; } }

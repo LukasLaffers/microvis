@@ -1,5 +1,5 @@
 /*
- * Elasticity of Scale and Substitution: model helpers (lecture 1). Technologies are in ../shared/technology-model.js.
+ * Two Elasticities: model helpers (lecture 1). Technologies are in ../shared/technology-model.js.
  *
  * Both elasticities are local: e(z) looks along the ray through z (scale), sigma(z) along the isoquant
  * through z (substitution). For the whiteboard (9 Oct) the page also transforms a technology phi into

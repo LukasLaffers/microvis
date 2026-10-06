@@ -1,5 +1,5 @@
-// Checks the elasticity-of-scale-and-substitution helpers.
-// Run with:  node scale-and-substitution/test-model.cjs
+// Checks the elasticity-of-two-elasticities helpers.
+// Run with:  node two-elasticities/test-model.cjs
 const assert = require('node:assert/strict');
 const TM = require('../shared/technology-model.js');
 const M = require('./model.js');
@@ -51,4 +51,4 @@ for (const [name, e, s] of [['cd', 1.2, 1], ['ces', 0.8, 0.5]]) {
   checks++;
 }
 
-console.log(`scale-and-substitution: all ${checks} checks passed`);
+console.log(`two-elasticities: all ${checks} checks passed`);

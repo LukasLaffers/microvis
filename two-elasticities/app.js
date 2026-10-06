@@ -1,5 +1,5 @@
 /*
- * Elasticity of Scale and Substitution: interface and plotting (lecture 1).
+ * Two Elasticities: interface and plotting (lecture 1).
  */
 (function () {
   'use strict';
