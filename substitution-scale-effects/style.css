@@ -1,7 +1,7 @@
 /* Substitution and Scale Effects: tool-specific styles (shared look is in ../shared/style.css). */
 .big-button {
   width: 100%; padding: 10px 12px; font: inherit; font-weight: 700; font-size: 15px;
-  color: #fff; background: var(--l2-blue); border: 0; border-radius: 2px; cursor: pointer; margin-bottom: 6px;
+  color: #fff; background: var(--l2-blue); border: 0; border-radius: 8px; cursor: pointer; margin-bottom: 6px;
 }
 .big-button:disabled { opacity: 0.6; cursor: default; }
 .plot-main { touch-action: auto; cursor: default; }

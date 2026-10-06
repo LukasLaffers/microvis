@@ -2,7 +2,7 @@
 .two-problems { display: flex; flex-wrap: wrap; gap: 0 28px; }
 .big-button {
   width: 100%; padding: 10px 12px; font: inherit; font-weight: 700; font-size: 15px;
-  color: #fff; background: var(--l2-red); border: 0; border-radius: 2px; cursor: pointer;
+  color: #fff; background: var(--l2-red); border: 0; border-radius: 8px; cursor: pointer;
 }
 .big-button:disabled { opacity: 0.6; cursor: default; }
 table.compare td { cursor: default; text-align: right; }
