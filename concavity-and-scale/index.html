@@ -7,17 +7,16 @@
   <meta name="description" content="A quasi-concave production function with no increasing returns to scale that is not concave: the chord between two bundles on different rays lies above the surface. With homotheticity, concavity returns (Friedman 1973). Lecture 1, Exercise 3; discussed in lecture 2.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 2 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l2">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 2 · Theory of the firm</p>
       <h1>Concavity and Returns to Scale</h1>
       <p class="subtitle">Exercise 3 of lecture 1: quasi-concave and no increasing returns to scale <span class="tex" data-tex="\overset{?}{\Longrightarrow}"></span> concave</p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,9 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Returns to scale compare <span class="tex" data-tex="\phi(\alpha z)"></span> with <span class="tex" data-tex="\alpha\phi(z)"></span>: they only look along a ray from the origin. Concavity compares any two bundles, also on different rays: is <span class="tex" data-tex="\phi(z^\lambda)\ge\lambda\phi(z)+(1-\lambda)\phi(z')"></span> for <span class="tex" data-tex="z^\lambda=\lambda z+(1-\lambda)z'"></span>?</p>
-          <p>Every isoquant here is a straight line, so every input requirement set is convex and <span class="tex" data-tex="\phi"></span> is quasi-concave. Along each ray the returns to scale are constant or decreasing. Still, above the segment from <span class="tex" data-tex="z'"></span> to <span class="tex" data-tex="z"></span> the surface sags below the straight chord (the <span class="c-l2-red">red curtain</span>): <span class="tex" data-tex="\phi"></span> is not concave. Press <b>Make it homothetic</b>: the isoquants become parallel and the red curtain disappears: the surface now lies on or above every chord (a thin <span class="c-l2-blue">blue</span> curtain where it is above).</p>
-          <p>Drag the 3D plot to turn it around.</p>
+          <p>Returns to scale only look along rays, comparing <span class="tex" data-tex="\phi(\alpha z)"></span> with <span class="tex" data-tex="\alpha\phi(z)"></span>. Concavity compares any two bundles, also on different rays. Here every isoquant is a straight line, so <span class="tex" data-tex="\phi"></span> is quasi-concave, and returns to scale are nowhere increasing. Is <span class="tex" data-tex="\phi"></span> concave?</p>
+          <ul>
+          <li>Look at the <span class="c-l2-red">red curtain</span>: above the segment from <span class="tex" data-tex="z'"></span> to <span class="tex" data-tex="z"></span> the surface sags below the chord. Not concave.</li>
+          <li>Press <b>Make it homothetic</b>: the isoquants become parallel, the red curtain disappears, and concavity returns.</li>
+          <li><b>Face the chord</b> gives the clearest view; drag to turn the plot.</li>
+          </ul>
         </details>
       </div>
 
@@ -91,14 +93,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../profit-two-ways/index.html"><span>Previous</span>One Step vs Two Steps</a>
+    <a class="all" href="../index.html#l2">All tools</a>
+    <a class="next" href="../cost-function/index.html"><span>Next</span>The Cost Function</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · J.W. Friedman, “Concavity of Production Functions and Non-Increasing Returns to Scale”, Econometrica 41(5), 1973.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

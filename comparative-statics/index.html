@@ -7,17 +7,16 @@
   <meta name="description" content="How optimal output and input demand respond to prices: dq*/dp = 1/C_qq, the decomposition of the own-price effect, and the area to the left of the conditional demand curve. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 4 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l4">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 4 · Theory of the firm</p>
       <h1>What If? Comparative Statics</h1>
       <p class="subtitle"><span class="tex" data-tex="\frac{\partial D^{i}}{\partial w_{i}}=\color{#4a90e2}{\frac{\partial H^{i}(w,q^{\ast})}{\partial w_{i}}}+\color{#d0021b}{\Big(-\frac{1}{C_{qq}}\Big)\Big(\frac{\partial H^{i}(w,q^{\ast})}{\partial q}\Big)^{2}}\qquad(\ast\ast)"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Differentiating the first-order condition <span class="tex" data-tex="p=C_q(w,q^\ast)"></span> answers "what if" questions. A higher output price raises output, <span class="tex" data-tex="\mathrm dq^\ast/\mathrm dp=1/C_{qq}>0"></span>. When <span class="tex" data-tex="w_1"></span> falls, the firm first substitutes towards input 1 at the old output (<span class="c-l2-blue">blue: <span class="tex" data-tex="z_1^\ast\to z_1^o"></span></span>) and then, because production got cheaper, expands output (<span class="c-l2-red">red: <span class="tex" data-tex="z_1^o\to z_1^{\ast\ast}"></span></span>). So the ordinary demand curve is flatter than the conditional ones.</p>
+          <p>Differentiate the first-order condition <span class="tex" data-tex="p=C_q(w,q^\ast)"></span> and "what if" questions answer themselves: a higher output price raises output, <span class="tex" data-tex="\mathrm dq^\ast/\mathrm dp=1/C_{qq}>0"></span>.</p>
+          <ul>
+          <li>Lower <span class="tex" data-tex="w_1"></span>: the firm first substitutes towards input 1 at the old output (<span class="c-l2-blue"><span class="tex" data-tex="z_1^\ast\to z_1^o"></span></span>), then expands because production got cheaper (<span class="c-l2-red"><span class="tex" data-tex="z_1^o\to z_1^{\ast\ast}"></span></span>). So ordinary demand is flatter than conditional demand.</li>
+          <li>The area to the left of <span class="tex" data-tex="H^1"></span> between the two prices is the change in cost.</li>
+          </ul>
         </details>
       </div>
 
@@ -84,16 +87,22 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../substitution-scale-effects/index.html"><span>Previous</span>Substitution and Scale Effects</a>
+    <a class="all" href="../index.html#l4">All tools</a>
+    <a class="next" href="../marshall-law/index.html"><span>Next</span>Marshall's Law of Derived Demand</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/firm-ui.js?v=2"></script>
-  <script src="../shared/firm-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/firm-ui.js?v=3"></script>
+  <script src="../shared/firm-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

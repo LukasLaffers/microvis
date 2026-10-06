@@ -7,17 +7,16 @@
   <meta name="description" content="A one-person economy with leisure and coconuts: the planner's optimum MRS = MRT, its decentralisation by a real wage w/p, why it fails when the production set is not convex, and how opening the economy to trade helps. Lecture 8.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 8 · Decentralisation in a simple economy</p>
+      <p class="eyebrow"><a href="../index.html#l8">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 8 · Decentralisation in a simple economy</p>
       <h1>Robinson Crusoe's Economy</h1>
       <p class="subtitle"><span class="tex" data-tex="\frac{U_1(x^\ast)}{U_2(x^\ast)}=\phi'(L^\ast)=\frac wp,\qquad \max_{q_2,L}\ pq_2-wL\ \text{s.t.}\ q_2\le\phi(L),\qquad \max_x U(x)\ \text{s.t.}\ px_2+wx_1\le wT+\pi^{\ast\ast}"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Robinson has <span class="tex" data-tex="T"></span> hours. Working <span class="tex" data-tex="L=T-x_1"></span> hours yields <span class="tex" data-tex="q_2=\phi(L)"></span> coconuts, so the red frontier is the most he can consume with each amount of leisure. In the morning he picks the best point on it, <span class="tex" data-tex="x^\ast"></span>, where his indifference curve touches the frontier. Then he splits into a firm manager who maximises profit at the real wage <span class="tex" data-tex="w/p"></span> and a consumer who spends his wage and the profit. If <span class="tex" data-tex="w/p"></span> is the slope at <span class="tex" data-tex="x^\ast"></span> and the production set is convex, both halves choose <span class="tex" data-tex="x^\ast"></span> again. With a non-convex technology the manager may hire a different amount of labour, and the two markets do not clear.</p>
+          <p>Robinson has <span class="tex" data-tex="T"></span> hours. Working <span class="tex" data-tex="L=T-x_1"></span> of them yields <span class="tex" data-tex="q_2=\phi(L)"></span> coconuts, so the red frontier is all he can have. His best point <span class="tex" data-tex="x^\ast"></span> is where an indifference curve touches it. Can prices find it? Split him into a manager who maximises profit at the real wage <span class="tex" data-tex="w/p"></span>, and a consumer who spends the wage and the profit.</p>
+          <ul>
+          <li>With a convex technology and <span class="tex" data-tex="w/p"></span> equal to the slope at <span class="tex" data-tex="x^\ast"></span>, both halves choose <span class="tex" data-tex="x^\ast"></span> again.</li>
+          <li>Choose <b>Increasing returns at x*</b> or <b>Loss at x*</b>: the manager hires a different amount of labour, and the markets do not clear.</li>
+          <li><b>Open economy</b>: at a world price he can consume beyond his own frontier.</li>
+          </ul>
         </details>
       </div>
       <div class="group">
@@ -89,15 +93,21 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../deadweight-loss/index.html"><span>Previous</span>The Deadweight Loss of a Tax</a>
+    <a class="all" href="../index.html#l8">All tools</a>
+    <a class="next" href="../edgeworth-box/index.html"><span>Next</span>The Edgeworth Box</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/consumer-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/consumer-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

@@ -7,17 +7,16 @@
   <meta name="description" content="A commodity tax costs the consumer more than it raises: the deadweight loss as the area between the Hicksian demand curve and the tax rectangle, its approximation, and DWL per krone for 14 commodity groups. Lecture 7.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 7 · Welfare measurement</p>
+      <p class="eyebrow"><a href="../index.html#l7">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 7 · Welfare measurement</p>
       <h1>The Deadweight Loss of a Tax</h1>
       <p class="subtitle"><span class="tex" data-tex="DWL=\int_{p_1^0}^{p_1^1}H^1(p_1,1,v^1)\,\mathrm dp_1-T\ \approx\ -\tfrac12\,\frac{\partial H^1}{\partial p_1}\,(p_1^1-p_1^0)^2>0"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>A tax raises the price of good 1 from <span class="tex" data-tex="p_1^0"></span> to <span class="tex" data-tex="p_1^1"></span>. The government collects the yellow rectangle <span class="tex" data-tex="T"></span>. The consumer loses <span class="tex" data-tex="|EV|"></span>, the whole area to the left of the Hicksian demand curve at her new utility between the two prices. The difference, the triangle-like area, is lost to everybody: the deadweight loss. It exists because the Hicksian curve slopes down, whether the good is normal or inferior, and it grows with the square of the tax.</p>
+          <p>A tax raises the price of good 1 from <span class="tex" data-tex="p_1^0"></span> to <span class="tex" data-tex="p_1^1"></span>. The government collects the yellow rectangle <span class="tex" data-tex="T"></span>; the consumer loses <span class="tex" data-tex="|EV|"></span>, the area to the left of the Hicksian demand curve between the two prices. The difference is lost to everybody: the deadweight loss.</p>
+          <ul>
+          <li>Raise the tax: the loss grows with the square of the tax.</li>
+          <li>The loss exists because the Hicksian curve slopes down, for normal and inferior goods alike.</li>
+          </ul>
         </details>
       </div>
       <div class="group">
@@ -76,16 +79,22 @@
     </section>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../cv-ev/index.html"><span>Previous</span>CV, EV and Consumer Surplus</a>
+    <a class="all" href="../index.html#l7">All tools</a>
+    <a class="next" href="../robinson-crusoe/index.html"><span>Next</span>Robinson Crusoe's Economy</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/consumer-model.js?v=2"></script>
-  <script src="../shared/consumer-ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/consumer-model.js?v=3"></script>
+  <script src="../shared/consumer-ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

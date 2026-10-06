@@ -7,17 +7,16 @@
   <meta name="description" content="When one firm's output raises (or lowers) the other's marginal cost, market supply is steeper (or flatter) than the sum of the marginal cost curves. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 5 · The firm and the market</p>
+      <p class="eyebrow"><a href="../index.html#l5-firm">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 5 · The firm and the market</p>
       <h1>Firms That Affect Each Other</h1>
       <p class="subtitle"><span class="tex" data-tex="MC_1(q^1;q^2)=c+q^1/\alpha+e\,q^2"></span>: with a negative externality (<span class="tex" data-tex="e>0"></span>) market supply reacts less to the price than <span class="tex" data-tex="MC_1+MC_2"></span>, with a positive one (<span class="tex" data-tex="e<0"></span>) more.</p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Each firm's supply curve depends on how much the <em>other</em> firm produces: with pollution or congestion, more <span class="tex" data-tex="q^2"></span> raises firm 1's marginal cost and shifts <span class="tex" data-tex="S^1"></span> up. Adding the firms' supply curves for a fixed output of the other firm gives the dotted <span class="tex" data-tex="MC_1+MC_2"></span> lines. But when the price rises both firms expand, which pushes up each other's costs, so the true market supply <span class="tex" data-tex="S"></span> (solid) cuts across the dotted lines and is steeper. Training, networking or infrastructure work the other way.</p>
+          <p>Each firm's marginal cost depends on the other firm's output: with pollution or congestion, more <span class="tex" data-tex="q^2"></span> raises firm 1's marginal cost. For a fixed output of the other firm, adding the supply curves gives the dotted <span class="tex" data-tex="MC_1+MC_2"></span> lines. But when the price rises both firms expand and push up each other's costs, so the true market supply <span class="tex" data-tex="S"></span> (solid) is steeper.</p>
+          <ul>
+          <li>Raise <span class="tex" data-tex="p"></span> and watch <span class="tex" data-tex="S"></span> cut across the dotted lines.</li>
+          <li>Switch to <b>Positive</b> (training, networks, infrastructure): market supply becomes flatter.</li>
+          </ul>
         </details>
       </div>
       <div class="group">
@@ -67,14 +70,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../market-supply/index.html"><span>Previous</span>From Firms to Market Supply</a>
+    <a class="all" href="../index.html#l5-firm">All tools</a>
+    <a class="next" href="../free-entry/index.html"><span>Next</span>Free Entry and Industry Size</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

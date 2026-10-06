@@ -7,15 +7,14 @@
   <meta name="description" content="Input requirement sets and isoquants: test free disposal, convexity and constant returns to scale by moving points. Lecture 1.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l1">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 1 · Theory of the firm</p>
       <h1>Input Requirement Sets</h1>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -25,8 +24,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The shaded area is the input requirement set <span class="tex" data-tex="Z(q)=\{z:\phi(z)\ge q\}"></span>: all input bundles that can produce at least <span class="tex" data-tex="q"></span>. Its lower boundary is the isoquant <span class="tex" data-tex="I(q)"></span>.</p>
-          <p>Drag the points <span class="c-accent-2"><span class="tex" data-tex="z"></span></span> and <span class="c-accent-4"><span class="tex" data-tex="z'"></span></span> (or tap to move the nearer one) and watch the three assumptions of the notes being checked: <strong>free disposal</strong> (more inputs never hurt), <strong>convexity</strong> (mixing two bundles that work also works) and <strong>constant returns to scale</strong> (doubling inputs doubles what can be produced).</p>
+          <p>The shaded area is the input requirement set <span class="tex" data-tex="Z(q)=\{z:\phi(z)\ge q\}"></span>: every bundle that can produce at least <span class="tex" data-tex="q"></span>. Its lower boundary is the isoquant.</p>
+          <ul>
+          <li>Drag <span class="c-accent-2"><span class="tex" data-tex="z"></span></span> and <span class="c-accent-4"><span class="tex" data-tex="z'"></span></span> and watch three assumptions being checked: free disposal, convexity, constant returns to scale.</li>
+          <li>Choose <b>Not convex</b> or <b>Congestion</b>, and find two bundles that break an assumption.</li>
+          <li>Exercise 1 of the notes is the last technology in the list.</li>
+          </ul>
         </details>
       </div>
 
@@ -95,14 +98,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../production-explorer/index.html"><span>Previous</span>Production Explorer</a>
+    <a class="all" href="../index.html#l1">All tools</a>
+    <a class="next" href="../building-the-mrts/index.html"><span>Next</span>Building the MRTS</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

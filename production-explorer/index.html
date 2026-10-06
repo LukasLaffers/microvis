@@ -7,16 +7,15 @@
   <meta name="description" content="Interactive production function: substitution along an isoquant, scale along a ray, and one input at a time. Lecture 1.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l1">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 1 · Theory of the firm</p>
       <h1>Production Explorer</h1>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,11 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The 3D surface is the production function <span class="tex" data-tex="q=\phi(z_1,z_2)"></span>, a hill over the input plane. Its contour lines are the <strong>isoquants</strong>.
-            <strong>Substitution</strong> means walking along one contour line: output stays at <span class="tex" data-tex="\bar q"></span> while the input mix changes. The slope of the isoquant is <span class="tex" data-tex="-MRTS_{21}"></span>, and <span class="tex" data-tex="\sigma"></span> measures how strongly the input mix reacts to the <span class="tex" data-tex="MRTS"></span> (a large <span class="tex" data-tex="\sigma"></span> means an isoquant with little curvature).
-            <strong>Scale</strong> means walking straight up the hill along a ray from the origin: all inputs grow by the same factor <span class="tex" data-tex="\lambda"></span>. The elasticity of scale <span class="tex" data-tex="e(\bar z)"></span> says by how many percent output grows when all inputs grow by 1%.
-            <strong>One input</strong> walks parallel to an axis: only <span class="tex" data-tex="z_1"></span> changes, and the slope is the marginal product <span class="tex" data-tex="\phi_1"></span>.</p>
-          <p>Every technology here is <span class="tex" data-tex="\phi(z)=F\big(g(z)\big)"></span> with <span class="tex" data-tex="g"></span> homogeneous of degree one: <span class="tex" data-tex="g"></span> shapes the isoquants (substitution), <span class="tex" data-tex="F"></span> labels them (scale). With <span class="tex" data-tex="F(x)=Ax^{k}"></span> the function is homogeneous and <span class="tex" data-tex="e=k"></span> everywhere; the other choices are homothetic, and <span class="tex" data-tex="e(\bar z)"></span> changes along the ray.</p>
+          <p>The surface is the production function <span class="tex" data-tex="q=\phi(z_1,z_2)"></span>, a hill over the input plane; its contour lines are the isoquants. Every technology here is <span class="tex" data-tex="\phi=F\big(g(z)\big)"></span>: <span class="tex" data-tex="g"></span> shapes the isoquants, <span class="tex" data-tex="F"></span> labels them.</p>
+          <ul>
+          <li><b>Substitution:</b> walk along an isoquant. Its slope is <span class="tex" data-tex="-MRTS_{21}"></span>, and <span class="tex" data-tex="\sigma"></span> says how strongly the input mix reacts to it.</li>
+          <li><b>Scale:</b> walk up a ray, all inputs times <span class="tex" data-tex="\lambda"></span>. The elasticity of scale <span class="tex" data-tex="e(\bar z)"></span> is the percentage change in output when all inputs grow by 1%.</li>
+          <li><b>One input:</b> walk parallel to an axis. The slope is the marginal product <span class="tex" data-tex="\phi_1"></span>.</li>
+          </ul>
         </details>
       </div>
 
@@ -173,14 +173,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <span class="prev"></span>
+    <a class="all" href="../index.html#l1">All tools</a>
+    <a class="next" href="../input-requirement-sets/index.html"><span>Next</span>Input Requirement Sets</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

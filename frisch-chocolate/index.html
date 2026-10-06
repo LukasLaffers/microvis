@@ -7,15 +7,14 @@
   <meta name="description" content="Ragnar Frisch's 1935 Freia nut chocolate data: a real production function, its isoquants, marginal products and returns to scale. Lecture 1.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l1">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 1 · Theory of the firm</p>
       <h1>Frisch's Chocolate Data (Freia, 1935)</h1>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -25,8 +24,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>In 1935 Ragnar Frisch recorded how many kilos of nut chocolate the Freia factory got from different amounts of two inputs: <span class="tex" data-tex="z_1"></span> = moulding and cooling work and <span class="tex" data-tex="z_2"></span> = cocoa fat, both measured by their value in kroner (Frisch writes <span class="tex" data-tex="v_1, v_2"></span> and <span class="tex" data-tex="x"></span>). Each number in the table is one point of a real production function <span class="tex" data-tex="q=\phi(z_1,z_2)"></span>.</p>
-          <p>Click a cell. Moving along a row changes only cocoa fat, so the differences are marginal products. Cells on the same ray from the origin show returns to scale. The isoquant plot redraws Frisch's own figure.</p>
+          <p>In 1935 Ragnar Frisch recorded how many kilos of nut chocolate the Freia factory got from two inputs: <span class="tex" data-tex="z_1"></span>, moulding and cooling work, and <span class="tex" data-tex="z_2"></span>, cocoa fat, both valued in kroner. Each cell of the table is one point of a real production function.</p>
+          <ul>
+          <li>Click a cell. Along a row only cocoa fat changes, so the differences are marginal products.</li>
+          <li>Cells on the same ray from the origin show the returns to scale.</li>
+          <li>The isoquant plot redraws Frisch's own figure.</li>
+          </ul>
         </details>
       </div>
 
@@ -84,14 +87,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../two-elasticities/index.html"><span>Previous</span>Two Elasticities: e(z) and σ(z)</a>
+    <a class="all" href="../index.html#l1">All tools</a>
+    <a class="next" href="../cost-minimisation/index.html"><span>Next</span>Cost Minimisation</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Data: R. Frisch, “The Principle of Substitution. An Example of its Application in the Chocolate Industry”, Nordisk Tidsskrift for Teknisk Økonomi, 1935.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

@@ -256,6 +256,13 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchScrollBoxes); else watchScrollBoxes();
 
+  // On a phone the controls come before the figure: there "How to read this" starts closed (one tap opens it),
+  // so the figure is not pushed far down the page.
+  function foldHowtoOnPhones() {
+    if (root.matchMedia && root.matchMedia('(max-width: 800px)').matches) document.querySelectorAll('details.howto').forEach(d => { d.open = false; });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', foldHowtoOnPhones); else foldHowtoOnPhones();
+
   // ---------- errors: show them on the page, not only in the console ----------
 
   const reported = new Set();

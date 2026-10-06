@@ -7,17 +7,16 @@
   <meta name="description" content="The minimal cost function as a function of input prices: concavity, Shephard's lemma, homogeneity and the matrix of price effects. Lecture 3.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lectures 3 and 4 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l3">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lectures 3 and 4 · Theory of the firm</p>
       <h1>The Cost Function</h1>
       <p class="subtitle"><span class="tex" data-tex="C(w,q)=\min_z\{w^tz:\ \phi(z)\ge q\}"></span> as a function of input prices</p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Start at the reference prices <span class="tex" data-tex="\bar w"></span>, where the cheapest bundle is <span class="tex" data-tex="\bar z=H(\bar w,q)"></span>. If the firm kept <span class="tex" data-tex="\bar z"></span> while <span class="tex" data-tex="w_1"></span> changes, its cost would be the black straight line <span class="tex" data-tex="w_1\bar z_1+\bar w_2\bar z_2"></span>. Because it can substitute, the true cost <span class="tex" data-tex="C(w,q)"></span> (blue) lies below that line and touches it at <span class="tex" data-tex="\bar w_1"></span>, with slope <span class="tex" data-tex="H^1(\bar w,q)"></span>: Shephard's lemma (C5). A function that lies below all its tangent lines is concave (C4).</p>
+          <p>At the prices <span class="tex" data-tex="\bar w"></span> the cheapest bundle is <span class="tex" data-tex="\bar z=H(\bar w,q)"></span>. Keeping <span class="tex" data-tex="\bar z"></span> while <span class="tex" data-tex="w_1"></span> changes would cost the black line <span class="tex" data-tex="w_1\bar z_1+\bar w_2\bar z_2"></span>. But the firm substitutes, so the true cost <span class="tex" data-tex="C(w,q)"></span> (blue) lies below that line and touches it at <span class="tex" data-tex="\bar w_1"></span>. A function below all its tangent lines is concave (C4).</p>
+          <ul>
+          <li>Drag <span class="tex" data-tex="w_1"></span> in the plot: the slope where they touch is <span class="tex" data-tex="H^1(\bar w,q)"></span>, Shephard's lemma (C5).</li>
+          <li>Scale both prices by <span class="tex" data-tex="\alpha"></span>: cost scales with them, input demand does not (C3, H3).</li>
+          </ul>
         </details>
       </div>
 
@@ -97,16 +100,22 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../concavity-and-scale/index.html"><span>Previous</span>Concavity and Returns to Scale</a>
+    <a class="all" href="../index.html#l3">All tools</a>
+    <a class="next" href="../substitution-scale-effects/index.html"><span>Next</span>Substitution and Scale Effects</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/firm-ui.js?v=2"></script>
-  <script src="../shared/firm-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/firm-ui.js?v=3"></script>
+  <script src="../shared/firm-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

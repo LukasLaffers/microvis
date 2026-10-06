@@ -7,17 +7,16 @@
   <meta name="description" content="Two utility functions represent the same preferences when one is an increasing transformation of the other: same rankings, same indifference curves. Quasi-concavity, Theorem 1 and the marginal rate of substitution. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 5 · Consumer preferences</p>
+      <p class="eyebrow"><a href="../index.html#l5-consumer">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 5 · Consumer preferences</p>
       <h1>Utility Is Ordinal</h1>
       <p class="subtitle"><span class="tex" data-tex="x\succcurlyeq y\iff U(x)\ge U(y)\iff f\big(U(x)\big)\ge f\big(U(y)\big)\quad\text{when } f'>0"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Left, a utility function <span class="tex" data-tex="U"></span>; right, <span class="tex" data-tex="V=f(U)"></span>. The surfaces have different heights, but the black indifference curve through <span class="tex" data-tex="x^\circ"></span> is the same curve in both, and every pair of bundles is ranked the same way, as long as <span class="tex" data-tex="f"></span> is increasing. Utility only orders bundles; how much higher a number is means nothing. On the right side: the indifference curve, the gradient <span class="tex" data-tex="\nabla U(x^\circ)"></span> and the tangent line. Along the tangent, a quasi-concave <span class="tex" data-tex="U"></span> is highest at <span class="tex" data-tex="x^\circ"></span> (Theorem 1).</p>
+          <p>Left, a utility function <span class="tex" data-tex="U"></span>; right, <span class="tex" data-tex="V=f(U)"></span>. The heights differ, but the indifference curve through <span class="tex" data-tex="x^\circ"></span> is the same, and every pair of bundles is ranked the same way, as long as <span class="tex" data-tex="f"></span> is increasing. Utility only orders bundles.</p>
+          <ul>
+          <li>Try other transformations: the indifference curves and <span class="tex" data-tex="MRS_{21}=U_1/U_2"></span> do not move. With <b>V = −U</b> the ranking flips.</li>
+          <li>Along the tangent line at <span class="tex" data-tex="x^\circ"></span>, a quasi-concave <span class="tex" data-tex="U"></span> is highest at <span class="tex" data-tex="x^\circ"></span> (Theorem 1). Choose <b>Bowed out</b> to see it fail.</li>
+          </ul>
         </details>
       </div>
       <div class="group">
@@ -83,14 +86,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../preference-axioms/index.html"><span>Previous</span>Better, Worse, Indifferent</a>
+    <a class="all" href="../index.html#l5-consumer">All tools</a>
+    <a class="next" href="../demand-duality/index.html"><span>Next</span>UMP and EMP: Two Sides of One Tangency</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
