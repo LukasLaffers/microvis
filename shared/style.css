@@ -421,3 +421,92 @@ details.sub-details summary { cursor: pointer; color: var(--muted); font-weight:
 .wip { max-width: 820px; margin: 4px 0 18px; padding: 12px 16px; border: 1px solid var(--l2-orange); border-left-width: 5px; border-radius: var(--radius); background: var(--panel); }
 .wip p { margin: 0; font-size: 14.5px; }
 .wip b { color: var(--ink); }
+
+/* =====================================================================
+   Design: like the lecture notes. White paper, the LaTeX typeface
+   (Computer Modern, bundled with KaTeX, so it works offline), hairline
+   rules instead of boxes, square controls. The economics colours stay.
+   ===================================================================== */
+
+@font-face { font-family: "Microvis Serif"; src: url("vendor/katex/fonts/KaTeX_Main-Regular.woff2") format("woff2"), url("vendor/katex/fonts/KaTeX_Main-Regular.woff") format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Microvis Serif"; src: url("vendor/katex/fonts/KaTeX_Main-Bold.woff2") format("woff2"), url("vendor/katex/fonts/KaTeX_Main-Bold.woff") format("woff"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Microvis Serif"; src: url("vendor/katex/fonts/KaTeX_Main-Italic.woff2") format("woff2"), url("vendor/katex/fonts/KaTeX_Main-Italic.woff") format("woff"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Microvis Serif"; src: url("vendor/katex/fonts/KaTeX_Main-BoldItalic.woff2") format("woff2"), url("vendor/katex/fonts/KaTeX_Main-BoldItalic.woff") format("woff"); font-weight: 700; font-style: italic; font-display: swap; }
+
+:root {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --ink: #141414;
+  --muted: #606060;
+  --line: #dcdcdc;
+  --grid: #eeeeee;
+  --radius: 2px;
+  --on-accent: #ffffff;
+  --font: "Microvis Serif", "KaTeX_Main", "Latin Modern Roman", "CMU Serif", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #131313; --panel: #131313; --ink: #ebebeb; --muted: #a3a3a3; --line: #333333; --grid: #252525; --on-accent: #131313; }
+}
+:root[data-theme="dark"] { --bg: #131313; --panel: #131313; --ink: #ebebeb; --muted: #a3a3a3; --line: #333333; --grid: #252525; --on-accent: #131313; }
+
+body { font-size: 16px; line-height: 1.55; }
+
+/* header: a title page, not a toolbar */
+/* the rule under the title runs inside the side padding, aligned with the content */
+.site-header { padding-top: 34px; padding-bottom: 18px; margin-bottom: 22px;
+  background: linear-gradient(var(--ink), var(--ink)) center bottom / calc(100% - 32px) 1px no-repeat; }
+@media (max-width: 700px) { .site-header h1, .home .site-header h1 { font-size: 27px; } .site-header { padding-top: 22px; } }
+.site-header h1 { font-size: 34px; font-weight: 400; letter-spacing: -0.01em; }
+.eyebrow { text-transform: none; letter-spacing: 0; font-size: 15px; font-weight: 400; font-style: italic; margin-bottom: 6px; }
+.back-link { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.subtitle { color: var(--ink); }
+
+/* panels: no boxes, only a rule above each section */
+.layout { gap: 26px 40px; }
+.layout > .side, .main-col { gap: 26px !important; }
+.panel { background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 12px 0 0; }
+.layout > .controls { border-top: 0; padding-top: 0; }
+.panel > h2, .panel-head h2 { font-size: 17px; font-weight: 700; }
+.caption, .note { font-size: 14px; }
+.group { border-top: 1px solid var(--line); }
+.group > h2 { text-transform: none; letter-spacing: 0; font-size: 15px; font-weight: 400; font-style: italic; color: var(--ink); }
+details.howto summary { font-weight: 700; }
+
+/* controls: square, quiet, black when chosen */
+select, input[type="number"], .ctrl-row input[type="number"], .go-row input[type="number"], .pair-row input[type="number"] { border-radius: var(--radius); background: var(--bg); border-color: var(--line); }
+input[type="range"], input[type="checkbox"] { accent-color: var(--ink); }
+.seg { border: 1px solid var(--ink); border-radius: var(--radius); }
+.seg button { background: transparent; font-weight: 400; }
+.seg button + button { border-left: 1px solid var(--ink); }
+.seg button[aria-pressed="true"], :root[data-mode="scale"] .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.btn-row button, .go-row button { border-radius: var(--radius); background: transparent; border-color: var(--line); }
+.btn-row button:hover, .go-row button:hover, .seg button:hover:not([aria-pressed="true"]) { border-color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.btn-row button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+.badge { border-radius: var(--radius); }
+.status-banner { border-radius: var(--radius); }
+button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline-color: var(--ink); }
+
+/* start page: a table of contents */
+.home .site-header, .home main, .home .site-footer { max-width: 980px; }
+.home .site-header h1 { font-size: 40px; }
+.intro { color: var(--ink); font-size: 17px; max-width: 680px; }
+.wip { max-width: 680px; border: 0; border-left: 2px solid var(--ink); border-radius: 0; background: none; padding: 2px 0 2px 14px; margin: 0 0 22px; }
+.wip p { font-style: italic; font-size: 16px; }
+.lecture-nav { gap: 2px 18px; margin: 0 0 6px; }
+.lecture-nav a { border: 0; background: none; padding: 0; border-radius: 0; font-size: 15px; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.lecture-nav a b { color: var(--muted); font-weight: 400; }
+.lecture-nav a:hover { text-decoration-color: var(--ink); }
+.home .lecture-title { border-left: 0; padding-left: 0; font-size: 23px; font-weight: 400; margin-top: 44px; margin-bottom: 4px; }
+.home .cards, .cards { display: block; }
+.card { display: grid; grid-template-columns: minmax(0, 290px) minmax(0, 1fr); grid-template-areas: "title desc" "label desc"; column-gap: 28px; align-content: start;
+  background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 14px 0 16px; transition: none; }
+.card:hover { transform: none; border-color: var(--line); }
+.card:hover h2 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.card h2 { grid-area: title; font-size: 19px; font-weight: 400; color: var(--ink); margin: 0 0 2px; }
+.card .lecture { grid-area: label; font-size: 14px; font-weight: 400; font-style: italic; color: var(--muted); margin: 0; }
+.card p:not(.lecture) { grid-area: desc; font-size: 15px; color: var(--ink); }
+@media (max-width: 700px) {
+  .card { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "label" "desc"; }
+  .card p:not(.lecture) { margin-top: 6px; }
+}
+.site-footer { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }

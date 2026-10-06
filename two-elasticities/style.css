@@ -7,7 +7,7 @@ label.sub select { margin-top: 4px; color: var(--ink); }
 .seg { margin-top: 8px; }
 .seg button { font-size: 12.5px; padding: 7px 3px; }
 .keynums { display: flex; flex-wrap: wrap; gap: 6px; }
-.keynums .kn { padding: 3px 10px; border: 1.5px solid var(--line); border-radius: 999px; font-size: 14px; background: var(--bg); }
+.keynums .kn { padding: 3px 10px; border: 1.5px solid var(--line); border-radius: 2px; font-size: 14px; background: var(--bg); }
 .keynums .kn.e { border-color: var(--l2-red); }
 .keynums .kn.s { border-color: var(--l2-blue); }
 .c-inc { color: var(--inc); }

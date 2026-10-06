@@ -6,5 +6,5 @@ table.effects td { cursor: default; }
 table.effects td:hover { outline: 0; }
 .row-sub th, .row-sub td { color: var(--l2-blue); }
 .row-inc th, .row-inc td { color: var(--l2-red); }
-.badge-kind { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; border: 1px solid currentColor; }
+.badge-kind { display: inline-block; padding: 1px 8px; border-radius: 2px; font-size: 12px; font-weight: 700; border: 1px solid currentColor; }
 .c-inc { color: var(--inc); }
