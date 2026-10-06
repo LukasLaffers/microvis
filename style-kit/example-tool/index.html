@@ -8,9 +8,11 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../shared/style.css?v=1">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
   <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
     <div>
       <p class="eyebrow"><a href="../index.html#l1">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 1 · Theory of the firm</p>
       <h1>Example Tool</h1>
@@ -67,5 +69,6 @@
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
   <script src="../shared/ui.js?v=1"></script>
   <script src="app.js?v=1"></script>
+  <script src="../shared/theme.js?v=1"></script>
 </body>
 </html>

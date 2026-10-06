@@ -12,6 +12,20 @@ const indexFile = path.join(ROOT, 'index.html');
 const V = fs.existsSync(indexFile) ? (fs.readFileSync(indexFile, 'utf8').match(/style\.css\?v=(\d+)/) || [, '1'])[1] : '1';
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Light / dark switch (shared/theme.js): a remembered choice is applied in <head> before the page is drawn, the button
+// sits in the top right corner of the header, and the script is loaded at the end of <body>.
+const THEME_HEAD = `<script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>`;
+const THEME_BUTTON = '<button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">' +
+  '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>' +
+  '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>';
+const withTheme = (html, prefix) => html
+  .replace(/\n? *<script>\/\* theme \*\/[^\n]*<\/script>/, '')
+  .replace(/\n? *<button class="theme-toggle"[^\n]*<\/button>/, '')
+  .replace(/\n? *<script src="[^"]*shared\/theme\.js[^"]*"><\/script>/, '')
+  .replace(/\n<\/head>/, '\n  ' + THEME_HEAD + '\n</head>')
+  .replace(/(<header class="site-header">)/, '$1\n    ' + THEME_BUTTON)
+  .replace(/\n<\/body>/, `\n  <script src="${prefix}shared/theme.js?v=${V}"></script>\n</body>`);
+
 const order = [];
 for (const sec of sections) for (const [slug, title, blurb, star] of sec.pages) order.push({ slug, title, blurb, star, sec });
 
@@ -64,7 +78,7 @@ ${s.pages.map(p => card(order.find(t => t.slug === p[0]))).join('\n')}
 </body>
 </html>
 `;
-fs.writeFileSync(indexFile, index);
+fs.writeFileSync(indexFile, withTheme(index, ''));
 
 // Pages: header link and pager.
 let changed = 0;
@@ -82,6 +96,7 @@ order.forEach((t, i) => {
   const pager = `<nav class="pager" aria-label="Other pages">\n    ${link(p, 'prev', 'Previous')}\n    <a class="all" href="${home}">All pages</a>\n    ${link(n, 'next', 'Next')}\n  </nav>\n\n  `;
   s = s.replace(/<nav class="pager"[\s\S]*?<\/nav>\n\n {2}/, '');
   s = s.replace(/<footer class="site-footer">/, pager + '<footer class="site-footer">');
+  s = withTheme(s, '../');
   if (s !== before) { fs.writeFileSync(file, s); changed++; }
 });
 console.log(`index.html: ${order.length} tiles; ${changed} pages updated`);

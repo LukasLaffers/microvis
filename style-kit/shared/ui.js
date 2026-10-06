@@ -198,7 +198,9 @@
   }
 
   // Redraw when the operating system switches between light and dark.
+  // Redraw also when the light / dark switch (shared/theme.js) is used.
   function watchColorScheme(cb) {
+    root.addEventListener('microvis-theme', cb);
     if (!root.matchMedia) return;
     const mq = root.matchMedia('(prefers-color-scheme: dark)');
     if (mq.addEventListener) mq.addEventListener('change', cb);
