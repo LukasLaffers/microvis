@@ -4,7 +4,7 @@ module.exports = {
   site: {
     title: 'Microvis',                         // big title on the start page
     pageTitle: 'Microvis — Interactive figures', // <title> of the start page
-    lead: 'Interactive figures for microeconomic theory. Move a parameter, and watch the economics respond.',
+    lead: 'Interactive figures for microeconomic theory.',
     note: '<b>Work in progress.</b> The tools are still being developed and checked. Feedback of any kind is very welcome.',
     footer: 'Your Name'
   },

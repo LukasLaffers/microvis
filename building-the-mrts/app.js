@@ -258,7 +258,7 @@
     if (t.tech === 'cd' || t.tech === 'ces') items.push(item('ok', `<b>Diminishing MRTS:</b> it falls along the isoquant as ${texStr('z_1')} rises, so the isoquant is convex.`));
     else if (t.tech === 'linear') items.push(item('ok', `<b>Constant MRTS:</b> ${texStr('dMRTS_{21}/dz_1=0')}, a straight isoquant (still convex).`));
     else items.push(item('na', '<b>Leontief:</b> the MRTS is 0 or ∞, and not defined at the corner.'));
-    items.push(item('na', `<b>Along the ray through ${texStr('\\bar z')}</b> the MRTS does not change: at ${texStr('2\\bar z')} it is ${Number.isNaN(m2) ? 'not defined either' : `${big(m2)} too`}, because ${texStr('\\phi')} is homogeneous (of degree ${texStr(`k=${U.num(k)}`)}). Change ${texStr('\\bar q')} and watch ${texStr('\\bar z')} slide along its ray with the same slope.`));
+    items.push(item('na', `<b>Along the ray through ${texStr('\\bar z')}</b> the MRTS does not change: at ${texStr('2\\bar z')} it is ${Number.isNaN(m2) ? 'not defined either' : `${big(m2)} too`}, because ${texStr('\\phi')} is homogeneous (of degree ${texStr(`k=${U.num(k)}`)}). As ${texStr('\\bar q')} changes, ${texStr('\\bar z')} slides along its ray with the same slope.`));
     $('checks').innerHTML = items.join('');
     $('eqs').insertAdjacentHTML('beforeend', table);
   }

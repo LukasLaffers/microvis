@@ -40,7 +40,7 @@ const index = `<!DOCTYPE html>
   <header class="site-header">
     <div>
       <h1>Microvis</h1>
-      <p class="lead">Interactive figures for microeconomic theory. Move a parameter, and watch the economics respond.</p>
+      <p class="lead">Interactive figures for microeconomic theory.</p>
     </div>
   </header>
 

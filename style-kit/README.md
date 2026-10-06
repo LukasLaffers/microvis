@@ -105,10 +105,10 @@ Breakpoints: below 1250px the side panels move under the figure; below 800px eve
 
 ## Writing
 
-Engaging but academic. Precise, never boring. Short.
+Academic and precise. Short. No slogans, no rhetorical questions, no "watch the …" or "meet the …".
 
-- **Tile**: one sentence, at most about 20 words, that makes you want to click.
-  "Two marginal products make one slope: why MRTS₂₁ = φ₁/φ₂." / "Climb the profit hill directly, or minimise cost first: the same summit."
+- **Tile**: one plain, precise sentence, at most about 20 words, saying what the page shows.
+  "Why the slope of the isoquant is MRTS₂₁ = φ₁/φ₂, the ratio of the marginal products." / "Maximising profit directly, or minimising cost first: both give the same input bundle."
 - **How to read this**: the idea in two or three sentences, then two or three things to try, each an action and what to notice.
   "Drag z̄ up the isoquant: φ₁ grows, φ₂ shrinks, the MRTS rises." / "Shrink Δz₁: the finite step and the tangent come together."
 - **Captions** are legends: what each colour is. No repetition of the guide.
