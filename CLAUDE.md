@@ -41,6 +41,7 @@ style-kit/              the look, layout, writing style and safeguards packaged 
 - Add each new tool to `tools/catalog.cjs` (and its drawing to `tools/glyphs.cjs`), then run `node tools/build-site.cjs`.
 - Text is short and lets the figure speak: a one-sentence tile description; "How to read this" is the idea in two or three sentences, then a short list of things to try.
 - `.nojekyll` must stay in the root so GitHub Pages serves files as they are.
+- Visitor counts: GoatCounter (dashboard https://microvis.goatcounter.com). `tools/build-site.cjs` adds one inline line to every page that counts a view only on lukaslaffers.github.io; no external script, no cookies. Do not add other trackers.
 - Our own CSS and JS are linked with a version tag, e.g. `../shared/style.css?v=2`. Raise the number in all pages (a one-line script) whenever a shared CSS/JS file changes, so that browsers never combine a new page with an old cached stylesheet. Vendor files are not tagged.
 
 ## Notation (must match the lecture notes)

@@ -130,6 +130,17 @@ Academic and precise. Short. No slogans, no rhetorical questions, no "watch the 
 - **Offline.** Libraries are bundled in `shared/vendor/` and loaded with relative paths. No CDN.
 - **Phone.** Controls come first, so the guide starts closed; figures get smaller fixed heights; no horizontal scrolling at 375px.
 
+## Visitor counts (optional)
+
+Microvis uses GoatCounter (free for non-commercial sites, no cookies, so no consent banner). Its `tools/build-site.cjs`
+adds one inline line before `</body>` of every page; it sends one request per page view, only on the published host:
+
+```html
+<script>/* visitor count */if(location.hostname==='USER.github.io'){new Image().src='https://CODE.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);}</script>
+```
+
+No external script is loaded, previews and local copies are not counted, and if GoatCounter is unreachable nothing else is affected. On the start page the same line also fetches `https://CODE.goatcounter.com/counter/TOTAL.json` and shows the total in the footer (turn on "Allow adding visitor counts on your website" in the GoatCounter settings); if that fails, the number stays hidden.
+
 ## Before publishing
 
 - Every page loads without errors (a Playwright script that opens each page and collects console errors).
