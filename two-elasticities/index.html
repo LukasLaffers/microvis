@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Elasticities · Microvis</title>
+  <meta name="description" content="The elasticity of scale e(z) and the elasticity of substitution sigma(z) in one figure: local measures that change from point to point, with buttons for technologies where both are constant, and what h(phi(z)) and phi(f(z1), g(z2)) do to them. Lecture 1.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <h1>Two Elasticities: <span class="tex" data-tex="e(z)"></span> and <span class="tex" data-tex="\sigma(z)"></span></h1>
+      <p class="subtitle"><span class="c-l2-red"><span class="tex" data-tex="e(z)=\frac{d\phi(\alpha z)}{d\alpha}\Big|_{\alpha=1}\frac{1}{\phi(z)}"></span></span>&nbsp;&nbsp;&nbsp;<span class="c-l2-blue"><span class="tex" data-tex="\sigma(z)=\frac{d\log\frac{z_2}{z_1}}{d\log MRTS_{21}(z)}\Big|_{d\phi=0}"></span></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>At the point <span class="tex" data-tex="\bar z"></span> two directions matter. Along the <span class="c-l2-red">red ray</span> all inputs grow in proportion: the <b>elasticity of scale</b> <span class="tex" data-tex="e(\bar z)"></span> says by how many percent output grows when all inputs grow by 1%. Along the <span class="c-l2-blue">blue isoquant</span> output stays the same and the input mix changes: the <b>elasticity of substitution</b> <span class="tex" data-tex="\sigma(\bar z)"></span> says by how many percent <span class="tex" data-tex="z_2/z_1"></span> changes when the MRTS changes by 1%.</p>
+          <p>Both are <b>local</b>: drag <span class="tex" data-tex="\bar z"></span> around and watch them change, or shade the plane by one of them. The buttons below jump to technologies where both are constant everywhere.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <div class="btn-row" role="group" aria-label="Presets">
+          <button type="button" data-preset="vary">Both vary</button>
+          <button type="button" data-preset="cd">Cobb-Douglas: both constant</button>
+          <button type="button" data-preset="ces">CES of degree k: both constant</button>
+        </div>
+        <div class="formula" id="formula"></div>
+        <label class="sub">Scale part (the labels of the isoquants)
+          <select id="F" aria-label="Scale part">
+            <option value="sshape">S-shaped: e changes along rays</option>
+            <option value="power">Power x^k: e = k everywhere</option>
+          </select>
+        </label>
+        <div class="ctrl" data-key="s" data-label="s" data-hint="e = 1 where x = s" data-min="1" data-max="6" data-step="0.1" data-show="sshape"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="2" data-step="0.05" data-show="power"></div>
+        <label class="sub">Substitution part (the shape of the isoquants)
+          <select id="g" aria-label="Substitution part">
+            <option value="mix">CES mixed with linear: σ changes along isoquants</option>
+            <option value="ces">CES: σ = 1/(1 − ρ) everywhere</option>
+            <option value="cd">Cobb-Douglas: σ = 1 everywhere</option>
+          </select>
+        </label>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="ρ < 1, ρ ≠ 0" data-min="-4" data-max="0.9" data-step="0.05" data-show="rho"></div>
+        <div class="ctrl" data-key="m" data-label="m" data-hint="share of the CES part" data-min="0.05" data-max="1" data-step="0.01" data-show="mix"></div>
+      </div>
+
+      <div class="group">
+        <h2>Transform the technology (whiteboard)</h2>
+        <div class="seg" role="group" aria-label="Transformation">
+          <button type="button" data-tr="none" aria-pressed="true">A: φ</button>
+          <button type="button" data-tr="B" aria-pressed="false">B: h(φ)</button>
+          <button type="button" data-tr="C" aria-pressed="false">C: φ(f, g)</button>
+        </div>
+        <div data-show="trB">
+          <select id="h" aria-label="h">
+            <option value="square">h(q) = q²</option>
+            <option value="sqrt">h(q) = √q</option>
+            <option value="log">h(q) = ln(1 + q)</option>
+          </select>
+        </div>
+        <div data-show="trC">
+          <div class="ctrl" data-key="b1" data-label="f(z_1)=z_1^{b_1}" data-hint="" data-min="0.3" data-max="1.8" data-step="0.05"></div>
+          <div class="ctrl" data-key="b2" data-label="g(z_2)=z_2^{b_2}" data-hint="" data-min="0.3" data-max="1.8" data-step="0.05"></div>
+        </div>
+        <p class="note" id="tr-note"></p>
+      </div>
+
+      <div class="group">
+        <h2>The point and the plot</h2>
+        <div class="ctrl" data-key="z1" data-label="\bar z_1" data-hint="" data-min="0.2" data-max="8" data-step="0.05"></div>
+        <div class="ctrl" data-key="z2" data-label="\bar z_2" data-hint="" data-min="0.2" data-max="8" data-step="0.05"></div>
+        <div class="seg" role="group" aria-label="Shading">
+          <button type="button" data-shade="e" aria-pressed="false">Shade by e</button>
+          <button type="button" data-shade="sigma" aria-pressed="true">Shade by σ</button>
+          <button type="button" data-shade="none" aria-pressed="false">No shading</button>
+        </div>
+        <div class="ctrl" data-key="R" data-label="\max z_1,\ z_2" data-hint="plot range" data-min="2" data-max="12" data-step="0.5"></div>
+      </div>
+    </section>
+
+    <div class="main-col">
+      <section class="panel" aria-label="Input space">
+        <div class="panel-head"><h2>Scale along the ray, substitution along the isoquant</h2><div class="keynums" id="keynums" aria-live="polite"></div></div>
+        <div id="plot" class="plot plot-main" aria-label="Input space: click or drag to move the point"></div>
+        <p class="caption" id="cap"></p>
+      </section>
+      <section class="panel" aria-label="The production function in 3D">
+        <div class="panel-head">
+          <h2>The same in 3D: <span class="tex" data-tex="q=\phi(z_1,z_2)"></span></h2>
+          <div class="btn-row" role="group" aria-label="Camera">
+            <button type="button" data-cam="3d">3D</button>
+            <button type="button" data-cam="ray">Along the ray</button>
+            <button type="button" data-cam="top">Top</button>
+          </div>
+        </div>
+        <div id="plot3d" class="plot plot-3d"></div>
+        <p class="caption" id="cap3d"></p>
+      </section>
+    </div>
+
+    <div class="side">
+      <section class="panel" aria-label="e along the ray">
+        <h2><span class="c-l2-red"><span class="tex" data-tex="e"></span> along the ray through <span class="tex" data-tex="\bar z"></span></span></h2>
+        <div id="plotE" class="plot plot-side"></div>
+        <p class="caption" id="capE"></p>
+      </section>
+      <section class="panel" aria-label="sigma along the isoquant">
+        <h2><span class="c-l2-blue"><span class="tex" data-tex="\sigma"></span> along the isoquant through <span class="tex" data-tex="\bar z"></span></span></h2>
+        <div id="plotS" class="plot plot-side"></div>
+        <p class="caption" id="capS"></p>
+      </section>
+      <section class="panel readouts" aria-label="What the numbers mean" aria-live="polite">
+        <h2>At <span class="tex" data-tex="\bar z"></span></h2>
+        <div id="meaning"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/technology-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

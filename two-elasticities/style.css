@@ -1,0 +1,22 @@
+/* Two Elasticities: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-main { height: 600px; }
+.plot-side { height: 250px; }
+@media (max-width: 800px) { .plot-main { height: 380px; } .plot-side { height: 230px; } }
+label.sub { display: block; font-size: 13px; color: var(--muted); margin-top: 10px; }
+label.sub select { margin-top: 4px; color: var(--ink); }
+.seg { margin-top: 8px; }
+.seg button { font-size: 12.5px; padding: 7px 3px; }
+.keynums { display: flex; flex-wrap: wrap; gap: 6px; }
+.keynums .kn { padding: 3px 10px; border: 1.5px solid var(--line); border-radius: 999px; font-size: 14px; background: var(--bg); }
+.keynums .kn.e { border-color: var(--l2-red); }
+.keynums .kn.s { border-color: var(--l2-blue); }
+.c-inc { color: var(--inc); }
+.c-dec { color: var(--dec); }
+.c-teal { color: #2a9d8f; }
+table.cmp { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; margin: 10px 0 4px; }
+table.cmp th, table.cmp td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+table.cmp th { color: var(--muted); font-weight: 600; }
+table.cmp td:first-child, table.cmp th:first-child { text-align: left; }
+.layout > .main-col { grid-area: main; display: grid; gap: 14px; min-width: 0; }
+.plot-3d { height: 560px; }
+@media (max-width: 800px) { .plot-3d { height: 420px; } }
