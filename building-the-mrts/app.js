@@ -79,13 +79,13 @@
     });
     // the step triangle
     const annotations = [], st = MM.step(z, state.dz, q, t), x2 = z[0] + state.dz;
-    traces.push(U.line2([z, [x2, z[1]]], th.accent, 3, 'dz₁'));
+    traces.push(U.line2([z, [x2, z[1]]], th.accent, 3, 'Δz₁'));
     if (st.z2new !== null) traces.push(U.line2([[x2, z[1]], [x2, st.z2new]], th.accent2, 4, 'what can be given up'));
     if (Number.isFinite(m)) {
       const off = 0.012 * R;
-      traces.push(U.line2([[x2 + off, z[1]], [x2 + off, z[1] - m * state.dz]], th.accent3, 2.5, 'MRTS · dz₁', 'dash'));
+      traces.push(U.line2([[x2 + off, z[1]], [x2 + off, z[1] - m * state.dz]], th.accent3, 2.5, 'MRTS · Δz₁', 'dash'));
     }
-    annotations.push({ x: (z[0] + x2) / 2, y: z[1], text: 'dz<sub>1</sub>', showarrow: false, yanchor: 'bottom', yshift: 2, font: { size: 12, color: th.accent } });
+    annotations.push({ x: (z[0] + x2) / 2, y: z[1], text: 'Δz<sub>1</sub>', showarrow: false, yanchor: 'bottom', yshift: 2, font: { size: 12, color: th.accent } });
     if (st.z2new !== null && st.giveUp > 1e-9) annotations.push({ x: x2, y: (z[1] + st.z2new) / 2, text: '−Δz<sub>2</sub>', showarrow: false, xanchor: 'right', xshift: -4, font: { size: 12, color: th.accent2 } });
     // tangent and point
     if (!Number.isNaN(m)) traces.push(U.line2(tangentLine(z, m, R), th.accent3, 2.5, 'tangent, slope −MRTS', 'dash'));
@@ -227,17 +227,17 @@
       lines.push(`\\begin{aligned}0=dq&=\\phi_1(\\bar z)\\,dz_1+\\phi_2(\\bar z)\\,dz_2\\\\ &=${f3(g[0])}\\,dz_1+${f3(g[1])}\\,dz_2\\end{aligned}`);
       if (g[1] > 0) {
         lines.push(`MRTS_{21}(\\bar z)=-\\frac{dz_2}{dz_1}\\Big|_{d\\phi=0}=\\frac{\\phi_1(\\bar z)}{\\phi_2(\\bar z)}=\\frac{${f3(g[0])}}{${f3(g[1])}}=${f3(S.m)}`);
-        text = `A step of ${texStr(`dz_1=${f2(dz)}`)}: the tangent says ${texStr(`MRTS_{21}\\cdot dz_1=${f3(S.m * dz)}`)} units of ${texStr('z_2')} can go; staying exactly on the isoquant, ${texStr(`-\\Delta z_2=${f3(st.giveUp)}`)}. ` +
+        text = `A step of ${texStr(`\\Delta z_1=${f2(dz)}`)}: the tangent says ${texStr(`MRTS_{21}\\cdot\\Delta z_1=${f3(S.m * dz)}`)} units of ${texStr('z_2')} can go; staying exactly on the isoquant, ${texStr(`-\\Delta z_2=${f3(st.giveUp)}`)}. ` +
           (t.tech === 'linear' ? 'They are equal: the isoquant is its own tangent.' : Math.abs(S.m * dz - st.giveUp) < 1e-9 ? '' : 'The smaller the step, the closer the two: the MRTS is the rate for small steps.') +
           (t.tech === 'linear' && st.z2new === 0 ? ` (Here the step uses up all of ${texStr('z_2')}.)` : '');
       } else {
         lines.push(`MRTS_{21}(\\bar z)=\\frac{\\phi_1(\\bar z)}{\\phi_2(\\bar z)}=\\frac{${f3(g[0])}}{0}=\\infty`);
-        text = `Here ${texStr('\\phi_2=0')}: input 2 is in excess. Even a tiny ${texStr('dz_1>0')} frees all the excess ${texStr('z_2')} down to the corner (${texStr(`-\\Delta z_2=${f3(st.giveUp)}`)}), so ${texStr('-dz_2/dz_1')} grows without bound: the isoquant is vertical.`;
+        text = `Here ${texStr('\\phi_2=0')}: input 2 is in excess. Even a tiny step ${texStr('\\Delta z_1>0')} frees all the excess ${texStr('z_2')} down to the corner (${texStr(`-\\Delta z_2=${f3(st.giveUp)}`)}), so ${texStr('-\\Delta z_2/\\Delta z_1')} grows without bound as the step shrinks: the isoquant is vertical.`;
       }
       if (g[0] === 0) text = `Here ${texStr('\\phi_1=0')}: input 1 is in excess, so more of it saves no ${texStr('z_2')} at all (${texStr('-\\Delta z_2=0')}): the isoquant is flat and ${texStr('MRTS_{21}=0')}.`;
     } else {
       lines.push('\\phi_1(\\bar z),\\ \\phi_2(\\bar z)\\ \\text{not defined at the kink}');
-      text = `At the corner ${texStr('\\phi')} is not differentiable, so the MRTS is not defined: any line between the vertical and the horizontal arm touches the isoquant here. A step ${texStr(`dz_1=${f2(dz)}`)} saves no ${texStr('z_2')}.`;
+      text = `At the corner ${texStr('\\phi')} is not differentiable, so the MRTS is not defined: any line between the vertical and the horizontal arm touches the isoquant here. A step ${texStr(`\\Delta z_1=${f2(dz)}`)} saves no ${texStr('z_2')}.`;
     }
     if (t.tech === 'cd' || t.tech === 'ces') {
       const [p1, p2] = MM.mrtsPartials(z, t);
@@ -263,6 +263,16 @@
     $('eqs').insertAdjacentHTML('beforeend', table);
   }
 
+  // MRTS21 and sigma at z-bar, next to the isoquant.
+  function renderKey(t, S) {
+    const sg = MM.sigma(t), m = S.m;
+    const mTex = Number.isNaN(m) ? '\\text{not defined}' : m === Infinity ? '\\infty' : f3(m);
+    const sTex = sg === Infinity ? '\\infty' : sg === 0 ? '0' : f3(sg);
+    $('keynums').innerHTML =
+      `<span class="kn">${texStr(`MRTS_{21}(\\bar z)=${mTex}`)}</span>` +
+      `<span class="kn">${texStr(`\\sigma(\\bar z)=${sTex}`)}</span>`;
+  }
+
   function render() {
     const t = T();
     U.applyVisibility({ cd: t.tech === 'cd', linear: t.tech === 'linear', leontief: t.tech === 'leontief', ces: t.tech === 'ces' });
@@ -276,6 +286,7 @@
     guard('cut in z₂', () => drawCut(th, t, 2, S));
     guard('MRTS plot', () => drawMrts(th, t, S));
     guard('step by step', () => renderEqs(t, S));
+    guard('key numbers', () => renderKey(t, S));
   }
 
   // ---------- dragging the point along the isoquant ----------

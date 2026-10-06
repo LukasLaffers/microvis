@@ -55,7 +55,7 @@
         <h2>The point on the isoquant</h2>
         <div class="ctrl" data-key="q" data-label="\bar q" data-hint="output on the isoquant" data-min="0.5" data-max="6" data-step="0.1"></div>
         <div class="ctrl" data-key="r" data-label="\bar z_2/\bar z_1" data-hint="input mix (factor intensity)" data-min="0.05" data-max="20" data-log="1"></div>
-        <div class="ctrl" data-key="dz" data-label="dz_1" data-hint="step in the triangle" data-min="0.05" data-max="2" data-step="0.05"></div>
+        <div class="ctrl" data-key="dz" data-label="\Delta z_1" data-hint="finite step in the triangle" data-min="0.05" data-max="2" data-step="0.05"></div>
         <div class="btn-row" role="group" aria-label="Pins">
           <button type="button" id="pin">Pin this point</button>
           <button type="button" id="three">Three points</button>
@@ -71,9 +71,9 @@
 
     <div class="main-col">
       <section class="panel" aria-label="Input space">
-        <div class="panel-head"><h2>The isoquant <span class="tex" data-tex="\phi(z)=\bar q"></span> and its slope</h2></div>
+        <div class="panel-head"><h2>The isoquant <span class="tex" data-tex="\phi(z)=\bar q"></span> and its slope</h2><div class="keynums" id="keynums" aria-live="polite"></div></div>
         <div id="plot" class="plot plot-main" aria-label="Isoquant: drag the point"></div>
-        <p class="caption">The <span class="c-ink"><span class="key"></span>isoquant</span>, the point <span class="c-accent-3"><span class="key dot"></span><span class="tex" data-tex="\bar z"></span></span> and its <span class="c-accent-3"><span class="key dash"></span>tangent</span> with slope <span class="tex" data-tex="-MRTS_{21}"></span>. The triangle: <span class="c-accent"><span class="key"></span><span class="tex" data-tex="dz_1"></span> more of input 1</span>, then down to the isoquant (<span class="c-accent-2"><span class="key"></span>what you can give up</span>) or to the tangent (<span class="c-accent-3"><span class="key dash"></span><span class="tex" data-tex="MRTS_{21}\cdot dz_1"></span></span>). Drag the point along the isoquant.</p>
+        <p class="caption">The <span class="c-ink"><span class="key"></span>isoquant</span>, the point <span class="c-accent-3"><span class="key dot"></span><span class="tex" data-tex="\bar z"></span></span> and its <span class="c-accent-3"><span class="key dash"></span>tangent</span> with slope <span class="tex" data-tex="-MRTS_{21}"></span>. The triangle, a finite step: <span class="c-accent"><span class="key"></span><span class="tex" data-tex="\Delta z_1"></span> more of input 1</span>, then down to the isoquant (<span class="c-accent-2"><span class="key"></span><span class="tex" data-tex="-\Delta z_2"></span>, what you can give up</span>) or to the tangent (<span class="c-accent-3"><span class="key dash"></span><span class="tex" data-tex="MRTS_{21}\cdot\Delta z_1"></span></span>). As the step shrinks to <span class="tex" data-tex="dz_1"></span>, the two agree. Drag the point along the isoquant.</p>
       </section>
       <section class="panel" aria-label="MRTS along the isoquant">
         <div class="panel-head">
