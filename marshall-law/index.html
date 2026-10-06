@@ -7,8 +7,8 @@
   <meta name="description" content="With constant returns to scale the elasticity of an industry's demand for labour is a weighted average of the elasticity of substitution and the price elasticity of product demand. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=3">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="../shared/style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -28,8 +28,8 @@
           <summary>How to read this</summary>
           <p>With constant returns, industry supply is flat at <span class="tex" data-tex="p=c(w)"></span> and demand <span class="tex" data-tex="Dem(p)"></span> decides the output. When the wage <span class="tex" data-tex="w_1"></span> rises, the industry uses less labour for two reasons: firms <span class="c-l2-blue">substitute capital for labour</span> (how easily: <span class="tex" data-tex="\sigma"></span>), and the dearer product <span class="c-l2-red">sells less</span> (how strongly: <span class="tex" data-tex="-\varepsilon^D_p"></span>).</p>
           <ul>
-          <li>Press <b>Raise w₁ and watch both channels</b>.</li>
-          <li>The industry's labour demand elasticity is a weighted average of the two, with labour's cost share <span class="tex" data-tex="sh_1"></span> as the weight on product demand. Change <span class="tex" data-tex="\delta"></span> or the prices and watch the lever.</li>
+          <li>Press <b>Raise w₁</b>: both channels respond at once.</li>
+          <li>The industry's labour demand elasticity is a weighted average of the two, with labour's cost share <span class="tex" data-tex="sh_1"></span> as the weight on product demand. Changing <span class="tex" data-tex="\delta"></span> or the prices moves the balance point of the lever.</li>
           <li>Choose <b>Leontief</b>: <span class="tex" data-tex="\sigma=0"></span>, and only product demand is left.</li>
           </ul>
         </details>
@@ -59,7 +59,7 @@
       <div class="group">
         <h2>What if the wage rises?</h2>
         <div class="ctrl" data-key="r" data-label="\Delta w_1/w_1" data-hint="wage rise, %" data-min="1" data-max="50" data-step="1"></div>
-        <div class="btn-row"><button type="button" id="raise">Raise w₁ and watch both channels</button></div>
+        <div class="btn-row"><button type="button" id="raise">Raise w₁</button></div>
       </div>
     </section>
 
@@ -108,10 +108,10 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=3"></script>
-  <script src="../shared/firm-ui.js?v=3"></script>
-  <script src="../shared/firm-model.js?v=3"></script>
-  <script src="model.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <script src="../shared/ui.js?v=4"></script>
+  <script src="../shared/firm-ui.js?v=4"></script>
+  <script src="../shared/firm-model.js?v=4"></script>
+  <script src="model.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

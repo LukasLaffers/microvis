@@ -20,6 +20,7 @@ shared/vendor/          bundled third-party libraries (Plotly, KaTeX) with their
 plans/                  plans for groups of tools, e.g. plans/lecture-2.md
 tools/catalog.cjs       the list of tools in lecture order: title and one-sentence description of each tile
 tools/build-site.cjs    writes index.html and the header link and previous/next links of every tool page
+style-kit/              the look, layout, writing style and safeguards packaged for a new project (README is the style guide); keep it in step when shared/style.css or shared/ui.js change
 <tool-name>/            one folder per tool, kebab-case, e.g. production-explorer/
   index.html            the page
   model.js              pure math, no DOM; UMD so Node tests can require it
