@@ -1,6 +1,5 @@
 /* Translog Cost Shares: tool-specific styles (shared look is in ../shared/style.css). */
 .main-panel .caption + .panel-head { margin-top: 18px; }
-.subtitle .tex { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; vertical-align: middle; }
 .subtitle .arrow { margin: 0 8px; }
 
 /* Full-width row under the plots: the published results and the aggregation example. */

@@ -182,7 +182,7 @@
     U.applyVisibility({ ces: state.mode === 'ces', own: state.mode === 'own' });
     document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
     const S = solve(), th = U.theme();
-    if (state.mode === 'ces') tex($('formula-ces'), `c(w)=\\big[\\delta^{\\sigma}w_1^{1-\\sigma}+(1-\\delta)^{\\sigma}w_2^{1-\\sigma}\\big]^{\\frac{1}{1-\\sigma}},\\ \\sigma=${f3(sigmaCES())}`, true);
+    if (state.mode === 'ces') tex($('formula-ces'), `\\begin{gathered}c(w)=\\big[\\delta^{\\sigma}w_1^{1-\\sigma}+(1-\\delta)^{\\sigma}w_2^{1-\\sigma}\\big]^{\\frac{1}{1-\\sigma}}\\\\ \\sigma=${f3(sigmaCES())}\\end{gathered}`, true);
     guard('approximation plot', () => drawApprox(th, S));
     guard('share plot', () => drawShares(th, S));
     guard('elasticities', () => renderElasticities(S));

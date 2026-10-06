@@ -1,7 +1,7 @@
 /* Substitution and Scale Effects: tool-specific styles (shared look is in ../shared/style.css). */
 .big-button {
   width: 100%; padding: 10px 12px; font: inherit; font-weight: 700; font-size: 15px;
-  color: #fff; background: var(--l2-blue); border: 0; border-radius: 8px; cursor: pointer; margin-bottom: 6px;
+  color: #fff; background: var(--l2-blue); border: 0; border-radius: 0; cursor: pointer; margin-bottom: 6px;
 }
 .big-button:disabled { opacity: 0.6; cursor: default; }
 .plot-main { touch-action: auto; cursor: default; }
@@ -11,4 +11,4 @@ table.effects th:first-child { text-align: left; }
 .row-sub, .row-sub th { color: var(--l2-blue); }
 .row-scale, .row-scale th { color: var(--l2-red); }
 .row-total th, .row-total td { font-weight: 700; }
-#marginal-box { margin-top: 10px; font-size: 14px; overflow-x: auto; }
+#marginal-box { margin-top: 10px; font-size: 14px; overflow-x: hidden; overflow-y: hidden; }

@@ -18,9 +18,13 @@
   function kind(eta) { return eta < -1e-9 ? 'inferior' : eta < 1 - 1e-9 ? 'necessity' : eta > 1 + 1e-9 ? 'luxury' : 'unit elastic'; }
 
   // Incomes over which the example has interior solutions (the Giffen example only for c p1 + p2 s/2 <= y < c p1 + p2 s).
+  // The income at which good 1 turns from normal to inferior in E (D2 = K there).
+  const turningIncome = (p, u) => p[1] * u.K * (1 + u.c / 2);
   function incomeRange(p, u) {
     if (u.type === 'giffen') return [u.c * p[0] + p[1] * u.s / 2 + 1e-6, u.c * p[0] + p[1] * u.s - 1e-6];
     if (u.type === 'stonegeary') { const m = p[0] * Math.max(u.g1, 0) + p[1] * Math.max(u.g2, 0); return [m + 0.5, m + 25]; }
+    // E: good 1 turns inferior at the income where D2 = K, y = p2 K (1 + c/2); show well past it
+    if (u.type === 'humped') return [0.5, Math.max(25, 2.5 * p[1] * u.K * (1 + u.c / 2))];
     return [1, 25];
   }
 
@@ -34,7 +38,7 @@
     };
   }
 
-  const api = { expansionPath, engelCurves, kind, incomeRange, conditions };
+  const api = { expansionPath, engelCurves, kind, incomeRange, turningIncome, conditions };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.EngelModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

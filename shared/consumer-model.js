@@ -9,6 +9,11 @@
  *   'giffen'       U = -(s - x2)^2 / (x1 - c)            on x1 > c, x2 < s. Interior solutions (c p1 + p2 s/2 <= y
  *                  < c p1 + p2 s): D1 = 2c + (p2 s - y)/p1, D2 = 2(y - c p1)/p2 - s. Good 1 is always inferior
  *                  (dD1/dy = -1/p1) and a Giffen good (dD1/dp1 > 0) exactly when y > p2 s.
+ *   'additive'     U = x1^a/a + x2^b/b,  0 < a, b < 1     curved income expansion path; the good whose exponent is
+ *                  closer to 1 is the luxury, the other the necessity, and the income elasticities change with y.
+ *   'humped'       U = c log x1 + log x2 + x2^2/(2K^2),  0 < c < 8.  MRS21 = h(x2)/x1 with h(x2) = c x2/(1 + x2^2/K^2):
+ *                  h rises up to x2 = K and falls after, so good 1 is normal while x2 < K and inferior after (its
+ *                  Engel curve rises, then falls). Indifference curves are convex because h' > -1 (min h' = -c/8).
  * The UMP is solved in closed form where one is known and otherwise numerically (golden section along the budget
  * line, valid for quasi-concave U); the EMP through duality: C(p,v) solves V(p,C) = v and H(p,v) = D(p,C(p,v)).
  *
@@ -37,6 +42,8 @@
         if (x1 < 0 || x2 < 0 || x1 <= u.c || x2 >= u.s) return NEG;
         return -((u.s - x2) ** 2) / (x1 - u.c);
       }
+      case 'additive': return x1 < 0 || x2 < 0 ? NEG : Math.pow(x1, u.a) / u.a + Math.pow(x2, u.b) / u.b;
+      case 'humped': return x1 <= 0 || x2 <= 0 ? NEG : u.c * Math.log(x1) + Math.log(x2) + x2 * x2 / (2 * u.K * u.K);
     }
     throw new Error('unknown utility ' + u.type);
   }
@@ -72,6 +79,22 @@
     if (u.type === 'giffen') {
       const x = [2 * u.c + (p2 * u.s - y) / p1, 2 * (y - u.c * p1) / p2 - u.s];
       return x[0] > u.c && x[1] >= 0 && x[1] < u.s ? x : null;
+    }
+    if (u.type === 'additive') {
+      // x_i^(a_i - 1) = lambda p_i, so x_i = (lambda p_i)^(-1/(1 - a_i)); spending falls with lambda: bisection in log lambda.
+      const xs = l => [Math.pow(Math.exp(l) * p1, -1 / (1 - u.a)), Math.pow(Math.exp(l) * p2, -1 / (1 - u.b))];
+      const spend = l => { const x = xs(l); return p1 * x[0] + p2 * x[1] - y; };
+      let lo = -60, hi = 60;
+      for (let it = 0; it < 200; it++) { const m = 0.5 * (lo + hi); if (spend(m) > 0) lo = m; else hi = m; }
+      return xs(0.5 * (lo + hi));
+    }
+    if (u.type === 'humped') {
+      // tangency x1 = (p2/p1) h(x2); the budget gives h(x2) + x2 = y/p2, increasing in x2 (h' > -1): bisection.
+      const h = x2 => u.c * x2 / (1 + x2 * x2 / (u.K * u.K)), target = y / p2;
+      let lo = 0, hi = target;
+      for (let it = 0; it < 200; it++) { const m = 0.5 * (lo + hi); if (h(m) + m < target) lo = m; else hi = m; }
+      const x2 = 0.5 * (lo + hi);
+      return [p2 * h(x2) / p1, x2];
     }
     return null;
   }
