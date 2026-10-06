@@ -7,17 +7,16 @@
   <meta name="description" content="Homogeneous production functions of degree k and homothetic production functions side by side: isoquants as radial blow-ups, the MRTS constant along rays, and how the spacing of the isoquants shows returns to scale. Lecture 1.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l1">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 1 · Theory of the firm</p>
       <h1>Homogeneous and Homothetic</h1>
       <p class="subtitle"><span class="tex" data-tex="\phi(\alpha z)=\alpha^k\phi(z)\qquad\text{vs}\qquad \phi(z)=F\big(g(z)\big),\ g\ \text{homogeneous of degree 1},\ F\ \text{increasing}"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,9 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The isoquants are drawn at <b>equal output steps</b>: <span class="tex" data-tex="q=\Delta q,\ 2\Delta q,\ 3\Delta q,\dots"></span> Along each coloured ray the input mix <span class="tex" data-tex="z_2/z_1"></span> is fixed and only the scale changes.</p>
-          <p><b>Homogeneous of degree <span class="tex" data-tex="k"></span>:</b> the isoquants are radial blow-ups of each other. Along every ray the tangents are parallel (the MRTS is the same), and the spacing of the isoquants shows the returns to scale: equal spacing for <span class="tex" data-tex="k=1"></span>, bunching up for <span class="tex" data-tex="k>1"></span>, spreading out for <span class="tex" data-tex="k<1"></span>.</p>
-          <p><b>Homothetic:</b> the same isoquant <i>shapes</i> with parallel tangents along rays, but the labels follow any increasing <span class="tex" data-tex="F"></span>: the spacing can change as you move out. Every homogeneous function is homothetic, not the other way round. <b>Neither:</b> the tangents along a ray turn.</p>
+          <p>The isoquants are drawn at equal output steps, <span class="tex" data-tex="q=\Delta q,\ 2\Delta q,\dots"></span>; along each ray only the scale changes. Every homogeneous function is homothetic, but not the other way round.</p>
+          <ul>
+          <li><b>Homogeneous:</b> the isoquants are radial blow-ups, with parallel tangents along each ray. Move <span class="tex" data-tex="k"></span>: the spacing is even for <span class="tex" data-tex="k=1"></span>, bunches up for <span class="tex" data-tex="k>1"></span>, spreads out for <span class="tex" data-tex="k<1"></span>.</li>
+          <li><b>Homothetic:</b> the same shapes and parallel tangents, but any increasing <span class="tex" data-tex="F"></span> labels them, so the spacing can change as you move out.</li>
+          <li><b>Neither:</b> the tangents along a ray turn.</li>
+          </ul>
         </details>
       </div>
 
@@ -92,15 +94,21 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../building-the-mrts/index.html"><span>Previous</span>Building the MRTS</a>
+    <a class="all" href="../index.html#l1">All tools</a>
+    <a class="next" href="../two-elasticities/index.html"><span>Next</span>Two Elasticities: e(z) and σ(z)</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figure 14 of the notes (after Cowell, <i>Microeconomics</i>, OUP 2005).
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/technology-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/technology-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

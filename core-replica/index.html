@@ -7,17 +7,16 @@
   <meta name="description" content="Replica economies: an allocation in the core that is not competitive is blocked by a coalition of N people of one type and M of the other once the economy is large enough, so the core shrinks to the competitive equilibrium. Lecture 9.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 9 · General equilibrium</p>
+      <p class="eyebrow"><a href="../index.html#l9">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 9 · General equilibrium</p>
       <h1>The Core Shrinks</h1>
       <p class="subtitle"><span class="tex" data-tex="N\cdot\big(\theta y^a+(1-\theta)R^a\big)+M\cdot y^b=N R^a+M R^b,\qquad \theta=\tfrac{M}{N}"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Replicate the Edgeworth box economy: <span class="tex" data-tex="N"></span> people like Alf and <span class="tex" data-tex="N"></span> like Bill. Take an allocation <span class="tex" data-tex="y"></span> in the core that gives everyone of a type the same bundle. If it is not competitive, the straight line through <span class="tex" data-tex="R"></span> and <span class="tex" data-tex="y"></span> cuts one person's indifference curve through <span class="tex" data-tex="y"></span>, so a point <span class="tex" data-tex="\theta y+(1-\theta)R"></span> on that line, close to <span class="tex" data-tex="y"></span>, is better for that person. All <span class="tex" data-tex="N"></span> people of that type and <span class="tex" data-tex="M"></span> of the other type can share their endowments that way: they block <span class="tex" data-tex="y"></span>. The closer <span class="tex" data-tex="y"></span> is to the competitive equilibrium, the closer <span class="tex" data-tex="\theta=M/N"></span> must be to 1, so the larger the economy must be.</p>
+          <p>Replicate the economy: <span class="tex" data-tex="N"></span> people like Alf and <span class="tex" data-tex="N"></span> like Bill. If a core allocation <span class="tex" data-tex="y"></span> is not competitive, the line from <span class="tex" data-tex="R"></span> through <span class="tex" data-tex="y"></span> gives one type a better bundle <span class="tex" data-tex="\theta y+(1-\theta)R"></span> near <span class="tex" data-tex="y"></span>. With <span class="tex" data-tex="M/N=\theta"></span>, all <span class="tex" data-tex="N"></span> of that type and <span class="tex" data-tex="M"></span> of the other can afford it from their own endowments: they block <span class="tex" data-tex="y"></span>.</p>
+          <ul>
+          <li>Raise <span class="tex" data-tex="N"></span>: the core shrinks towards the competitive equilibrium.</li>
+          <li>Move <span class="tex" data-tex="y"></span> towards the equilibrium: <span class="tex" data-tex="\theta"></span> must get closer to 1, so the economy must be larger.</li>
+          </ul>
         </details>
       </div>
       <div class="group">
@@ -71,16 +74,22 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../edgeworth-box/index.html"><span>Previous</span>The Edgeworth Box</a>
+    <a class="all" href="../index.html#l9">All tools</a>
+    <span class="next"></span>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/consumer-model.js?v=2"></script>
-  <script src="../shared/exchange-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/consumer-model.js?v=3"></script>
+  <script src="../shared/exchange-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

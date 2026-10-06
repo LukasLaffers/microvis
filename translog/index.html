@@ -7,17 +7,16 @@
   <meta name="description" content="The translog cost function as a second-order approximation, cost shares linear in log prices, elasticities (%), (#), ($), the parameter restrictions, and the Arnberg and Bjørner (2007) results. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 4 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l4">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 4 · Theory of the firm</p>
       <h1>Translog Cost Shares</h1>
       <p class="subtitle"><span class="tex" data-tex="\log c=\alpha_0+\sum_i\alpha_i\log w_i+\tfrac12\sum_i\sum_j\beta_{ij}\log w_i\log w_j"></span> <span class="arrow">⇒</span> <span class="tex" data-tex="sh_i=\alpha_i+\sum_j\beta_{ij}\log w_j\quad(\&)"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>With constant returns, <span class="tex" data-tex="C=c(w)\,q"></span>. The translog is a second-order Taylor approximation of <span class="tex" data-tex="\log c"></span> in the log prices, so it fits any unit cost function near a reference price <span class="tex" data-tex="\bar w"></span>. Shephard's lemma turns it into cost-share equations that are <em>linear</em> in log prices (&amp;) and can be estimated by OLS; the elasticities then follow from (%), (#) and ($). Compare the translog with a true CES cost function, or enter your own parameters and see which restrictions from economic theory they break.</p>
+          <p>With constant returns, <span class="tex" data-tex="C=c(w)\,q"></span>. The translog is a second-order Taylor approximation of <span class="tex" data-tex="\log c"></span> in the log prices, so it fits any unit cost function near <span class="tex" data-tex="\bar w"></span>. By Shephard's lemma its cost shares are <em>linear</em> in log prices (&amp;) and can be estimated by OLS.</p>
+          <ul>
+          <li><b>Approximate a CES:</b> move the prices away from <span class="tex" data-tex="\bar w"></span> and see where the approximation drifts.</li>
+          <li><b>Your own parameters:</b> which restrictions from economic theory do they break?</li>
+          <li>The elasticities (%), (#), (&#36;) and the results of Arnberg and Bjørner (2007) have panels of their own.</li>
+          </ul>
         </details>
       </div>
 
@@ -110,15 +114,21 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../marshall-law/index.html"><span>Previous</span>Marshall's Law of Derived Demand</a>
+    <a class="all" href="../index.html#l4">All tools</a>
+    <a class="next" href="../substitution-or-composition/index.html"><span>Next</span>Substitution or Composition?</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Data: S. Arnberg and T. B. Bjørner (2007), Substitution between energy, capital and labour within industrial companies: A micro panel data analysis, <i>Resource and Energy Economics</i> 29, 122–136, as reported in the notes.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/firm-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/firm-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

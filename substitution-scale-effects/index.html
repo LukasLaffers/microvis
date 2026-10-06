@@ -7,17 +7,16 @@
   <meta name="description" content="When an input price rises, input demand changes through a substitution effect (along the isoquant) and a scale effect (along the expansion path). Lecture 3.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lectures 3 and 4 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l3">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lectures 3 and 4 · Theory of the firm</p>
       <h1>Substitution and Scale Effects</h1>
       <p class="subtitle"><span class="tex" data-tex="\frac{\partial D^1(w,p)}{\partial w_1}=\color{#4a90e2}{\underbrace{\frac{\partial H^1(w,q^\ast)}{\partial w_1}}_{\text{substitution}}}+\color{#d0021b}{\underbrace{\frac{\partial H^1(w,q^\ast)}{\partial q}\,\frac{\partial S(w,p)}{\partial w_1}}_{\text{scale}}}"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The firm starts at <span class="tex" data-tex="A=D(w,p)"></span>. When <span class="tex" data-tex="w_1"></span> rises it first substitutes along the old isoquant to <span class="tex" data-tex="B"></span>, the cheapest way to produce the same output at the new prices (<span class="c-l2-blue">blue: substitution</span>). Because producing has become more expensive, it then produces less and moves down the new expansion path to <span class="tex" data-tex="C=D(w',p)"></span> (<span class="c-l2-red">red: scale</span>). The total change in input 1 is the sum of the two.</p>
+          <p>The firm starts at <span class="tex" data-tex="A=D(w,p)"></span>. When <span class="tex" data-tex="w_1"></span> rises it first substitutes along the old isoquant to <span class="tex" data-tex="B"></span> (<span class="c-l2-blue">substitution</span>). Producing has become dearer, so it then produces less and moves down the new expansion path to <span class="tex" data-tex="C=D(w',p)"></span> (<span class="c-l2-red">scale</span>). The total change is the sum of the two.</p>
+          <ul>
+          <li>Press <b>▶ Show the effects</b>.</li>
+          <li>Try <b>Leontief</b>: no substitution, only scale. <b>Linear</b>: substitution is all or nothing.</li>
+          </ul>
         </details>
       </div>
 
@@ -94,16 +97,22 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../cost-function/index.html"><span>Previous</span>The Cost Function</a>
+    <a class="all" href="../index.html#l3">All tools</a>
+    <a class="next" href="../comparative-statics/index.html"><span>Next</span>What If? Comparative Statics</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/firm-ui.js?v=2"></script>
-  <script src="../shared/firm-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/firm-ui.js?v=3"></script>
+  <script src="../shared/firm-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

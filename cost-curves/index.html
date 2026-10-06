@@ -7,17 +7,16 @@
   <meta name="description" content="Step 2 of profit maximisation: choose output where price equals marginal cost, above minimum average cost. The supply curve S(w,p). Lecture 2.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lectures 2 and 3 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l2">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lectures 2 and 3 · Theory of the firm</p>
       <h1>Cost Curves and Supply</h1>
       <p class="subtitle"><span class="tex" data-tex="\max_{q\ge0}\ pq-C(w,q)\qquad\text{(PM')}"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The <span class="c-l2-red">red curve</span> is marginal cost <span class="tex" data-tex="MC=C_q"></span>, the black curve average cost <span class="tex" data-tex="AC=C/q"></span>. For a price <span class="tex" data-tex="p"></span> the firm produces where <span class="tex" data-tex="p=MC"></span> on the rising part of <span class="tex" data-tex="MC"></span>. It produces only if <span class="tex" data-tex="p\ge AC"></span>; otherwise it shuts down. The <span class="c-l2-orange">orange curve</span> is therefore the supply curve <span class="tex" data-tex="S(w,p)"></span>.</p>
+          <p>The <span class="c-l2-red">red curve</span> is marginal cost <span class="tex" data-tex="MC=C_q"></span>, the black one average cost <span class="tex" data-tex="AC=C/q"></span>. At price <span class="tex" data-tex="p"></span> the firm produces where <span class="tex" data-tex="p=MC"></span> on the rising part of <span class="tex" data-tex="MC"></span>, but only if <span class="tex" data-tex="p\ge AC"></span>. So the <span class="c-l2-orange">orange curve</span> is the supply curve <span class="tex" data-tex="S(w,p)"></span>.</p>
+          <ul>
+          <li>Move <span class="tex" data-tex="p"></span> across the shutdown price <span class="tex" data-tex="\hat p=\min AC"></span>: output jumps from zero to <span class="tex" data-tex="\hat q"></span>.</li>
+          <li>Choose <b>Homogeneous of degree k</b> and set <span class="tex" data-tex="k>1"></span>: profit has no maximum. Increasing returns and price taking do not mix.</li>
+          <li>With any homogeneous technology, <span class="tex" data-tex="AC/MC=k"></span> at every output.</li>
+          </ul>
         </details>
       </div>
 
@@ -100,15 +104,21 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../cost-minimisation/index.html"><span>Previous</span>Cost Minimisation</a>
+    <a class="all" href="../index.html#l2">All tools</a>
+    <a class="next" href="../profit-two-ways/index.html"><span>Next</span>One Step vs Two Steps</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/firm-ui.js?v=2"></script>
-  <script src="../shared/firm-model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/firm-ui.js?v=3"></script>
+  <script src="../shared/firm-model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

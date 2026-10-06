@@ -7,17 +7,16 @@
   <meta name="description" content="With constant returns to scale the elasticity of an industry's demand for labour is a weighted average of the elasticity of substitution and the price elasticity of product demand. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 4 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l4">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 4 · Theory of the firm</p>
       <h1>Marshall's Law of Derived Demand</h1>
       <p class="subtitle"><span class="tex" data-tex="(-\varepsilon^u_{11})=\color{#4a90e2}{\sigma\,(1-sh_1)}+\color{#d0021b}{(-\varepsilon^D_p)\,sh_1}"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>With constant returns to scale, <span class="tex" data-tex="C(w,q)=c(w)\,q"></span>, the industry supply curve is flat at <span class="tex" data-tex="p=c(w)"></span> and the demand schedule <span class="tex" data-tex="Dem(p)"></span> decides how much is produced. When the wage <span class="tex" data-tex="w_1"></span> rises, the industry uses less labour for two reasons: firms <span class="c-l2-blue">substitute capital for labour</span> (how easily: <span class="tex" data-tex="\sigma"></span>), and the product gets dearer so <span class="c-l2-red">consumers buy less</span> (how strongly: <span class="tex" data-tex="-\varepsilon^D_p"></span>). The industry's labour demand elasticity is a weighted average of the two, with labour's cost share <span class="tex" data-tex="sh_1"></span> as the weight on product demand. Move the shares and watch the balance point of the lever.</p>
+          <p>With constant returns, industry supply is flat at <span class="tex" data-tex="p=c(w)"></span> and demand <span class="tex" data-tex="Dem(p)"></span> decides the output. When the wage <span class="tex" data-tex="w_1"></span> rises, the industry uses less labour for two reasons: firms <span class="c-l2-blue">substitute capital for labour</span> (how easily: <span class="tex" data-tex="\sigma"></span>), and the dearer product <span class="c-l2-red">sells less</span> (how strongly: <span class="tex" data-tex="-\varepsilon^D_p"></span>).</p>
+          <ul>
+          <li>Press <b>Raise w₁ and watch both channels</b>.</li>
+          <li>The industry's labour demand elasticity is a weighted average of the two, with labour's cost share <span class="tex" data-tex="sh_1"></span> as the weight on product demand. Change <span class="tex" data-tex="\delta"></span> or the prices and watch the lever.</li>
+          <li>Choose <b>Leontief</b>: <span class="tex" data-tex="\sigma=0"></span>, and only product demand is left.</li>
+          </ul>
         </details>
       </div>
 
@@ -92,16 +96,22 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../comparative-statics/index.html"><span>Previous</span>What If? Comparative Statics</a>
+    <a class="all" href="../index.html#l4">All tools</a>
+    <a class="next" href="../translog/index.html"><span>Next</span>Translog Cost Shares</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Industry demand <span class="tex" data-tex="Dem(p)=10\,p^{\varepsilon^D_p}"></span> with a constant price elasticity.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/firm-ui.js?v=2"></script>
-  <script src="../shared/firm-model.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/firm-ui.js?v=3"></script>
+  <script src="../shared/firm-model.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

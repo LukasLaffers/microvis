@@ -7,17 +7,16 @@
   <meta name="description" content="The better-than set B(x), the worse-than set W(x) and the indifference set I(x) for several preferences, which axioms they satisfy, and why lexicographic preferences are not continuous. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 5 · Consumer preferences</p>
+      <p class="eyebrow"><a href="../index.html#l5-consumer">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 5 · Consumer preferences</p>
       <h1>Better, Worse, Indifferent</h1>
       <p class="subtitle"><span class="tex" data-tex="B(x)=\{x'\in X:x'\succcurlyeq x\},\quad W(x)=\{x'\in X:x\succcurlyeq x'\},\quad I(x)=\{x'\in X:x'\sim x\}"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Pick a preference relation and a reference bundle <span class="tex" data-tex="x^\circ"></span>. Blue: bundles at least as good as <span class="tex" data-tex="x^\circ"></span>, the set <span class="tex" data-tex="B(x^\circ)"></span>. Grey: bundles no better, <span class="tex" data-tex="W(x^\circ)"></span>. The curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. Click anywhere to place a test bundle <span class="tex" data-tex="x'"></span>: the page tells you how it compares with <span class="tex" data-tex="x^\circ"></span> and whether the segment between them stays in <span class="tex" data-tex="B(x^\circ)"></span>, which convexity requires. The table lists which axioms hold.</p>
+          <p>For a reference bundle <span class="tex" data-tex="x^\circ"></span>: blue is <span class="tex" data-tex="B(x^\circ)"></span>, the bundles at least as good; grey is <span class="tex" data-tex="W(x^\circ)"></span>, the bundles no better; the curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. The table lists which axioms hold.</p>
+          <ul>
+          <li>Click to place a test bundle <span class="tex" data-tex="x'"></span>. How does it compare with <span class="tex" data-tex="x^\circ"></span>, and does the segment between them stay in <span class="tex" data-tex="B(x^\circ)"></span>, as convexity requires?</li>
+          <li>Choose <b>A bliss point</b> or <b>Indifference curves bowed out</b>: which axioms fail?</li>
+          <li>Choose <b>Lexicographic</b>: <span class="tex" data-tex="I(x^\circ)"></span> is a single point, and the preferences are not continuous.</li>
+          </ul>
         </details>
       </div>
       <div class="group">
@@ -71,14 +75,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../budget-sets/index.html"><span>Previous</span>Budget Sets</a>
+    <a class="all" href="../index.html#l5-consumer">All tools</a>
+    <a class="next" href="../ordinal-utility/index.html"><span>Next</span>Utility Is Ordinal</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figure after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

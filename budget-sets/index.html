@@ -7,17 +7,16 @@
   <meta name="description" content="Technically feasible and budget-feasible choices: income (B1), endowment (B2), both (B3) and a two-part tariff, and what a price change does to each. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 5 · Consumer preferences</p>
+      <p class="eyebrow"><a href="../index.html#l5-consumer">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 5 · Consumer preferences</p>
       <h1>Budget Sets</h1>
       <p class="subtitle"><span class="tex" data-tex="p^tx\le y\ \ (B1),\qquad p^tx\le p^tR\ \ (B2),\qquad p^tx\le p^tR+y\ \ (B3)"></span></p>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -27,7 +26,12 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The grey area is what the consumer can choose: bundles that are technically feasible (in <span class="tex" data-tex="X"></span>) and affordable. With an income <span class="tex" data-tex="y"></span> (B1) or an endowment <span class="tex" data-tex="R"></span> sold at market prices (B2), the set can look the same, but a price change works differently: under (B1) the budget line turns about the point where all money goes on good 2, under (B2) about <span class="tex" data-tex="R"></span>, which always stays affordable. The blue line is the budget line after <span class="tex" data-tex="p_1"></span> changes to <span class="tex" data-tex="p_1'"></span>. Click the plot to test a bundle.</p>
+          <p>The grey area is what the consumer can choose: bundles that are technically feasible (in <span class="tex" data-tex="X"></span>) and affordable. An income <span class="tex" data-tex="y"></span> (B1) and an endowment <span class="tex" data-tex="R"></span> sold at market prices (B2) can give the same set, but a price change works differently.</p>
+          <ul>
+          <li>Move <span class="tex" data-tex="p_1'"></span> (the blue line): under (B1) the line turns about the point where all money goes on good 2, under (B2) about <span class="tex" data-tex="R"></span>, which stays affordable.</li>
+          <li>Try <b>Two-part tariff</b> and <b>Whole units of good 2</b>: the set is no longer convex.</li>
+          <li>Click the plot to test a bundle.</li>
+          </ul>
         </details>
       </div>
       <div class="group">
@@ -76,14 +80,20 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../monopoly/index.html"><span>Previous</span>Monopoly and Product Differentiation</a>
+    <a class="all" href="../index.html#l5-consumer">All tools</a>
+    <a class="next" href="../preference-axioms/index.html"><span>Next</span>Better, Worse, Indifferent</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figures after Cowell, <i>Microeconomics</i> (OUP, 2005), as in the notes.
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="model.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="model.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

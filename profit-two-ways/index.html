@@ -7,20 +7,19 @@
   <meta name="description" content="Profit maximisation in one step (choose inputs directly) and in two steps (cost minimisation, then output choice) give the same answer. Lecture 2.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=2">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="../shared/style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Lecture 2 · Theory of the firm</p>
+      <p class="eyebrow"><a href="../index.html#l2">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 2 · Theory of the firm</p>
       <h1>One Step vs Two Steps</h1>
       <div class="two-problems">
         <p class="subtitle">One step (PM): <span class="tex" data-tex="\max_z\ p\phi(z)-w^tz"></span></p>
         <p class="subtitle">Two steps: <span class="c-l2-blue">(CM) <span class="tex" data-tex="\min_z w^tz\ \text{s.t.}\ \phi(z)\ge q"></span></span>, then <span class="c-l2-red">(PM') <span class="tex" data-tex="\max_q pq-C(w,q)"></span></span></p>
       </div>
     </div>
-    <a class="back-link" href="../index.html">← All Microvis tools</a>
   </header>
 
   <div class="status-banner" id="status" role="alert" hidden></div>
@@ -30,7 +29,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The 3D surface is profit <span class="tex" data-tex="p\phi(z)-w^tz"></span> for every input bundle; its peak is the one step answer. The <span class="c-l2-blue">blue ray</span> is the expansion path, the cheapest bundles for every output level (Step 1). The <span class="c-l2-red">red curve</span> is profit along that ray (Step 2), and its peak is the two step answer. The two peaks coincide.</p>
+          <p>The surface is profit <span class="tex" data-tex="p\phi(z)-w^tz"></span> over all input bundles: its peak is the one step answer. The <span class="c-l2-blue">blue ray</span> is the expansion path, the cheapest bundle for each output (Step 1); the <span class="c-l2-red">red curve</span> is profit along it (Step 2). Both peaks are the same point: <span class="tex" data-tex="D(w,p)=H\big(w,S(w,p)\big)"></span>.</p>
+          <ul>
+          <li>Press <b>▶ Show the two steps</b>.</li>
+          <li>Change <span class="tex" data-tex="p"></span> or <span class="tex" data-tex="w_1"></span>: the two answers move together.</li>
+          </ul>
         </details>
       </div>
 
@@ -115,16 +118,22 @@
     </div>
   </main>
 
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../cost-curves/index.html"><span>Previous</span>Cost Curves and Supply</a>
+    <a class="all" href="../index.html#l2">All tools</a>
+    <a class="next" href="../concavity-and-scale/index.html"><span>Next</span>Concavity and Returns to Scale</a>
+  </nav>
+
   <footer class="site-footer">
     Lukáš Lafférs · <a href="../index.html">Microvis</a>
   </footer>
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=2"></script>
-  <script src="../shared/firm-ui.js?v=2"></script>
-  <script src="../shared/firm-model.js?v=2"></script>
-  <script src="search.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="../shared/ui.js?v=3"></script>
+  <script src="../shared/firm-ui.js?v=3"></script>
+  <script src="../shared/firm-model.js?v=3"></script>
+  <script src="search.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
