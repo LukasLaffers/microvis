@@ -27,21 +27,27 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>Keep the prices fixed and give the consumer more income: the budget line shifts out in parallel and the best bundle moves along the <em>income expansion path</em> (orange). The demand for each good as a function of income is its <em>Engel curve</em>. In A the path is a ray: income does not change the ratio of the goods. In B good 2 is a luxury, so the consumer buys relatively more of it as she gets richer. In C good 1 is inferior: she buys less of it.</p>
+          <p>Keep the prices fixed and give the consumer more income: the budget line shifts out in parallel and the best bundle moves along the <em>income expansion path</em> (orange). The demand for each good as a function of income is its <em>Engel curve</em>. In A the path is a ray: income does not change the ratio of the goods. In B good 2 is a luxury, so the consumer buys relatively more of it as she gets richer. In C good 1 is inferior: she buys less of it. In A to C the paths are straight lines; they need not be. In D the path curves: one good is a luxury, the other a necessity, and the income elasticities change with income. In E good 1 is normal at low incomes and inferior at high ones: its Engel curve rises, then falls.</p>
         </details>
       </div>
       <div class="group">
-        <h2>Panels of the notes</h2>
+        <h2>Examples</h2>
         <div class="seg seg-3" role="group" aria-label="Panel">
           <button type="button" data-panel="A" aria-pressed="true">A: same ratio</button>
           <button type="button" data-panel="B" aria-pressed="false">B: luxury</button>
           <button type="button" data-panel="C" aria-pressed="false">C: inferior</button>
+          <button type="button" data-panel="D" aria-pressed="false">D: curved</button>
+          <button type="button" data-panel="E" aria-pressed="false">E: normal, then inferior</button>
         </div>
         <div class="formula" id="formula"></div>
         <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="A"></div>
         <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="A"></div>
         <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="B"></div>
         <div class="ctrl" data-key="g1" data-label="\gamma_1" data-hint="subsistence of good 1" data-min="0" data-max="6" data-step="0.1" data-show="B"></div>
+        <div class="ctrl" data-key="ad1" data-label="a" data-hint="exponent of good 1" data-min="0.1" data-max="0.95" data-step="0.01" data-show="D"></div>
+        <div class="ctrl" data-key="ad2" data-label="b" data-hint="exponent of good 2" data-min="0.1" data-max="0.95" data-step="0.01" data-show="D"></div>
+        <div class="ctrl" data-key="hc" data-label="c" data-hint="weight on good 1 (c < 8)" data-min="0.5" data-max="7.5" data-step="0.1" data-show="E"></div>
+        <div class="ctrl" data-key="hK" data-label="K" data-hint="good 1 turns inferior at x₂ = K" data-min="1" data-max="6" data-step="0.1" data-show="E"></div>
       </div>
       <div class="group">
         <h2>Prices and income</h2>

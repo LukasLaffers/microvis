@@ -21,6 +21,10 @@
         return two('U(x)=\\kappa\\log(1+x_1)+x_2', `\\kappa=${num(u.kappa)}`);
       case 'giffen':
         return two('U(x)=-\\frac{(s-x_2)^2}{x_1-c}', `c=${num(u.c)},\\ s=${num(u.s)}`);
+      case 'additive':
+        return two('U(x)=\\frac{x_1^{a}}{a}+\\frac{x_2^{b}}{b}', `a=${num(u.a)},\\ b=${num(u.b)}`);
+      case 'humped':
+        return two('U(x)=c\\log x_1+\\log x_2+\\frac{x_2^2}{2K^2}', `c=${num(u.c)},\\ K=${num(u.K)}`);
     }
     return '';
   }

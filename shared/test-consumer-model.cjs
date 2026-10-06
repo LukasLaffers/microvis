@@ -12,7 +12,9 @@ const prefs = [
   { type: 'ces', delta: 0.4, rho: -1 }, { type: 'ces', delta: 0.6, rho: 0.5 }, { type: 'ces', delta: 0.5, rho: -3 },
   { type: 'stonegeary', a: 0.35, g1: 2, g2: 1 }, { type: 'stonegeary', a: 0.6, g1: 1, g2: -2 },
   { type: 'quasilinear', kappa: 6 },
-  { type: 'giffen', c: 1, s: 4 }
+  { type: 'giffen', c: 1, s: 4 },
+  { type: 'additive', a: 0.8, b: 0.4 }, { type: 'additive', a: 0.3, b: 0.7 },
+  { type: 'humped', c: 2, K: 3 }, { type: 'humped', c: 6, K: 2 }
 ];
 // Prices and incomes with interior solutions for each utility (giffen: c p1 + p2 s / 2 < y < c p1 + p2 s).
 function draw(u) {
@@ -103,6 +105,44 @@ for (const u of prefs) {
   const area = M.integrateP1(p1 => M.hicks([p1, 1], v, u)[0], 1, 2, 100);
   close(area, M.expenditure([2, 1], v, u) - M.expenditure([1, 1], v, u), 1e-7);
   checks++;
+}
+
+// The curved examples of the Engel tool.
+{
+  // additive: the good whose exponent is closer to 1 is the luxury (eta > 1), the other the necessity; both normal
+  const u = { type: 'additive', a: 0.8, b: 0.4 };
+  for (const y of [2, 8, 20]) {
+    const e = M.elasticities([1, 1], y, u);
+    assert.ok(e.eta[0] > 1 && e.eta[1] > 0 && e.eta[1] < 1, `additive eta ${e.eta}`);
+    checks++;
+  }
+  // and the income elasticities change with income (the path is not a straight line)
+  const e1 = M.elasticities([1, 1], 2, u).eta[0], e2 = M.elasticities([1, 1], 20, u).eta[0];
+  assert.ok(Math.abs(e1 - e2) > 0.05); checks++;
+  const x1 = M.demand([1, 1], 2, u), x2 = M.demand([1, 1], 20, u), xm = M.demand([1, 1], 11, u);
+  // the midpoint income does not give the midpoint bundle: the path is curved
+  assert.ok(Math.abs(xm[0] - (x1[0] + x2[0]) / 2) > 0.05 || Math.abs(xm[1] - (x1[1] + x2[1]) / 2) > 0.05); checks++;
+}
+{
+  // humped: good 1 is normal while D2 < K and inferior after; its Engel curve has one peak, at D2 = K
+  for (const u of [{ type: 'humped', c: 2, K: 3 }, { type: 'humped', c: 6, K: 2 }]) {
+    const p = [1.3, 0.8], ys = Array.from({ length: 400 }, (_, i) => 0.2 + i * 0.25), d = ys.map(y => M.demand(p, y, u));
+    let peak = 0; d.forEach((x, i) => { if (x[0] > d[peak][0]) peak = i; });
+    assert.ok(peak > 0 && peak < ys.length - 1, 'Engel curve of good 1 has an interior peak');
+    close(d[peak][1], u.K, 0.06, 'peak where D2 = K (on a grid of incomes 0.25 apart)');
+    for (let i = 1; i < d.length; i++) {
+      assert.ok(d[i][1] > d[i - 1][1], 'good 2 always normal');
+      if (d[i][1] < u.K * 0.98) assert.ok(d[i][0] > d[i - 1][0], 'good 1 normal below K');
+      if (d[i - 1][1] > u.K * 1.02) assert.ok(d[i][0] < d[i - 1][0], 'good 1 inferior above K');
+    }
+    // convex indifference curves (quasi-concave U): along the curve through a bundle the MRS falls as x1 rises
+    for (const y of [3, 8, 20]) {
+      const v = M.indirect(p, y, u), x1s = Array.from({ length: 60 }, (_, i) => 0.05 + i * 0.2);
+      const mrs = x1s.map(a => { const b = M.x2On(a, v, u); return b === null ? null : M.mrs21([a, b], u); }).filter(m => m !== null);
+      for (let i = 1; i < mrs.length; i++) assert.ok(mrs[i] <= mrs[i - 1] * (1 + 1e-6), 'convex indifference curve');
+    }
+    checks += 3 + 2 * (ys.length - 1);
+  }
 }
 
 console.log(`All ${checks} consumer-model checks passed.`);

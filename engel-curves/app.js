@@ -11,14 +11,19 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { panel: 'A', delta: 0.5, rho: -1, a: 0.4, g1: 3, p1: 1, p2: 1, y: 10 };
+  const state = { panel: 'A', delta: 0.5, rho: -1, a: 0.4, g1: 3, ad1: 0.8, ad2: 0.4, hc: 2, hK: 3, p1: 1, p2: 1, y: 10 };
   let ctrls = {};
   const schedule = U.scheduler(render);
   const f3 = x => fmt(Math.abs(x) < 1e-7 ? 0 : x, 3);   // rounding noise of the finite differences prints as 0
   const par = x => (x < 0 ? `(${f3(x)})` : f3(x));
   const same = (a, b) => Math.abs(a - b) <= 1e-5 * Math.max(1, Math.abs(a), Math.abs(b));
-  const pref = () => state.panel === 'A' ? { type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }
-    : state.panel === 'B' ? { type: 'stonegeary', a: state.a, g1: state.g1, g2: 0 } : { type: 'giffen', c: 1, s: 4 };
+  const pref = () => ({
+    A: () => ({ type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }),
+    B: () => ({ type: 'stonegeary', a: state.a, g1: state.g1, g2: 0 }),
+    C: () => ({ type: 'giffen', c: 1, s: 4 }),
+    D: () => ({ type: 'additive', a: state.ad1, b: state.ad2 }),
+    E: () => ({ type: 'humped', c: state.hc, K: state.hK })
+  })[state.panel]();
 
   function solve() {
     const u = pref(), p = [state.p1, state.p2], [lo, hi] = EM.incomeRange(p, u);
@@ -41,9 +46,18 @@
     const path = EM.expansionPath(p, u, U.linspace(lo, hi, 80));
     traces.push(U.line2(path, th.orange, 3.5, 'income expansion path'));
     traces.push(U.line2([[state.y / p[0], 0], [0, state.y / p[1]]], th.ink, 2.2, `budget line, y = ${fmt(state.y)}`));
+    if (state.panel === 'E') {
+      const yT = EM.turningIncome(p, u);
+      if (yT > lo && yT < hi) traces.push(U.dot2([CM.demand(p, yT, u)], th.muted, 'good 1 turns inferior here', 9, { marker: { color: th.panel, size: 9, line: { color: th.ink, width: 1.5 } } }));
+    }
     traces.push(U.dot2([x], th.red, 'D(p, y)', 11));
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, Lx] }, y: { range: [0, Ly] } }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('cap').innerHTML = { A: 'A homothetic (CES) consumer: the path is a ray from the origin. Doubling income doubles the demand for both goods (both income elasticities are 1).', B: 'Subsistence in good 1: the first ' + texStr(`p_1\\gamma_1=${fmt(p[0] * state.g1)}`) + ' of income goes on good 1, the rest is split. The path bends towards good 2: a luxury.', C: 'Good 1 is inferior: as income rises the path bends back, she buys less of good 1 and more of good 2. (The example is defined for incomes from ' + fmt(lo, 2) + ' to ' + fmt(hi, 2) + '.)' }[state.panel];
+    const lux = state.ad1 > state.ad2 ? 1 : 2, yT = state.panel === 'E' ? EM.turningIncome(p, u) : 0;
+    const capD = Math.abs(state.ad1 - state.ad2) < 1e-9
+      ? 'With a = b the utility is homothetic and the path is a ray again.'
+      : `The path curves towards good ${lux}: good ${lux} (the exponent closer to 1) is a luxury and good ${3 - lux} a necessity. The income elasticities are not constant: compare them at a low and a high income.`;
+    const capE = `Good 1 is normal while she has less than ${texStr(`K=${fmt(state.hK)}`)} of good 2, that is up to ${texStr(`y=p_2K(1+c/2)=${fmt(yT)}`)}; beyond that the path bends back and she buys less of good 1 as income rises: good 1 becomes inferior.`;
+    $('cap').innerHTML = { D: capD, E: capE, A: 'A homothetic (CES) consumer: the path is a ray from the origin. Doubling income doubles the demand for both goods (both income elasticities are 1).', B: 'Subsistence in good 1: the first ' + texStr(`p_1\\gamma_1=${fmt(p[0] * state.g1)}`) + ' of income goes on good 1, the rest is split. The path bends towards good 2: a luxury.', C: 'Good 1 is inferior: as income rises the path bends back, she buys less of good 1 and more of good 2. (The example is defined for incomes from ' + fmt(lo, 2) + ' to ' + fmt(hi, 2) + '.)' }[state.panel];
   }
 
   function drawEngel(th, S) {
@@ -58,7 +72,10 @@
     Plotly.react('plotB', [
       U.line2(c.map(r => [r[0], r[2]]), th.red, 2.5, 'D²(p, y)'), U.line2(c.map(r => [r[0], r[1]]), th.blue, 2.5, 'D¹(p, y)', same ? 'dash' : 'solid'),
       U.dot2([[state.y, x[0]], [state.y, x[1]]], th.ink, 'now', 8)
-    ], U.base2d(th, { xt: 'y', yt: 'demand', annotations, margin: { l: 52, r: 28, t: 8, b: 44 } }), U.PLOT_CONFIG);
+    ], U.base2d(th, {
+      xt: 'y', yt: 'demand', annotations, margin: { l: 52, r: 28, t: 8, b: 44 },
+      shapes: state.panel === 'E' ? [{ type: 'line', x0: EM.turningIncome(p, u), x1: EM.turningIncome(p, u), yref: 'paper', y0: 0, y1: 1, line: { color: th.muted, width: 1, dash: 'dot' } }] : []
+    }), U.PLOT_CONFIG);
     $('capB').innerHTML = `Demand for each good as income grows, prices fixed. The slope of ${texStr('\\log D^j')} in ${texStr('\\log y')} is the income elasticity ${texStr('\\eta_j')}.`;
   }
 
@@ -79,7 +96,7 @@
   }
 
   function render() {
-    U.applyVisibility({ A: state.panel === 'A', B: state.panel === 'B', C: state.panel === 'C' });
+    U.applyVisibility({ A: state.panel === 'A', B: state.panel === 'B', C: state.panel === 'C', D: state.panel === 'D', E: state.panel === 'E' });
     document.querySelectorAll('[data-panel]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.panel === state.panel)));
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
