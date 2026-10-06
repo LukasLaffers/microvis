@@ -19,3 +19,5 @@ table.pins td:first-child, table.pins th:first-child { text-align: left; }
 .pin-2 { color: var(--l2-red); }
 .keynums { display: flex; flex-wrap: wrap; gap: 6px; }
 .keynums .kn { padding: 3px 10px; border: 1px solid var(--accent-3); border-radius: 0; font-size: 14px; color: var(--ink); background: var(--bg); }
+/* on a tablet the step-by-step panel takes the full width, so its equations fit without scrolling */
+@media (max-width: 1250px) { .side > .readouts { grid-column: 1 / -1; } }
