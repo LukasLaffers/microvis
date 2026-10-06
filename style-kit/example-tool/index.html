@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Example Tool · Microvis</title>
+  <meta name="description" content="The smallest page in the Microvis style: one slider, one curve, one live number.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=1">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow"><a href="../index.html#l1">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 1 · Theory of the firm</p>
+      <h1>Example Tool</h1>
+      <p class="subtitle"><span class="tex" data-tex="q=A\,z^{k}\qquad e(z)=\frac{z\,\phi'(z)}{\phi(z)}=k"></span></p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The curve is output <span class="tex" data-tex="q=Az^k"></span> for one input. Its elasticity <span class="tex" data-tex="e"></span> says by how many percent output grows when the input grows by 1%.</p>
+          <ul>
+            <li>Move <span class="tex" data-tex="k"></span> across 1: the curve turns from concave to convex.</li>
+            <li>Move <span class="tex" data-tex="A"></span>: the curve stretches, but <span class="tex" data-tex="e"></span> does not change.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Technology</h2>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="2" data-step="0.05"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Output">
+      <div class="panel-head"><h2>Output <span class="tex" data-tex="q"></span> against the input <span class="tex" data-tex="z"></span></h2></div>
+      <div id="plot" class="plot plot-2d"></div>
+      <p class="caption"><span class="c-accent"><span class="key"></span>output</span> and the <span class="c-accent-3"><span class="key dot"></span>point</span> <span class="tex" data-tex="z=1"></span>.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Key numbers" aria-live="polite">
+        <h2>Key numbers</h2>
+        <dl id="nums"></dl>
+      </section>
+    </div>
+  </main>
+
+  <nav class="pager" aria-label="Other pages">
+    <span class="prev"></span>
+    <a class="all" href="../index.html#l1">All pages</a>
+    <span class="next"></span>
+  </nav>
+
+  <footer class="site-footer">
+    Your Name
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js?v=1"></script>
+  <script src="app.js?v=1"></script>
+</body>
+</html>
