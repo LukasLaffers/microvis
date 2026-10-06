@@ -10,6 +10,7 @@ style-kit/
   index.html           start page (generated: do not edit by hand)
   shared/style.css     the whole look: colours, type, panels, controls, tiles, layout
   shared/ui.js         helpers: sliders with number boxes, KaTeX, plot styling, error banner, Safari fixes
+  shared/theme.js      the light / dark switch in the top right corner (added to every page by build-site.cjs)
   shared/vendor/       Plotly 2.35.2 and KaTeX 0.16.9 (not in this folder: copy Microvis/shared/vendor)
   tools/catalog.cjs    the site title and the list of pages in reading order
   tools/glyphs.cjs     the small drawing on each tile
@@ -51,7 +52,7 @@ These come from the feedback that shaped Microvis.
 | `--grid` | `#eceef2` | `#20242b` | plot grid |
 | `--brand` | `#1d5bd8` | `#7aa7ff` | links, sliders, focus, the accent of the tile drawings |
 
-Dark mode follows the operating system (`prefers-color-scheme`), and `data-theme="light|dark"` on `<html>` can force either. Figures read their colours from these tokens (`Microvis.theme()`), so they switch too.
+Dark mode follows the operating system (`prefers-color-scheme`) until the reader uses the switch in the top right corner; the choice is remembered for all pages (localStorage) and applied in `<head>` before the page is drawn. Figures read their colours from these tokens (`Microvis.theme()`), so they switch too.
 
 ## Type
 
