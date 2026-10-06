@@ -11,6 +11,13 @@ const ROOT = path.join(__dirname, '..');
 const V = (fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').match(/style\.css\?v=(\d+)/) || [, '1'])[1];
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Visitor counts (GoatCounter, dashboard at https://microvis.goatcounter.com): one request per page view, only on the
+// published site (not on previews or local copies), no cookies, no external script. On the start page it also shows the
+// site total in the footer (needs "Allow adding visitor counts on your website" in the GoatCounter settings; the total
+// is cached there for up to four hours). If GoatCounter cannot be reached, nothing is shown and nothing else is affected.
+const COUNTER = `<script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>`;
+const withCounter = html => html.replace(/\n? *<script>\/\* visitor count \*\/[^\n]*<\/script>/, '').replace(/\n<\/body>/, '\n  ' + COUNTER + '\n</body>');
+
 const order = [];
 for (const sec of catalog) for (const [slug, title, blurb, star] of sec.tools) order.push({ slug, title, blurb, star, sec });
 
@@ -59,12 +66,12 @@ ${s.tools.map((_, i) => card(order.find(t => t.slug === s.tools[i][0]))).join('\
   </main>
 
   <footer class="site-footer">
-    Lukáš Lafférs
+    Lukáš Lafférs<span id="visits" hidden></span>
   </footer>
 </body>
 </html>
 `;
-fs.writeFileSync(path.join(ROOT, 'index.html'), index);
+fs.writeFileSync(path.join(ROOT, 'index.html'), withCounter(index));
 
 // Tool pages: header link and pager.
 let changed = 0;
@@ -81,6 +88,7 @@ order.forEach((t, i) => {
   const pager = `<nav class="pager" aria-label="Other tools">\n    ${link(p, 'prev', 'Previous')}\n    <a class="all" href="${home}">All tools</a>\n    ${link(n, 'next', 'Next')}\n  </nav>\n\n  `;
   s = s.replace(/<nav class="pager"[\s\S]*?<\/nav>\n\n {2}/, '');
   s = s.replace(/<footer class="site-footer">/, pager + '<footer class="site-footer">');
+  s = withCounter(s);
   if (s !== before) { fs.writeFileSync(file, s); changed++; }
 });
 console.log(`index.html: ${order.length} tiles; ${changed} tool pages updated`);
