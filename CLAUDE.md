@@ -14,7 +14,8 @@ shared/test-firm-model.cjs  `node shared/test-firm-model.cjs` must pass
 shared/consumer-model.js  consumer model for the lecture 6+ tools: D, V, C, H, Slutsky, elasticities (UMD)
 shared/consumer-ui.js     KaTeX formulas for the consumer utility functions
 shared/exchange-model.js  two-person exchange economy for the lecture 9 tools: equilibria, contract curve, core, replicas (UMD)
-shared/test-consumer-model.cjs, shared/test-exchange-model.cjs  must pass
+shared/technology-model.js  phi = F(g(z)) with variable e and sigma, h(phi) and phi(f(z1), g(z2)), for the lecture 1 tools on homogeneity and the two elasticities (UMD)
+shared/test-consumer-model.cjs, shared/test-exchange-model.cjs, shared/test-technology-model.cjs  must pass
 shared/vendor/          bundled third-party libraries (Plotly, KaTeX) with their licenses
 plans/                  plans for groups of tools, e.g. plans/lecture-2.md
 <tool-name>/            one folder per tool, kebab-case, e.g. production-explorer/

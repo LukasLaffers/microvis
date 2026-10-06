@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Homogeneous and Homothetic · Microvis</title>
+  <meta name="description" content="Homogeneous production functions of degree k and homothetic production functions side by side: isoquants as radial blow-ups, the MRTS constant along rays, and how the spacing of the isoquants shows returns to scale. Lecture 1.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Lecture 1 · Theory of the firm</p>
+      <h1>Homogeneous and Homothetic</h1>
+      <p class="subtitle"><span class="tex" data-tex="\phi(\alpha z)=\alpha^k\phi(z)\qquad\text{vs}\qquad \phi(z)=F\big(g(z)\big),\ g\ \text{homogeneous of degree 1},\ F\ \text{increasing}"></span></p>
+    </div>
+    <a class="back-link" href="../index.html">← All Microvis tools</a>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The isoquants are drawn at <b>equal output steps</b>: <span class="tex" data-tex="q=\Delta q,\ 2\Delta q,\ 3\Delta q,\dots"></span> Along each coloured ray the input mix <span class="tex" data-tex="z_2/z_1"></span> is fixed and only the scale changes.</p>
+          <p><b>Homogeneous of degree <span class="tex" data-tex="k"></span>:</b> the isoquants are radial blow-ups of each other. Along every ray the tangents are parallel (the MRTS is the same), and the spacing of the isoquants shows the returns to scale: equal spacing for <span class="tex" data-tex="k=1"></span>, bunching up for <span class="tex" data-tex="k>1"></span>, spreading out for <span class="tex" data-tex="k<1"></span>.</p>
+          <p><b>Homothetic:</b> the same isoquant <i>shapes</i> with parallel tangents along rays, but the labels follow any increasing <span class="tex" data-tex="F"></span>: the spacing can change as you move out. Every homogeneous function is homothetic, not the other way round. <b>Neither:</b> the tangents along a ray turn.</p>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Technology</h2>
+        <div class="seg" role="group" aria-label="Class of technology">
+          <button type="button" data-cls="homogeneous" aria-pressed="true">Homogeneous</button>
+          <button type="button" data-cls="homothetic" aria-pressed="false">Homothetic</button>
+          <button type="button" data-cls="neither" aria-pressed="false">Neither</button>
+        </div>
+        <div class="formula" id="formula"></div>
+        <div data-show="shape">
+          <select id="shape" aria-label="Isoquant shape">
+            <option value="ces">Isoquant shape g: CES</option>
+            <option value="cd">Isoquant shape g: Cobb-Douglas</option>
+          </select>
+          <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+          <div class="ctrl" data-key="rho" data-label="\rho" data-hint="curvature (ρ < 1, ρ ≠ 0)" data-min="-4" data-max="0.9" data-step="0.05" data-show="ces"></div>
+        </div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="2.5" data-step="0.05" data-show="homogeneous"></div>
+        <div data-show="homothetic">
+          <select id="Fh" aria-label="Increasing transformation F">
+            <option value="sshape">F: S-shaped, first increasing then decreasing returns</option>
+            <option value="log">F: logarithmic, decreasing returns</option>
+          </select>
+          <div class="ctrl" data-key="s" data-label="s" data-hint="returns turn decreasing at g = s" data-min="1" data-max="6" data-step="0.1" data-show="sshape"></div>
+          <div class="ctrl" data-key="c" data-label="c" data-hint="" data-min="0.5" data-max="5" data-step="0.1" data-show="log"></div>
+        </div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="" data-min="0.5" data-max="5" data-step="0.1" data-show="neither"></div>
+      </div>
+
+      <div class="group">
+        <h2>Isoquants</h2>
+        <div class="ctrl" data-key="dq" data-label="\Delta q" data-hint="output step between isoquants" data-min="0.25" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="R" data-label="\max z_1,\ z_2" data-hint="plot range" data-min="2" data-max="20" data-step="0.5"></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Isoquant map">
+      <div class="panel-head"><h2>Isoquants at equal output steps, and three rays</h2><div class="keynums" id="keynums"></div></div>
+      <div id="plot" class="plot plot-iso"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Output along the rays">
+        <h2>Output along each ray</h2>
+        <div id="plotQ" class="plot plot-side"></div>
+        <p class="caption" id="capQ"></p>
+      </section>
+      <section class="panel" aria-label="MRTS along the rays">
+        <h2>The MRTS along each ray</h2>
+        <div id="plotM" class="plot plot-side"></div>
+        <p class="caption" id="capM"></p>
+      </section>
+      <section class="panel readouts" aria-label="Checks" aria-live="polite">
+        <h2>Checks</h2>
+        <ul class="checks" id="checks"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figure 14 of the notes (after Cowell, <i>Microeconomics</i>, OUP 2005).
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/technology-model.js"></script>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
