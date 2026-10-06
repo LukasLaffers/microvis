@@ -94,11 +94,25 @@
       </div>
     </section>
 
-    <section class="panel main-panel" aria-label="Input space">
-      <div class="panel-head"><h2>Scale along the ray, substitution along the isoquant</h2><div class="keynums" id="keynums" aria-live="polite"></div></div>
-      <div id="plot" class="plot plot-main" aria-label="Input space: click or drag to move the point"></div>
-      <p class="caption" id="cap"></p>
-    </section>
+    <div class="main-col">
+      <section class="panel" aria-label="Input space">
+        <div class="panel-head"><h2>Scale along the ray, substitution along the isoquant</h2><div class="keynums" id="keynums" aria-live="polite"></div></div>
+        <div id="plot" class="plot plot-main" aria-label="Input space: click or drag to move the point"></div>
+        <p class="caption" id="cap"></p>
+      </section>
+      <section class="panel" aria-label="The production function in 3D">
+        <div class="panel-head">
+          <h2>The same in 3D: <span class="tex" data-tex="q=\phi(z_1,z_2)"></span></h2>
+          <div class="btn-row" role="group" aria-label="Camera">
+            <button type="button" data-cam="3d">3D</button>
+            <button type="button" data-cam="ray">Along the ray</button>
+            <button type="button" data-cam="top">Top</button>
+          </div>
+        </div>
+        <div id="plot3d" class="plot plot-3d"></div>
+        <p class="caption" id="cap3d"></p>
+      </section>
+    </div>
 
     <div class="side">
       <section class="panel" aria-label="e along the ray">

@@ -17,3 +17,6 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: 13.5px; font-vari
 table.cmp th, table.cmp td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--line); }
 table.cmp th { color: var(--muted); font-weight: 600; }
 table.cmp td:first-child, table.cmp th:first-child { text-align: left; }
+.layout > .main-col { grid-area: main; display: grid; gap: 14px; min-width: 0; }
+.plot-3d { height: 560px; }
+@media (max-width: 800px) { .plot-3d { height: 420px; } }

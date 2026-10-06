@@ -11,7 +11,9 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { ...SM.PRESETS.vary, tr: 'none', h: 'square', b1: 0.5, b2: 1.2, z1: 2, z2: 2.5, shade: 'sigma', R: 6 };
+  const clone = o => JSON.parse(JSON.stringify(o));
+  const CAMERA_3D = { eye: { x: -1.5, y: -1.55, z: 0.95 }, up: { x: 0, y: 0, z: 1 }, center: { x: 0, y: 0, z: -0.12 }, projection: { type: 'perspective' } };
+  const state = { ...SM.PRESETS.vary, tr: 'none', h: 'square', b1: 0.5, b2: 1.2, z1: 2, z2: 2.5, shade: 'sigma', R: 6, camera: clone(CAMERA_3D) };
   let ctrls = {}, lastR = null;
   const schedule = U.scheduler(render);
   const f2 = v => fmt(v, 2), f3 = v => fmt(v, 3), n = U.num;
@@ -84,6 +86,56 @@
       (state.shade === 'none' ? '' : homoth
         ? (state.shade === 'e' ? 'For a homothetic technology the bands of equal e follow the isoquants: e depends on the output level only.' : 'For a homothetic technology σ is the same along every ray: it depends on the input mix only.')
         : 'This technology is not homothetic, so the shading follows neither the rays nor the isoquants.') + ' Click or drag to move the point.';
+  }
+
+  // ---------- the same in 3D ----------
+
+  // Look across the ray, from the side where the surface is lower, so that the red curve shows its slope.
+  function rayCamera() {
+    const z = zbar(), n0 = Math.hypot(z[0], z[1]), d = [z[0] / n0, z[1] / n0], side = [d[1], -d[0]];
+    return { eye: { x: 2.1 * side[0] - 0.4 * d[0], y: 2.1 * side[1] - 0.4 * d[1], z: 0.35 }, up: { x: 0, y: 0, z: 1 }, center: { x: 0, y: 0, z: -0.1 }, projection: { type: 'perspective' } };
+  }
+  const CAMERAS = {
+    '3d': () => clone(CAMERA_3D),
+    ray: rayCamera,
+    top: () => ({ eye: { x: 0, y: -0.01, z: 2.3 }, up: { x: 0, y: 1, z: 0 }, center: { x: 0, y: 0, z: 0 }, projection: { type: 'orthographic' } })
+  };
+
+  function draw3d(th, T) {
+    const R = state.R, z = zbar(), q = TM.phi(z, T), n3 = 46;
+    const g = U.linspace(R / 200, R, n3), Z = g.map(b => g.map(a => TM.phi([a, b], T)));
+    const zmax = Math.max(...Z.flat().filter(Number.isFinite)), lift = 0.006 * zmax;
+    const traces = [];
+    // colour the surface by the same measure as the shading in the 2D figure
+    const isE = state.shade === 'e', shaded = state.shade !== 'none';
+    const C = shaded ? g.map(b => g.map(a => {
+      const v = isE ? TM.scaleElasticity([a, b], T) : TM.sigma([a, b], T);
+      return isE ? U.clampTo(v, 0, 2) : U.clampTo(Math.log2(v), -2, 2);
+    })) : null;
+    const lo = isE ? th.dec : th.accent4, hi = isE ? th.inc : '#2a9d8f', mid = th.dark ? '#3a4150' : '#f3f1ea';
+    traces.push({
+      type: 'surface', x: g, y: g, z: Z, opacity: 0.9, showscale: false, hovertemplate: 'z₁ = %{x:.2f}<br>z₂ = %{y:.2f}<br>q = %{z:.3f}<extra></extra>',
+      lighting: { ambient: 0.75, diffuse: 0.55, specular: 0.05, roughness: 0.9 },
+      ...(shaded ? { surfacecolor: C, cmin: isE ? 0 : -2, cmax: 2, colorscale: [[0, lo], [0.5, mid], [1, hi]] } : { colorscale: U.SURFACE_SCALE, cmin: 0, cmax: zmax })
+    });
+    const l3 = (pts, color, width, dash, name) => ({ type: 'scatter3d', mode: 'lines', x: pts.map(p => p[0]), y: pts.map(p => p[1]), z: pts.map(p => p[2]), line: { color, width, dash: dash || 'solid' }, name: name || '', hoverinfo: name ? 'name' : 'skip' });
+    // the ray: on the floor and climbing the surface
+    const amax = R / Math.max(z[0], z[1]), al = U.linspace(0, amax, 80);
+    traces.push(l3(al.map(a => [a * z[0], a * z[1], 0]), th.red, 3, 'dash'));
+    traces.push(l3(al.map(a => [a * z[0], a * z[1], TM.phi([a * z[0], a * z[1]], T) + lift]), th.red, 8, 'solid', 'output along the ray'));
+    // the isoquant through z-bar: on the floor and as a contour at height q
+    const iso = TM.isoquant(q, T, R, 200);
+    traces.push(l3(iso.map(p => [p[0], p[1], 0]), th.blue, 3, 'dash'));
+    traces.push(l3(iso.map(p => [p[0], p[1], q + lift]), th.blue, 8, 'solid', 'isoquant through z̄ at height q̄'));
+    traces.push(l3([[z[0], z[1], 0], [z[0], z[1], q]], th.muted, 2, 'dot'));
+    traces.push({ type: 'scatter3d', mode: 'markers+text', x: [z[0]], y: [z[1]], z: [q + lift], text: ['z̄'], textposition: 'top center', textfont: { color: th.ink, size: 14 }, marker: { size: 6, color: th.ink }, hoverinfo: 'skip' });
+    const axis = (title, r) => ({ title: { text: title, font: { color: th.ink } }, range: r, color: th.muted, gridcolor: th.grid, backgroundcolor: 'rgba(0,0,0,0)', showspikes: false, tickfont: { color: th.muted } });
+    Plotly.react('plot3d', traces, {
+      margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', font: { color: th.ink, family: th.font, size: 12 }, showlegend: false, uirevision: 'keep',
+      scene: { uirevision: 'keep', camera: state.camera, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.75 }, xaxis: axis('z₁', [0, R]), yaxis: axis('z₂', [0, R]), zaxis: axis('q', [0, zmax * 1.02]) }
+    }, U.PLOT_CONFIG);
+    const e = TM.scaleElasticity(z, T), sg = TM.sigma(z, T);
+    $('cap3d').innerHTML = `The <span class="c-l2-red"><span class="key"></span>red curve</span> is output along the ray through ${texStr('\\bar z')}: how fast it climbs, in percent per percent, is ${texStr(`e(\\bar z)=${f3(e)}`)}. The <span class="c-l2-blue"><span class="key"></span>blue curve</span> is the isoquant through ${texStr('\\bar z')}, a contour of the surface at height ${texStr(`\\bar q=${f3(q)}`)}: how sharply it bends is measured by ${texStr(`\\sigma(\\bar z)=${sTex(sg)}`)}. ${shaded ? `The surface is coloured by ${isE ? texStr('e(z)') : texStr('\\sigma(z)')}, as in the shading above.` : ''} Drag to turn it around.`;
   }
 
   // ---------- e along the ray, sigma along the isoquant ----------
@@ -164,6 +216,7 @@
     formula();
     const th = U.theme();
     guard('input space', () => drawMain(th, A, T));
+    guard('3D view', () => draw3d(th, T));
     guard('side plots', () => drawSides(th, A, T));
     guard('numbers', () => renderMeaning(A, T));
   }
@@ -199,8 +252,10 @@
     $('h').addEventListener('change', e => { state.h = e.target.value; schedule(); });
     document.querySelectorAll('[data-tr]').forEach(b => b.addEventListener('click', () => { state.tr = b.dataset.tr; schedule(); }));
     document.querySelectorAll('[data-shade]').forEach(b => b.addEventListener('click', () => { state.shade = b.dataset.shade; schedule(); }));
+    document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = CAMERAS[b.dataset.cam](); schedule(); }));
     setupDrag();
     render();
+    $('plot3d').on('plotly_relayout', ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; });
     U.watchColorScheme(schedule);
   }
 
