@@ -68,7 +68,7 @@
       }
     };
     lab(0, th.blue, 'E<sub>1</sub> = 0'); lab(1, th.red, 'E<sub>2</sub> = 0'); lab(2, th.ink, 'E<sub>3</sub> = 0');
-    U.plot('plot', traces, U.base2d(th, {
+    Plotly.react('plot', traces, U.base2d(th, {
       xt: 'p<sub>1</sub> / p<sub>3</sub>', yt: 'p<sub>2</sub> / p<sub>3</sub>',
       x: { range: [0, V.xmax] }, y: { range: [0, V.ymax] }, annotations
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
@@ -151,9 +151,10 @@
     if (state.playing) return;
     const path = X.tatonnement([state.p1, state.p2], par(), { steps: 1500, tol: 1e-5 });
     state.trail = [path[0]]; state.playing = true; $('animate').disabled = true;
-    let k = 0;
-    const step = () => {
-      k = Math.min(path.length - 1, k + 2);
+    // about three seconds whatever the computer: the frame shows where the prices are at this moment
+    const start = performance.now(), DURATION = 3000;
+    const step = now => {
+      const k = Math.min(path.length - 1, Math.round((path.length - 1) * Math.min(1, (now - start) / DURATION)));
       state.trail = path.slice(0, k + 1);
       ctrls.p1.setExact(path[k][0]); ctrls.p2.setExact(path[k][1]);
       if (k < path.length - 1) requestAnimationFrame(step);
