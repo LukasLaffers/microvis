@@ -100,6 +100,7 @@ Breakpoints: below 1250px the side panels move under the figure; below 800px eve
 - `details.howto` "How to read this": `<p>` then `<ul>` of things to try.
 - `.caption` the figure legend, with colour keys: `<span class="c-accent"><span class="key"></span>label</span>` (`.key.dash`, `.key.dot`).
 - `.readouts dl` key numbers; `.checks` a list with ✓ / ✗ marks; `.badge` a small outlined label.
+- Numbers: `Microvis.fmt(x)` gives two decimals, three when two would show 0.00 (0.004). Where parts and their total are shown together, `Microvis.fmtSum([a, b])` rounds them so that the shown numbers add up. Published tables keep their own decimals.
 - `.formula` a KaTeX block in the controls; `.subtitle` the header formula.
 - `.status-banner` the error box (filled by `Microvis.showError`).
 - `[data-show="a|b c"]` shown when (a or b) and c hold: `Microvis.applyVisibility(preds)`.

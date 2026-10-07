@@ -97,8 +97,8 @@
     const { P } = S, Ns = U.linspace(1, NMAX, NMAX), lo = [], hi = [];
     for (const N of Ns) { const s = RM.surviving(P, N); lo.push(s.lo); hi.push(s.hi); }
     const traces = [
-      { type: 'scatter', mode: 'lines', x: Ns, y: lo, line: { color: GREEN, width: 2, shape: 'hv' }, hovertemplate: 'N = %{x}: from %{y:.3f}<extra></extra>' },
-      { type: 'scatter', mode: 'lines', x: Ns, y: hi, line: { color: GREEN, width: 2, shape: 'hv' }, fill: 'tonexty', fillcolor: 'rgba(76,175,80,0.22)', hovertemplate: 'N = %{x}: to %{y:.3f}<extra></extra>' }
+      { type: 'scatter', mode: 'lines', x: Ns, y: lo, line: { color: GREEN, width: 2, shape: 'hv' }, hovertemplate: 'N = %{x}: from %{y:.2f}<extra></extra>' },
+      { type: 'scatter', mode: 'lines', x: Ns, y: hi, line: { color: GREEN, width: 2, shape: 'hv' }, fill: 'tonexty', fillcolor: 'rgba(76,175,80,0.22)', hovertemplate: 'N = %{x}: to %{y:.2f}<extra></extra>' }
     ];
     P.eqs.forEach(q => traces.push(U.line2([[1, q.xa[0]], [NMAX, q.xa[0]]], th.ink, 1.5, 'competitive equilibrium', 'dot')));
     traces.push(U.line2([[1, S.x1], [NMAX, S.x1]], th.ink, 1.5, 'allocation y', 'dash'));

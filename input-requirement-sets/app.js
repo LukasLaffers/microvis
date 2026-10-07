@@ -74,7 +74,7 @@
   const marker = (p, color, name, size = 14, symbol = 'circle') => ({
     type: 'scatter', mode: 'markers', x: [p[0]], y: [p[1]],
     marker: { color, size, symbol, line: { color: symbol.startsWith('x') ? color : '#ffffff', width: symbol.startsWith('x') ? 1 : 2 } },
-    name, hovertemplate: `${name}<br>(%{x:.3f}, %{y:.3f})<extra></extra>`
+    name, hovertemplate: `${name}<br>(%{x:.2f}, %{y:.2f})<extra></extra>`
   });
   const zLambda = () => [state.lambda * state.z[0] + (1 - state.lambda) * state.zp[0], state.lambda * state.z[1] + (1 - state.lambda) * state.zp[1]];
 

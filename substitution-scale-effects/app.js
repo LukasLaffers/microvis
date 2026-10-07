@@ -273,18 +273,19 @@
   function renderTable(P) {
     const { s, w, r, now } = P, f = x => fmt(Math.abs(x) < 5e-10 ? 0 : x, 3);
     if (now) {
-      const sub = now.substitution, sc = now.scale, tot = [sub[0] + sc[0], sub[1] + sc[1]];
+      const [s1, c1, t1] = U.fmtSum([now.substitution[0], now.scale[0]]), [s2, c2, t2] = U.fmtSum([now.substitution[1], now.scale[1]]);
       $('table').innerHTML =
         `<thead><tr><th>so far</th><th>input 1</th><th>input 2</th></tr></thead><tbody>` +
-        `<tr class="row-sub"><th>substitution</th><td>${f(sub[0])}</td><td>${f(sub[1])}</td></tr>` +
-        `<tr class="row-scale"><th>scale</th><td>${f(sc[0])}</td><td>${f(sc[1])}</td></tr>` +
-        `<tr class="row-total"><th>total</th><td>${f(tot[0])}</td><td>${f(tot[1])}</td></tr></tbody>`;
+        `<tr class="row-sub"><th>substitution</th><td>${s1}</td><td>${s2}</td></tr>` +
+        `<tr class="row-scale"><th>scale</th><td>${c1}</td><td>${c2}</td></tr>` +
+        `<tr class="row-total"><th>total</th><td>${t1}</td><td>${t2}</td></tr></tbody>`;
     } else {
+      const [s1, c1, t1] = U.fmtSum([r.substitution[0], r.scale[0]]), [s2, c2, t2] = U.fmtSum([r.substitution[1], r.scale[1]]);
       $('table').innerHTML =
         `<thead><tr><th></th><th>input 1</th><th>input 2</th></tr></thead><tbody>` +
-        `<tr class="row-sub"><th>substitution ${texStr('B-A')}</th><td>${f(r.substitution[0])}</td><td>${f(r.substitution[1])}</td></tr>` +
-        `<tr class="row-scale"><th>scale ${texStr('C-B')}</th><td>${f(r.scale[0])}</td><td>${f(r.scale[1])}</td></tr>` +
-        `<tr class="row-total"><th>total ${texStr('C-A')}</th><td>${f(r.total[0])}</td><td>${f(r.total[1])}</td></tr></tbody>`;
+        `<tr class="row-sub"><th>substitution ${texStr('B-A')}</th><td>${s1}</td><td>${s2}</td></tr>` +
+        `<tr class="row-scale"><th>scale ${texStr('C-B')}</th><td>${c1}</td><td>${c2}</td></tr>` +
+        `<tr class="row-total"><th>total ${texStr('C-A')}</th><td>${t1}</td><td>${t2}</td></tr></tbody>`;
     }
     const box = $('marginal-box');
     if (state.marginal) {
@@ -292,11 +293,13 @@
       if (r.qA === 0 || tie) box.innerHTML = '<p class="note">The derivative is not defined here (no production, or the linear technology at its switch price).</p>';
       else {
         const d = SS.decomposeDerivative(w, state.p, s), e = d.input1, ok = Math.abs(e.substitution + e.scale - e.total) <= 1e-4 * Math.max(1, Math.abs(e.total));
-        box.innerHTML = texStr(`\\frac{\\partial D^1}{\\partial w_1}=${f(e.total)}=\\color{#4a90e2}{${f(e.substitution)}}\\color{#d0021b}{${e.scale < 0 ? '' : '+'}${f(e.scale)}}`) +
+        // total = substitution + scale, rounded so that the shown numbers add up
+        const split = (x, y) => { const [a, b, t] = U.fmtSum([x, y]); return `${t}=\\color{#4a90e2}{${a}}\\color{#d0021b}{${b.startsWith('−') ? '' : '+'}${b}}`; };
+        box.innerHTML = texStr(`\\frac{\\partial D^1}{\\partial w_1}=${split(e.substitution, e.scale)}`) +
           ` <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓ sum = total' : '✗'}</span>` +
           (() => { const c = SS.scaleClosedForm(w, state.p, s), ok2 = Math.abs(c.scale - e.scale) <= 1e-4 * Math.max(1, Math.abs(e.scale));
             return `<p class="note">Lecture 4, (∗∗): scale effect ${texStr(`\\color{#d0021b}{-\\tfrac{1}{C_{qq}}\\big(\\tfrac{\\partial H^1}{\\partial q}\\big)^2=-\\tfrac{1}{${f(c.Cqq)}}(${f(c.dHdq)})^2=${f(c.scale)}}`)} <span class="${ok2 ? 'ok-mark' : 'no-mark'}">${ok2 ? '✓ = finite difference' : '✗'}</span></p>`; })() +
-          `<p class="note">${texStr(`\\partial S/\\partial w_1=${f(d.dSdw1)}`)}, ${texStr(`\\partial H^1/\\partial q=${f(e.dHdq)}`)}. Cross effect: ${texStr(`\\partial D^2/\\partial w_1=${f(d.input2.total)}=\\color{#4a90e2}{${f(d.input2.substitution)}}\\color{#d0021b}{${d.input2.scale < 0 ? '' : '+'}${f(d.input2.scale)}}`)}</p>`;
+          `<p class="note">${texStr(`\\partial S/\\partial w_1=${f(d.dSdw1)}`)}, ${texStr(`\\partial H^1/\\partial q=${f(e.dHdq)}`)}. Cross effect: ${texStr(`\\partial D^2/\\partial w_1=${split(d.input2.substitution, d.input2.scale)}`)}</p>`;
       }
     } else box.innerHTML = '';
     $('readouts').innerHTML = (now ? [

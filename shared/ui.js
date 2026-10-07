@@ -10,6 +10,9 @@
 
   // ---------- formatting ----------
 
+  // Two decimals; three when two would show a non-zero number as 0.00 (0.004, not 0.00).
+  // Any d >= 2 means this (older calls pass 3 or 4); d = 0 or 1 is kept.
+  const decimals = (x, d) => d < 2 ? d : (x !== 0 && Math.abs(x) < 0.005 ? 3 : 2);
   function fmt(x, d = 2) {
     if (x === null || x === undefined || Number.isNaN(x)) return '—';
     if (x === Infinity) return '∞';
@@ -19,7 +22,13 @@
       const [m, e] = x.toExponential(2).split('e');
       return `${m.replace('-', '−')}×10^${Number(e)}`;
     }
-    return x.toFixed(d).replace('-', '−');
+    return x.toFixed(decimals(x, d)).replace('-', '−');
+  }
+  // Parts and their total, all with the same decimals; the total is the sum of the rounded parts, so the shown numbers add up.
+  function fmtSum(parts) {
+    const dec = Math.max(...parts.concat(parts.reduce((s, x) => s + x, 0)).map(x => decimals(Math.abs(x) < 1e-3 ? 0 : x, 2)));
+    const r = parts.map(x => Number(x.toFixed(dec))), all = r.concat(r.reduce((s, x) => s + x, 0));
+    return all.map(x => (Math.abs(x) < 0.5 * 10 ** -dec ? 0 : x).toFixed(dec).replace('-', '−'));
   }
   // Short number for formulas: 0.50 -> 0.5, 1.00 -> 1.
   const num = x => String(Number(x.toFixed(2)));
@@ -307,7 +316,7 @@
   }
 
   root.Microvis = {
-    $, fmt, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
+    $, fmt, fmtSum, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
     control, controls, scheduler, applyVisibility,
     theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, eventToData, watchColorScheme,
     showError, guard, librariesReady

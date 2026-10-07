@@ -20,8 +20,8 @@ Four changes, waiting for "merge it":
 ### 2. Next
 Nothing requested beyond 1 and 3.
 
-### 3. Waiting on the user's answer
-- **Two decimals instead of three** in the right-hand panels. The user suggested it; I agreed and proposed two rules before doing it: (a) where parts and their sum are shown together, round the parts and show the total as their rounded sum, so tables add up; (b) numbers below 0.1 in absolute value: two significant digits (0.0042), not 0.00. Not started; ask for the go-ahead, then do all tools in one pass (`fmt(x, 3)` calls in the `app.js` files; `shared/ui.js` `fmt`).
+### 3. Two decimals (done on the branch, not merged)
+User: "two decimal places wherever possible; where not possible retain three (e.g. 0.004)". `shared/ui.js` `fmt(x, d)`: any d >= 2 now gives two decimals, three when two would show a non-zero number as 0.00; below 0.001 the old ×10^n form. New `fmtSum(parts)` returns the parts and their total with the same decimals, the total being the sum of the rounded parts; used in the decomposition tables and lines of Substitution and Scale Effects, Slutsky and Marshall's Law. Plot hover labels `.3f` → `.2f`. Kept at three: the published tables (Translog: Arnberg and Bjørner; Deadweight Loss: the commodity groups). Slutsky: the elasticity line computes its result from the rounded numbers shown. Other lines with products (Marshall, Engel, Monopoly, Homogeneous) can be off by 0.01 in the last digit.
 
 ### 4. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.

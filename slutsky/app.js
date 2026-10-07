@@ -76,17 +76,22 @@
 
   function renderNumbers(S) {
     const { u, p, d, cls } = S;
+    // the totals are the sums of the rounded parts, so the table adds up
+    const g1 = U.fmtSum([d.substitution[0], d.income[0]]), g2 = U.fmtSum([d.substitution[1], d.income[1]]);
     $('table').innerHTML = `<thead><tr><th></th><th>good 1</th><th>good 2</th></tr></thead><tbody>` +
-      `<tr class="row-sub"><th>substitution ${texStr('E_2-E_1')}</th><td>${f3(d.substitution[0])}</td><td>${f3(d.substitution[1])}</td></tr>` +
-      `<tr class="row-inc"><th>income ${texStr('E_3-E_2')}</th><td>${f3(d.income[0])}</td><td>${f3(d.income[1])}</td></tr>` +
-      `<tr><th>total ${texStr('E_3-E_1')}</th><td>${f3(d.total[0])}</td><td>${f3(d.total[1])}</td></tr></tbody>`;
+      `<tr class="row-sub"><th>substitution ${texStr('E_2-E_1')}</th><td>${g1[0]}</td><td>${g2[0]}</td></tr>` +
+      `<tr class="row-inc"><th>income ${texStr('E_3-E_2')}</th><td>${g1[1]}</td><td>${g2[1]}</td></tr>` +
+      `<tr><th>total ${texStr('E_3-E_1')}</th><td>${g1[2]}</td><td>${g2[2]}</td></tr></tbody>`;
     const s = CM.slutsky(p, state.y, u, 0, 0), e = CM.elasticities(p, state.y, u);
     const item = (ok, html) => `<li><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span><span>${html}</span></li>`;
+    // the elasticity as computed from the rounded numbers on the right, so the line adds up
+    const shown = x => { const t = f3(x); return t.includes('×') ? x : Number(t.replace('−', '-')); };
+    const euShown = shown(e.ec[0][0]) - shown(e.eta[0]) * shown(e.b[0]);
     const kindTxt = { normal: '<span class="badge-kind c-inc">normal</span>', inferior: '<span class="badge-kind c-l2-orange">inferior</span>', giffen: '<span class="badge-kind c-l2-red">Giffen</span>' }[cls.kind];
     $('checks').innerHTML = [
-      item(same(s.total, s.substitution + s.income), `At ${texStr(`p_1=${fmt(p[0])}`)}: ${texStr(`\\frac{\\partial D^1}{\\partial p_1}=${f3(s.total)}=\\color{#4a90e2}{${f3(s.substitution)}}\\color{#d0021b}{${s.income < 0 ? '' : '+'}${f3(s.income)}}`)}`),
-      item(same(e.eu[0][0], e.ec[0][0] - e.eta[0] * e.b[0]), `${texStr(`\\varepsilon^u_{11}=${f3(e.eu[0][0])}=\\varepsilon^c_{11}-\\eta_1b_1=${f3(e.ec[0][0])}-(${f3(e.eta[0])})(${f3(e.b[0])})`)}`),
-      `<li><span class="mark na">·</span><span>Good 1 is ${kindTxt}: ${texStr(`\\eta_1=${f3(e.eta[0])}`)}${cls.kind === 'giffen' ? `, ${texStr(`\\varepsilon^u_{11}=${f3(e.eu[0][0])}>0`)}` : ''}.</span></li>`
+      item(same(s.total, s.substitution + s.income), `At ${texStr(`p_1=${fmt(p[0])}`)}: ${(() => { const [a, b, t] = U.fmtSum([s.substitution, s.income]); return texStr(`\\frac{\\partial D^1}{\\partial p_1}=${t}=\\color{#4a90e2}{${a}}\\color{#d0021b}{${b.startsWith('−') ? '' : '+'}${b}}`); })()}`),
+      item(same(e.eu[0][0], e.ec[0][0] - e.eta[0] * e.b[0]), `${texStr(`\\varepsilon^u_{11}=${f3(euShown)}=\\varepsilon^c_{11}-\\eta_1b_1=${f3(e.ec[0][0])}-(${f3(e.eta[0])})(${f3(e.b[0])})`)}`),
+      `<li><span class="mark na">·</span><span>Good 1 is ${kindTxt}: ${texStr(`\\eta_1=${f3(e.eta[0])}`)}${cls.kind === 'giffen' ? `, ${texStr(`\\varepsilon^u_{11}=${f3(euShown)}>0`)}` : ''}.</span></li>`
     ].join('');
   }
 

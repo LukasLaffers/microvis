@@ -39,6 +39,7 @@ style-kit/              the look, layout, writing style and safeguards packaged 
 - Use the notation of the lecture notes: inputs $z_1, z_2$, production function $\phi$, output $q$, $MRTS_{21} = \phi_1/\phi_2$, elasticity of substitution $\sigma$, elasticity of scale $e$, degree of homogeneity $k$ (not $\nu$). Full table below.
 - Tools for lecture 2 and later take all firm math from `shared/firm-model.js` (do not duplicate it); tool-specific math goes in the tool's own `model.js` with its own tests.
 - Tools load `../shared/ui.js` for controls, formatting and the error banner; tool-specific CSS goes in `<tool>/style.css`.
+- Numbers on pages: two decimals via `Microvis.fmt` (three when two would show 0.00, e.g. 0.004); parts with their total via `Microvis.fmtSum`, so the shown numbers add up. Tables quoted from papers keep their published decimals.
 - Every tool: works on a phone (controls collapse above the plots), has a short "How to read this" text, labels axes, and shows the key numbers live.
 - Write all code ourselves. Do not copy code from other repositories without a compatible license (in particular not from qgallea/utility-explorer, which has no license).
 - Add each new tool to `tools/catalog.cjs` (and its drawing to `tools/glyphs.cjs`), then run `node tools/build-site.cjs`.

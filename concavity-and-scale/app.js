@@ -52,7 +52,7 @@
     const traces = [{
       type: 'surface', x: g, y: g, z: Z, colorscale: U.SURFACE_SCALE, cmin: 0, cmax: zmax, showscale: false, opacity: 0.86,
       lighting: { ambient: 0.75, diffuse: 0.55, specular: 0.05, roughness: 0.9 },
-      hovertemplate: 'z₁ = %{x:.2f}<br>z₂ = %{y:.2f}<br>q = %{z:.3f}<extra></extra>'
+      hovertemplate: 'z₁ = %{x:.2f}<br>z₂ = %{y:.2f}<br>q = %{z:.2f}<extra></extra>'
     }];
     const l3 = (pts, color, width, dash, name) => ({
       type: 'scatter3d', mode: 'lines', x: pts.map(p => p[0]), y: pts.map(p => p[1]), z: pts.map(p => p[2]),

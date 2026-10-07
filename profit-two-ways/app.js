@@ -103,7 +103,7 @@
     traces.push({ type: 'scatter3d', mode: 'lines', ...A[1], line: { color: th.red, width: 8 }, hoverinfo: 'skip' });
     traces.push({ type: 'scatter3d', mode: 'markers', ...A[2], marker: { color: th.red, size: 7 }, hoverinfo: 'skip' });
     // One step answer: the peak found by the numerical search.
-    traces.push({ type: 'scatter3d', mode: 'markers+text', x: [one.z[0]], y: [one.z[1]], z: [one.value], marker: { color: th.ink, size: 7, line: { color: '#ffffff', width: 1 } }, text: ['one step: D(w,p)'], textposition: 'top center', textfont: { color: th.ink, size: 12 }, hovertemplate: 'one step<br>z₁ = %{x:.3f}, z₂ = %{y:.3f}<br>profit = %{z:.3f}<extra></extra>' });
+    traces.push({ type: 'scatter3d', mode: 'markers+text', x: [one.z[0]], y: [one.z[1]], z: [one.value], marker: { color: th.ink, size: 7, line: { color: '#ffffff', width: 1 } }, text: ['one step: D(w,p)'], textposition: 'top center', textfont: { color: th.ink, size: 12 }, hovertemplate: 'one step<br>z₁ = %{x:.2f}, z₂ = %{y:.2f}<br>profit = %{z:.2f}<extra></extra>' });
     const axis = (title, range) => ({ title: { text: title }, range, color: th.ink, gridcolor: th.grid, zerolinecolor: th.line, showbackground: true, backgroundcolor: th.panel, showspikes: false });
     Plotly.react('plot3d', traces, {
       margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', showlegend: false, uirevision: 'keep',
