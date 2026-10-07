@@ -149,7 +149,10 @@
     const move = ev => {
       const v = U.eventToData(gd, ev);
       if (!v) return;
-      const V = economyView();
+      const V = economyView(), eq = V.eq.p, fl = gd._fullLayout;
+      // The equilibrium is magnetic: within about 14 pixels of it, the point snaps onto it.
+      const px = fl && fl.xaxis ? Math.hypot((v[0] - eq[0]) / V.xmax * fl.xaxis._length, (v[1] - eq[1]) / V.ymax * fl.yaxis._length) : Infinity;
+      if (px < 14) { ctrls.p1.setExact(eq[0]); ctrls.p2.setExact(eq[1]); return; }
       ctrls.p1.setExact(U.clampTo(v[0], 0.03 * V.xmax, V.xmax));
       ctrls.p2.setExact(U.clampTo(v[1], 0.03 * V.ymax, V.ymax));
     };
