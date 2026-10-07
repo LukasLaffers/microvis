@@ -1,0 +1,11 @@
+/* Two Technologies and a Kink: tool-specific styles (shared look is in ../shared/style.css). */
+.plot-iso { height: 600px; }
+.plot-side { height: 250px; }
+@media (max-width: 800px) { .plot-iso { height: 400px; } .plot-side { height: 240px; } }
+table.effects td { cursor: default; }
+table.effects td:hover { outline: none; }
+table.effects th:first-child { text-align: left; }
+.row-sub, .row-sub th { color: var(--l2-blue); }
+.row-scale, .row-scale th { color: var(--l2-red); }
+.row-total th, .row-total td { font-weight: 700; }
+#decoNote { margin-top: 0; }

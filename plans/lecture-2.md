@@ -6,6 +6,7 @@ Three tools, one per idea of the lecture, built on one shared, tested model:
 | Folder | Title | Lecture idea | Colour (as in the notes) |
 |---|---|---|---|
 | `cost-minimisation/` | Cost Minimisation | Step 1 (CM): $\min_z w^t z$ s.t. $\phi(z)\ge q$ — substitution | blue |
+| `two-technologies/` (*) | Two Technologies and a Kink | the 2022 Assignment 2: phi_D = min{phi_A, phi_B} and phi_C = max{phi_A, phi_B} of two mirrored Cobb-Douglas technologies (alpha = 3/5, beta = 1/5); kinked isoquant, isocost line turning around the kink for beta/alpha <= w1/w2 <= alpha/beta, H1 with a vertical piece, C(w1, 1, q), substitution and scale at w1 with p such that q is optimal (zero substitution at the kink; the exercise's points w1 = 0.25 and 6); firm C not quasi-concave, H1 jumps at w1 = w2 | assignment 2 (2022) |
 | `cost-curves/` | Cost Curves and Supply | Step 2 (PM'): $\max_q pq - C(w,q)$ — scale | red, supply orange |
 | `profit-two-ways/` | One Step vs Two Steps | (PM) gives the same answer as (CM)+(PM') | black / blue / red |
 

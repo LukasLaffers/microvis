@@ -124,6 +124,10 @@ G['deadweight-loss'] = svg(AX + L([[9, 13], [57, 53]]) + A([[9, 25], [59, 25]], 
   const E = [lo, m1(lo)];
   G['excess-demand'] = svg(AX + S([[9, E[1] - 0.5 * (E[0] - 9)], [59, E[1] + 0.5 * (59 - E[0])]], DASH) + L(fn(m1, 15, 44.4), 2) + A(fn(m2, 9, 59), 2) + D(E[0], E[1], false, 3));
 }
+{ // a kinked isoquant (steep on one side of the ray z1 = z2, flat on the other) and two isocost lines through the kink
+  const left = inBox(fn(x => 55 - 25 * Math.pow(21 / (x - 9), 5), 20, 30, 40)), right = fn(x => 55 - 25 * Math.pow(21 / (x - 9), 1 / 5), 30, 59, 40);
+  G['two-technologies'] = svg(AX + S([[9, 55], [55, 9]], DASH) + L(left.concat(right.slice(1)), 2.4) + A([[17, 17], [43, 43]], 2) + D(30, 30));
+}
 G['core-replica'] = svg('<rect x="7" y="7" width="50" height="50" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>' +
   '<path d="M13 51Q19 19 51 13Q37 41 13 51Z" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.45"/>' +
   '<path d="M19 45Q23 26 44 21Q37 37 19 45Z" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.75"/>' +
