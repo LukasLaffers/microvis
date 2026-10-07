@@ -1,6 +1,6 @@
 // Screenshot the main figure of each tool (light and dark) and save it as WebP next to the tool: preview.webp, preview-dark.webp.
 // node previews.cjs tool:selector ...
-const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+const { chromium } = require(process.env.PLAYWRIGHT || '/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
 (async () => {
   const b = await chromium.launch();

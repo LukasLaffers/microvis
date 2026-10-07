@@ -117,6 +117,13 @@ G['deadweight-loss'] = svg(AX + L([[9, 13], [57, 53]]) + A([[9, 25], [59, 25]], 
     S([[X(0), Y(0)], [X(10), Y(10)]], DASH) + L(ua, 1.8) + L(ub, 1.8, 'opacity="0.6"') +
     A([[X(R[0] + 1.2), Y(R[1] + 1.2 * s)], [X(E[0] - 2.6), Y(E[1] - 2.6 * s)]], 1.8) + D(X(E[0]), Y(E[1])) + D(X(R[0]), Y(R[1]), false, 2.4));
 }
+{ // the price plane: where market 1 clears (steep), market 2 (flat, accent) and market 3 (dashed), all meeting at the
+  // equilibrium
+  const m1 = x => 55 - 1.7 * (x - 15), m2 = x => 43 - 0.45 * (x - 9);
+  let lo = 15, hi = 45; for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; (m1(m) - m2(m)) > 0 ? lo = m : hi = m; }
+  const E = [lo, m1(lo)];
+  G['excess-demand'] = svg(AX + S([[9, E[1] - 0.5 * (E[0] - 9)], [59, E[1] + 0.5 * (59 - E[0])]], DASH) + L(fn(m1, 15, 44.4), 2) + A(fn(m2, 9, 59), 2) + D(E[0], E[1], false, 3));
+}
 G['core-replica'] = svg('<rect x="7" y="7" width="50" height="50" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>' +
   '<path d="M13 51Q19 19 51 13Q37 41 13 51Z" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.45"/>' +
   '<path d="M19 45Q23 26 44 21Q37 37 19 45Z" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.75"/>' +

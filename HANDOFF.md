@@ -4,7 +4,7 @@ Read this first, then `CLAUDE.md` (conventions, notation) and `style-kit/README.
 
 ## The project in two lines
 
-Interactive figures for Lukáš Lafférs' lecture notes in microeconomic theory (lectures 1–9), 31 tools.
+Interactive figures for Lukáš Lafférs' lecture notes in microeconomic theory (lectures 1–9), 32 tools.
 Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (GitHub Pages from `main`, about 1 minute after a merge).
 
 ## Start here: what is open
@@ -21,6 +21,9 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 - **Smoother animations** (user: "a little bit bumpy"). New `shared/ui.js` helpers: `U.plot(id, traces, layout, config)` = `Plotly.react`, but when only trace points changed it moves them with `Plotly.animate(..., {redraw: false})` (much faster; it waits for queued animation steps before a real rebuild, else Plotly throws "_module"); `U.arrow2` and `U.text2` draw arrows and labels as traces so they can move that way. Rule for animated figures: keep the layout (axes ranges, annotations, shapes) and trace names fixed during the animation; moving things are traces. Also: t-independent maths cached (Slutsky demand curves, indifference curves and arrow scale; Engel path and curves), captions/tables at most 10 per second and slow finite-difference checks at most 5 per second while playing. Script time per frame went from 15–117 ms to 2–7 ms (Chromium in the container). Not improved: One Step vs Two Steps, whose 3D scene is slow here only because the container renders WebGL in software.
 - **Every animation button sits in the heading of its figure** (user: "the button at the same position like for these two cases"): Profit Two Ways (▶ Show the two steps, next to the camera buttons), Marshall's Law (▶ Raise w₁), Substitution or Composition (▶ Notes example). `.big-button` is gone; `.btn-row button:disabled` in `shared/style.css` → version tag 7.
 
+
+### Not merged yet (on the branch, preview sent)
+- **New tool: Excess Demand and Equilibrium** (`excess-demand/`, lecture 9, tile after the Edgeworth Box), built on the economy of the 2021 Assignment 2: three goods, two firms (CES of degree 1/2, making good 3 from goods 1 and 2), two Cobb-Douglas consumers who own the firms. Price plane with p3 = 1: curves where each market clears (all three meet: Walras' law), a draggable price point and an **Equilibrium** button. No price-adjustment arrows and no auctioneer (tâtonnement): the user removed them because the lecture does not cover them. The price plane uses `Plotly.react`, not `U.plot`: with `Plotly.animate(..., {redraw: false})` the contour traces (the three curves) disappear. Side: the three markets as demand/supply bars, the values p_i E_i that add up to zero, λ for homogeneity. Shows numbers only, not the excess demand formulas (part 7 of the assignment). `model.js` tested: Walras' law and homogeneity at random prices, budgets, firm and consumer optimality by brute force, the auctioneer converging from four corners, the assignment's equilibrium (0.794, 1.395, 1) and quantities.
 
 ### Next
 Nothing requested. Open question to the user: does One Step vs Two Steps (3D) animate smoothly on their Mac? (Not measurable in the container: no GPU.)

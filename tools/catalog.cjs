@@ -50,6 +50,7 @@ module.exports = [
   ] },
   { id: 'l9', lecture: 9, nav: 'General equilibrium', title: 'General equilibrium', tools: [
     ['edgeworth-box', 'The Edgeworth Box', 'Offer curves, equilibria, the core and the welfare theorems in a two-person exchange economy.'],
+    ['excess-demand', 'Excess Demand and Equilibrium', 'Three goods, two firms, two consumers: the prices at which excess demand is zero in every market.'],
     ['core-replica', 'The Core Shrinks', 'As the economy is replicated, the core shrinks towards the competitive equilibrium.', true]
   ] }
 ];
