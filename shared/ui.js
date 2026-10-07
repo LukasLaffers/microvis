@@ -280,10 +280,18 @@
   function guard(what, fn) {
     try { fn(); } catch (err) { showError(`Could not draw the ${what}: ${err && err.message ? err.message : err}`); }
   }
-  // A ResizeObserver notice is not an error of the page.
-  root.addEventListener('error', ev => { if (ev.message && !/ResizeObserver/.test(ev.message)) showError(`Error: ${ev.message}`); });
+  // Only errors of this page are shown. Not ours: a ResizeObserver notice, and "Script error.", which is all a browser
+  // reports when a script from elsewhere fails (a browser extension, a content blocker, the browser's own page features).
+  // Our scripts come from the same site, so their errors always arrive with a message and a file name.
+  root.addEventListener('error', ev => {
+    const msg = ev.message || '';
+    if (!msg || /ResizeObserver/.test(msg) || /^Script error\.?$/.test(msg)) return;
+    if (ev.filename && root.location.protocol !== 'file:' && ev.filename.indexOf(root.location.origin) !== 0) return;
+    showError(`Error: ${msg}`);
+  });
   root.addEventListener('unhandledrejection', ev => {
     const r = ev.reason;
+    if (r === undefined || r === null) return;   // no information: not from our code
     showError(`Error: ${r && r.message ? r.message : r}`);
   });
 
