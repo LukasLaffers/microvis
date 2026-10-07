@@ -11,14 +11,14 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { ...X.ASSIGNMENT, p1: 0.55, p2: 2.2, lam: 1, trail: null, round: 0, playing: false };
+  const state = { ...X.ASSIGNMENT, p1: 0.55, p2: 2.2, lam: 1 };
   const par = () => ({ rhoA: state.rhoA, rhoB: state.rhoB, alpha: state.alpha, beta: state.beta });
   const prices = () => [state.lam * state.p1, state.lam * state.p2, state.lam];
 
   let ctrls = {};
   const schedule = U.scheduler(render);
 
-  // ---------- what depends only on the economy: equilibrium, view, curves where each market clears, arrows ----------
+  // ---------- what depends only on the economy: equilibrium, view, curves where each market clears ----------
 
   let cache = { key: '' };
   function economyView() {
@@ -30,16 +30,7 @@
     for (let i = 0; i < n; i++) { xs.push(xmax * (0.02 + 0.98 * i / (n - 1))); ys.push(ymax * (0.02 + 0.98 * i / (n - 1))); }
     const Z = [[], [], []];
     ys.forEach(b => { const rows = [[], [], []]; xs.forEach(a => { const E = X.excess([a, b, 1], pr); for (let k = 0; k < 3; k++) rows[k].push(E[k]); }); for (let k = 0; k < 3; k++) Z[k].push(rows[k]); });
-    // Arrows: the direction of price adjustment, d(log p_i) proportional to E_i, drawn in screen proportions.
-    const arrows = [];
-    for (let i = 0; i < 9; i++) for (let j = 0; j < 9; j++) {
-      const a = xmax * (0.07 + 0.86 * i / 8), b = ymax * (0.07 + 0.86 * j / 8), E = X.excess([a, b, 1], pr);
-      const vx = a * E[0] / xmax, vy = b * E[1] / ymax, len = Math.hypot(vx, vy);
-      if (!(len > 1e-9)) continue;
-      const L = 0.045 * Math.min(1, 0.35 + len / 0.15);
-      arrows.push([a, b, a + xmax * vx / len * L, b + ymax * vy / len * L]);
-    }
-    cache = { key, eq, xmax, ymax, xs, ys, Z, arrows };
+    cache = { key, eq, xmax, ymax, xs, ys, Z };
     return cache;
   }
 
@@ -52,10 +43,9 @@
       contours: { start: 0, end: 0, size: 1, coloring: 'none' }, line: { color, width: k === 2 ? 2 : 3, dash }
     });
     traces.push(curve(0, th.blue, 'solid', 'E₁ = 0'), curve(1, th.red, 'solid', 'E₂ = 0'), curve(2, th.ink, 'dot', 'E₃ = 0'));
-    if (state.trail && state.trail.length > 1) traces.push(U.line2(state.trail, th.orange, 2, 'rounds of the auctioneer', 'dot', { mode: 'lines+markers', marker: { size: 6, color: th.orange } }));
     traces.push(U.dot2([[V.eq.p[0], V.eq.p[1]]], th.ink, 'equilibrium', 13));
     traces.push(U.dot2([[state.p1, state.p2]], th.orange, 'current prices', 15));
-    const annotations = V.arrows.map(([x0, y0, x1, y1]) => ({ x: x1, y: y1, ax: x0, ay: y0, axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowsize: 1, arrowwidth: 1.2, arrowcolor: th.muted, opacity: 0.55, text: '' }));
+    const annotations = [];
     // Label the three curves near the edge of the view.
     const lab = (k, color, text) => {
       const Z = V.Z[k], n = V.xs.length;
@@ -102,7 +92,7 @@
       barmode: 'stack', showlegend: true, legend: { orientation: 'h', y: -0.32, x: 0, font: { size: 11, color: th.ink } },
       xaxis: { type: 'multicategory', color: th.muted, tickfont: { color: th.muted, size: 11 }, fixedrange: true, linecolor: th.line }
     }, { ...U.PLOT_CONFIG, displayModeBar: false });
-    const word = i => Math.abs(e.E[i]) < 5e-3 ? 'clears' : e.E[i] > 0 ? 'excess demand: its price rises' : 'excess supply: its price falls';
+    const word = i => Math.abs(e.E[i]) < 5e-3 ? 'the market clears' : e.E[i] > 0 ? 'excess demand' : 'excess supply';
     $('capM').innerHTML = `Demand (consumers and firms' inputs) next to supply (endowments and firms' output). Good 1: ${word(0)}. Good 2: ${word(1)}. Good 3: ${word(2)}.`;
   }
 
@@ -146,78 +136,20 @@
     guard('numbers', () => renderNumbers(V, e));
   }
 
-  // The auctioneer (Walras' tatonnement), in visible rounds: announce prices, collect excess demands, then raise the
-  // price of each good in excess demand and lower it in excess supply (good 3 is the numéraire). No trade until all clear.
-  const H = 0.3, TOL = 0.005;
-  function roundText(E, k) {
-    const one = i => Math.abs(E[i]) < TOL ? `good ${i + 1} clears` : E[i] > 0
-      ? `good ${i + 1} in excess demand (${texStr(`E_${i + 1}=${fmt(E[i])}`)}), so ${texStr(`p_${i + 1}`)} rises`
-      : `good ${i + 1} in excess supply (${texStr(`E_${i + 1}=${fmt(E[i])}`)}), so ${texStr(`p_${i + 1}`)} falls`;
-    return `Round ${k}: ${one(0)}; ${one(1)}.`;
-  }
-  const cleared = E => Math.abs(E[0]) < TOL && Math.abs(E[1]) < TOL;
-  function say(html) { $('round').innerHTML = html; }
-
-  // One round, drawn as a short glide from the old to the new prices; resolves when done.
-  function oneRound() {
-    return new Promise(resolve => {
-      const from = [state.p1, state.p2], E = X.excess([from[0], from[1], 1], par());
-      if (cleared(E)) {
-        // close enough: settle on the equilibrium itself, so the numbers agree with the panel on the right
-        const eq = economyView().eq.p;
-        if (state.trail) state.trail.push(eq.slice(0, 2));
-        ctrls.p1.setExact(eq[0]); ctrls.p2.setExact(eq[1]);
-        say(`After ${state.round} rounds all markets clear at ${texStr(`p^\\ast=(${fmt(eq[0])},\\ ${fmt(eq[1])},\\ 1)`)}. The auctioneer stops, and trade takes place at these prices.`);
-        resolve(false); return;
-      }
-      const to = [0, 1].map(i => from[i] * Math.exp(Math.max(-0.4, Math.min(0.4, H * E[i]))));
-      if (!state.trail) { state.trail = [from.slice()]; state.round = 0; }
-      state.round += 1;
-      say(roundText(E, state.round));
-      state.trail.push(from.slice());
-      const start = performance.now(), GLIDE = 350;
-      const step = now => {
-        const f = Math.min(1, (now - start) / GLIDE), g = 1 - Math.pow(1 - f, 2);
-        const at = [from[0] + (to[0] - from[0]) * g, from[1] + (to[1] - from[1]) * g];
-        state.trail[state.trail.length - 1] = at;
-        ctrls.p1.setExact(at[0]); ctrls.p2.setExact(at[1]);
-        if (f < 1) requestAnimationFrame(step); else resolve(true);
-      };
-      requestAnimationFrame(step);
-    });
-  }
-
-  async function run(rounds) {
-    if (state.playing) return;
-    state.playing = true;
-    ['animate', 'oneRound', 'toEq'].forEach(id => { $(id).disabled = true; });
-    for (let k = 0; k < rounds; k++) {
-      const moved = await oneRound();
-      if (!moved) break;
-      if (rounds > 1) await new Promise(r => setTimeout(r, state.round > 25 ? 60 : 250));
-    }
-    state.playing = false;
-    ['animate', 'oneRound', 'toEq'].forEach(id => { $(id).disabled = false; });
-  }
-
   function init() {
     U.renderStaticTex();
     // rho = 0 is the Cobb-Douglas limit, where the formula is not defined: step over it.
     const adjust = (key, v) => (key === 'rhoA' || key === 'rhoB') && Math.abs(v) < 0.025 ? (v >= 0 ? 0.05 : -0.05) : v;
-    ctrls = U.controls(document, state, { adjust, onChange: () => { if (!state.playing) { state.trail = null; say(''); } schedule(); } });
-    $('animate').addEventListener('click', () => run(300));
-    $('oneRound').addEventListener('click', () => run(1));
-    $('toEq').addEventListener('click', () => { const V = economyView(); state.trail = null; ctrls.p1.setExact(V.eq.p[0]); ctrls.p2.setExact(V.eq.p[1]); });
+    ctrls = U.controls(document, state, { adjust, onChange: schedule });
+    $('toEq').addEventListener('click', () => { const V = economyView(); ctrls.p1.setExact(V.eq.p[0]); ctrls.p2.setExact(V.eq.p[1]); });
     $('assignment').addEventListener('click', () => { Object.entries(X.ASSIGNMENT).forEach(([k, v]) => ctrls[k].setExact(v)); });
     // Drag the current prices in the plane.
     const gd = $('plot');
     let dragging = false;
     const move = ev => {
-      if (state.playing) return;
       const v = U.eventToData(gd, ev);
       if (!v) return;
       const V = economyView();
-      state.trail = null;
       ctrls.p1.setExact(U.clampTo(v[0], 0.03 * V.xmax, V.xmax));
       ctrls.p2.setExact(U.clampTo(v[1], 0.03 * V.ymax, V.ymax));
     };

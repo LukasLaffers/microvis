@@ -3,6 +3,4 @@
 .plot-markets { height: 300px; }
 .plot-walras { height: 150px; }
 @media (max-width: 800px) { .plot-main { height: 420px; } .plot-markets { height: 280px; } }
-.btn-row button.go { border-color: var(--ink); font-weight: 600; }
 .btn-row button:disabled { opacity: 0.5; cursor: default; }
-.round { min-height: 2.9em; margin: 6px 0 0; font-size: 13.5px; color: var(--ink); }
