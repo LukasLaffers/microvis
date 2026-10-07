@@ -30,8 +30,8 @@
           <summary>How to read this</summary>
           <p>At any prices, excess demand, demand minus supply, says which markets are out of balance. Good 3 is the numéraire, so every point of the plane is a price vector. On the <span class="c-l2-blue">blue curve</span> market 1 clears, on the <span class="c-l2-red">red curve</span> market 2; the equilibrium is where they cross.</p>
           <ul>
-          <li>Drag the <span class="c-l2-orange">orange point</span>: the bars show which goods are in excess demand, the grey arrows where that pushes the prices.</li>
-          <li>Press <b>▶ Let the market find the prices</b>: prices rise where demand exceeds supply and fall where it falls short, until all markets clear.</li>
+          <li>Drag the <span class="c-l2-orange">orange point</span>: the bars show which goods are in excess demand. Each grey arrow shows where the prices would move from that point: up for a good in excess demand, down for a good in excess supply.</li>
+          <li>Press <b>▶ Run the auctioneer</b> or <b>One round</b>. In each round an auctioneer announces prices, collects everyone's demand and supply, and adjusts the prices that way. Nobody trades until all markets clear (Walras' tâtonnement).</li>
           <li>The dotted curve, where market 3 clears, passes through the same point: Walras' law.</li>
           <li>Move <span class="tex" data-tex="\lambda"></span>: multiplying all prices changes nothing.</li>
           </ul>
@@ -61,12 +61,14 @@
       <div class="panel-head">
         <h2>Where each market clears</h2>
         <div class="btn-row">
-          <button type="button" class="go" id="animate">▶ Let the market find the prices</button>
+          <button type="button" class="go" id="animate">▶ Run the auctioneer</button>
+          <button type="button" id="oneRound">One round</button>
           <button type="button" id="toEq">Equilibrium</button>
         </div>
       </div>
       <div id="plot" class="plot plot-main" aria-label="Price plane: drag the orange point"></div>
-      <p class="caption"><span class="c-l2-blue"><span class="key"></span><span class="tex" data-tex="E_1=0"></span></span>, <span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="E_2=0"></span></span> and <span class="c-ink"><span class="key dash"></span><span class="tex" data-tex="E_3=0"></span></span>: the prices at which market 1, 2 or 3 clears. The <span class="c-ink"><span class="key dot"></span>equilibrium</span> is where all three meet; the <span class="c-l2-orange"><span class="key dot"></span>current prices</span> can be dragged. Grey arrows: the direction in which excess demand pushes the prices, a price rising when its good is in excess demand.</p>
+      <p class="round" id="round" aria-live="polite"></p>
+      <p class="caption"><span class="c-l2-blue"><span class="key"></span><span class="tex" data-tex="E_1=0"></span></span>, <span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="E_2=0"></span></span> and <span class="c-ink"><span class="key dash"></span><span class="tex" data-tex="E_3=0"></span></span>: the prices at which market 1, 2 or 3 clears. The <span class="c-ink"><span class="key dot"></span>equilibrium</span> is where all three meet; the <span class="c-l2-orange"><span class="key dot"></span>current prices</span> can be dragged. Grey arrows: from each point, the direction in which the auctioneer moves the prices. The orange dots are the rounds.</p>
     </section>
 
     <div class="side">
