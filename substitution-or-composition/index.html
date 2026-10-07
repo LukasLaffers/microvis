@@ -7,8 +7,8 @@
   <meta name="description" content="Two firms that cannot substitute at all can make aggregate data look as if energy was replaced by capital: why Arnberg and Bjørner (2007) use variation within firms. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=6">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="../shared/style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=7">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>Two firms use energy <span class="tex" data-tex="E"></span> and capital <span class="tex" data-tex="K"></span> in fixed proportions: they <em>cannot</em> substitute. Yet when energy gets dearer, the energy-intensive product gets dearer, consumers switch, and output moves to the capital-intensive firm. Each firm stays on its own ray, while the industry total turns towards capital.</p>
           <ul>
-          <li>Press the notes example, or raise <span class="tex" data-tex="w_E"></span>.</li>
+          <li>Press <b>▶ Notes example</b>, or raise <span class="tex" data-tex="w_E"></span>.</li>
           <li>Tick <b>Show what an econometrician sees</b>: aggregate data show substitution that happens inside no firm. It is a change in composition.</li>
           </ul>
         </details>
@@ -38,7 +38,6 @@
       <div class="group">
         <h2>Prices</h2>
         <div class="ctrl" data-key="wE" data-label="w_E" data-hint="price of energy (w_K = 1)" data-min="0.5" data-max="3" data-step="0.01"></div>
-        <div class="btn-row"><button type="button" id="notes">Notes example: w_E from 1 to 2</button></div>
       </div>
       <div class="group">
         <h2>Consumers</h2>
@@ -51,7 +50,10 @@
     </section>
 
     <section class="panel main-panel" aria-label="Input space">
-      <div class="panel-head"><h2>Input space: each firm stays on its ray</h2></div>
+      <div class="panel-head">
+        <h2>Input space: each firm stays on its ray</h2>
+        <div class="btn-row" role="group" aria-label="Animation"><button type="button" id="notes">▶ Notes example: w_E from 1 to 2</button></div>
+      </div>
       <div id="plot" class="plot plot-main"></div>
       <p class="caption" id="cap"></p>
     </section>
@@ -82,10 +84,10 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=6"></script>
-  <script src="model.js?v=6"></script>
-  <script src="app.js?v=6"></script>
-  <script src="../shared/theme.js?v=6"></script>
+  <script src="../shared/ui.js?v=7"></script>
+  <script src="model.js?v=7"></script>
+  <script src="app.js?v=7"></script>
+  <script src="../shared/theme.js?v=7"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

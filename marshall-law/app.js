@@ -68,7 +68,7 @@
     if (m.substitution > 0.09 * xMax) annotations.push({ x: m.substitution / 2, y: (yb0 + yb1) / 2, text: 'σ(1−sh<sub>1</sub>)', showarrow: false, font: { size: 11, color: '#ffffff' } });
     if (bal - m.substitution > 0.12 * xMax) annotations.push({ x: (m.substitution + bal) / 2, y: (yb0 + yb1) / 2, text: '(−ε<sup>D</sup><sub>p</sub>)sh<sub>1</sub>', showarrow: false, font: { size: 11, color: '#ffffff' } });
 
-    Plotly.react('plot', [{ type: 'scatter', mode: 'markers', x: [0, xMax], y: [0, 0], marker: { opacity: 0 }, hoverinfo: 'skip' }], {
+    U.plot('plot', [{ type: 'scatter', mode: 'markers', x: [0, xMax], y: [0, 0], marker: { opacity: 0 }, hoverinfo: 'skip' }], {
       ...U.base2d(th, { xt: 'elasticity (absolute value)', x: { range: [-0.04 * xMax, xMax] }, y: { range: [-1.15, 3.05], visible: false }, shapes, annotations, margin: { l: 16, r: 16, t: 8, b: 44 } })
     }, { ...U.PLOT_CONFIG, displayModeBar: false });
 
@@ -93,7 +93,7 @@
     ];
     const all = [...D, ...H].map(p => p[1]).filter(v => v > 0);
     const yLo = Math.min(...all), yHi = Math.max(...all);
-    Plotly.react('plotD', traces, U.base2d(th, {
+    U.plot('plotD', traces, U.base2d(th, {
       xt: 'w<sub>1</sub> (log scale)', yt: 'z<sub>1</sub> (log scale)',
       x: { type: 'log', range: [Math.log10(w1 / 4), Math.log10(w1 * 4)], ...logTicks(w1 / 4, w1 * 4) },
       y: { type: 'log', range: [Math.log10(yLo) - 0.05, Math.log10(yHi) + 0.05], ...logTicks(yLo / 1.13, yHi * 1.13) },
@@ -117,15 +117,14 @@
       U.line2([[0, c0], [qMax, c0]], th.orange, 2.5, 'supply before: p = c(w)'),
       U.line2([[0, c1], [qMax, c1]], th.orange, 2.5, 'supply after the wage rise', 'dash'),
       U.dot2([[q0, c0]], th.ink, 'equilibrium before', 10),
-      U.dot2([[q1, c1]], th.red, 'equilibrium after', 10)
+      U.dot2([[q1, c1]], th.red, 'equilibrium after', 10),
+      // what moves while the wage rises is drawn as traces, so the animation only moves points
+      U.line2([[q0, 0], [q0, c0], [null, null], [q1, 0], [q1, c1]], th.muted, 1, '', 'dot'),
+      { ...U.arrow2([q0, 0], [q1, 0], th.red, 3, 1e-6 * qMax), cliponaxis: false },
+      U.text2([qMax, c0], 'c(w)', th.orange, 'bottom left'),
+      U.text2([qMax, c1], 'c(w′)', th.orange, 'top left')
     ];
-    const shapes = [q0, q1].map((qq, k) => ({ type: 'line', x0: qq, x1: qq, y0: 0, y1: k ? c1 : c0, line: { color: th.muted, width: 1, dash: 'dot' } }));
-    const annotations = [
-      { x: q1, y: 0, ax: q0, ay: 0, axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 3, arrowcolor: th.red, text: '' },
-      { x: qMax, y: c0, text: 'c(w)', showarrow: false, xanchor: 'right', yanchor: 'top', yshift: -2, font: { size: 12, color: th.orange } },
-      { x: qMax, y: c1, text: 'c(w′)', showarrow: false, xanchor: 'right', yanchor: 'bottom', yshift: 2, font: { size: 12, color: th.orange } }
-    ];
-    Plotly.react('plotC', traces, U.base2d(th, { xt: 'q (industry output)', yt: 'p', x: { range: [0, qMax] }, y: { range: [0, pTop] }, shapes, annotations }), U.PLOT_CONFIG);
+    U.plot('plotC', traces, U.base2d(th, { xt: 'q (industry output)', yt: 'p', x: { range: [0, qMax] }, y: { range: [0, pTop] } }), U.PLOT_CONFIG);
     $('capC').innerHTML = `Supply is flat at ${texStr('p=c(w)')}. A ${fmt(state.r, 0)} % wage rise lifts it to ${texStr(`c(w')=${fmt(c1, 3)}`)} (by ${pct(c1 / c0 - 1)}; to first order by ${texStr('sh_1')} × ${fmt(state.r, 0)} % = ${pct(P.m.sh1 * state.r / 100)}), and output falls along ${texStr('Dem(p)')} from ${fmt(q0, 2)} to ${fmt(q1, 2)} (${pct(q1 / q0 - 1)}).`;
   }
 
@@ -134,20 +133,19 @@
   function drawFirm(th, P) {
     const { s, w, wi, wiT } = P, w1n = w[0] * (1 + P.r * state.t), wn = [w1n, w[1]];
     const h0 = FM.unitDemand(w, s).h, h1 = FM.unitDemand(wn, s).h, c0 = FM.unitCost(w, s), c1 = FM.unitCost(wn, s);
-    const zMax = 2.6 * Math.max(h0[0], h0[1], h1[0], h1[1]);
+    // the frame is set by the whole wage rise, so it stays put while the wage rises
+    const hEnd = FM.unitDemand([w[0] * (1 + P.r), w[1]], s).h, zMax = 2.6 * Math.max(h0[0], h0[1], hEnd[0], hEnd[1]);
     const iso = FM.isoquant(1, s, zMax, 300);
     const traces = [
       U.line2(iso, th.blue, 2.5, 'unit isoquant φ(z) = 1'),
       U.line2([[c0 / w[0], 0], [0, c0 / w[1]]], th.grey, 1.8, 'isocost before'),
       U.dot2([h0], th.ink, 'H̃(w) before', 10)
     ];
-    const annotations = [];
-    if (state.t > 0) {
-      traces.push(U.line2([[c1 / wn[0], 0], [0, c1 / wn[1]]], th.grey, 1.8, 'isocost after', 'dash'));
-      traces.push(U.dot2([h1], th.blue, 'H̃(w′) after', 10));
-      if (Math.hypot(h1[0] - h0[0], h1[1] - h0[1]) > 1e-3 * zMax) annotations.push({ x: h1[0], y: h1[1], ax: h0[0], ay: h0[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2.5, arrowcolor: th.blue, text: '' });
-    }
-    Plotly.react('plotF', traces, U.base2d(th, { xt: 'z<sub>1</sub> (labour per unit)', yt: 'z<sub>2</sub> (capital per unit)', x: { range: [0, zMax] }, y: { range: [0, zMax] }, annotations }), U.PLOT_CONFIG);
+    const on = state.t > 0;
+    traces.push(U.line2(on ? [[c1 / wn[0], 0], [0, c1 / wn[1]]] : [], th.grey, 1.8, 'isocost after', 'dash'));
+    traces.push(U.dot2(on ? [h1] : [], th.blue, 'H̃(w′) after', 10));
+    traces.push(U.arrow2(h0, h1, th.blue, 2.5, on ? 1e-3 * zMax : Infinity));
+    U.plot('plotF', traces, U.base2d(th, { xt: 'z<sub>1</sub> (labour per unit)', yt: 'z<sub>2</sub> (capital per unit)', x: { range: [0, zMax] }, y: { range: [0, zMax] } }), U.PLOT_CONFIG);
     $('capF').innerHTML = `Per unit of output the firm uses ${texStr(`\\widetilde H(w)=(${fmt(h0[0], 3)},${fmt(h0[1], 3)})`)}. After a ${fmt(state.r * state.t, 0)} % wage rise it moves along the <span class="c-l2-blue">unit isoquant</span> to ${texStr(`(${fmt(h1[0], 3)},${fmt(h1[1], 3)})`)}: less labour per unit of output (substitution, ${texStr('\\sigma')}). ${s.tech === 'leontief' ? 'With Leontief technology there is no substitution: the point stays put.' : ''}`;
   }
 
@@ -167,7 +165,7 @@
     const base = U.base2d(th, { xt: 'σ', yt: '|ε<sup>u</sup><sub>11</sub>|', x: { domain: [0, 0.28], range: [0, 5] }, y: { range: [0, Math.max(...ys) * 1.08] }, margin: { l: 46, r: 8, t: 8, b: 44 } });
     base.xaxis2 = { ...base.xaxis, domain: [0.36, 0.64], range: [0, 4], title: { ...base.xaxis.title, text: '−ε<sup>D</sup><sub>p</sub>' } };
     base.xaxis3 = { ...base.xaxis, domain: [0.72, 1], range: [0, 1], title: { ...base.xaxis.title, text: 'sh<sub>1</sub> (via w<sub>1</sub>)' } };
-    Plotly.react('plotR', traces, base, { ...U.PLOT_CONFIG, displayModeBar: false });
+    U.plot('plotR', traces, base, { ...U.PLOT_CONFIG, displayModeBar: false });
     const sg = m.sigma, eta = state.eta;
     $('capR').innerHTML = `Labour demand is more elastic when substitution is easier (left) and when consumers react more to the product price (middle). Along the wage (right) ${texStr('(-\\varepsilon^u_{11})=\\sigma+(-\\varepsilon^D_p-\\sigma)\\,sh_1')}: it rises with labour's cost share only if ${texStr('-\\varepsilon^D_p>\\sigma')} (Hicks' qualification of Marshall's third rule). ${s.tech === 'cobb' ? 'With σ = 1 the share does not move with the wage.' : `Here ${texStr(`-\\varepsilon^D_p=${fmt(eta, 2)}`)} ${eta > sg ? '>' : eta < sg ? '<' : '='} ${texStr(`\\sigma=${fmt(sg, 2)}`)}.`}`;
   }

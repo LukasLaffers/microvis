@@ -7,8 +7,8 @@
   <meta name="description" content="How demand moves with income at fixed prices: income expansion paths, Engel curves, income elasticities, necessities, luxuries and inferior goods, and the conditions of Engel and Cournot. Lecture 6.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=6">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="../shared/style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=7">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -30,6 +30,7 @@
           <summary>How to read this</summary>
           <p>Fix the prices and raise income: the budget line shifts out, and the best bundle moves along the <em>income expansion path</em> (orange). Demand for a good as a function of income is its <em>Engel curve</em>.</p>
           <ul>
+          <li>Press <b>▶ Raise y smoothly</b>: the bundle traces the path, and the Engel curves on the right grow with it.</li>
           <li><b>A</b>: the path is a ray. <b>B</b>: good 2 is a luxury. <b>C</b>: good 1 is inferior.</li>
           <li><b>D</b>: the path curves, and the income elasticities change with income.</li>
           <li><b>E</b>: good 1 is normal at low incomes and inferior at high ones; its Engel curve rises, then falls.</li>
@@ -64,7 +65,10 @@
     </section>
 
     <section class="panel main-panel" aria-label="Income expansion path">
-      <div class="panel-head"><h2>Income expansion path</h2></div>
+      <div class="panel-head">
+        <h2>Income expansion path</h2>
+        <div class="btn-row" role="group" aria-label="Animation"><button type="button" id="play-income">▶ Raise y smoothly</button></div>
+      </div>
       <div id="plot" class="plot plot-main"></div>
       <p class="caption" id="cap"></p>
     </section>
@@ -95,12 +99,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=6"></script>
-  <script src="../shared/consumer-model.js?v=6"></script>
-  <script src="../shared/consumer-ui.js?v=6"></script>
-  <script src="model.js?v=6"></script>
-  <script src="app.js?v=6"></script>
-  <script src="../shared/theme.js?v=6"></script>
+  <script src="../shared/ui.js?v=7"></script>
+  <script src="../shared/consumer-model.js?v=7"></script>
+  <script src="../shared/consumer-ui.js?v=7"></script>
+  <script src="model.js?v=7"></script>
+  <script src="app.js?v=7"></script>
+  <script src="../shared/theme.js?v=7"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

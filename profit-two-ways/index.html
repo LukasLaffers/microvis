@@ -7,8 +7,8 @@
   <meta name="description" content="Profit maximisation in one step (choose inputs directly) and in two steps (cost minimisation, then output choice) give the same answer. Lecture 2.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=6">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="../shared/style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=7">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -33,7 +33,7 @@
           <summary>How to read this</summary>
           <p>The surface is profit <span class="tex" data-tex="p\phi(z)-w^tz"></span> over all input bundles: its peak is the one step answer. The <span class="c-l2-blue">blue ray</span> is the expansion path, the cheapest bundle for each output (Step 1); the <span class="c-l2-red">red curve</span> is profit along it (Step 2). Both peaks are the same point: <span class="tex" data-tex="D(w,p)=H\big(w,S(w,p)\big)"></span>.</p>
           <ul>
-          <li>Press <b>▶ Show the two steps</b>.</li>
+          <li>Press <b>▶ Show the two steps</b>: Step 1 draws the expansion path; Step 2 slides along it to the best output.</li>
           <li>Change <span class="tex" data-tex="p"></span> or <span class="tex" data-tex="w_1"></span>: the two answers move together.</li>
           </ul>
         </details>
@@ -74,11 +74,6 @@
       </div>
 
       <div class="group">
-        <button type="button" class="big-button" id="animate">▶ Show the two steps</button>
-        <p class="note" id="anim-note">Step 1 draws the expansion path; Step 2 slides along it to the best output.</p>
-      </div>
-
-      <div class="group">
         <h2>Layers</h2>
         <label class="check"><input type="checkbox" id="surface" checked> <span>Profit surface</span></label>
         <div class="ctrl" data-key="opacity" data-label="\text{opacity}" data-hint="surface" data-min="0.1" data-max="1" data-step="0.05"></div>
@@ -89,6 +84,7 @@
     <section class="panel plot3d-panel" aria-label="Profit surface">
       <div class="panel-head">
         <h2>Profit <span class="tex" data-tex="p\phi(z)-w_1z_1-w_2z_2"></span></h2>
+        <div class="btn-row" role="group" aria-label="Animation"><button type="button" id="animate">▶ Show the two steps</button></div>
         <div class="btn-row" role="group" aria-label="Camera">
           <button type="button" data-cam="3d">3D</button>
           <button type="button" data-cam="top">Top</button>
@@ -132,12 +128,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=6"></script>
-  <script src="../shared/firm-ui.js?v=6"></script>
-  <script src="../shared/firm-model.js?v=6"></script>
-  <script src="search.js?v=6"></script>
-  <script src="app.js?v=6"></script>
-  <script src="../shared/theme.js?v=6"></script>
+  <script src="../shared/ui.js?v=7"></script>
+  <script src="../shared/firm-ui.js?v=7"></script>
+  <script src="../shared/firm-model.js?v=7"></script>
+  <script src="search.js?v=7"></script>
+  <script src="app.js?v=7"></script>
+  <script src="../shared/theme.js?v=7"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

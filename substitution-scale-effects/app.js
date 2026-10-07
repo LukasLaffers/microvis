@@ -21,6 +21,9 @@
 
   let ctrls = {};
   const schedule = U.scheduler(render);
+  // While an animation plays, captions and tables are rewritten at most ten times a second (each rewrite lays out the page).
+  let writeText = true, lastText = 0;
+  const textDue = () => { if (!state.playing) return true; const t = performance.now(); if (t - lastText < 100) return false; lastText = t; return true; };
   const N = 160;   // steps along the smooth change
 
   // The smooth change of w1 is computed only in that mode, and again only when a parameter other than t changes.
@@ -29,7 +32,7 @@
     const s = tech(), w = [state.w1, state.w2], r = SS.decompose(w, state.p, s, state.w1n - state.w1);
     if (state.mode !== 'smooth') return { s, w, r };
     const key = JSON.stringify([s, w, state.p, state.w1n]);
-    if (cache.key !== key) cache = { key, path: SS.path(w, state.p, s, state.w1n, N) };
+    if (cache.key !== key) cache = { key, path: SS.path(w, state.p, s, state.w1n, N), big: null };
     return { s, w, r, path: cache.path, now: at(cache.path, state.t) };
   };
 
@@ -109,7 +112,7 @@
       annotations.push({ x: (A[0] + C[0]) / 2, y: y2, text: `total ${fmt(C[0] - A[0], 3)}`, showarrow: false, yanchor: 'bottom', font: { size: 11, color: th.ink } });
     }
 
-    Plotly.react('plot', traces, U.base2d(th, {
+    U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
       x: { range: xr, constrain: 'domain' }, y: { range: yr, scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
       annotations, shapes
@@ -147,7 +150,7 @@
       traces.push(ray(A, th.muted, 1, 'expansion path at the start'));
     }
     if (qNow > 0) {
-      traces.push(U.line2(FM.isoquant(qNow, s, zmax), th.ink, 2.5, `isoquant now, q = ${fmt(qNow)}`));
+      traces.push(U.line2(FM.isoquant(qNow, s, zmax), th.ink, 2.5, 'isoquant now'));
       if (moved) traces.push(U.line2(isocost(wNow, D), th.ink, 1.8, 'isocost line now'));
       if (moved) traces.push(ray(D, th.ink, 1.4, 'expansion path now'));
     }
@@ -164,25 +167,21 @@
       const d = SS.decomposeDerivative([x, w[1]], state.p, s);
       return { sub: [d.input1.substitution, d.input2.substitution].map(v => v * sign), sc: [d.input1.scale, d.input2.scale].map(v => v * sign) };
     };
-    const v = vel(now.w1);
-    if (v) {
-      // one length scale for the whole change, so the arrows' lengths can be compared from moment to moment
+    // Arrows, labels and bars are traces (not annotations), so that each frame of the animation only moves points.
+    const v = vel(now.w1) || { sub: [0, 0], sc: [0, 0] };
+    // one length scale for the whole change, so the arrows' lengths can be compared from moment to moment
+    if (cache.big === null) {
       let big = 1e-12;
       for (let i = 0; i <= N; i += 10) { const u = vel(path.w1[i]); if (u) big = Math.max(big, Math.hypot(...u.sub), Math.hypot(...u.sc), Math.hypot(u.sub[0] + u.sc[0], u.sub[1] + u.sc[1])); }
-      const L = 0.45 * span / big, tip = d => [D[0] + d[0] * L, D[1] + d[1] * L];
-      const arrow = (to, color, width) => {
-        if (Math.hypot(to[0] - D[0], to[1] - D[1]) < 1e-3 * span) return;
-        annotations.push({ x: to[0], y: to[1], ax: D[0], ay: D[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowsize: 1.2, arrowwidth: width, arrowcolor: color, text: '' });
-      };
-      const tS = tip(v.sub), tC = tip(v.sc), tT = tip([v.sub[0] + v.sc[0], v.sub[1] + v.sc[1]]);
-      if (Math.hypot(tT[0] - D[0], tT[1] - D[1]) > 1e-3 * span) {
-        shapes.push({ type: 'line', x0: tS[0], y0: tS[1], x1: tT[0], y1: tT[1], line: { color: th.red, width: 1, dash: 'dot' } });
-        shapes.push({ type: 'line', x0: tC[0], y0: tC[1], x1: tT[0], y1: tT[1], line: { color: th.blue, width: 1, dash: 'dot' } });
-      }
-      arrow(tS, th.blue, 3); arrow(tC, th.red, 3); arrow(tT, th.ink, 2);
-      const lab = (z, text, color) => { if (Math.hypot(z[0] - D[0], z[1] - D[1]) > 0.02 * span) annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: z[0] >= D[0] ? 'left' : 'right', xshift: z[0] >= D[0] ? 6 : -6, font: { size: 12, color }, bgcolor: th.panel }); };
-      lab(tS, 'substitution', th.blue); lab(tC, 'scale', th.red);
+      cache.big = big;
     }
+    const L = 0.45 * span / cache.big, tip = d => [D[0] + d[0] * L, D[1] + d[1] * L], min = 1e-3 * span;
+    const tS = tip(v.sub), tC = tip(v.sc), tT = tip([v.sub[0] + v.sc[0], v.sub[1] + v.sc[1]]);
+    const far = (z, m) => Math.hypot(z[0] - D[0], z[1] - D[1]) > m;
+    traces.push(U.line2(far(tT, min) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, min) ? [tC, tT] : [], th.blue, 1, '', 'dot'));
+    traces.push(U.arrow2(D, tS, th.blue, 3, min), U.arrow2(D, tC, th.red, 3, min), U.arrow2(D, tT, th.ink, 2, min));
+    const lab = (z, text, color) => U.text2(far(z, 0.02 * span) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left');
+    traces.push(lab(tS, 'substitution', th.blue), lab(tC, 'scale', th.red));
 
     // Points.
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 15, color } });
@@ -193,15 +192,15 @@
     // Bars on the z1 axis, growing together: substitution, scale and their sum, accumulated so far.
     const h = yr[1] - yr[0], row = i => yr[0] + (0.035 + 0.04 * i) * h;
     const bar = (i, d, color, width, text) => {
-      if (Math.abs(d) < 1e-9) return;
-      shapes.push({ type: 'line', x0: A[0], x1: A[0] + d, y0: row(i), y1: row(i), line: { color, width } });
-      annotations.push({ x: Math.min(A[0], A[0] + d), y: row(i), text, showarrow: false, xanchor: 'right', xshift: -6, font: { size: 11, color } });
+      const show = Math.abs(d) >= 1e-9;
+      traces.push(U.line2(show ? [[A[0], row(i)], [A[0] + d, row(i)]] : [], color, width, ''));
+      traces.push(U.text2(show ? [Math.min(A[0], A[0] + d), row(i)] : null, text + '  ', color, 'middle left', 11));
     };
     bar(2, now.substitution[0], th.blue, 5, 'substitution');
     bar(1, now.scale[0], th.red, 5, 'scale');
     bar(0, now.substitution[0] + now.scale[0], th.ink, 2.5, 'total');
 
-    Plotly.react('plot', traces, U.base2d(th, {
+    U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
       x: { range: xr, constrain: 'domain' }, y: { range: yr, scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
       annotations, shapes
@@ -211,8 +210,9 @@
     if (r.qA === 0) cap = 'At these prices the firm does not produce (p is below minimum average cost), so there is nothing to decompose.';
     else if (s.tech === 'leontief') cap = 'Leontief: no substitution is possible, so the whole change is the scale effect: the firm slides down its expansion path.';
     else if (s.tech === 'linear') cap = 'Linear: the firm uses only the cheaper input, so when w₁ passes the switch price the bundle jumps to the other axis.';
+    else if (!writeText) cap = null;
     else cap = `${texStr(`w_1=${fmt(now.w1)}`)}, output ${texStr(`q=${fmt(qNow)}`)}. The firm moves along the black path from A to C. At every moment it substitutes (blue arrow, along the current isoquant) and scales down (red arrow, along the current expansion path) at the same time; the two arrows add up to the black one, the direction of the path.`;
-    $('cap-main').innerHTML = cap;
+    if (cap !== null) $('cap-main').innerHTML = cap;
   }
 
   // ---------- why output falls ----------
@@ -262,7 +262,7 @@
     }
     const dw = r.wNew[0] - w[0];
     $('capTri').innerHTML = tri ? `Lecture 4, (∗): by Shephard's lemma ${texStr(`\\partial MC/\\partial w_1=\\partial H^1/\\partial q=${fmt(tri.c.dHdq, 3)}`)}. A change of ${texStr(`w_1`)} by ${fmt(dw, 2)} shifts MC at ${texStr('q^\\ast')} by about ${fmt(tri.c.dHdq, 3)} × ${fmt(dw, 2)} = ${fmt(tri.shift, 3)} (the vertical side of the red triangle). MC has slope ${texStr(`C_{qq}=${fmt(tri.c.Cqq, 3)}`)}, so output changes by about ${fmt(tri.shift, 3)} / ${fmt(tri.c.Cqq, 3)} = ${fmt(tri.dq, 3)} (the horizontal side): ${texStr('\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=\\left(-\\frac{1}{C_{qq}}\\right)\\frac{\\partial H^1}{\\partial q}')}. This is a first-order estimate; the actual change is ${fmt(Math.abs(r.qA - r.qC), 3)}.` : '';
-    Plotly.react('plotB', traces, U.base2d(th, {
+    U.plot('plotB', traces, U.base2d(th, {
       xt: 'q', yt: 'p', x: { range: [0, qmax] }, y: { range: [0, yMax] }, annotations,
       shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: p, y1: p, line: { color: th.muted, width: 1.5, dash: 'dash' } }]
     }), U.PLOT_CONFIG);
@@ -316,6 +316,7 @@
   // ---------- render loop ----------
 
   function render() {
+    writeText = textDue();
     U.applyVisibility({ ces: state.tech === 'ces', ushape: state.profile === 'ushape', homog: state.profile === 'homog', steps: state.mode === 'steps', smooth: state.mode === 'smooth' });
     $('play-steps').setAttribute('aria-pressed', String(state.mode === 'steps'));
     $('play-smooth').setAttribute('aria-pressed', String(state.mode === 'smooth'));
@@ -328,7 +329,7 @@
     tex($('formula-numbers'), f.numbers, true);
     guard('input-space plot', () => drawMain(th, P));
     guard('cost plot', () => drawCosts(th, P));
-    guard('table', () => renderTable(P));
+    if (writeText) guard('table', () => renderTable(P));
   }
 
   // The two animations; while one runs, both buttons wait.
@@ -354,7 +355,7 @@
   // Raise w1 smoothly: t runs from 0 to 1 and everything moves at the same time; the slider t stays.
   const playSmooth = () => play('smooth', 5000,
     f => { state.t = f; ctrls.t.sync(); guard('animation', render); },
-    () => {});
+    render);
 
   function init() {
     U.renderStaticTex();

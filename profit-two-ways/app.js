@@ -137,7 +137,7 @@
       const z = S.q > 0 ? P.D : [0, 0], right = z[0] > 0.5 * zmax;
       annotations.push({ x: z[0], y: z[1], text: 'H(w,S(w,p)) = D(w,p)', showarrow: false, xanchor: right ? 'right' : 'left', yanchor: 'top', xshift: right ? -8 : 8, yshift: -6, font: { size: 12, color: th.ink }, bgcolor: th.panel });
     }
-    Plotly.react('plotA', traces, U.base2d(th, {
+    U.plot('plotA', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
       x: { range: [0, zmax], constrain: 'domain' }, y: { range: [0, zmax], scaleanchor: 'x', scaleratio: 1, constrain: 'domain' }, annotations
     }), U.PLOT_CONFIG);
@@ -154,7 +154,7 @@
     else if (state.anim !== null && phase1() >= 1) { const q = sq * f2; traces.push(U.dot2([[q, p * q - FM.cost(w, q, s)]], th.red, 'searching', 11)); }
     const hi = Math.max(...prof, 1), lo = Math.max(Math.min(...prof), -1.5 * hi);
     const ann = f2 >= 1 && sq > 0 ? [{ x: sq, y: Pi, text: 'q = S(w,p)', showarrow: false, yanchor: 'bottom', yshift: 8, font: { color: th.red, size: 12 } }] : [];
-    Plotly.react('plotB', traces, U.base2d(th, {
+    U.plot('plotB', traces, U.base2d(th, {
       xt: 'q (along the expansion path)', yt: 'pq − C(w,q)', x: { range: [0, qMax] }, y: { range: [lo - 0.05 * hi, hi * 1.25] }, annotations: ann,
       shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 0, y1: 0, line: { color: th.muted, width: 1.5 } }]
     }), U.PLOT_CONFIG);
@@ -210,7 +210,7 @@
         drawB(th, P);
       });
       if (state.anim < 1) requestAnimationFrame(step);
-      else { state.anim = null; render(); $('animate').disabled = false; $('animate').textContent = '↻ Show the two steps again'; }
+      else { state.anim = null; render(); $('animate').disabled = false; }
     };
     requestAnimationFrame(step);
   }

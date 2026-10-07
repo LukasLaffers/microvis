@@ -283,6 +283,7 @@ input[type="checkbox"] { accent-color: var(--brand); width: 16px; height: 16px; 
 .go-row button { padding: 4px 12px; }
 .btn-row button:hover, .go-row button:hover, .seg button:hover:not([aria-pressed="true"]) { border-color: var(--ink); }
 .btn-row button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--panel); font-weight: 600; }
+.btn-row button:disabled { opacity: 0.6; cursor: default; }
 
 button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible {
   outline: 2px solid var(--brand);

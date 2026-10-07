@@ -7,8 +7,8 @@
   <meta name="description" content="With constant returns to scale the elasticity of an industry's demand for labour is a weighted average of the elasticity of substitution and the price elasticity of product demand. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=6">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="../shared/style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=7">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>With constant returns, industry supply is flat at <span class="tex" data-tex="p=c(w)"></span> and demand <span class="tex" data-tex="Dem(p)"></span> decides the output. When the wage <span class="tex" data-tex="w_1"></span> rises, the industry uses less labour for two reasons: firms <span class="c-l2-blue">substitute capital for labour</span> (how easily: <span class="tex" data-tex="\sigma"></span>), and the dearer product <span class="c-l2-red">sells less</span> (how strongly: <span class="tex" data-tex="-\varepsilon^D_p"></span>).</p>
           <ul>
-          <li>Press <b>Raise w₁</b>: both channels respond at once.</li>
+          <li>Press <b>▶ Raise w₁</b>: both channels respond at once.</li>
           <li>The industry's labour demand elasticity is a weighted average of the two, with labour's cost share <span class="tex" data-tex="sh_1"></span> as the weight on product demand. Changing <span class="tex" data-tex="\delta"></span> or the prices moves the balance point of the lever.</li>
           <li>Choose <b>Leontief</b>: <span class="tex" data-tex="\sigma=0"></span>, and only product demand is left.</li>
           </ul>
@@ -61,12 +61,14 @@
       <div class="group">
         <h2>What if the wage rises?</h2>
         <div class="ctrl" data-key="r" data-label="\Delta w_1/w_1" data-hint="wage rise, %" data-min="1" data-max="50" data-step="1"></div>
-        <div class="btn-row"><button type="button" id="raise">Raise w₁</button></div>
       </div>
     </section>
 
     <section class="panel main-panel" aria-label="The weighted average">
-      <div class="panel-head"><h2>The weighted average</h2></div>
+      <div class="panel-head">
+        <h2>The weighted average</h2>
+        <div class="btn-row" role="group" aria-label="Animation"><button type="button" id="raise">▶ Raise w₁</button></div>
+      </div>
       <div id="plot" class="plot plot-lever"></div>
       <p class="caption" id="capA"></p>
       <div class="panel-head"><h2>The industry's demand for labour</h2></div>
@@ -110,12 +112,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=6"></script>
-  <script src="../shared/firm-ui.js?v=6"></script>
-  <script src="../shared/firm-model.js?v=6"></script>
-  <script src="model.js?v=6"></script>
-  <script src="app.js?v=6"></script>
-  <script src="../shared/theme.js?v=6"></script>
+  <script src="../shared/ui.js?v=7"></script>
+  <script src="../shared/firm-ui.js?v=7"></script>
+  <script src="../shared/firm-model.js?v=7"></script>
+  <script src="model.js?v=7"></script>
+  <script src="app.js?v=7"></script>
+  <script src="../shared/theme.js?v=7"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>
