@@ -15,8 +15,10 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 - Substitution and Scale Effects: opens with the two-step picture A → B → C; two buttons in the figure's panel head, **▶ Step by step** and **▶ Raise w₁ smoothly** (smooth change, slider `t` under the plot). `state.mode` = `'steps'` / `'smooth'` switches figure, cost plot, table and captions (`data-show`). `model.js` `path()` with tests.
 - Two decimals everywhere: `shared/ui.js` `fmt(x, d)`, any d >= 2 gives two decimals, three when two would show a non-zero number as 0.00 (0.004); below 0.001 the ×10^n form. `fmtSum(parts)` gives parts and total with the same decimals, the total being the sum of the rounded parts (decomposition tables of Substitution and Scale Effects, Slutsky, Marshall's Law). Hover labels `.2f`. The published tables (Translog, Deadweight Loss groups) keep three. Lines with products of rounded numbers (Marshall, Engel, Monopoly, Homogeneous) can be off by 0.01 in the last digit; Slutsky's elasticity line is computed from the shown numbers.
 
-### 2. Next
-Nothing requested.
+### 2. Not merged yet (branch `claude/vigilant-carson-p2wfrl`)
+- **Substitution and Income Effects (Slutsky)** now works like Substitution and Scale Effects: opens with the two-step picture E₁ → E₂ → E₃; in the figure's panel head **▶ Step by step** (blue along v⁰ to E₂, then red to E₃) and **▶ Lower/Raise p₁ smoothly** (label follows the direction; slider `t` under the plot; arrows substitution + income = direction of the path; bars on the x₁ axis; table "so far"; checks at the current p₁). `model.js` `path()` (same symmetric split as the firm tool: H at fixed utility vs. fixed prices) with tests (adds up, converges, equals the integrals of the two (M3) terms).
+- **Every animation button sits in the heading of its figure** (user: "the button at the same position like for these two cases"): Profit Two Ways (▶ Show the two steps, next to the camera buttons), Marshall's Law (▶ Raise w₁), Substitution or Composition (▶ Notes example). `.big-button` is gone; `.btn-row button:disabled` in `shared/style.css` → version tag 7.
+
 
 ### 3. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
@@ -37,7 +39,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 
 - Plain HTML/CSS/JS, no build step for pages; Plotly 2.35.2 and KaTeX 0.16.9 vendored in `shared/vendor/`; works offline and from `file://`.
 - `tools/catalog.cjs` (tools in lecture order, tile sentence) + `tools/glyphs.cjs` (64 px tile drawings) → `node tools/build-site.cjs` writes `index.html` and, in every tool page: the "Microvis /" header link, previous/next links, the light/dark switch (button + `<head>` line + `shared/theme.js`), and the GoatCounter line. Run it after any catalog/glyph change; it is idempotent.
-- Version tags: our CSS/JS are linked as `?v=N` (now **6**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=6"' index.html */index.html | xargs sed -i 's/?v=6"/?v=7"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
+- Version tags: our CSS/JS are linked as `?v=N` (now **7**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=7"' index.html */index.html | xargs sed -i 's/?v=7"/?v=8"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
 - Hover previews on tiles: `<tool>/preview.webp` and `preview-dark.webp`, made with `tools/previews.cjs` (Playwright).
 - `style-kit/`: a copy of the look for a new project (README = style guide). Keep `style-kit/shared/{style.css,ui.js,theme.js}` in step with `shared/`.
 - Dark mode: tokens on `:root`, `data-theme` set by the switch; figures redraw on the `microvis-theme` event via `Microvis.watchColorScheme`.

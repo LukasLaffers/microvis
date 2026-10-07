@@ -15,7 +15,8 @@
     normal: { type: 'ces', delta: 0.5, rho: -1, p1: 2, p1n: 1, p2: 1, y: 10 },
     giffen: { type: 'giffen', p1: 2.5, p1n: 2, p2: 1, y: 5 }
   };
-  const state = { a: 0.4, g1: 1, g2: 1, ...PRESETS.normal };
+  const state = { a: 0.4, g1: 1, g2: 1, ...PRESETS.normal, t: 1,
+    mode: 'steps', anim: null, playing: false };   // mode: 'steps' (E1 -> E2 -> E3) or 'smooth' (p1 changes gradually)
   let ctrls = {};
   const schedule = U.scheduler(render);
   const f3 = x => fmt(Math.abs(x) < 5e-10 ? 0 : x, 3);
@@ -23,37 +24,153 @@
   const pref = () => state.type === 'ces' ? { type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }
     : state.type === 'stonegeary' ? { type: 'stonegeary', a: state.a, g1: state.g1, g2: state.g2 } : { type: 'giffen', c: 1, s: 4 };
 
+  const N = 160;   // steps along the smooth change
+
+  // The smooth change of p1 is computed only in that mode, and again only when a parameter other than t changes.
+  let cache = { key: '', path: null };
   function solve() {
     const u = pref(), p = [state.p1, state.p2];
-    return { u, p, d: SM.decompose(p, state.y, u, state.p1n), cls: SM.classify(p, state.y, u) };
+    const S = { u, p, d: SM.decompose(p, state.y, u, state.p1n), cls: SM.classify(p, state.y, u) };
+    if (state.mode !== 'smooth') return S;
+    const key = JSON.stringify([u, p, state.y, state.p1n]);
+    if (cache.key !== key) cache = { key, path: SM.path(p, state.y, u, state.p1n, N) };
+    return { ...S, path: cache.path, now: at(cache.path, state.t) };
   }
 
-  function draw(th, S) {
-    const { u, p, d } = S, y = state.y, pn = [state.p1n, state.p2];
-    // Each axis up to its largest intercept (no common scale: the Giffen example lives in a narrow strip).
+  // The state of the change at t in [0, 1]: p1, bundle and the accumulated parts (linear between steps).
+  function at(P, t) {
+    const x = t * N, k = Math.min(N - 1, Math.floor(x)), f = x - k;
+    const lerp = (u, v) => Array.isArray(u) ? u.map((ui, i) => ui + (v[i] - ui) * f) : u + (v - u) * f;
+    return { p1: lerp(P.p1[k], P.p1[k + 1]), D: lerp(P.D[k], P.D[k + 1]),
+      substitution: lerp(P.substitution[k], P.substitution[k + 1]), income: lerp(P.income[k], P.income[k + 1]), k: Math.round(x) };
+  }
+
+  // Each axis up to its largest intercept (no common scale: the Giffen example lives in a narrow strip).
+  function frame(S) {
+    const y = state.y, p = S.p, pn = [state.p1n, state.p2];
     const Lx = 1.12 * y / Math.min(p[0], pn[0]), Ly = 1.12 * y / p[1];
-    const x1s = U.linspace(Lx / 500, Lx, 400), ic = v => CM.indifferenceCurve(v, u, x1s).map(([a, b]) => [a, b !== null && b <= Ly * 1.05 ? b : null]);
-    const L = Math.max(Lx, Ly);
-    const line = (m, q, color, width, name, dash) => U.line2([[m / q[0], 0], [0, m / q[1]]], color, width, name, dash);
+    const x1s = U.linspace(Lx / 500, Lx, 400);
+    return { Lx, Ly, L: Math.max(Lx, Ly), ic: v => CM.indifferenceCurve(v, S.u, x1s).map(([a, b]) => [a, b !== null && b <= Ly * 1.05 ? b : null]) };
+  }
+  const budget = (m, q, color, width, name, dash) => U.line2([[m / q[0], 0], [0, m / q[1]]], color, width, name, dash);
+  const layout = (th, F, annotations, shapes = []) => U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, F.Lx] }, y: { range: [0, F.Ly] }, annotations, shapes, margin: { l: 48, r: 12, t: 8, b: 44 } });
+
+  // Two pictures: the two-step split E1 -> E2 -> E3 (on load), and the smooth change with slider t.
+  const draw = (th, S) => (state.mode === 'smooth' ? drawSmooth : drawSteps)(th, S);
+
+  const headText = S => S.cls.kind === 'giffen' ? 'A Giffen good: the income effect wins' : S.cls.kind === 'inferior' ? 'An inferior good' : 'A normal good';
+
+  // ---------- the two-step split ----------
+
+  // Animation: 0-0.5 substitution (E1 to E2 along v0), 0.5-1 income (E2 to E3).
+  const fSub = () => state.anim === null ? 1 : Math.min(1, state.anim / 0.5);
+  const fInc = () => state.anim === null ? 1 : Math.max(0, (state.anim - 0.5) / 0.5);
+
+  function drawSteps(th, S) {
+    const { u, p, d } = S, y = state.y, pn = [state.p1n, state.p2], F = frame(S), L = F.L;
     const traces = [
-      U.line2(ic(d.v0), th.muted, 1.8, 'indifference curve v⁰'),
-      U.line2(ic(d.v1), th.muted, 1.8, 'indifference curve v¹', 'dot'),
-      line(y, p, th.ink, 2, `budget at p₁ = ${fmt(p[0])}`),
-      line(y, pn, th.ink, 2, `budget at p₁′ = ${fmt(pn[0])}`, 'dash'),
-      line(d.yc, pn, th.blue, 1.6, 'compensated budget (new prices, old utility)', 'dot'),
-      U.dot2([d.E1], th.ink, 'E₁', 11), U.dot2([d.E2], th.blue, 'E₂', 11), U.dot2([d.E3], th.red, 'E₃', 11)
+      U.line2(F.ic(d.v0), th.muted, 1.8, 'indifference curve v⁰'),
+      U.line2(F.ic(d.v1), th.muted, 1.8, 'indifference curve v¹', 'dot'),
+      budget(y, p, th.ink, 2, `budget at p₁ = ${fmt(p[0])}`),
+      budget(y, pn, th.ink, 2, `budget at p₁′ = ${fmt(pn[0])}`, 'dash'),
+      budget(d.yc, pn, th.blue, 1.6, 'compensated budget (new prices, old utility)', 'dot')
     ];
     const annotations = [];
-    const arrow = (a, b, color) => { if (Math.hypot(a[0] - b[0], a[1] - b[1]) > L * 0.01) annotations.push({ x: b[0], y: b[1], ax: a[0], ay: a[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2.5, arrowcolor: color, text: '' }); };
-    arrow(d.E1, d.E2, th.blue); arrow(d.E2, d.E3, th.red);
     const lab = (pt, text, color, ax) => annotations.push({ x: pt[0], y: pt[1], text, showarrow: false, xanchor: ax, yanchor: 'bottom', xshift: ax === 'left' ? 8 : -8, yshift: 4, font: { size: 14, color } });
-    lab(d.E1, 'E<sub>1</sub>', th.ink, 'right'); lab(d.E2, 'E<sub>2</sub>', th.blue, 'left'); lab(d.E3, 'E<sub>3</sub>', th.red, 'left');
-    Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, Lx] }, y: { range: [0, Ly] }, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    if (state.anim === null) {
+      traces.push(U.dot2([d.E1], th.ink, 'E₁', 11), U.dot2([d.E2], th.blue, 'E₂', 11), U.dot2([d.E3], th.red, 'E₃', 11));
+      const arrow = (a, b, color) => { if (Math.hypot(a[0] - b[0], a[1] - b[1]) > L * 0.01) annotations.push({ x: b[0], y: b[1], ax: a[0], ay: a[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2.5, arrowcolor: color, text: '' }); };
+      arrow(d.E1, d.E2, th.blue); arrow(d.E2, d.E3, th.red);
+      lab(d.E1, 'E<sub>1</sub>', th.ink, 'right'); lab(d.E2, 'E<sub>2</sub>', th.blue, 'left'); lab(d.E3, 'E<sub>3</sub>', th.red, 'left');
+    } else {
+      // Substitution: along v0 from E1 to E2 (blue). Income: from E2 straight to E3 (red).
+      const fs = fSub(), fc = fInc(), n = 60;
+      const arc = Array.from({ length: Math.max(1, Math.round(n * fs)) + 1 }, (_, i) => {
+        const x1 = d.E1[0] + (d.E2[0] - d.E1[0]) * i / n, x2 = i === 0 ? d.E1[1] : i === n ? d.E2[1] : CM.x2On(x1, d.v0, u);
+        return x2 === null ? null : [x1, x2];
+      }).filter(Boolean);
+      if (arc.length > 1) traces.push(U.line2(arc, th.blue, 4, 'substitution'));
+      const now = fs < 1 ? arc[arc.length - 1] : [d.E2[0] + (d.E3[0] - d.E2[0]) * fc, d.E2[1] + (d.E3[1] - d.E2[1]) * fc];
+      if (fs >= 1 && fc > 0) traces.push(U.line2([d.E2, now], th.red, 4, 'income'));
+      traces.push(U.dot2([d.E1], th.ink, 'E₁', 11)); lab(d.E1, 'E<sub>1</sub>', th.ink, 'right');
+      if (fs >= 1) { traces.push(U.dot2([d.E2], th.blue, 'E₂', 11)); lab(d.E2, 'E<sub>2</sub>', th.blue, 'left'); }
+      traces.push(U.dot2([now], fs < 1 ? th.blue : th.red, 'moving', 9));
+    }
+    Plotly.react('plot', traces, layout(th, F, annotations), { ...U.PLOT_CONFIG, displayModeBar: false });
     const fall = pn[0] < p[0];
-    $('head').textContent = S.cls.kind === 'giffen' ? 'A Giffen good: the income effect wins' : S.cls.kind === 'inferior' ? 'An inferior good' : 'A normal good';
+    $('head').textContent = headText(S);
     $('cap').innerHTML = `The price of good 1 ${fall ? 'falls' : 'rises'} from ${fmt(p[0])} to ${fmt(pn[0])}. ${texStr('E_1\\to E_2')}: <span class="c-l2-blue">substitution</span> along the indifference curve ${texStr('v^0')}, to where its slope equals the new price ratio (the dotted blue line is the budget line that would just let her stay on ${texStr('v^0')}, with income ${texStr(`C(p',v^0)=${f3(d.yc)}`)}). ${texStr('E_2\\to E_3')}: <span class="c-l2-red">income effect</span>, a parallel shift to the actual new budget line.` +
       (S.cls.kind === 'giffen' ? ` Here the income effect on good 1 (${f3(d.income[0])}) outweighs the substitution effect (${f3(d.substitution[0])}): she buys ${fall ? 'less' : 'more'} of good 1 although it got ${fall ? 'cheaper' : 'dearer'}.` : '');
   }
+
+  // ---------- the smooth change ----------
+
+  function drawSmooth(th, S) {
+    const { u, p, d, path, now } = S, y = state.y, F = frame(S), traces = [], annotations = [], shapes = [];
+    const pNow = [now.p1, p[1]], D = now.D, vNow = CM.utility(D, u), moved = Math.abs(now.p1 - p[0]) > 1e-9;
+
+    // Where the consumer started (faint) and where she is now (strong): indifference curve and budget line.
+    traces.push(U.line2(F.ic(d.v0), th.muted, 1.2, 'indifference curve at the start, v⁰'));
+    traces.push(budget(y, p, th.muted, 1.2, `budget at the start, p₁ = ${fmt(p[0])}`, 'dash'));
+    traces.push(U.line2(F.ic(vNow), th.ink, 2.5, 'indifference curve now'));
+    if (moved) traces.push(budget(y, pNow, th.ink, 1.8, `budget now, p₁ = ${fmt(now.p1)}`));
+
+    // The path of the consumer: travelled (black) and still ahead (faint).
+    const k = now.k;
+    traces.push(U.line2(path.D.slice(k), th.muted, 1.5, 'still ahead', 'dot'));
+    traces.push(U.line2(path.D.slice(0, k + 1).concat([D]), th.ink, 4, 'path of the consumer'));
+
+    // At the current point, both effects at once: substitution along the indifference curve, income across them.
+    const sign = Math.sign(state.p1n - state.p1) || 1;
+    const vel = x => {
+      const sl = [0, 1].map(j => CM.slutsky([x, p[1]], y, u, j, 0));
+      return { sub: sl.map(s => s.substitution * sign), inc: sl.map(s => s.income * sign) };
+    };
+    const ok = v => [...v.sub, ...v.inc].every(Number.isFinite);
+    const v = vel(now.p1);
+    if (ok(v)) {
+      // one length scale for the whole change, so the arrows' lengths can be compared from moment to moment
+      let big = 1e-12;
+      for (let i = 0; i <= N; i += 10) { const w = vel(path.p1[i]); if (ok(w)) big = Math.max(big, Math.hypot(...w.sub), Math.hypot(...w.inc), Math.hypot(w.sub[0] + w.inc[0], w.sub[1] + w.inc[1])); }
+      const ext = Math.max(...[path.D[N], d.E2].map(z => Math.hypot(z[0] - d.E1[0], z[1] - d.E1[1])), 0.05 * Math.min(F.Lx, F.Ly));
+      const len = 0.6 * Math.max(ext, 0.15 * Math.min(F.Lx, F.Ly)) / big, tip = q => [D[0] + q[0] * len, D[1] + q[1] * len], tiny = 1e-3 * ext;
+      const arrow = (to, color, width) => {
+        if (Math.hypot(to[0] - D[0], to[1] - D[1]) < tiny) return;
+        annotations.push({ x: to[0], y: to[1], ax: D[0], ay: D[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowsize: 1.2, arrowwidth: width, arrowcolor: color, text: '' });
+      };
+      const tS = tip(v.sub), tI = tip(v.inc), tT = tip([v.sub[0] + v.inc[0], v.sub[1] + v.inc[1]]);
+      if (Math.hypot(tT[0] - D[0], tT[1] - D[1]) > tiny) {
+        shapes.push({ type: 'line', x0: tS[0], y0: tS[1], x1: tT[0], y1: tT[1], line: { color: th.red, width: 1, dash: 'dot' } });
+        shapes.push({ type: 'line', x0: tI[0], y0: tI[1], x1: tT[0], y1: tT[1], line: { color: th.blue, width: 1, dash: 'dot' } });
+      }
+      arrow(tS, th.blue, 3); arrow(tI, th.red, 3); arrow(tT, th.ink, 2);
+      const lab = (z, text, color) => { if (Math.hypot(z[0] - D[0], z[1] - D[1]) > 0.04 * ext) annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: z[0] >= D[0] ? 'left' : 'right', xshift: z[0] >= D[0] ? 6 : -6, font: { size: 12, color }, bgcolor: th.panel }); };
+      lab(tS, 'substitution', th.blue); lab(tI, 'income', th.red);
+    }
+
+    // Points.
+    const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 14, color } });
+    traces.push(U.dot2([d.E1], th.ink, 'E₁ = D(p, y)', 10)); label(d.E1, 'E<sub>1</sub>', th.ink, -8);
+    traces.push(U.dot2([d.E3], th.muted, "E₃ = D(p′, y)", 9)); label(d.E3, 'E<sub>3</sub>', th.muted, 8);
+    traces.push(U.dot2([D], th.ink, 'the consumer now', 13));
+
+    // Bars on the x1 axis, growing together: substitution, income and their sum, accumulated so far.
+    const row = i => (0.035 + 0.04 * i) * F.Ly;
+    const bar = (i, dx, color, width, text) => {
+      if (Math.abs(dx) < 1e-9) return;
+      shapes.push({ type: 'line', x0: d.E1[0], x1: d.E1[0] + dx, y0: row(i), y1: row(i), line: { color, width } });
+      annotations.push({ x: Math.min(d.E1[0], d.E1[0] + dx), y: row(i), text, showarrow: false, xanchor: 'right', xshift: -6, font: { size: 11, color } });
+    };
+    bar(2, now.substitution[0], th.blue, 5, 'substitution');
+    bar(1, now.income[0], th.red, 5, 'income');
+    bar(0, now.substitution[0] + now.income[0], th.ink, 2.5, 'total');
+
+    Plotly.react('plot', traces, layout(th, F, annotations, shapes), { ...U.PLOT_CONFIG, displayModeBar: false });
+    $('head').textContent = headText(S);
+    $('cap').innerHTML = `${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars on the ${texStr('x_1')} axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
+  }
+
+  // ---------- demand curves ----------
 
   function drawDemand(th, S) {
     const { u, p, d } = S, lo = Math.min(p[0], state.p1n), hi = Math.max(p[0], state.p1n);
@@ -66,7 +183,8 @@
     Plotly.react('plotB', [
       U.line2(H, th.blue, 2.2, 'Hicksian H¹(p₁, p₂, v⁰)', 'dash'),
       U.line2(D, '#4caf50', 2.5, 'Marshallian D¹(p₁, p₂, y)'),
-      U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E2[0], state.p1n]], th.blue, 'E₂', 9), U.dot2([[d.E3[0], state.p1n]], th.red, 'E₃', 9)
+      ...(S.now ? [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E3[0], state.p1n]], th.muted, 'E₃', 9), U.dot2([[S.now.D[0], S.now.p1]], th.ink, 'now', 12)]
+        : [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E2[0], state.p1n]], th.blue, 'E₂', 9), U.dot2([[d.E3[0], state.p1n]], th.red, 'E₃', 9)])
     ], U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: [0, Math.max(...xs) * 1.1] } }), U.PLOT_CONFIG);
     const k = S.cls.kind;
     $('capB').innerHTML = `<span style="color:#4caf50"><span class="key"></span>Marshallian</span> and <span class="c-l2-blue"><span class="key dash"></span>Hicksian</span> demand through ${texStr('E_1')}. ` +
@@ -75,13 +193,14 @@
   }
 
   function renderNumbers(S) {
-    const { u, p, d, cls } = S;
+    const { u, d, cls, now } = S, p = now ? [now.p1, S.p[1]] : S.p;   // the derivatives at the current price
     // the totals are the sums of the rounded parts, so the table adds up
-    const g1 = U.fmtSum([d.substitution[0], d.income[0]]), g2 = U.fmtSum([d.substitution[1], d.income[1]]);
-    $('table').innerHTML = `<thead><tr><th></th><th>good 1</th><th>good 2</th></tr></thead><tbody>` +
-      `<tr class="row-sub"><th>substitution ${texStr('E_2-E_1')}</th><td>${g1[0]}</td><td>${g2[0]}</td></tr>` +
-      `<tr class="row-inc"><th>income ${texStr('E_3-E_2')}</th><td>${g1[1]}</td><td>${g2[1]}</td></tr>` +
-      `<tr><th>total ${texStr('E_3-E_1')}</th><td>${g1[2]}</td><td>${g2[2]}</td></tr></tbody>`;
+    const sub = now ? now.substitution : d.substitution, inc = now ? now.income : d.income;
+    const g1 = U.fmtSum([sub[0], inc[0]]), g2 = U.fmtSum([sub[1], inc[1]]);
+    $('table').innerHTML = `<thead><tr><th>${now ? 'so far' : ''}</th><th>good 1</th><th>good 2</th></tr></thead><tbody>` +
+      `<tr class="row-sub"><th>substitution${now ? '' : ` ${texStr('E_2-E_1')}`}</th><td>${g1[0]}</td><td>${g2[0]}</td></tr>` +
+      `<tr class="row-inc"><th>income${now ? '' : ` ${texStr('E_3-E_2')}`}</th><td>${g1[1]}</td><td>${g2[1]}</td></tr>` +
+      `<tr><th>total${now ? '' : ` ${texStr('E_3-E_1')}`}</th><td>${g1[2]}</td><td>${g2[2]}</td></tr></tbody>`;
     const s = CM.slutsky(p, state.y, u, 0, 0), e = CM.elasticities(p, state.y, u);
     const item = (ok, html) => `<li><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span><span>${html}</span></li>`;
     // the elasticity as computed from the rounded numbers on the right, so the line adds up
@@ -96,7 +215,10 @@
   }
 
   function render() {
-    U.applyVisibility({ ces: state.type === 'ces', stonegeary: state.type === 'stonegeary', giffen: state.type === 'giffen' });
+    U.applyVisibility({ ces: state.type === 'ces', stonegeary: state.type === 'stonegeary', giffen: state.type === 'giffen', steps: state.mode === 'steps', smooth: state.mode === 'smooth' });
+    $('play-steps').setAttribute('aria-pressed', String(state.mode === 'steps'));
+    $('play-smooth').setAttribute('aria-pressed', String(state.mode === 'smooth'));
+    $('play-smooth').textContent = `▶ ${state.p1n < state.p1 ? 'Lower' : 'Raise'} p₁ smoothly`;
     document.querySelectorAll('[data-preset]').forEach(b => { const P = PRESETS[b.dataset.preset]; b.setAttribute('aria-pressed', String(Object.keys(P).every(k => state[k] === P[k]))); });
     $('type').value = state.type;
     const S = solve(), th = U.theme();
@@ -105,6 +227,31 @@
     guard('demand plot', () => drawDemand(th, S));
     guard('numbers', () => renderNumbers(S));
   }
+
+  // The two animations; while one runs, both buttons wait.
+  function play(mode, DURATION, frame, done) {
+    if (state.playing) return;
+    const start = performance.now();
+    state.playing = true; state.mode = mode;
+    $('play-steps').disabled = $('play-smooth').disabled = true;
+    const step = now => {
+      const f = Math.min(1, (now - start) / DURATION);
+      frame(f);
+      if (f < 1) requestAnimationFrame(step);
+      else { state.playing = false; $('play-steps').disabled = $('play-smooth').disabled = false; done(); }
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Step by step: first substitution (E1 to E2), then income (E2 to E3); ends on the two-step picture.
+  const playSteps = () => play('steps', 3000,
+    f => { if (state.anim === null) { state.anim = 0; render(); } state.anim = f; guard('animation', () => draw(U.theme(), solve())); },
+    () => { state.anim = null; render(); });
+
+  // Change p1 smoothly: t runs from 0 to 1 and everything moves at the same time; the slider t stays.
+  const playSmooth = () => play('smooth', 5000,
+    f => { state.t = f; ctrls.t.sync(); guard('animation', render); },
+    () => {});
 
   function init() {
     U.renderStaticTex();
@@ -115,6 +262,8 @@
       Object.entries(P).forEach(([k, v]) => { state[k] = v; if (ctrls[k]) ctrls[k].sync(); });
       schedule();
     }));
+    $('play-steps').addEventListener('click', playSteps);
+    $('play-smooth').addEventListener('click', playSmooth);
     render();
     U.watchColorScheme(schedule);
   }

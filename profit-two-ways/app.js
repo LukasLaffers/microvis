@@ -210,7 +210,7 @@
         drawB(th, P);
       });
       if (state.anim < 1) requestAnimationFrame(step);
-      else { state.anim = null; render(); $('animate').disabled = false; $('animate').textContent = '↻ Show the two steps again'; }
+      else { state.anim = null; render(); $('animate').disabled = false; }
     };
     requestAnimationFrame(step);
   }

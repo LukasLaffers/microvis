@@ -51,4 +51,28 @@ for (const [u, p, y, p1n] of cases) {
   close(d.E1[0] / d.E1[1], Math.sqrt(0.5), 1e-12); close(d.E3[0], 10 / 2, 1e-12);
   checks += 2;
 }
+// The smooth path: starts at E1, ends at E3, the accumulated parts add up exactly to the total at every step,
+// converge as the steps shrink, and equal the integrals of the two terms of (M3) (trapezoid rule on the derivatives).
+for (const [u, p, y, p1n] of cases) {
+  const label = JSON.stringify({ u, p, y, p1n });
+  const P = M.path(p, y, u, p1n, 200), d = M.decompose(p, y, u, p1n), n = P.p1.length - 1;
+  for (const i of [0, 1]) { close(P.D[0][i], d.E1[i], 1e-12, 'starts at E1 ' + label); close(P.D[n][i], d.E3[i], 1e-12, 'ends at E3 ' + label); }
+  P.D.forEach((x, k) => [0, 1].forEach(i => close(P.substitution[k][i] + P.income[k][i], x[i] - P.D[0][i], 1e-10, 'adds up along the way ' + label)));
+  const fine = M.path(p, y, u, p1n, 800);
+  for (const i of [0, 1]) close(fine.substitution[800][i], P.substitution[n][i], 1e-4, 'converges ' + label);
+  let si = [0, 0], ii = [0, 0];
+  const m = 400, h = (p1n - p[0]) / m;
+  const terms = x => [0, 1].map(j => CM.slutsky([x, p[1]], y, u, j, 0)).map(s => [s.substitution, s.income]);
+  let prev = terms(p[0]);
+  for (let k = 1; k <= m; k++) {
+    const cur = terms(p[0] + k * h);
+    for (const j of [0, 1]) { si[j] += 0.5 * h * (prev[j][0] + cur[j][0]); ii[j] += 0.5 * h * (prev[j][1] + cur[j][1]); }
+    prev = cur;
+  }
+  for (const j of [0, 1]) { close(fine.substitution[800][j], si[j], 2e-3, 'substitution = integral ' + label); close(fine.income[800][j], ii[j], 2e-3, 'income = integral ' + label); }
+  // A price fall: the accumulated substitution effect raises the demand for good 1.
+  if (p1n < p[0]) assert.ok(P.substitution[n][0] > 0, 'smooth substitution ' + label);
+  checks += 4 + 2 * (n + 1) + 6;
+}
+
 console.log(`All ${checks} Slutsky checks passed.`);
