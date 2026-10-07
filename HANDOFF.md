@@ -9,22 +9,16 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 
 ## Start here: what is open
 
-### 1. Not merged yet (branch `claude/vigilant-carson-p2wfrl`, head after the handoff commit)
+### 1. Not merged yet (branch `claude/vigilant-carson-p2wfrl`)
 
-Three changes, previewed but waiting for "merge it":
-- **"Script error." fix** (`shared/ui.js`): the red error banner ignored nothing; it showed "Script error." from Safari extensions / content blockers at random. Now it shows only errors of our own scripts. Tested.
+Four changes, waiting for "merge it":
+- **"Script error." fix** (`shared/ui.js`): the red error banner showed "Script error." from Safari extensions / content blockers at random. Now it shows only errors of our own scripts. Tested.
 - **Cost Curves and Supply**: the orange supply curve is 9 px (was 5) under the red MC line, and the q axis starts at −1.2 % so the vertical part at q = 0 is not cut in half. The user liked it.
-- **Substitution and Scale Effects: smooth animation** (`model.js` `path()`, new `app.js` main figure). w1 rises gradually, everything moves at once, blue/red arrows at the current point add up to the black direction of the path, slider `t`, checkbox "Compare with the two-step split". Tests in `test-model.cjs` (exact additivity, convergence, equals the integral of the derivative terms).
+- **Substitution and Scale Effects: smooth animation** (`model.js` `path()`). w1 rises gradually, everything moves at once, blue/red arrows at the current point add up to the black direction of the path, slider `t`. Tests in `test-model.cjs` (exact additivity, convergence, equals the integral of the derivative terms).
+- **Substitution and Scale Effects: two buttons** (as the user asked: "the initial figure the same way as before", "two buttons next to each other", "too low"). The page opens with the old static picture A → B → C. In the figure's panel head, next to the plot (also on phones): **▶ Step by step** (old two-phase animation, ends on the old picture) and **▶ Raise w₁ smoothly** (ends on the smooth picture; slider `t` under the plot). `state.mode` = `'steps'` / `'smooth'` switches the main figure, the cost figure, the table and the captions (`data-show="steps"` / `"smooth"`). The "Compare with the two-step split" checkbox is gone. Previewed? Not yet: give the user the raw.githack link.
 
-### 2. Requested by the user, NOT done yet (do this next, then preview, then merge)
-
-User's words (Substitution and Scale Effects): "I like the animation mostly. But I would like the initial figure to look the same way as it was before. And I would like two buttons, one that would do the step-by-step thing, another one that would do raise w1 smoothly, next to each other. And the problem is that they are too low: if I click them, I then need to scroll up."
-
-So:
-- The figure on load = the old static picture: A, B, C, the blue arc A→B along the old isoquant, the red segment B→C, old/new isocost lines and rays, the bars (B−A) + (C−B) = C−A. The old code is in git: `git show 652ddcb:substitution-scale-effects/app.js` (functions `drawMain`, `animate` with `fSub`/`fScale`).
-- Two buttons side by side, near the top of the controls (right under "How to read this", or in the panel head of the figure so they are next to the plot): **▶ Step by step** (the old two-phase animation A→B→C) and **▶ Raise w₁ smoothly** (the new one). After either animation, the figure can stay in that mode; a sensible default: after "smoothly" ends, keep the smooth picture with slider t; "Step by step" returns to the old picture.
-- Then the "Compare with the two-step split" checkbox is probably not needed (the step-by-step view is the comparison). Keep the guide text short and rewrite it for the two buttons.
-- Check on a phone that the buttons are visible without scrolling away from the figure (on phones the controls come first; consider putting the buttons in the figure's panel head).
+### 2. Next
+Nothing requested beyond 1 and 3.
 
 ### 3. Waiting on the user's answer
 - **Two decimals instead of three** in the right-hand panels. The user suggested it; I agreed and proposed two rules before doing it: (a) where parts and their sum are shown together, round the parts and show the total as their rounded sum, so tables add up; (b) numbers below 0.1 in absolute value: two significant digits (0.0042), not 0.00. Not started; ask for the go-ahead, then do all tools in one pass (`fmt(x, 3)` calls in the `app.js` files; `shared/ui.js` `fmt`).

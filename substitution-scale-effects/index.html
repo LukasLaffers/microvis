@@ -28,11 +28,10 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>When <span class="tex" data-tex="w_1"></span> rises, the firm does not first substitute and then cut output: both happen at once, all along the way. At every moment the change in its input demand has two parts, <span class="c-l2-blue">substitution</span> along the current isoquant and <span class="c-l2-red">scale</span> along the current expansion path, as in the formula above.</p>
+          <p>The firm starts at <span class="tex" data-tex="A=D(w,p)"></span>. When <span class="tex" data-tex="w_1"></span> rises, the change splits into <span class="c-l2-blue">substitution</span> along the old isoquant to <span class="tex" data-tex="B"></span> and <span class="c-l2-red">scale</span> down the new expansion path to <span class="tex" data-tex="C=D(w',p)"></span>. The two-step split is bookkeeping: as <span class="tex" data-tex="w_1"></span> rises gradually, both effects happen at once.</p>
           <ul>
-          <li>Press <b>▶ Raise w₁ smoothly</b>: the isocost line turns, the isoquant shrinks, and the firm slides from <span class="tex" data-tex="A"></span> to <span class="tex" data-tex="C"></span>.</li>
-          <li>Drag <span class="tex" data-tex="t"></span> to stop anywhere: the blue and red arrows add up to the black one, the direction of the path.</li>
-          <li>Tick <b>Compare with the two-step split</b> to see the textbook bookkeeping <span class="tex" data-tex="A\to B\to C"></span>: the same total, split in two steps.</li>
+          <li>Press <b>▶ Step by step</b>: first <span class="tex" data-tex="A\to B"></span>, then <span class="tex" data-tex="B\to C"></span>.</li>
+          <li>Press <b>▶ Raise w₁ smoothly</b>, then drag <span class="tex" data-tex="t"></span>: at every point the blue and red arrows add up to the black one, the direction of the path.</li>
           <li>Try <b>Leontief</b>: no substitution, only scale.</li>
           </ul>
         </details>
@@ -73,26 +72,31 @@
       </div>
 
       <div class="group">
-        <h2>The change</h2>
-        <button type="button" class="big-button" id="animate">▶ Raise w₁ smoothly</button>
-        <div class="ctrl" data-key="t" data-label="t" data-hint="0: start · 1: end of the change" data-min="0" data-max="1" data-step="0.005"></div>
-        <label class="check"><input type="checkbox" id="twostep"> <span>Compare with the two-step split</span></label>
         <label class="check"><input type="checkbox" id="marginal"> <span>Marginal (derivative) version in the table</span></label>
       </div>
     </section>
 
     <section class="panel main-panel" aria-label="Input space">
-      <div class="panel-head"><h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2></div>
+      <div class="panel-head">
+        <h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2>
+        <div class="btn-row" role="group" aria-label="Animation">
+          <button type="button" id="play-steps" aria-pressed="true">▶ Step by step</button>
+          <button type="button" id="play-smooth" aria-pressed="false">▶ Raise w₁ smoothly</button>
+        </div>
+      </div>
       <div id="plot" class="plot plot-main"></div>
+      <div class="ctrl" data-key="t" data-label="t" data-hint="0: start · 1: end of the change" data-min="0" data-max="1" data-step="0.005" data-show="smooth"></div>
       <p class="caption" id="cap-main"></p>
-      <p class="caption"><span class="c-ink"><span class="key"></span>now</span>: isoquant, isocost line and (dotted) expansion path at the current <span class="tex" data-tex="w_1"></span>; <span class="c-muted"><span class="key"></span>faint</span>: the same at the start. The bars on the <span class="tex" data-tex="z_1"></span> axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total, accumulated so far.</p>
+      <p class="caption" data-show="steps"><span class="c-muted"><span class="key"></span>isoquants for <span class="tex" data-tex="q^\ast"></span> and <span class="tex" data-tex="S(w',p)"></span></span>; <span class="c-ink"><span class="key dash"></span>old</span> and <span class="c-ink"><span class="key"></span>new isocost line</span>; dotted rays: old and new expansion paths. The bars on the <span class="tex" data-tex="z_1"></span> axis add up: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total.</p>
+      <p class="caption" data-show="smooth"><span class="c-ink"><span class="key"></span>now</span>: isoquant, isocost line and (dotted) expansion path at the current <span class="tex" data-tex="w_1"></span>; <span class="c-muted"><span class="key"></span>faint</span>: the same at the start. The bars on the <span class="tex" data-tex="z_1"></span> axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total, accumulated so far.</p>
     </section>
 
     <div class="side">
       <section class="panel" aria-label="Why output falls">
         <h2>Why output falls</h2>
         <div id="plotB" class="plot plot-2d"></div>
-        <p class="caption">A higher input price shifts marginal cost up, so the profit-maximising output falls, gradually, as <span class="tex" data-tex="w_1"></span> rises. <span class="c-l2-red"><span class="key"></span>MC now</span>, <span class="c-l2-red">thin: at the start, dotted: at the end</span>, <span class="c-ink"><span class="key"></span>AC now</span>.</p>
+        <p class="caption" data-show="steps">A higher input price shifts marginal cost up, so the profit-maximising output falls. <span class="c-l2-red"><span class="key"></span>MC after</span>, <span class="c-l2-red">thin: MC before</span>, <span class="c-ink"><span class="key"></span>AC after</span>.</p>
+        <p class="caption" data-show="smooth">A higher input price shifts marginal cost up, so the profit-maximising output falls, gradually, as <span class="tex" data-tex="w_1"></span> rises. <span class="c-l2-red"><span class="key"></span>MC now</span>, <span class="c-l2-red">thin: at the start, dotted: at the end</span>, <span class="c-ink"><span class="key"></span>AC now</span>.</p>
         <p class="caption" id="capTri"></p>
       </section>
       <section class="panel readouts" aria-label="The two effects" aria-live="polite">
