@@ -11,7 +11,8 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { ...X.ASSIGNMENT, p1: 0.55, p2: 2.2, lam: 1 };
+  const DEFAULTS = { ...X.ASSIGNMENT, p1: 0.55, p2: 2.2, lam: 1 };
+  const state = { ...DEFAULTS };
   const par = () => ({ rhoA: state.rhoA, rhoB: state.rhoB, alpha: state.alpha, beta: state.beta });
   const prices = () => [state.lam * state.p1, state.lam * state.p2, state.lam];
 
@@ -142,7 +143,8 @@
     const adjust = (key, v) => (key === 'rhoA' || key === 'rhoB') && Math.abs(v) < 0.025 ? (v >= 0 ? 0.05 : -0.05) : v;
     ctrls = U.controls(document, state, { adjust, onChange: schedule });
     $('toEq').addEventListener('click', () => { const V = economyView(); ctrls.p1.setExact(V.eq.p[0]); ctrls.p2.setExact(V.eq.p[1]); });
-    $('assignment').addEventListener('click', () => { Object.entries(X.ASSIGNMENT).forEach(([k, v]) => ctrls[k].setExact(v)); });
+    // Default values: the economy, prices and lambda as the page opens.
+    $('defaults').addEventListener('click', () => { Object.entries(DEFAULTS).forEach(([k, v]) => ctrls[k].setExact(v)); });
     // Drag the current prices in the plane.
     const gd = $('plot');
     let dragging = false;
