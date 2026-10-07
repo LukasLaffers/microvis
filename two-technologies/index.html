@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Technologies and a Kink · Microvis</title>
+  <meta name="description" content="A firm that needs two Cobb-Douglas technologies, min{phi_A, phi_B}, has a kinked isoquant: for a whole range of input prices the cheapest bundle stays at the kink, conditional demand has a vertical piece and the substitution effect is zero. A firm that uses the better technology, max{phi_A, phi_B}, is not quasi-concave and its cheapest bundle jumps. Lecture 2.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=7">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div>
+      <p class="eyebrow"><a href="../index.html#l2">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 2 · Theory of the firm</p>
+      <h1>Two Technologies and a Kink</h1>
+      <p class="subtitle"><span class="tex" data-tex="\phi_D(z)=\min\{\phi_A(z),\phi_B(z)\}\qquad\phi_C(z)=\max\{\phi_A(z),\phi_B(z)\}"></span></p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Firm D needs both technologies, so it produces the smaller of the two outputs; its isoquant has a kink on the ray <span class="tex" data-tex="z_1=z_2"></span>, where <span class="tex" data-tex="\phi_A=\phi_B"></span>. Firm C uses the better technology; its isoquant bends inwards.</p>
+          <ul>
+          <li>Move <span class="tex" data-tex="w_1"></span> with Firm D: the isocost line turns around the kink, and the cheapest bundle stays there for every slope between the two dotted lines.</li>
+          <li>There, <span class="tex" data-tex="H^1"></span> does not change with <span class="tex" data-tex="w_1"></span>: the substitution effect is zero, only the scale effect is left.</li>
+          <li>Switch to <b>Firm C</b>: the cheapest bundle jumps at <span class="tex" data-tex="w_1=w_2"></span>, and the middle of the chord lies below the isoquant, so <span class="tex" data-tex="\phi_C"></span> is not quasi-concave.</li>
+          </ul>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>Firm</h2>
+        <div class="seg" role="group" aria-label="Firm">
+          <button type="button" data-firm="D" aria-pressed="true">Firm D: min</button>
+          <button type="button" data-firm="C" aria-pressed="false">Firm C: max</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Technologies</h2>
+        <div class="formula" id="formula"></div>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="α > β, α + β < 1" data-min="0.3" data-max="0.85" data-step="0.01"></div>
+        <div class="ctrl" data-key="beta" data-label="\beta" data-hint="" data-min="0.05" data-max="0.45" data-step="0.01"></div>
+      </div>
+
+      <div class="group">
+        <h2>Prices and output</h2>
+        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="price of input 1 (w₂ = 1)" data-min="0.1" data-max="10" data-log="1"></div>
+        <div class="ctrl" data-key="q" data-label="q" data-hint="output" data-min="0.5" data-max="2" data-step="0.05"></div>
+        <div class="btn-row"><button type="button" id="defaults">Default values</button></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Input space">
+      <div class="panel-head">
+        <h2>The cheapest way to produce <span class="tex" data-tex="q"></span></h2>
+        <div class="btn-row">
+          <button type="button" data-w1="0.25"><span class="tex" data-tex="w_1=0.25"></span></button>
+          <button type="button" data-w1="6"><span class="tex" data-tex="w_1=6"></span></button>
+        </div>
+      </div>
+      <div id="plot" class="plot plot-iso"></div>
+      <p class="caption" id="cap"></p>
+      <p class="caption"><span class="c-accent"><span class="key"></span><span class="tex" data-tex="\phi_A=q"></span></span>, <span class="c-accent-2"><span class="key"></span><span class="tex" data-tex="\phi_B=q"></span></span> and the <span class="c-ink"><span class="key"></span>firm's isoquant</span>; <span class="c-l2-grey"><span class="key"></span>isocost line</span> through the <span class="c-ink"><span class="key dot"></span>cheapest bundle</span> <span class="tex" data-tex="H(w,q)"></span>.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Conditional demand for input 1">
+        <h2>Conditional demand for input 1, <span class="tex" data-tex="H^1(w_1,1,q)"></span></h2>
+        <div id="plotH" class="plot plot-side"></div>
+        <p class="caption" id="capH"></p>
+      </section>
+      <section class="panel" aria-label="Minimal cost">
+        <h2>Minimal cost <span class="tex" data-tex="C(w_1,1,q)"></span></h2>
+        <div id="plotC" class="plot plot-side"></div>
+        <p class="caption" id="capC"></p>
+      </section>
+      <section class="panel readouts" aria-label="Substitution and scale" aria-live="polite">
+        <h2>Substitution and scale</h2>
+        <p class="note" id="decoNote"></p>
+        <table class="data effects" id="deco"></table>
+        <dl id="nums"></dl>
+      </section>
+    </div>
+  </main>
+
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../cost-minimisation/index.html"><span>Previous</span>Cost Minimisation</a>
+    <a class="all" href="../index.html#l2">All tools</a>
+    <a class="next" href="../cost-curves/index.html"><span>Next</span>Cost Curves and Supply</a>
+  </nav>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js?v=7"></script>
+  <script src="model.js?v=7"></script>
+  <script src="app.js?v=7"></script>
+  <script src="../shared/theme.js?v=7"></script>
+  <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
+</body>
+</html>
