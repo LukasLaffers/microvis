@@ -19,6 +19,9 @@
     mode: 'steps', anim: null, playing: false };   // mode: 'steps' (E1 -> E2 -> E3) or 'smooth' (p1 changes gradually)
   let ctrls = {};
   const schedule = U.scheduler(render);
+  // While an animation plays, captions and tables are rewritten at most ten times a second (each rewrite lays out the page).
+  let writeText = true, lastText = 0;
+  const textDue = () => { if (!state.playing) return true; const t = performance.now(); if (t - lastText < 100) return false; lastText = t; return true; };
   const f3 = x => fmt(Math.abs(x) < 5e-10 ? 0 : x, 3);
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
   const pref = () => state.type === 'ces' ? { type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }
@@ -33,7 +36,7 @@
     const S = { u, p, d: SM.decompose(p, state.y, u, state.p1n), cls: SM.classify(p, state.y, u) };
     if (state.mode !== 'smooth') return S;
     const key = JSON.stringify([u, p, state.y, state.p1n]);
-    if (cache.key !== key) cache = { key, path: SM.path(p, state.y, u, state.p1n, N) };
+    if (cache.key !== key) cache = { key, path: SM.path(p, state.y, u, state.p1n, N), big: null };
     return { ...S, path: cache.path, now: at(cache.path, state.t) };
   }
 
@@ -49,9 +52,15 @@
   function frame(S) {
     const y = state.y, p = S.p, pn = [state.p1n, state.p2];
     const Lx = 1.12 * y / Math.min(p[0], pn[0]), Ly = 1.12 * y / p[1];
-    const x1s = U.linspace(Lx / 500, Lx, 400);
-    return { Lx, Ly, L: Math.max(Lx, Ly), ic: v => CM.indifferenceCurve(v, S.u, x1s).map(([a, b]) => [a, b !== null && b <= Ly * 1.05 ? b : null]) };
+    const x1s = U.linspace(Lx / 500, Lx, 400), few = U.linspace(Lx / 500, Lx, 150);
+    const key = JSON.stringify([S.u, p, y, pn]);
+    if (icMemo.key !== key) icMemo = { key, map: new Map() };
+    const curve = (v, xs) => CM.indifferenceCurve(v, S.u, xs).map(([a, b]) => [a, b !== null && b <= Ly * 1.05 ? b : null]);
+    // the fixed curves are computed once; the moving one (n = 'few') with fewer points, as it changes every frame
+    const ic = (v, n) => n === 'few' ? curve(v, few) : (icMemo.map.get(v) || (icMemo.map.set(v, curve(v, x1s)), icMemo.map.get(v)));
+    return { Lx, Ly, L: Math.max(Lx, Ly), ic };
   }
+  let icMemo = { key: '', map: null }, demandMemo = { key: '', D: null, H: null }, lastChecks = 0;
   const budget = (m, q, color, width, name, dash) => U.line2([[m / q[0], 0], [0, m / q[1]]], color, width, name, dash);
   const layout = (th, F, annotations, shapes = []) => U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, F.Lx] }, y: { range: [0, F.Ly] }, annotations, shapes, margin: { l: 48, r: 12, t: 8, b: 44 } });
 
@@ -96,7 +105,7 @@
       if (fs >= 1) { traces.push(U.dot2([d.E2], th.blue, 'E₂', 11)); lab(d.E2, 'E<sub>2</sub>', th.blue, 'left'); }
       traces.push(U.dot2([now], fs < 1 ? th.blue : th.red, 'moving', 9));
     }
-    Plotly.react('plot', traces, layout(th, F, annotations), { ...U.PLOT_CONFIG, displayModeBar: false });
+    U.plot('plot', traces, layout(th, F, annotations), { ...U.PLOT_CONFIG, displayModeBar: false });
     const fall = pn[0] < p[0];
     $('head').textContent = headText(S);
     $('cap').innerHTML = `The price of good 1 ${fall ? 'falls' : 'rises'} from ${fmt(p[0])} to ${fmt(pn[0])}. ${texStr('E_1\\to E_2')}: <span class="c-l2-blue">substitution</span> along the indifference curve ${texStr('v^0')}, to where its slope equals the new price ratio (the dotted blue line is the budget line that would just let her stay on ${texStr('v^0')}, with income ${texStr(`C(p',v^0)=${f3(d.yc)}`)}). ${texStr('E_2\\to E_3')}: <span class="c-l2-red">income effect</span>, a parallel shift to the actual new budget line.` +
@@ -112,8 +121,8 @@
     // Where the consumer started (faint) and where she is now (strong): indifference curve and budget line.
     traces.push(U.line2(F.ic(d.v0), th.muted, 1.2, 'indifference curve at the start, v⁰'));
     traces.push(budget(y, p, th.muted, 1.2, `budget at the start, p₁ = ${fmt(p[0])}`, 'dash'));
-    traces.push(U.line2(F.ic(vNow), th.ink, 2.5, 'indifference curve now'));
-    if (moved) traces.push(budget(y, pNow, th.ink, 1.8, `budget now, p₁ = ${fmt(now.p1)}`));
+    traces.push(U.line2(F.ic(vNow, 'few'), th.ink, 2.5, 'indifference curve now'));
+    if (moved) traces.push(budget(y, pNow, th.ink, 1.8, 'budget now'));
 
     // The path of the consumer: travelled (black) and still ahead (faint).
     const k = now.k;
@@ -127,26 +136,23 @@
       return { sub: sl.map(s => s.substitution * sign), inc: sl.map(s => s.income * sign) };
     };
     const ok = v => [...v.sub, ...v.inc].every(Number.isFinite);
-    const v = vel(now.p1);
-    if (ok(v)) {
-      // one length scale for the whole change, so the arrows' lengths can be compared from moment to moment
+    // Arrows, labels and bars are traces (not annotations), so that each frame of the animation only moves points.
+    let v = vel(now.p1);
+    if (!ok(v)) v = { sub: [0, 0], inc: [0, 0] };
+    // one length scale for the whole change, so the arrows' lengths can be compared from moment to moment
+    if (cache.big === null) {
       let big = 1e-12;
       for (let i = 0; i <= N; i += 10) { const w = vel(path.p1[i]); if (ok(w)) big = Math.max(big, Math.hypot(...w.sub), Math.hypot(...w.inc), Math.hypot(w.sub[0] + w.inc[0], w.sub[1] + w.inc[1])); }
-      const ext = Math.max(...[path.D[N], d.E2].map(z => Math.hypot(z[0] - d.E1[0], z[1] - d.E1[1])), 0.05 * Math.min(F.Lx, F.Ly));
-      const len = 0.6 * Math.max(ext, 0.15 * Math.min(F.Lx, F.Ly)) / big, tip = q => [D[0] + q[0] * len, D[1] + q[1] * len], tiny = 1e-3 * ext;
-      const arrow = (to, color, width) => {
-        if (Math.hypot(to[0] - D[0], to[1] - D[1]) < tiny) return;
-        annotations.push({ x: to[0], y: to[1], ax: D[0], ay: D[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowsize: 1.2, arrowwidth: width, arrowcolor: color, text: '' });
-      };
-      const tS = tip(v.sub), tI = tip(v.inc), tT = tip([v.sub[0] + v.inc[0], v.sub[1] + v.inc[1]]);
-      if (Math.hypot(tT[0] - D[0], tT[1] - D[1]) > tiny) {
-        shapes.push({ type: 'line', x0: tS[0], y0: tS[1], x1: tT[0], y1: tT[1], line: { color: th.red, width: 1, dash: 'dot' } });
-        shapes.push({ type: 'line', x0: tI[0], y0: tI[1], x1: tT[0], y1: tT[1], line: { color: th.blue, width: 1, dash: 'dot' } });
-      }
-      arrow(tS, th.blue, 3); arrow(tI, th.red, 3); arrow(tT, th.ink, 2);
-      const lab = (z, text, color) => { if (Math.hypot(z[0] - D[0], z[1] - D[1]) > 0.04 * ext) annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: z[0] >= D[0] ? 'left' : 'right', xshift: z[0] >= D[0] ? 6 : -6, font: { size: 12, color }, bgcolor: th.panel }); };
-      lab(tS, 'substitution', th.blue); lab(tI, 'income', th.red);
+      cache.big = big;
     }
+    const ext = Math.max(...[path.D[N], d.E2].map(z => Math.hypot(z[0] - d.E1[0], z[1] - d.E1[1])), 0.05 * Math.min(F.Lx, F.Ly));
+    const len = 0.6 * Math.max(ext, 0.15 * Math.min(F.Lx, F.Ly)) / cache.big, tip = q => [D[0] + q[0] * len, D[1] + q[1] * len], tiny = 1e-3 * ext;
+    const tS = tip(v.sub), tI = tip(v.inc), tT = tip([v.sub[0] + v.inc[0], v.sub[1] + v.inc[1]]);
+    const far = (z, m) => Math.hypot(z[0] - D[0], z[1] - D[1]) > m;
+    traces.push(U.line2(far(tT, tiny) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, tiny) ? [tI, tT] : [], th.blue, 1, '', 'dot'));
+    traces.push(U.arrow2(D, tS, th.blue, 3, tiny), U.arrow2(D, tI, th.red, 3, tiny), U.arrow2(D, tT, th.ink, 2, tiny));
+    const lab = (z, text, color) => U.text2(far(z, 0.04 * ext) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left');
+    traces.push(lab(tS, 'substitution', th.blue), lab(tI, 'income', th.red));
 
     // Points.
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 14, color } });
@@ -157,17 +163,17 @@
     // Bars on the x1 axis, growing together: substitution, income and their sum, accumulated so far.
     const row = i => (0.035 + 0.04 * i) * F.Ly;
     const bar = (i, dx, color, width, text) => {
-      if (Math.abs(dx) < 1e-9) return;
-      shapes.push({ type: 'line', x0: d.E1[0], x1: d.E1[0] + dx, y0: row(i), y1: row(i), line: { color, width } });
-      annotations.push({ x: Math.min(d.E1[0], d.E1[0] + dx), y: row(i), text, showarrow: false, xanchor: 'right', xshift: -6, font: { size: 11, color } });
+      const show = Math.abs(dx) >= 1e-9;
+      traces.push(U.line2(show ? [[d.E1[0], row(i)], [d.E1[0] + dx, row(i)]] : [], color, width, ''));
+      traces.push(U.text2(show ? [Math.min(d.E1[0], d.E1[0] + dx), row(i)] : null, text + '  ', color, 'middle left', 11));
     };
     bar(2, now.substitution[0], th.blue, 5, 'substitution');
     bar(1, now.income[0], th.red, 5, 'income');
     bar(0, now.substitution[0] + now.income[0], th.ink, 2.5, 'total');
 
-    Plotly.react('plot', traces, layout(th, F, annotations, shapes), { ...U.PLOT_CONFIG, displayModeBar: false });
+    U.plot('plot', traces, layout(th, F, annotations, shapes), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('head').textContent = headText(S);
-    $('cap').innerHTML = `${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars on the ${texStr('x_1')} axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
+    if (writeText) $('cap').innerHTML = `${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars on the ${texStr('x_1')} axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
   }
 
   // ---------- demand curves ----------
@@ -178,9 +184,12 @@
     const ps = state.type === 'giffen'
       ? U.linspace(Math.max(0.3, (state.y - 4 * p[1]) * 1.02, 0.3), Math.max((state.y - 2 * p[1]), lo + 0.1), 120)
       : U.linspace(Math.max(0.3, lo * 0.6), hi * 1.5, 120);
-    const D = SM.marshallCurve(p[1], state.y, u, ps), H = SM.hicksCurve(p[1], d.v0, u, ps);
+    // the two curves do not change while p1 moves: computed once per setting
+    const key = JSON.stringify([u, p, state.y, state.p1n]);
+    if (demandMemo.key !== key) demandMemo = { key, D: SM.marshallCurve(p[1], state.y, u, ps), H: SM.hicksCurve(p[1], d.v0, u, ps) };
+    const { D, H } = demandMemo;
     const xs = [...D, ...H].map(q => q[0]).filter(Number.isFinite);
-    Plotly.react('plotB', [
+    U.plot('plotB', [
       U.line2(H, th.blue, 2.2, 'Hicksian H¹(p₁, p₂, v⁰)', 'dash'),
       U.line2(D, '#4caf50', 2.5, 'Marshallian D¹(p₁, p₂, y)'),
       ...(S.now ? [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E3[0], state.p1n]], th.muted, 'E₃', 9), U.dot2([[S.now.D[0], S.now.p1]], th.ink, 'now', 12)]
@@ -201,6 +210,9 @@
       `<tr class="row-sub"><th>substitution${now ? '' : ` ${texStr('E_2-E_1')}`}</th><td>${g1[0]}</td><td>${g2[0]}</td></tr>` +
       `<tr class="row-inc"><th>income${now ? '' : ` ${texStr('E_3-E_2')}`}</th><td>${g1[1]}</td><td>${g2[1]}</td></tr>` +
       `<tr><th>total${now ? '' : ` ${texStr('E_3-E_1')}`}</th><td>${g1[2]}</td><td>${g2[2]}</td></tr></tbody>`;
+    // the derivatives below are slow (finite differences of demand): while an animation plays, at most five times a second
+    if (state.playing && performance.now() - lastChecks < 200) return;
+    lastChecks = performance.now();
     const s = CM.slutsky(p, state.y, u, 0, 0), e = CM.elasticities(p, state.y, u);
     const item = (ok, html) => `<li><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span><span>${html}</span></li>`;
     // the elasticity as computed from the rounded numbers on the right, so the line adds up
@@ -215,6 +227,7 @@
   }
 
   function render() {
+    writeText = textDue();
     U.applyVisibility({ ces: state.type === 'ces', stonegeary: state.type === 'stonegeary', giffen: state.type === 'giffen', steps: state.mode === 'steps', smooth: state.mode === 'smooth' });
     $('play-steps').setAttribute('aria-pressed', String(state.mode === 'steps'));
     $('play-smooth').setAttribute('aria-pressed', String(state.mode === 'smooth'));
@@ -225,7 +238,7 @@
     tex($('formula'), CU.formula(S.u), true);
     guard('plot', () => draw(th, S));
     guard('demand plot', () => drawDemand(th, S));
-    guard('numbers', () => renderNumbers(S));
+    if (writeText) guard('numbers', () => renderNumbers(S));
   }
 
   // The two animations; while one runs, both buttons wait.
@@ -251,7 +264,7 @@
   // Change p1 smoothly: t runs from 0 to 1 and everything moves at the same time; the slider t stays.
   const playSmooth = () => play('smooth', 5000,
     f => { state.t = f; ctrls.t.sync(); guard('animation', render); },
-    () => {});
+    render);
 
   function init() {
     U.renderStaticTex();

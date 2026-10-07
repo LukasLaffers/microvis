@@ -12,7 +12,13 @@
   const { $, fmt, tex, texStr, guard } = U;
 
   const state = { panel: 'A', delta: 0.5, rho: -1, a: 0.4, g1: 3, ad1: 0.8, ad2: 0.4, hc: 2, hK: 3, p1: 1, p2: 1, y: 10, anim: null };   // anim: progress of the income animation (null when not playing)
-  let ctrls = {};
+  let ctrls = {}, memo = { key: '' }, lastNumbers = 0;
+  // The expansion path and the Engel curves do not change while income moves: computed once per setting.
+  function curves(u, p, lo, hi) {
+    const key = JSON.stringify([u, p]);
+    if (memo.key !== key) { const yAll = U.linspace(lo, hi, 80); memo = { key, yAll, path: EM.expansionPath(p, u, yAll), engel: EM.engelCurves(p, u, U.linspace(lo, hi, 120)) }; }
+    return memo;
+  }
   const schedule = U.scheduler(render);
   const f3 = x => fmt(Math.abs(x) < 1e-7 ? 0 : x, 3);   // rounding noise of the finite differences prints as 0
   const par = x => (x < 0 ? `(${f3(x)})` : f3(x));
@@ -44,20 +50,20 @@
       const v = CM.indirect(p, yy, u);
       traces.push(U.line2(CM.indifferenceCurve(v, u, x1s).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.blue, 1, 'indifference curve', 'dot'));
     }
-    const yAll = U.linspace(lo, hi, 80), path = EM.expansionPath(p, u, yAll);
+    const { yAll, path } = curves(u, p, lo, hi);
     if (anim) {
       // the path traced so far (strong) and still ahead (faint), and the indifference curve touching the current budget line
       traces.push(U.line2(path.filter((_, i) => yAll[i] >= state.y), th.orange, 1.5, 'still ahead', 'dot'));
       traces.push(U.line2(path.filter((_, i) => yAll[i] < state.y).concat([x]), th.orange, 3.5, 'income expansion path'));
-      traces.push(U.line2(CM.indifferenceCurve(CM.indirect(p, state.y, u), u, x1s).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.blue, 1.8, 'indifference curve'));
+      traces.push(U.line2(CM.indifferenceCurve(CM.indirect(p, state.y, u), u, U.linspace(Lx / 400, Lx, 150)).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.blue, 1.8, 'indifference curve'));
     } else traces.push(U.line2(path, th.orange, 3.5, 'income expansion path'));
-    traces.push(U.line2([[state.y / p[0], 0], [0, state.y / p[1]]], th.ink, 2.2, `budget line, y = ${fmt(state.y)}`));
+    traces.push(U.line2([[state.y / p[0], 0], [0, state.y / p[1]]], th.ink, 2.2, anim ? 'budget line now' : `budget line, y = ${fmt(state.y)}`));
     if (state.panel === 'E') {
       const yT = EM.turningIncome(p, u);
       if (yT > lo && yT < hi) traces.push(U.dot2([CM.demand(p, yT, u)], th.muted, 'good 1 turns inferior here', 9, { marker: { color: th.panel, size: 9, line: { color: th.ink, width: 1.5 } } }));
     }
     traces.push(U.dot2([x], th.red, 'D(p, y)', 11));
-    Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, Lx] }, y: { range: [0, Ly] } }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    U.plot('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, Lx] }, y: { range: [0, Ly] } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     const lux = state.ad1 > state.ad2 ? 1 : 2, yT = state.panel === 'E' ? EM.turningIncome(p, u) : 0;
     const capD = Math.abs(state.ad1 - state.ad2) < 1e-9
       ? 'With a = b the utility is homothetic and the path is a ray again.'
@@ -67,7 +73,7 @@
   }
 
   function drawEngel(th, S) {
-    const { u, p, lo, hi, x } = S, c = EM.engelCurves(p, u, U.linspace(lo, hi, 120));
+    const { u, p, lo, hi, x } = S, c = curves(u, p, lo, hi).engel;
     // When the two Engel curves coincide (e.g. equal weights in A), draw D¹ dashed on top of D² and label them once.
     const top = Math.max(...c.map(r => Math.max(r[1], r[2]))), same = c.every(r => Math.abs(r[1] - r[2]) < 1e-3 * top);
     const end = c[c.length - 1];
@@ -78,7 +84,7 @@
     // While income rises, the curves are drawn up to the current income (strong) and faint beyond it.
     const anim = state.anim !== null, done = c.filter(r => !anim || r[0] < state.y).concat(anim ? [[state.y, x[0], x[1]]] : []);
     const ahead = anim ? [U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[2]]), th.red, 1, 'D² still ahead', 'dot'), U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[1]]), th.blue, 1, 'D¹ still ahead', 'dot')] : [];
-    Plotly.react('plotB', [
+    U.plot('plotB', [
       ...ahead,
       U.line2(done.map(r => [r[0], r[2]]), th.red, 2.5, 'D²(p, y)'), U.line2(done.map(r => [r[0], r[1]]), th.blue, 2.5, 'D¹(p, y)', same ? 'dash' : 'solid'),
       U.dot2([[state.y, x[0]], [state.y, x[1]]], th.ink, 'now', anim ? 11 : 8)
@@ -91,6 +97,9 @@
   }
 
   function renderNumbers(S) {
+    // finite differences of demand are slow: while income rises, the numbers are updated at most five times a second
+    if (state.anim !== null && performance.now() - lastNumbers < 200) return;
+    lastNumbers = performance.now();
     const c = EM.conditions(S.p, state.y, S.u), e = c.e;
     const k = j => { const t = EM.kind(e.eta[j]); return `<span class="kind ${t.replace(' ', '-')}">${t}</span>`; };
     $('table').innerHTML = `<thead><tr><th></th><th>good 1</th><th>good 2</th></tr></thead><tbody>` +

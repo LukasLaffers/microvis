@@ -196,6 +196,50 @@
     name, hovertemplate: `${name}<br>(%{x:.2f}, %{y:.2f})<extra></extra>`, ...extra
   });
 
+  // An arrow as a trace, so that U.plot can move it: a line with an arrowhead at its end (empty when shorter than min).
+  const arrow2 = (from, to, color, width, min = 0) => {
+    const show = Math.hypot(to[0] - from[0], to[1] - from[1]) > min, size = 7 + 2.5 * width;
+    return {
+      type: 'scatter', mode: 'lines+markers', x: show ? [from[0], to[0]] : [], y: show ? [from[1], to[1]] : [],
+      line: { color, width }, marker: { symbol: ['circle', 'arrow'], size: [0, size], color, angleref: 'previous', line: { width: 0 } },
+      hoverinfo: 'skip'
+    };
+  };
+  // A text label as a trace (empty when pt is null), e.g. a label that moves in an animation.
+  const text2 = (pt, text, color, position = 'middle right', size = 12) => ({
+    type: 'scatter', mode: 'text', x: pt ? [pt[0]] : [], y: pt ? [pt[1]] : [], text: [text], textposition: position,
+    textfont: { color, size }, hoverinfo: 'skip', cliponaxis: false
+  });
+
+  // Plotly.react, but when only the points of the traces changed (same traces, same layout, same config), move them
+  // with Plotly.animate without a redraw: several times faster, which keeps animations smooth. Moving labels and arrows in an
+  // animation should therefore be traces (mode 'text', marker symbol 'arrow'), not annotations or shapes.
+  function plot(id, traces, layout, config) {
+    const gd = typeof id === 'string' ? document.getElementById(id) : id;
+    const key = JSON.stringify([layout, config, traces.map(t => ({ ...t, x: 0, y: 0, text: 0 }))]);
+    // A rebuild is waiting for an animation step to finish: it takes the newest figure.
+    if (gd._microvisPending) { gd._microvisPending = [traces, layout, config]; gd._microvisKey = key; return; }
+    if (gd._microvisKey === key && gd.data && gd.data.length === traces.length) {
+      // restyle only the traces whose points or text moved
+      const same = (u, v) => u === v || (Array.isArray(u) && Array.isArray(v) && u.length === v.length && u.every((x, i) => x === v[i]));
+      const moved = traces.map((t, i) => i).filter(i => !same(traces[i].x, gd.data[i].x) || !same(traces[i].y, gd.data[i].y) || !same(traces[i].text, gd.data[i].text));
+      // Plotly's animation path without a full redraw: only the moved traces are redrawn
+      if (moved.length) Plotly.animate(gd, { data: moved.map(i => ({ x: traces[i].x, y: traces[i].y, text: traces[i].text })), traces: moved },
+        { transition: { duration: 0 }, frame: { duration: 0, redraw: false }, mode: 'immediate' }).catch(() => {});
+    } else {
+      // rebuild the figure, but never in the middle of an animation step (Plotly would fail on the old traces)
+      gd._microvisPending = [traces, layout, config];
+      const rebuild = () => {
+        const q = gd._transitionData;
+        if (gd._transitioning || (q && ((q._frameQueue && q._frameQueue.length) || q._animationRaf))) { requestAnimationFrame(rebuild); return; }
+        const args = gd._microvisPending; gd._microvisPending = null;
+        Plotly.react(gd, ...args);
+      };
+      rebuild();
+    }
+    gd._microvisKey = key;
+  }
+
   // Convert a pointer event to data coordinates of a 2D plot with fixed linear axes (null if outside).
   function eventToData(gd, ev) {
     const fl = gd._fullLayout;
@@ -318,7 +362,7 @@
   root.Microvis = {
     $, fmt, fmtSum, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
     control, controls, scheduler, applyVisibility,
-    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, eventToData, watchColorScheme,
+    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, arrow2, text2, plot, eventToData, watchColorScheme,
     showError, guard, librariesReady
   };
 })(window);
