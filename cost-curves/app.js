@@ -50,13 +50,13 @@
     // Supply curve underneath everything else.
     if (!isHomog()) {
       const above = qq.map((q, i) => [q, mc[i]]).filter(v => v[0] >= hat.qHat);
-      traces.push(U.line2([[0, 0], [0, hat.pHat]], th.orange, 5, 'supply: q = 0 below p̂'));
-      traces.push(U.line2(above.map(v => [v[0], clip(v[1])]), th.orange, 5, 'supply S(w,p)'));
+      traces.push(U.line2([[0, 0], [0, hat.pHat]], th.orange, 9, 'supply: q = 0 below p̂'));
+      traces.push(U.line2(above.map(v => [v[0], clip(v[1])]), th.orange, 9, 'supply S(w,p)'));
     } else if (state.k < 1 - 1e-9) {
-      traces.push(U.line2(qq.map((q, i) => [q, clip(mc[i])]), th.orange, 5, 'supply S(w,p)'));
+      traces.push(U.line2(qq.map((q, i) => [q, clip(mc[i])]), th.orange, 9, 'supply S(w,p)'));
     } else if (kOne()) {
-      traces.push(U.line2([[0, 0], [0, hat.pHat]], th.orange, 5, 'supply'));
-      traces.push(U.line2([[0, hat.pHat], [qmax, hat.pHat]], th.orange, 5, 'supply (any q at p = c/A)'));
+      traces.push(U.line2([[0, 0], [0, hat.pHat]], th.orange, 9, 'supply'));
+      traces.push(U.line2([[0, hat.pHat], [qmax, hat.pHat]], th.orange, 9, 'supply (any q at p = c/A)'));
     }
 
     traces.push(U.line2(qq.map((q, i) => [q, clip(ac[i])]), th.ink, 2, 'AC = C/q'));
