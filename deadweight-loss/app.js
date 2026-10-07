@@ -64,7 +64,7 @@
     $('checks').innerHTML = state.tau > 0 ? [
       item(r.lossEV > r.T, `${texStr(`|EV|=${f3(r.lossEV)}>T=${f3(r.T)}`)}: the consumer loses more than the government collects`),
       item(true, `Approximation ${texStr(`-\\tfrac12\\frac{\\partial H^1}{\\partial p_1}(p_1^1-p_1^0)^2=${f3(r.approx)}`)} vs exact ${f3(r.DWL)}`),
-      item(true, `Per krone: ${texStr(`DWL/T=${f3(r.ratio)}`)}; approximation ${texStr(`-\\tfrac12\\varepsilon^c_{11}\\frac{p_1^1-p_1^0}{p_1^1}=${f3(r.ratioApprox)}`)}. (A 14 % VAT gives ${texStr('\\tfrac{p_1^1-p_1^0}{p_1^1}=0.123')}.)`)
+      item(true, `Per krone: ${texStr(`DWL/T=${f3(r.ratio)}`)}; approximation ${texStr(`-\\tfrac12\\varepsilon^c_{11}\\frac{p_1^1-p_1^0}{p_1^1}=${f3(r.ratioApprox)}`)}. (A 14 % VAT gives ${texStr('\\tfrac{p_1^1-p_1^0}{p_1^1}=0.12')}.)`)
     ].join('') : '<li><span class="mark na">·</span><span>No tax: no revenue, no deadweight loss.</span></li>';
   }
 

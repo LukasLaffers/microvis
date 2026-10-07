@@ -7,8 +7,8 @@
   <meta name="description" content="When an input price rises, input demand changes through a substitution effect (along the isoquant) and a scale effect (along the expansion path). Lecture 3.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=5">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="../shared/style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=6">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -28,10 +28,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The firm starts at <span class="tex" data-tex="A=D(w,p)"></span>. When <span class="tex" data-tex="w_1"></span> rises it first substitutes along the old isoquant to <span class="tex" data-tex="B"></span> (<span class="c-l2-blue">substitution</span>). Producing has become dearer, so it then produces less and moves down the new expansion path to <span class="tex" data-tex="C=D(w',p)"></span> (<span class="c-l2-red">scale</span>). The total change is the sum of the two.</p>
+          <p>The firm starts at <span class="tex" data-tex="A=D(w,p)"></span>. When <span class="tex" data-tex="w_1"></span> rises, the change splits into <span class="c-l2-blue">substitution</span> along the old isoquant to <span class="tex" data-tex="B"></span> and <span class="c-l2-red">scale</span> down the new expansion path to <span class="tex" data-tex="C=D(w',p)"></span>. The two-step split is bookkeeping: as <span class="tex" data-tex="w_1"></span> rises gradually, both effects happen at once.</p>
           <ul>
-          <li>Press <b>▶ Show the effects</b>.</li>
-          <li>Try <b>Leontief</b>: no substitution, only scale. <b>Linear</b>: substitution is all or nothing.</li>
+          <li>Press <b>▶ Step by step</b>: first <span class="tex" data-tex="A\to B"></span>, then <span class="tex" data-tex="B\to C"></span>.</li>
+          <li>Press <b>▶ Raise w₁ smoothly</b>, then drag <span class="tex" data-tex="t"></span>: at every point the blue and red arrows add up to the black one, the direction of the path.</li>
+          <li>Try <b>Leontief</b>: no substitution, only scale.</li>
           </ul>
         </details>
       </div>
@@ -71,23 +72,31 @@
       </div>
 
       <div class="group">
-        <button type="button" class="big-button" id="animate">▶ Show the effects</button>
         <label class="check"><input type="checkbox" id="marginal"> <span>Marginal (derivative) version in the table</span></label>
       </div>
     </section>
 
     <section class="panel main-panel" aria-label="Input space">
-      <div class="panel-head"><h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2></div>
+      <div class="panel-head">
+        <h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2>
+        <div class="btn-row" role="group" aria-label="Animation">
+          <button type="button" id="play-steps" aria-pressed="true">▶ Step by step</button>
+          <button type="button" id="play-smooth" aria-pressed="false">▶ Raise w₁ smoothly</button>
+        </div>
+      </div>
       <div id="plot" class="plot plot-main"></div>
+      <div class="ctrl" data-key="t" data-label="t" data-hint="0: start · 1: end of the change" data-min="0" data-max="1" data-step="0.005" data-show="smooth"></div>
       <p class="caption" id="cap-main"></p>
-      <p class="caption"><span class="c-muted"><span class="key"></span>isoquants for <span class="tex" data-tex="q^\ast"></span> and <span class="tex" data-tex="S(w',p)"></span></span>; <span class="c-ink"><span class="key dash"></span>old</span> and <span class="c-ink"><span class="key"></span>new isocost line</span>; dotted rays: old and new expansion paths. The bars on the <span class="tex" data-tex="z_1"></span> axis add up: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total.</p>
+      <p class="caption" data-show="steps"><span class="c-muted"><span class="key"></span>isoquants for <span class="tex" data-tex="q^\ast"></span> and <span class="tex" data-tex="S(w',p)"></span></span>; <span class="c-ink"><span class="key dash"></span>old</span> and <span class="c-ink"><span class="key"></span>new isocost line</span>; dotted rays: old and new expansion paths. The bars on the <span class="tex" data-tex="z_1"></span> axis add up: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total.</p>
+      <p class="caption" data-show="smooth"><span class="c-ink"><span class="key"></span>now</span>: isoquant, isocost line and (dotted) expansion path at the current <span class="tex" data-tex="w_1"></span>; <span class="c-muted"><span class="key"></span>faint</span>: the same at the start. The bars on the <span class="tex" data-tex="z_1"></span> axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total, accumulated so far.</p>
     </section>
 
     <div class="side">
       <section class="panel" aria-label="Why output falls">
         <h2>Why output falls</h2>
         <div id="plotB" class="plot plot-2d"></div>
-        <p class="caption">A higher input price shifts marginal cost up, so the profit-maximising output falls. <span class="c-l2-red"><span class="key"></span>MC after</span>, <span class="c-l2-red">thin: MC before</span>, <span class="c-ink"><span class="key"></span>AC after</span>.</p>
+        <p class="caption" data-show="steps">A higher input price shifts marginal cost up, so the profit-maximising output falls. <span class="c-l2-red"><span class="key"></span>MC after</span>, <span class="c-l2-red">thin: MC before</span>, <span class="c-ink"><span class="key"></span>AC after</span>.</p>
+        <p class="caption" data-show="smooth">A higher input price shifts marginal cost up, so the profit-maximising output falls, gradually, as <span class="tex" data-tex="w_1"></span> rises. <span class="c-l2-red"><span class="key"></span>MC now</span>, <span class="c-l2-red">thin: at the start, dotted: at the end</span>, <span class="c-ink"><span class="key"></span>AC now</span>.</p>
         <p class="caption" id="capTri"></p>
       </section>
       <section class="panel readouts" aria-label="The two effects" aria-live="polite">
@@ -111,12 +120,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=5"></script>
-  <script src="../shared/firm-ui.js?v=5"></script>
-  <script src="../shared/firm-model.js?v=5"></script>
-  <script src="model.js?v=5"></script>
-  <script src="app.js?v=5"></script>
-  <script src="../shared/theme.js?v=5"></script>
+  <script src="../shared/ui.js?v=6"></script>
+  <script src="../shared/firm-ui.js?v=6"></script>
+  <script src="../shared/firm-model.js?v=6"></script>
+  <script src="model.js?v=6"></script>
+  <script src="app.js?v=6"></script>
+  <script src="../shared/theme.js?v=6"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

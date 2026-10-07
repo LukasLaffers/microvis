@@ -138,10 +138,10 @@
     ps.forEach((p, i) => { if (p >= pl && p <= ph) m = Math.max(m, Math.abs(E[i][0]), Math.abs(E[i][1])); });
     const lim = Math.min(12, Math.max(0.05, 1.1 * m)), cl = v => Math.max(-lim, Math.min(lim, v));
     const traces = [
-      { type: 'scatter', mode: 'lines', x: ps, y: E.map(v => cl(v[0])), line: { color: th.ink, width: 2.5 }, name: 'E₁(p, 1)', hovertemplate: 'p = %{x:.3f}<br>E₁ = %{y:.3f}<extra></extra>' },
-      { type: 'scatter', mode: 'lines', x: ps, y: E.map(v => cl(v[1])), line: { color: th.muted, width: 1.5, dash: 'dash' }, name: 'E₂(p, 1)', hovertemplate: 'p = %{x:.3f}<br>E₂ = %{y:.3f}<extra></extra>' }
+      { type: 'scatter', mode: 'lines', x: ps, y: E.map(v => cl(v[0])), line: { color: th.ink, width: 2.5 }, name: 'E₁(p, 1)', hovertemplate: 'p = %{x:.2f}<br>E₁ = %{y:.2f}<extra></extra>' },
+      { type: 'scatter', mode: 'lines', x: ps, y: E.map(v => cl(v[1])), line: { color: th.muted, width: 1.5, dash: 'dash' }, name: 'E₂(p, 1)', hovertemplate: 'p = %{x:.2f}<br>E₂ = %{y:.2f}<extra></extra>' }
     ];
-    if (S.eqs.length) traces.push({ type: 'scatter', mode: 'markers', x: S.eqs.map(q => q.p), y: S.eqs.map(() => 0), marker: { symbol: 'star', size: 13, color: th.ink, line: { color: '#ffffff', width: 1 } }, hovertemplate: 'equilibrium p = %{x:.3f}<extra></extra>' });
+    if (S.eqs.length) traces.push({ type: 'scatter', mode: 'markers', x: S.eqs.map(q => q.p), y: S.eqs.map(() => 0), marker: { symbol: 'star', size: 13, color: th.ink, line: { color: '#ffffff', width: 1 } }, hovertemplate: 'equilibrium p = %{x:.2f}<extra></extra>' });
     const shapes = [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 0, y1: 0, line: { color: th.muted, width: 1 } }];
     if (state.mode === 'market') shapes.push({ type: 'line', x0: state.p, x1: state.p, yref: 'paper', y0: 0, y1: 1, line: { color: th.grey, width: 2 } });
     const L = U.base2d(th, { xt: 'p = p<sub>1</sub>/p<sub>2</sub> (log scale)', yt: 'excess demand', x: { type: 'log', range: [Math.log10(0.05), Math.log10(20)], tickvals: [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20], ticktext: ['0.05', '0.1', '0.2', '0.5', '1', '2', '5', '10', '20'] }, y: { range: [-lim, lim] }, shapes, margin: { l: 52, r: 10, t: 8, b: 44 } });

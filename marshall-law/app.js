@@ -40,6 +40,7 @@
 
   function drawLever(th, P) {
     const { m } = P, sg = m.sigma, eD = -epsD(), bal = m.weighted, sh = m.sh1;
+    const [shownSub, shownOut, shownBal] = U.fmtSum([m.substitution, m.output]);   // the two parts and their sum, so the shown numbers add up
     const xMax = 1.22 * Math.max(sg, eD, 0.3), bw = 0.035 * xMax;
     const shapes = [], annotations = [];
     const rect = (x0, x1, y0, y1, color, opacity = 1) => shapes.push({ type: 'rect', x0, x1, y0, y1, fillcolor: color, opacity, line: { width: 0 } });
@@ -63,7 +64,7 @@
     const anchor = (x, other) => same0 ? (x <= other ? 'right' : 'left') : x < 0.15 * xMax ? 'left' : x > 0.85 * xMax ? 'right' : 'center';
     annotations.push({ x: sg, y: yB + 0.04 + hS, text: `σ = ${fmt(sg, 2)}<br>weight 1 − sh<sub>1</sub> = ${fmt(1 - sh, 2)}`, showarrow: false, yanchor: 'bottom', xanchor: anchor(sg, eD), font: { size: 12, color: th.blue } });
     annotations.push({ x: eD, y: yB + 0.04 + hD, text: `−ε<sup>D</sup><sub>p</sub> = ${fmt(eD, 2)}<br>weight sh<sub>1</sub> = ${fmt(sh, 2)}`, showarrow: false, yanchor: 'bottom', xanchor: eD === sg ? 'left' : anchor(eD, sg), font: { size: 12, color: th.red } });
-    annotations.push({ x: bal + 1.2 * bw, y: yB - 0.4, text: `<b>−ε<sup>u</sup><sub>11</sub> = ${fmt(bal, 3)}</b>`, showarrow: false, xanchor: 'left', yanchor: 'middle', font: { size: 13, color: th.ink } });
+    annotations.push({ x: bal + 1.2 * bw, y: yB - 0.4, text: `<b>−ε<sup>u</sup><sub>11</sub> = ${shownBal}</b>`, showarrow: false, xanchor: 'left', yanchor: 'middle', font: { size: 13, color: th.ink } });
     if (m.substitution > 0.09 * xMax) annotations.push({ x: m.substitution / 2, y: (yb0 + yb1) / 2, text: 'σ(1−sh<sub>1</sub>)', showarrow: false, font: { size: 11, color: '#ffffff' } });
     if (bal - m.substitution > 0.12 * xMax) annotations.push({ x: (m.substitution + bal) / 2, y: (yb0 + yb1) / 2, text: '(−ε<sup>D</sup><sub>p</sub>)sh<sub>1</sub>', showarrow: false, font: { size: 11, color: '#ffffff' } });
 
@@ -71,7 +72,7 @@
       ...U.base2d(th, { xt: 'elasticity (absolute value)', x: { range: [-0.04 * xMax, xMax] }, y: { range: [-1.15, 3.05], visible: false }, shapes, annotations, margin: { l: 16, r: 16, t: 8, b: 44 } })
     }, { ...U.PLOT_CONFIG, displayModeBar: false });
 
-    $('capA').innerHTML = `Weights ${texStr('1-sh_1')} at ${texStr('\\sigma')} and ${texStr('sh_1')} at ${texStr('-\\varepsilon^D_p')} balance at their weighted average, ${texStr('-\\varepsilon^u_{11}')}. The bar below adds the two parts: ${texStr(`\\color{#4a90e2}{${fmt(m.substitution, 3)}}+\\color{#d0021b}{${fmt(m.output, 3)}}=${fmt(bal, 3)}`)}. The bigger labour's cost share, the more the answer is driven by product demand.`;
+    $('capA').innerHTML = `Weights ${texStr('1-sh_1')} at ${texStr('\\sigma')} and ${texStr('sh_1')} at ${texStr('-\\varepsilon^D_p')} balance at their weighted average, ${texStr('-\\varepsilon^u_{11}')}. The bar below adds the two parts: ${texStr(`\\color{#4a90e2}{${shownSub}}+\\color{#d0021b}{${shownOut}}=${shownBal}`)}. The bigger labour's cost share, the more the answer is driven by product demand.`;
   }
 
   // ---------- log-log industry demand for labour vs conditional demand ----------

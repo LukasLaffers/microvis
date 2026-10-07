@@ -10,6 +10,9 @@
 
   // ---------- formatting ----------
 
+  // Two decimals; three when two would show a non-zero number as 0.00 (0.004, not 0.00).
+  // Any d >= 2 means this (older calls pass 3 or 4); d = 0 or 1 is kept.
+  const decimals = (x, d) => d < 2 ? d : (x !== 0 && Math.abs(x) < 0.005 ? 3 : 2);
   function fmt(x, d = 2) {
     if (x === null || x === undefined || Number.isNaN(x)) return '—';
     if (x === Infinity) return '∞';
@@ -19,7 +22,13 @@
       const [m, e] = x.toExponential(2).split('e');
       return `${m.replace('-', '−')}×10^${Number(e)}`;
     }
-    return x.toFixed(d).replace('-', '−');
+    return x.toFixed(decimals(x, d)).replace('-', '−');
+  }
+  // Parts and their total, all with the same decimals; the total is the sum of the rounded parts, so the shown numbers add up.
+  function fmtSum(parts) {
+    const dec = Math.max(...parts.concat(parts.reduce((s, x) => s + x, 0)).map(x => decimals(Math.abs(x) < 1e-3 ? 0 : x, 2)));
+    const r = parts.map(x => Number(x.toFixed(dec))), all = r.concat(r.reduce((s, x) => s + x, 0));
+    return all.map(x => (Math.abs(x) < 0.5 * 10 ** -dec ? 0 : x).toFixed(dec).replace('-', '−'));
   }
   // Short number for formulas: 0.50 -> 0.5, 1.00 -> 1.
   const num = x => String(Number(x.toFixed(2)));
@@ -280,10 +289,18 @@
   function guard(what, fn) {
     try { fn(); } catch (err) { showError(`Could not draw the ${what}: ${err && err.message ? err.message : err}`); }
   }
-  // A ResizeObserver notice is not an error of the page.
-  root.addEventListener('error', ev => { if (ev.message && !/ResizeObserver/.test(ev.message)) showError(`Error: ${ev.message}`); });
+  // Only errors of this page are shown. Not ours: a ResizeObserver notice, and "Script error.", which is all a browser
+  // reports when a script from elsewhere fails (a browser extension, a content blocker, the browser's own page features).
+  // Our scripts come from the same site, so their errors always arrive with a message and a file name.
+  root.addEventListener('error', ev => {
+    const msg = ev.message || '';
+    if (!msg || /ResizeObserver/.test(msg) || /^Script error\.?$/.test(msg)) return;
+    if (ev.filename && root.location.protocol !== 'file:' && ev.filename.indexOf(root.location.origin) !== 0) return;
+    showError(`Error: ${msg}`);
+  });
   root.addEventListener('unhandledrejection', ev => {
     const r = ev.reason;
+    if (r === undefined || r === null) return;   // no information: not from our code
     showError(`Error: ${r && r.message ? r.message : r}`);
   });
 
@@ -299,7 +316,7 @@
   }
 
   root.Microvis = {
-    $, fmt, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
+    $, fmt, fmtSum, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
     control, controls, scheduler, applyVisibility,
     theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, eventToData, watchColorScheme,
     showError, guard, librariesReady

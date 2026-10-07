@@ -114,7 +114,7 @@
     })) : null;
     const lo = isE ? th.dec : th.accent4, hi = isE ? th.inc : '#2a9d8f', mid = th.dark ? '#3a4150' : '#f3f1ea';
     traces.push({
-      type: 'surface', x: g, y: g, z: Z, opacity: 0.9, showscale: false, hovertemplate: 'z₁ = %{x:.2f}<br>z₂ = %{y:.2f}<br>q = %{z:.3f}<extra></extra>',
+      type: 'surface', x: g, y: g, z: Z, opacity: 0.9, showscale: false, hovertemplate: 'z₁ = %{x:.2f}<br>z₂ = %{y:.2f}<br>q = %{z:.2f}<extra></extra>',
       lighting: { ambient: 0.75, diffuse: 0.55, specular: 0.05, roughness: 0.9 },
       ...(shaded ? { surfacecolor: C, cmin: isE ? 0 : -2, cmax: 2, colorscale: [[0, lo], [0.5, mid], [1, hi]] } : { colorscale: U.SURFACE_SCALE, cmin: 0, cmax: zmax })
     });

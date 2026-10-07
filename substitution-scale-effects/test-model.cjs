@@ -104,4 +104,27 @@ for (const tech of ['cobb', 'ces', 'leontief']) for (const [a, m] of [[2, 1], [1
   checks += 3;
 }
 
+// The smooth path: starts at A, ends at C, the accumulated parts add up exactly to the total at every step,
+// converge as the steps shrink, and equal the integrals of the two terms of dD/dw1 (trapezoid rule on the derivative).
+for (const tech of ['cobb', 'ces', 'leontief']) for (const [w, p] of [[[1, 1], 8], [[0.7, 1.4], 12]]) for (const w1End of [1.8 * w[0], 0.6 * w[0]]) {
+  const s = { tech, delta: 0.45, rho: -0.6, profile: 'ushape', A: 1, k: 0.6, a: 2, m: 1 };
+  if (!(M.output(w, p, s) > 0) || !(M.output([w1End, w[1]], p, s) > 0)) continue;
+  const label = JSON.stringify({ tech, w, p, w1End });
+  const P = M.path(w, p, s, w1End, 200), r = M.decompose(w, p, s, w1End - w[0]), n = P.w1.length - 1;
+  for (let i = 0; i < 2; i++) { close(P.D[0][i], r.A[i], 1e-12, 'starts at A ' + label); close(P.D[n][i], r.C[i], 1e-12, 'ends at C ' + label); }
+  P.D.forEach((d, k) => [0, 1].forEach(i => close(P.substitution[k][i] + P.scale[k][i], d[i] - P.D[0][i], 1e-10, 'adds up along the way ' + label)));
+  const fine = M.path(w, p, s, w1End, 800);
+  for (let i = 0; i < 2; i++) close(fine.substitution[800][i], P.substitution[n][i], 1e-4, 'converges ' + label);
+  // integral of the derivative terms along the way
+  let si = [0, 0], sc = [0, 0];
+  const m = 400, h = (w1End - w[0]) / m;
+  const terms = x => { const d = M.decomposeDerivative([x, w[1]], p, s); return [[d.input1.substitution, d.input2.substitution], [d.input1.scale, d.input2.scale]]; };
+  let prev = terms(w[0]);
+  for (let k = 1; k <= m; k++) { const cur = terms(w[0] + k * h); for (let i = 0; i < 2; i++) { si[i] += 0.5 * h * (prev[0][i] + cur[0][i]); sc[i] += 0.5 * h * (prev[1][i] + cur[1][i]); } prev = cur; }
+  for (let i = 0; i < 2; i++) { close(fine.substitution[800][i], si[i], 2e-3, 'substitution = integral ' + label); close(fine.scale[800][i], sc[i], 2e-3, 'scale = integral ' + label); }
+  if (tech === 'leontief') for (let i = 0; i < 2; i++) close(P.substitution[n][i], 0, 1e-12, 'Leontief: no substitution ' + label);
+  if (w1End > w[0] && tech !== 'leontief') assert.ok(P.substitution[n][0] < 0 && P.scale[n][0] < 0, 'both lower input 1 ' + label);
+  checks += 4 + 2 * (n + 1) + 6;
+}
+
 console.log(`All ${checks} decomposition checks passed.`);
