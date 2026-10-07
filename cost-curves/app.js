@@ -103,7 +103,7 @@
     }
 
     Plotly.react('plot', traces, U.base2d(th, {
-      xt: 'q', yt: 'p', x: { range: [0, qmax] }, y: { range: [0, yMax] }, annotations, shapes,
+      xt: 'q', yt: 'p', x: { range: [-0.012 * qmax, qmax] }, y: { range: [0, yMax] }, annotations, shapes,
       margin: { l: 52, r: 16, t: 10, b: 48 }
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
   }

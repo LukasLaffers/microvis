@@ -5,7 +5,7 @@
  *   A = D(w,p) = H(w, q*)          before
  *   B = H(w', q*)                  same output, new prices      B - A: substitution (blue)
  *   C = D(w',p) = H(w', S(w',p))   new output, new prices       C - B: scale (red)
- * and, for a marginal change,
+ * (the textbook two-step bookkeeping; the change itself is smooth, see path() below) and, for a marginal change,
  *   dD^i/dw1 = dH^i(w,q*)/dw1 + dH^i(w,q*)/dq * dS(w,p)/dw1.
  *
  * Works in the browser (window.SubScaleModel, needs window.FirmModel) and in Node.
@@ -82,7 +82,32 @@
     return { q, Cqq, dHdq, dMCdw1, dqdw1: -dHdq / Cqq, scale: -dHdq * dHdq / Cqq };
   }
 
-  const api = { output, decompose, decomposeDerivative, isoquantArc, scaleClosedForm };
+  /*
+   * The smooth change: w1 rises gradually from w[0] to w1End, and at every moment the firm both substitutes
+   * and scales. n steps; at each step the bundle D = H(w, S(w,p)) moves, and the move splits into
+   *   substitution: change of H at fixed output (along the current isoquant),
+   *   scale:        change of H at fixed prices (along the current expansion path),
+   * averaged over the two orders, so each step is split symmetrically and the steps add up exactly to the total
+   * D(end) - D(start). As n grows, the accumulated parts converge to the integrals of the two terms of
+   * dD/dw1 = dH/dw1 + dH/dq dS/dw1 along the way.
+   * Returns w1 (n+1 values), q, D (bundles) and the accumulated substitution and scale (vectors, starting at 0).
+   */
+  function path(w, p, s, w1End, n = 120) {
+    const w1 = Array.from({ length: n + 1 }, (_, i) => w[0] + (w1End - w[0]) * i / n);
+    const q = w1.map(x => output([x, w[1]], p, s));
+    const H = (x, qq) => qq > 0 ? FM.condDemand([x, w[1]], qq, s).H : [0, 0];
+    const D = w1.map((x, i) => H(x, q[i]));
+    const substitution = [[0, 0]], scale = [[0, 0]];
+    for (let k = 0; k < n; k++) {
+      const a = D[k], b = H(w1[k + 1], q[k]), c = H(w1[k], q[k + 1]), d = D[k + 1];
+      const ps = substitution[k], pc = scale[k];
+      substitution.push([0, 1].map(i => ps[i] + 0.5 * ((b[i] - a[i]) + (d[i] - c[i]))));
+      scale.push([0, 1].map(i => pc[i] + 0.5 * ((c[i] - a[i]) + (d[i] - b[i]))));
+    }
+    return { w1, q, D, substitution, scale };
+  }
+
+  const api = { output, decompose, decomposeDerivative, isoquantArc, scaleClosedForm, path };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SubScaleModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
