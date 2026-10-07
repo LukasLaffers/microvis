@@ -12,6 +12,7 @@ Lecture 9: *General equilibrium.* It covers:
 | Folder | Title | Lecture idea | Notes' figures |
 |---|---|---|---|
 | `edgeworth-box/` | The Edgeworth Box | offer curves, equilibria where they cross (one or three), contract curve, lens and core, excess demand with Walras' law and homogeneity, second welfare theorem with a lump-sum transfer of good 1 | Cowell 5.1, 7.2–7.5, 7.7 |
+| `excess-demand/` | Excess Demand and Equilibrium | the economy of Assignment 2 (2021): three goods, two firms (CES of degree 1/2), two Cobb-Douglas consumers who own the firms; the price plane with p3 = 1, where each market clears (E1 = 0, E2 = 0, E3 = 0 meet at one point), arrows of price adjustment and the auctioneer's path, the three markets as demand/supply bars, Walras' law at every price, homogeneity of degree zero; equilibrium (0.794, 1.395, 1) | notes 9, excess demand functions |
 | `core-replica/` | The Core Shrinks | the notes' blocking coalition in the $N$-replica, the surviving part of the core as $N$ grows | Cowell 7.6 |
 
 The exchange economy math is in `shared/exchange-model.js` (tests: `node shared/test-exchange-model.cjs`). Consumers have CES utility from `shared/consumer-model.js`.
