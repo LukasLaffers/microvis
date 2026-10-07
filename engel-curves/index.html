@@ -30,6 +30,7 @@
           <summary>How to read this</summary>
           <p>Fix the prices and raise income: the budget line shifts out, and the best bundle moves along the <em>income expansion path</em> (orange). Demand for a good as a function of income is its <em>Engel curve</em>.</p>
           <ul>
+          <li>Press <b>▶ Raise y smoothly</b>: the bundle traces the path, and the Engel curves on the right grow with it.</li>
           <li><b>A</b>: the path is a ray. <b>B</b>: good 2 is a luxury. <b>C</b>: good 1 is inferior.</li>
           <li><b>D</b>: the path curves, and the income elasticities change with income.</li>
           <li><b>E</b>: good 1 is normal at low incomes and inferior at high ones; its Engel curve rises, then falls.</li>
@@ -64,7 +65,10 @@
     </section>
 
     <section class="panel main-panel" aria-label="Income expansion path">
-      <div class="panel-head"><h2>Income expansion path</h2></div>
+      <div class="panel-head">
+        <h2>Income expansion path</h2>
+        <div class="btn-row" role="group" aria-label="Animation"><button type="button" id="play-income">▶ Raise y smoothly</button></div>
+      </div>
       <div id="plot" class="plot plot-main"></div>
       <p class="caption" id="cap"></p>
     </section>

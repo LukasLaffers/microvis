@@ -11,7 +11,7 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { panel: 'A', delta: 0.5, rho: -1, a: 0.4, g1: 3, ad1: 0.8, ad2: 0.4, hc: 2, hK: 3, p1: 1, p2: 1, y: 10 };
+  const state = { panel: 'A', delta: 0.5, rho: -1, a: 0.4, g1: 3, ad1: 0.8, ad2: 0.4, hc: 2, hK: 3, p1: 1, p2: 1, y: 10, anim: null };   // anim: progress of the income animation (null when not playing)
   let ctrls = {};
   const schedule = U.scheduler(render);
   const f3 = x => fmt(Math.abs(x) < 1e-7 ? 0 : x, 3);   // rounding noise of the finite differences prints as 0
@@ -37,14 +37,20 @@
     const { u, p, lo, hi, x } = S;
     const ys = U.linspace(lo + 0.05 * (hi - lo), hi - 0.05 * (hi - lo), 5), Lx = 1.1 * hi / p[0], Ly = 1.1 * hi / p[1];
     const x1s = U.linspace(Lx / 400, Lx, 300);
-    const traces = [];
-    for (const yy of ys) {
+    const traces = [], anim = state.anim !== null;
+    // While income rises: only the current budget line and indifference curve; otherwise five sample incomes.
+    if (!anim) for (const yy of ys) {
       traces.push(U.line2([[yy / p[0], 0], [0, yy / p[1]]], th.grey, 1.2, `budget line, y = ${fmt(yy)}`));
       const v = CM.indirect(p, yy, u);
       traces.push(U.line2(CM.indifferenceCurve(v, u, x1s).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.blue, 1, 'indifference curve', 'dot'));
     }
-    const path = EM.expansionPath(p, u, U.linspace(lo, hi, 80));
-    traces.push(U.line2(path, th.orange, 3.5, 'income expansion path'));
+    const yAll = U.linspace(lo, hi, 80), path = EM.expansionPath(p, u, yAll);
+    if (anim) {
+      // the path traced so far (strong) and still ahead (faint), and the indifference curve touching the current budget line
+      traces.push(U.line2(path.filter((_, i) => yAll[i] >= state.y), th.orange, 1.5, 'still ahead', 'dot'));
+      traces.push(U.line2(path.filter((_, i) => yAll[i] < state.y).concat([x]), th.orange, 3.5, 'income expansion path'));
+      traces.push(U.line2(CM.indifferenceCurve(CM.indirect(p, state.y, u), u, x1s).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.blue, 1.8, 'indifference curve'));
+    } else traces.push(U.line2(path, th.orange, 3.5, 'income expansion path'));
     traces.push(U.line2([[state.y / p[0], 0], [0, state.y / p[1]]], th.ink, 2.2, `budget line, y = ${fmt(state.y)}`));
     if (state.panel === 'E') {
       const yT = EM.turningIncome(p, u);
@@ -69,12 +75,17 @@
       ? [{ x: end[0], y: end[1], text: 'D<sup>1</sup> = D<sup>2</sup>', showarrow: false, xanchor: 'right', yanchor: 'bottom', yshift: 4, font: { size: 13, color: th.ink } }]
       : [{ x: end[0], y: end[1], text: 'D<sup>1</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.blue } },
          { x: end[0], y: end[2], text: 'D<sup>2</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.red } }];
+    // While income rises, the curves are drawn up to the current income (strong) and faint beyond it.
+    const anim = state.anim !== null, done = c.filter(r => !anim || r[0] < state.y).concat(anim ? [[state.y, x[0], x[1]]] : []);
+    const ahead = anim ? [U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[2]]), th.red, 1, 'D² still ahead', 'dot'), U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[1]]), th.blue, 1, 'D¹ still ahead', 'dot')] : [];
     Plotly.react('plotB', [
-      U.line2(c.map(r => [r[0], r[2]]), th.red, 2.5, 'D²(p, y)'), U.line2(c.map(r => [r[0], r[1]]), th.blue, 2.5, 'D¹(p, y)', same ? 'dash' : 'solid'),
-      U.dot2([[state.y, x[0]], [state.y, x[1]]], th.ink, 'now', 8)
+      ...ahead,
+      U.line2(done.map(r => [r[0], r[2]]), th.red, 2.5, 'D²(p, y)'), U.line2(done.map(r => [r[0], r[1]]), th.blue, 2.5, 'D¹(p, y)', same ? 'dash' : 'solid'),
+      U.dot2([[state.y, x[0]], [state.y, x[1]]], th.ink, 'now', anim ? 11 : 8)
     ], U.base2d(th, {
       xt: 'y', yt: 'demand', annotations, margin: { l: 52, r: 28, t: 8, b: 44 },
-      shapes: state.panel === 'E' ? [{ type: 'line', x0: EM.turningIncome(p, u), x1: EM.turningIncome(p, u), yref: 'paper', y0: 0, y1: 1, line: { color: th.muted, width: 1, dash: 'dot' } }] : []
+      shapes: state.panel === 'E' ? [{ type: 'line', x0: EM.turningIncome(p, u), x1: EM.turningIncome(p, u), yref: 'paper', y0: 0, y1: 1, line: { color: th.muted, width: 1, dash: 'dot' } }] : [],
+      x: { range: [c[0][0], c[c.length - 1][0]] }
     }), U.PLOT_CONFIG);
     $('capB').innerHTML = `Demand for each good as income grows, prices fixed. The slope of ${texStr('\\log D^j')} in ${texStr('\\log y')} is the income elasticity ${texStr('\\eta_j')}.`;
   }
@@ -105,6 +116,22 @@
     guard('numbers', () => renderNumbers(S));
   }
 
+  // Raise y smoothly over the example's range: the budget line shifts out, the bundle traces the path and the Engel curves.
+  function playIncome() {
+    if (state.anim !== null) return;
+    const start = performance.now(), DURATION = 5000;
+    state.anim = 0; $('play-income').disabled = true;
+    const step = now => {
+      state.anim = Math.min(1, (now - start) / DURATION);
+      const [lo, hi] = EM.incomeRange([state.p1, state.p2], pref());
+      state.y = lo + (0.03 + 0.94 * state.anim) * (hi - lo); ctrls.y.sync();
+      guard('animation', render);
+      if (state.anim < 1) requestAnimationFrame(step);
+      else { state.anim = null; $('play-income').disabled = false; render(); }
+    };
+    requestAnimationFrame(step);
+  }
+
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
@@ -114,6 +141,7 @@
       state.y = lo + 0.5 * (hi - lo);
       schedule();
     }));
+    $('play-income').addEventListener('click', playIncome);
     render();
     U.watchColorScheme(schedule);
   }

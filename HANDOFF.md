@@ -17,6 +17,7 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 
 ### 2. Not merged yet (branch `claude/vigilant-carson-p2wfrl`)
 - **Substitution and Income Effects (Slutsky)** now works like Substitution and Scale Effects: opens with the two-step picture E₁ → E₂ → E₃; in the figure's panel head **▶ Step by step** (blue along v⁰ to E₂, then red to E₃) and **▶ Lower/Raise p₁ smoothly** (label follows the direction; slider `t` under the plot; arrows substitution + income = direction of the path; bars on the x₁ axis; table "so far"; checks at the current p₁). `model.js` `path()` (same symmetric split as the firm tool: H at fixed utility vs. fixed prices) with tests (adds up, converges, equals the integrals of the two (M3) terms).
+- **Income Expansion Paths and Engel Curves**: ▶ Raise y smoothly in the figure heading: income rises over the example's range (3 % to 97 %), the path is traced (strong so far, faint ahead) with the current indifference curve, and the Engel curves grow with it; the Engel plot's y axis is fixed to the income range.
 - **Every animation button sits in the heading of its figure** (user: "the button at the same position like for these two cases"): Profit Two Ways (▶ Show the two steps, next to the camera buttons), Marshall's Law (▶ Raise w₁), Substitution or Composition (▶ Notes example). `.big-button` is gone; `.btn-row button:disabled` in `shared/style.css` → version tag 7.
 
 
