@@ -114,7 +114,8 @@
     const { s, w, p, S, qs, Pi } = P, qmax = state.qmax, qq = linspace(0, qmax, 400);
     const C = qq.map(q => FM.cost(w, q, s)), R = qq.map(q => p * q), prof = qq.map((q, i) => R[i] - C[i]);
     const bounded = S.kind !== 'unbounded' && S.kind !== 'indeterminate';
-    const top = p * qmax * 1.1;
+    // up to the revenue at q_max, but never below the cost at half of it (at p = 0 there is no revenue to scale by)
+    const top = 1.1 * Math.max(p * qmax, C[Math.round(C.length / 2)], 1e-6);
 
     const annR = [];
     if (bounded && Pi > 1e-9) {
@@ -126,8 +127,11 @@
       U.line2(qq.map((q, i) => [q, C[i] < 3 * top ? C[i] : null]), th.red, 2.5, 'cost C(w,q)')
     ], U.base2d(th, { xt: 'q', yt: 'value', x: { range: [0, qmax] }, y: { range: [0, top] }, annotations: annR }), U.PLOT_CONFIG);
 
-    const finite = prof.filter(Number.isFinite), pmaxV = Math.max(...finite, 1), pminV = Math.min(...finite);
-    const lo = Math.max(pminV, -1.2 * pmaxV) - 0.1 * pmaxV;
+    const finite = prof.filter(Number.isFinite), hi = Math.max(...finite), pminV = Math.min(...finite);
+    // A positive maximum sets the scale. When the firm shuts down (profit ≤ 0 everywhere), scale by the loss at q_max/2.
+    const loss = Math.abs(prof[Math.round(prof.length / 2)]) || 1;
+    const pmaxV = hi > 0.05 * loss ? hi : 0.25 * loss;
+    const lo = hi > 0.05 * loss ? Math.max(pminV, -1.2 * pmaxV) - 0.1 * pmaxV : -1.2 * loss;
     const annP = [], tr = [U.line2(qq.map((q, i) => [q, prof[i]]), th.red, 2.5, 'profit pq − C(w,q)')];
     if (bounded && qs > 0) tr.push(U.dot2([[qs, Pi]], th.ink, 'maximum at q*', 12));
     if (S.kind === 'zero') tr.push(U.dot2([[0, 0]], th.ink, 'maximum at q = 0', 12));
@@ -195,6 +199,10 @@
       ? `\\begin{gathered}C(w,q)=c(w)\\,G(q)\\\\ G(q)=\\tfrac13q^3-${U.num(s.a)}q^2+${U.num(s.a * s.a + s.m)}q\\end{gathered}`
       : `C(w,q)=c(w)\\,(q/A)^{1/k},\\quad k=${U.num(s.k)},\\ A=${U.num(s.A)}`, true);
     const P = solve(), th = U.theme();
+    // the profit-maximising output beyond the q axis: say so
+    const beyond = P.S.kind !== 'unbounded' && P.S.kind !== 'indeterminate' && P.qs > state.qmax;
+    $('range-warn').hidden = !beyond;
+    if (beyond) $('range-warn').innerHTML = `The best output ${texStr(`q^\\ast=${fmt(P.qs, 2)}`)} lies beyond the plotted range: raise ${texStr('q_{\\max}')}.`;
     // Lecture 3 corollary with the current numbers (homogeneous profile only).
     if (isHomog()) {
       const c = U.num(P.c), e = U.num((1 - s.k) / s.k), inv = U.num(1 / s.k), Aterm = s.A === 1 ? '' : `\\,${U.num(s.A)}^{-${inv}}`;

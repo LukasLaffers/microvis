@@ -29,7 +29,7 @@
   function solve() {
     const s = tech(), w = prices(), r = FM.condDemand(w, state.q, s), C = FM.cost(w, state.q, s);
     const ends = r.segment ? r.segment.flat() : r.H;
-    const zmax = state.autofit ? Math.max(2, 1.6 * Math.max(...ends)) : state.zmax;
+    const zmax = state.autofit ? Math.min(20, Math.max(2, 1.6 * Math.max(...ends))) : state.zmax;   // at most the slider's maximum
     return { s, w, H: r.H, kind: r.kind, segment: r.segment, C, zmax };
   }
 
@@ -133,7 +133,8 @@
     ];
     const yMax = Math.max(1, ...h1.filter(Number.isFinite).slice(5)) * 1.1;
     Plotly.react('plotB', traces, U.base2d(th, {
-      xt: 'w<sub>1</sub>', yt: 'H<sup>1</sup>(w,q)', x: { range: [0, 5.1] }, y: { range: [0, Math.min(yMax, 4 * Math.max(H[0], 0.5) + 1)] }
+      // room for the whole dot at the slider's ends: w1 up to 5, and H1 at the current w1 always inside
+      xt: 'w<sub>1</sub>', yt: 'H<sup>1</sup>(w,q)', x: { range: [0, 5.25] }, y: { range: [0, Math.max(Math.min(yMax, 4 * Math.max(H[0], 0.5) + 1), 1.12 * H[0])] }
     }), U.PLOT_CONFIG);
     $('capB').innerHTML = state.tech === 'leontief'
       ? 'No substitution possible: the demand does not react to prices.'
@@ -178,6 +179,9 @@
     tex($('formula-general'), f.general, true);
     tex($('formula-numbers'), f.numbers, true);
     if (state.autofit) { state.zmax = Number(P.zmax.toFixed(1)); ctrls.zmax.sync(); }
+    // the cheapest bundle (or the isoquant) beyond the plotted range: say so
+    const far = (P.segment ? P.segment.flat() : P.H).some(v => v > P.zmax) || !FM.isoquant(state.q, P.s, P.zmax).length;
+    $('range-warn').hidden = !far;
     renderIsoStatus(P.C);
     const th = U.theme();
     guard('input-space plot', () => drawMain(th, P));

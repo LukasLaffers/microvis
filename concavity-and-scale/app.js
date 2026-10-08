@@ -204,7 +204,9 @@
       item(true, `<b>Quasi-concave.</b> Every isoquant is a straight line, so every input requirement set ${texStr('Z(q)=\\{z:\\phi(z)\\ge q\\}')} is convex.`),
       item(nr, nr
         ? homo ? `<b>No increasing returns to scale.</b> ${texStr(`e(z)=k=${U.num(P.k1)}\\le 1`)} at every ${texStr('z')}.` : `<b>No increasing returns to scale.</b> ${texStr('e(z)')} lies between ${texStr(`k_1=${U.num(P.k1)}`)} and ${texStr(`k_2=${U.num(P.k2)}`)}, so ${texStr('e(z)\\le 1')} at every ${texStr('z')}.`
-        : homo ? `<b>Increasing returns to scale</b> everywhere: ${texStr(`e(z)=k=${U.num(P.k1)}>1`)}.` : `<b>Increasing returns to scale</b> near the ${texStr(P.k1 > 1 ? 'z_1' : 'z_2')} axis, where ${texStr('e(z)')} is close to ${texStr(`k_${P.k1 > 1 ? 1 : 2}=${U.num(P.k1 > 1 ? P.k1 : P.k2)}>1`)}.`),
+        : homo ? `<b>Increasing returns to scale</b> everywhere: ${texStr(`e(z)=k=${U.num(P.k1)}>1`)}.` : (P.k1 > 1 && P.k2 > 1
+          ? `<b>Increasing returns to scale</b> everywhere: ${texStr('e(z)')} lies between ${texStr(`k_1=${U.num(P.k1)}`)} and ${texStr(`k_2=${U.num(P.k2)}`)}, both above 1.`
+          : `<b>Increasing returns to scale</b> near the ${texStr(P.k1 > 1 ? 'z_1' : 'z_2')} axis, where ${texStr('e(z)')} is close to ${texStr(`k_${P.k1 > 1 ? 1 : 2}=${U.num(P.k1 > 1 ? P.k1 : P.k2)}>1`)}.`)),
       item(homo, homo
         ? `<b>Homothetic.</b> The isoquants are parallel lines, so ${texStr('MRTS_{21}')} is the same all along each ray: ${texStr(`\\phi=(z_1+z_2)^{${U.num(P.k1)}}`)} is homogeneous of degree ${texStr(`k=${U.num(P.k1)}`)}.`
         : `<b>Not homothetic.</b> ${texStr(`MRTS_{21}=q^{1/k_2-1/k_1}`)} changes with output: on the ray through ${texStr('z')} it is ${f3(m1)} at ${texStr('z')} and ${f3(m2)} at ${texStr('2z')}. The isoquants rotate as output rises.`),

@@ -46,7 +46,9 @@
     const zmax = Math.max(2, 1.4 * Math.max(...(S.q > 0 ? D : Href)));
     const one = SR.maximise((a, b) => FM.profitAt(a, b, w, p, s), zmax);
     // Profit surface on a 70 x 70 grid, cut off below so the peak stays visible.
-    const floor = -0.5 * Math.max(Pi, 0.25 * p * qRef, 1e-6);
+    // (when the firm shuts down, Pi = 0: then the loss at q-hat sets the depth, so that the surface keeps its shape)
+    const lossRef = Math.max(0, FM.cost(w, qRef, s) - p * qRef);
+    const floor = -0.5 * Math.max(Pi, 0.25 * p * qRef, 3 * lossRef, 1e-6);
     const xs = linspace(0, zmax, 70);
     const zs = xs.map(b => xs.map(a => Math.max(floor, FM.profitAt(a, b, w, p, s))));
     // Expansion path: H(w, q) for q up to where it leaves the box.
@@ -125,7 +127,9 @@
       if (f1 < 0.3 * (i + 1)) return; // tangencies appear one by one in the animation
       const C = FM.cost(w, q, s), H = FM.condDemand(w, q, s).H;
       traces.push(U.line2([[C / w[0], 0], [0, C / w[1]]], main ? th.ink : th.grey, main ? 2 : 1, `isocost, cost ${fmt(C)}`));
-      if (u.kind !== 'multiple') traces.push(U.dot2([H], main ? th.ink : th.grey, `H(w, ${fmt(q)})`, main ? 12 : 8));
+      // the big black dot is the firm's choice; when it shuts down, the tangency at q-hat is only one of the grey ones
+      const best = main && S.q > 0;
+      if (u.kind !== 'multiple') traces.push(U.dot2([H], best ? th.ink : th.grey, `H(w, ${fmt(q)})`, best ? 12 : 8));
     });
     const n1 = Math.max(2, Math.round(path.length * f1));
     traces.push(U.line2(path.slice(0, n1).map(v => v.H), th.blue, 2, 'expansion path', 'dash'));
@@ -135,7 +139,8 @@
       annotations.push({ xref: 'paper', yref: 'paper', x: 0.98, y: 0.98, xanchor: 'right', yanchor: 'top', showarrow: false, text: 'Many bundles are optimal', bgcolor: th.panel, bordercolor: th.line, borderpad: 4, font: { size: 12 } });
     } else if (f1 >= 1) {
       const z = S.q > 0 ? P.D : [0, 0], right = z[0] > 0.5 * zmax;
-      annotations.push({ x: z[0], y: z[1], text: 'H(w,S(w,p)) = D(w,p)', showarrow: false, xanchor: right ? 'right' : 'left', yanchor: 'top', xshift: right ? -8 : 8, yshift: -6, font: { size: 12, color: th.ink }, bgcolor: th.panel });
+      if (!(S.q > 0)) traces.push(U.dot2([z], th.ink, 'D(w,p) = 0: shut down', 12));
+      annotations.push({ x: z[0], y: z[1], text: S.q > 0 ? 'H(w,S(w,p)) = D(w,p)' : 'D(w,p) = 0: the firm shuts down', showarrow: false, xanchor: right ? 'right' : 'left', yanchor: 'top', xshift: right ? -8 : 8, yshift: -6, font: { size: 12, color: th.ink }, bgcolor: th.panel });
     }
     U.plot('plotA', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
@@ -152,7 +157,9 @@
     const f2 = phase2(), sq = S.q > 0 ? S.q : 0;
     if (f2 >= 1) traces.push(U.dot2([[sq, Pi]], th.red, 'maximum: S(w,p)', 12));
     else if (state.anim !== null && phase1() >= 1) { const q = sq * f2; traces.push(U.dot2([[q, p * q - FM.cost(w, q, s)]], th.red, 'searching', 11)); }
-    const hi = Math.max(...prof, 1), lo = Math.max(Math.min(...prof), -1.5 * hi);
+    // A positive maximum sets the scale; when the firm shuts down (profit ≤ 0 everywhere), the loss at q-hat does.
+    const loss = Math.abs(p * qRef - FM.cost(w, qRef, s)) || 1, top = Math.max(...prof);
+    const hi = top > 0.05 * loss ? top : 0.25 * loss, lo = top > 0.05 * loss ? Math.max(Math.min(...prof), -1.5 * hi) : -1.2 * loss;
     const ann = f2 >= 1 && sq > 0 ? [{ x: sq, y: Pi, text: 'q = S(w,p)', showarrow: false, yanchor: 'bottom', yshift: 8, font: { color: th.red, size: 12 } }] : [];
     U.plot('plotB', traces, U.base2d(th, {
       xt: 'q (along the expansion path)', yt: 'pq − C(w,q)', x: { range: [0, qMax] }, y: { range: [lo - 0.05 * hi, hi * 1.25] }, annotations: ann,
