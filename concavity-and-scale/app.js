@@ -106,13 +106,13 @@
       type: 'scatter3d', mode: 'markers', x: [Zl[0]], y: [Zl[1]], z: [cl], marker: { size: 5, color: th.red }, hoverinfo: 'skip'
     });
     const axis = (title, r) => ({ title: { text: title, font: { color: th.ink } }, range: r, color: th.muted, gridcolor: th.grid, backgroundcolor: 'rgba(0,0,0,0)', showspikes: false, tickfont: { color: th.muted } });
-    Plotly.react('plot3d', traces, {
+    U.react3d('plot3d', traces, {
       margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', font: { color: th.ink, family: th.font, size: 12 }, showlegend: false, uirevision: 'keep',
       scene: {
         uirevision: 'keep', camera: state.camera, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.9 },
         xaxis: axis('z₁', [0, L]), yaxis: axis('z₂', [0, L]), zaxis: axis('q', [0, zmax * 1.02])
       }
-    }, U.PLOT_CONFIG);
+    }, U.PLOT_CONFIG, events3d);
   }
 
   // Camera looking horizontally at the segment, from the side of the origin (where the surface is lower).
@@ -232,6 +232,12 @@
     if (lam !== undefined) ctrls.lam.setExact(lam);
   }
 
+  // Handlers of the 3D figure (attached again by U.react3d whenever it rebuilds the figure).
+  const events3d = {
+    // remember the camera the user rotates to, so redraws keep it
+    plotly_relayout: ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; }
+  };
+
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { onChange: schedule });
@@ -253,7 +259,6 @@
     });
     document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = CAMERAS[b.dataset.cam](); schedule(); }));
     render();
-    $('plot3d').on('plotly_relayout', ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; });
     U.watchColorScheme(schedule);
   }
 

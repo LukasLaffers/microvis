@@ -117,4 +117,13 @@ for (const [name, p] of Object.entries(M.PRESETS)) {
   checks += 6;
 }
 
+// Free disposal at a point outside the box checks points above it, never below: z' >= z in every grid point.
+{
+  const m = M.PRESETS.smooth, z = [m.box * 1.2, m.box * 1.1];
+  const r = M.freeDisposalAt('smooth', m.q, z, m.box);
+  assert.ok(r.holds, 'smooth technology: free disposal holds above a point outside the box');
+  const c = M.PRESETS.congestion, rc = M.freeDisposalAt('congestion', c.q, [c.box * 1.1, c.box * 1.1], c.box);
+  if (rc.witness) assert.ok(rc.witness[0] >= c.box * 1.1 - 1e-12 && rc.witness[1] >= c.box * 1.1 - 1e-12, 'witness lies above z');
+}
+
 console.log(`All ${checks} model checks passed.`);

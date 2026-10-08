@@ -131,7 +131,7 @@
     const start = performance.now(), DURATION = 5000;
     state.anim = 0; $('play-income').disabled = true;
     const step = now => {
-      state.anim = Math.min(1, (now - start) / DURATION);
+      state.anim = Math.max(0, Math.min(1, (now - start) / DURATION));
       const [lo, hi] = EM.incomeRange([state.p1, state.p2], pref());
       state.y = lo + (0.03 + 0.94 * state.anim) * (hi - lo); ctrls.y.sync();
       guard('animation', render);

@@ -105,12 +105,12 @@
     // One step answer: the peak found by the numerical search.
     traces.push({ type: 'scatter3d', mode: 'markers+text', x: [one.z[0]], y: [one.z[1]], z: [one.value], marker: { color: th.ink, size: 7, line: { color: '#ffffff', width: 1 } }, text: ['one step: D(w,p)'], textposition: 'top center', textfont: { color: th.ink, size: 12 }, hovertemplate: 'one step<br>z₁ = %{x:.2f}, z₂ = %{y:.2f}<br>profit = %{z:.2f}<extra></extra>' });
     const axis = (title, range) => ({ title: { text: title }, range, color: th.ink, gridcolor: th.grid, zerolinecolor: th.line, showbackground: true, backgroundcolor: th.panel, showspikes: false });
-    Plotly.react('plot3d', traces, {
+    U.react3d('plot3d', traces, {
       margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', showlegend: false, uirevision: 'keep',
       font: { color: th.ink, family: th.font, size: 12 }, hoverlabel: { font: { family: th.font } },
       scene: { uirevision: 'keep', camera: state.camera, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.75 },
         xaxis: axis('z₁', [0, zmax]), yaxis: axis('z₂', [0, zmax]), zaxis: axis('profit', [floor, top]) }
-    }, U.PLOT_CONFIG);
+    }, U.PLOT_CONFIG, events3d);
   }
 
   // ---------- Step 1 in the input space ----------
@@ -202,7 +202,7 @@
     const start = performance.now(), DURATION = 4000;
     $('animate').disabled = true;
     const step = now => {
-      state.anim = Math.min(1, (now - start) / DURATION);
+      state.anim = Math.max(0, Math.min(1, (now - start) / DURATION));
       const P = solve(), th = U.theme(), A = animated3d(P);
       guard('animation', () => {
         if (anim3dIdx) Plotly.restyle('plot3d', { x: A.map(t => t.x), y: A.map(t => t.y), z: A.map(t => t.z) }, anim3dIdx);
@@ -215,6 +215,12 @@
     requestAnimationFrame(step);
   }
 
+  // Handlers of the 3D figure (attached again by U.react3d whenever it rebuilds the figure).
+  const events3d = {
+    // remember the camera the user rotates to, so redraws keep it
+    plotly_relayout: ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; }
+  };
+
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { onChange: schedule });
@@ -225,7 +231,6 @@
     $('animate').addEventListener('click', animate);
     document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = clone(CAMERAS[b.dataset.cam]); schedule(); }));
     render();
-    $('plot3d').on('plotly_relayout', ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; });
     U.watchColorScheme(schedule);
   }
 

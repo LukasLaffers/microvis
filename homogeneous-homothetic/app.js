@@ -133,7 +133,11 @@
   }
 
   function render() {
-    const S = HM.tech(state);
+    let S = HM.tech(state);
+    // An S-shaped F never reaches its ceiling s²: keep the step between isoquants below it, so that isoquants exist.
+    const top = TM.maxOutput(S), dqMax = Number.isFinite(top) ? Math.min(3, Math.floor(0.9 * top * 20) / 20) : 3;
+    if (Math.abs(ctrls.dq.max - dqMax) > 1e-9) ctrls.dq.setRange(0.25, Math.max(0.25, dqMax));
+    if (state.dq > ctrls.dq.max) { state.dq = ctrls.dq.max; ctrls.dq.sync(); S = HM.tech(state); }
     U.applyVisibility({ shape: state.cls !== 'neither', ces: state.shape === 'ces', homogeneous: state.cls === 'homogeneous', homothetic: state.cls === 'homothetic', neither: state.cls === 'neither', sshape: state.Fh === 'sshape', log: state.Fh === 'log' });
     document.querySelectorAll('[data-cls]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cls === state.cls)));
     formula();
@@ -143,9 +147,10 @@
     guard('checks', () => renderChecks(S));
   }
 
+  let ctrls = null;
   function init() {
     U.renderStaticTex();
-    U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: schedule });
+    ctrls = U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: schedule });
     document.querySelectorAll('[data-cls]').forEach(b => b.addEventListener('click', () => { state.cls = b.dataset.cls; schedule(); }));
     $('shape').addEventListener('change', e => { state.shape = e.target.value; schedule(); });
     $('Fh').addEventListener('change', e => { state.Fh = e.target.value; schedule(); });

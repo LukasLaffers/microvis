@@ -88,14 +88,14 @@
       hovertemplate: 'z₁ = %{x} kr, z₂ = %{y} kr<br>q = %{z} kg<extra></extra>'
     });
     const axis = (title, range) => ({ title: { text: title }, range, color: th.ink, gridcolor: th.grid, zerolinecolor: th.line, showbackground: true, backgroundcolor: th.panel, showspikes: false });
-    Plotly.react('plot3d', traces, {
+    U.react3d('plot3d', traces, {
       margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', showlegend: false, uirevision: 'keep',
       font: { color: th.ink, family: th.font, size: 12 }, hoverlabel: { font: { family: th.font } },
       scene: {
         uirevision: 'keep', camera: state.camera, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.8 },
         xaxis: axis('z₁ work (kr)', [0, Z1MAX]), yaxis: axis('z₂ cocoa fat (kr)', [0, Z2MAX]), zaxis: axis('q (kg)', [0, QMAX])
       }
-    }, U.PLOT_CONFIG);
+    }, U.PLOT_CONFIG, events3d);
   }
 
   // ---------- isoquants (Frisch's figure) ----------
@@ -168,10 +168,12 @@
 
     const row = vary2 ? D.q[si] : D.q.map(r => r[sj]), steps = [1, 2, 3].map(m => row[m] - row[m - 1]);
     const step = vary2 ? 5 : 50;
+    // diminishing only when every step adds less than the one before
+    const trend = steps.every((v, i) => i === 0 || v < steps[i - 1]) ? ': diminishing marginal product' : steps.every((v, i) => i === 0 || v > steps[i - 1]) ? ': increasing marginal product' : ': no steady pattern';
     $('titleB').textContent = vary2 ? 'Adding cocoa fat, work fixed' : 'Adding work, cocoa fat fixed';
     $('capB').textContent = vary2
-      ? `Each line is a row of the table. With z₁ = ${D.z1[si]} kr of work, each extra ${step} kr of cocoa fat adds ${steps.join(', ')} kg: ${steps[2] < steps[0] ? 'diminishing marginal product' : 'no clear pattern'}.`
-      : `Each line is a column of the table. With z₂ = ${D.z2[sj]} kr of cocoa fat, each extra ${step} kr of work adds ${steps.join(', ')} kg.`;
+      ? `Each line is a row of the table. With z₁ = ${D.z1[si]} kr of work, each extra ${step} kr of cocoa fat adds ${steps.join(', ')} kg${trend}.`
+      : `Each line is a column of the table. With z₂ = ${D.z2[sj]} kr of cocoa fat, each extra ${step} kr of work adds ${steps.join(', ')} kg${trend}.`;
   }
 
   // ---------- readouts ----------
@@ -207,6 +209,14 @@
     guard('readouts', renderReadouts);
   }
 
+  const onClick = ev => { const pt = ev.points && ev.points[0]; if (pt && pt.customdata) select(pt.customdata[0], pt.customdata[1]); };
+  // Handlers of the 3D figure (attached again by U.react3d whenever it rebuilds the figure).
+  const events3d = {
+    // remember the camera the user rotates to, so redraws keep it
+    plotly_relayout: ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; },
+    plotly_click: ev => onClick(ev)
+  };
+
   function init() {
     U.renderStaticTex();
     const pick = el => { if (el && el.dataset.i !== undefined) select(Number(el.dataset.i), Number(el.dataset.j)); };
@@ -221,10 +231,7 @@
     document.querySelectorAll('[data-vary]').forEach(b => b.addEventListener('click', () => { state.vary = Number(b.dataset.vary); schedule(); }));
     document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = clone(CAMERAS[b.dataset.cam]); schedule(); }));
     render();
-    const onClick = ev => { const pt = ev.points && ev.points[0]; if (pt && pt.customdata) select(pt.customdata[0], pt.customdata[1]); };
     $('plotA').on('plotly_click', onClick);
-    $('plot3d').on('plotly_click', onClick);
-    $('plot3d').on('plotly_relayout', ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; });
     U.watchColorScheme(schedule);
   }
 

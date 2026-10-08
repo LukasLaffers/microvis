@@ -339,7 +339,7 @@
     state.playing = true; state.mode = mode;
     $('play-steps').disabled = $('play-smooth').disabled = true;
     const step = now => {
-      const f = Math.min(1, (now - start) / DURATION);
+      const f = Math.max(0, Math.min(1, (now - start) / DURATION));   // the first frame's time stamp can be earlier than the click
       frame(f);
       if (f < 1) requestAnimationFrame(step);
       else { state.playing = false; $('play-steps').disabled = $('play-smooth').disabled = false; done(); }

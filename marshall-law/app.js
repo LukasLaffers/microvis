@@ -213,7 +213,7 @@
     // Animate the wage rise: both channels move together.
     $('raise').addEventListener('click', () => {
       const t0 = performance.now(), dur = 1400;
-      const step = now => { state.t = Math.min(1, (now - t0) / dur); render(); if (state.t < 1) requestAnimationFrame(step); };
+      const step = now => { state.t = Math.max(0, Math.min(1, (now - t0) / dur)); render(); if (state.t < 1) requestAnimationFrame(step); };
       state.t = 0; requestAnimationFrame(step);
     });
     render();

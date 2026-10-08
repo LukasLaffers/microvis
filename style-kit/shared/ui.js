@@ -18,9 +18,11 @@
     if (x === Infinity) return '∞';
     if (x === -Infinity) return '−∞';
     const a = Math.abs(x);
-    if (a !== 0 && (a >= 1e4 || a < 1e-3)) {
-      const [m, e] = x.toExponential(2).split('e');
-      return `${m.replace('-', '−')}×10^${Number(e)}`;
+    if (a < 1e-9) x = 0;   // rounding noise of a computation (e.g. 3.6×10⁻¹⁵ for a profit of 0) prints as 0
+    else if (a >= 1e4 || a < 1e-3) {
+      // 4.00×10⁻⁴ with superscript digits: reads the same in text and in KaTeX
+      const [m, e] = x.toExponential(2).split('e'), sup = String(Number(e)).replace(/[-0-9]/g, c => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'['-0123456789'.indexOf(c)]);
+      return `${m.replace('-', '−')}×10${sup}`;
     }
     return x.toFixed(decimals(x, d)).replace('-', '−');
   }
@@ -240,6 +242,26 @@
     gd._microvisKey = key;
   }
 
+  // Plotly.react for a 3D figure. When the camera switches between perspective and orthographic, Plotly builds a new
+  // WebGL context and keeps the old one; after a few switches the browser drops contexts and figures go blank (sooner on a
+  // phone). So then the figure is rebuilt from scratch: the old contexts are released and the handlers in `events`
+  // ({ plotly_relayout: f, ... }) are attached again, as a rebuilt figure has none.
+  function react3d(id, traces, layout, config, events = {}) {
+    const gd = typeof id === 'string' ? document.getElementById(id) : id;
+    const cam = layout.scene && layout.scene.camera, type = (cam && cam.projection && cam.projection.type) || 'perspective';
+    if (gd._microvisProjection && gd._microvisProjection !== type) {
+      gd.querySelectorAll('canvas').forEach(cv => {
+        const g = cv.getContext('webgl2') || cv.getContext('webgl') || cv.getContext('experimental-webgl'), x = g && g.getExtension('WEBGL_lose_context');
+        if (x) x.loseContext();
+      });
+      Plotly.purge(gd);
+      gd._microvisEvents = false;
+    }
+    gd._microvisProjection = type;
+    Plotly.react(gd, traces, layout, config);
+    if (!gd._microvisEvents) { Object.entries(events).forEach(([name, f]) => gd.on(name, f)); gd._microvisEvents = true; }
+  }
+
   // Convert a pointer event to data coordinates of a 2D plot with fixed linear axes (null if outside).
   function eventToData(gd, ev) {
     const fl = gd._fullLayout;
@@ -320,18 +342,27 @@
 
   // ---------- errors: show them on the page, not only in the console ----------
 
-  const reported = new Set();
-  function showError(msg) {
-    if (reported.has(msg)) return;
-    reported.add(msg);
+  // The messages on the banner, by key. A message of guard() goes away as soon as the same part draws without error;
+  // any other message (a script that failed to load, an uncaught error) stays.
+  const reported = new Map();
+  function showBanner() {
     const box = $('status');
     if (!box) return;
-    box.hidden = false;
-    box.insertAdjacentHTML('beforeend', '<p></p>');
-    box.lastElementChild.textContent = msg;
+    box.textContent = '';
+    reported.forEach(msg => { box.insertAdjacentHTML('beforeend', '<p></p>'); box.lastElementChild.textContent = msg; });
+    box.hidden = reported.size === 0;
+  }
+  function showError(msg, key = msg) {
+    if (reported.get(key) === msg) return;
+    reported.set(key, msg);
+    showBanner();
   }
   function guard(what, fn) {
-    try { fn(); } catch (err) { showError(`Could not draw the ${what}: ${err && err.message ? err.message : err}`); }
+    const key = 'guard:' + what;
+    try {
+      fn();
+      if (reported.delete(key)) showBanner();
+    } catch (err) { showError(`Could not draw the ${what}: ${err && err.message ? err.message : err}`, key); }
   }
   // Only errors of this page are shown. Not ours: a ResizeObserver notice, and "Script error.", which is all a browser
   // reports when a script from elsewhere fails (a browser extension, a content blocker, the browser's own page features).
@@ -362,7 +393,7 @@
   root.Microvis = {
     $, fmt, fmtSum, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
     control, controls, scheduler, applyVisibility,
-    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, arrow2, text2, plot, eventToData, watchColorScheme,
+    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, arrow2, text2, plot, react3d, eventToData, watchColorScheme,
     showError, guard, librariesReady
   };
 })(window);

@@ -88,7 +88,7 @@
     if (timer) cancelAnimationFrame(timer);
     ctrls.eta.setExact(CM.NOTES_ETA);
     const t0 = performance.now(), dur = 1600;
-    const step = now => { const t = Math.min(1, (now - t0) / dur); state.wE = 1 + t; ctrls.wE.sync(); render(); if (t < 1) timer = requestAnimationFrame(step); };
+    const step = now => { const t = Math.max(0, Math.min(1, (now - t0) / dur)); state.wE = 1 + t; ctrls.wE.sync(); render(); if (t < 1) timer = requestAnimationFrame(step); };
     timer = requestAnimationFrame(step);
   }
 

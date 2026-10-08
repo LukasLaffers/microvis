@@ -135,13 +135,14 @@
   const inSet = (name, q, z, opts) => output(name, z[0], z[1], opts) >= q - EPS;
 
   /*
-   * Free disposal at z: is every z' >= z (inside the box) also in Z(q)?
+   * Free disposal at z: is every z' >= z (up to the box, or a little beyond z when z lies outside it) also in Z(q)?
    * Checked on an n x n grid of the quadrant; returns {holds, witness} with a failing z' if any.
    */
   function freeDisposalAt(name, q, z, box, opts, n = 40) {
+    const top = [Math.max(box, 1.5 * z[0]), Math.max(box, 1.5 * z[1])];   // never below z: the quadrant points up and right
     for (let i = 0; i <= n; i++) {
       for (let j = 0; j <= n; j++) {
-        const w = [z[0] + (box - z[0]) * i / n, z[1] + (box - z[1]) * j / n];
+        const w = [z[0] + (top[0] - z[0]) * i / n, z[1] + (top[1] - z[1]) * j / n];
         if (!inSet(name, q, w, opts)) return { holds: false, witness: w };
       }
     }
