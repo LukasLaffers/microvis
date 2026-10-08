@@ -140,7 +140,12 @@
     for (let it = 0; it < 200; it++) { const m = 0.5 * (lo + hi); if (f(m) < 0) lo = m; else hi = m; }
     return 0.5 * (lo + hi);
   }
-  const indifferenceCurve = (v, u, x1s) => x1s.map(x1 => [x1, x2On(x1, v, u)]);
+  // Points of the indifference curve U = v. Where x2On stops at the lower boundary (x2 = 0, or g2) with more than v,
+  // the curve has already met the axis: that piece of the boundary is not on the curve, so it is left out (null).
+  const indifferenceCurve = (v, u, x1s) => x1s.map(x1 => {
+    const x2 = x2On(x1, v, u);
+    return [x1, x2 !== null && utility([x1, x2], u) - v > 1e-9 * Math.max(1, Math.abs(v)) ? null : x2];
+  });
 
   // Derivatives by central differences (relative step 1e-5).
   const bumpP = (p, k, h) => { const q = p.slice(); q[k] += h; return q; };

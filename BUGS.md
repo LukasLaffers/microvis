@@ -1,6 +1,22 @@
 # Bug list (bug hunt, 8 October 2026)
 
-Checked on the current `main` / branch head `9ec35e3` (after #15–#19), 33 tools. Found by moving every slider to its minimum and maximum, choosing every option and pressing every button on every tile, then 120 random moves per tile. After that I read the code and looked at screenshots. **Nothing has been fixed yet.**
+## Status: all fixed on the branch (night of 8–9 October), not merged yet
+
+Every item below has been fixed, except the two that turned out not to be bugs (Robinson Crusoe's axis margin, which leaves room for the production point; Free Entry's "no equilibrium" path, which the slider cannot reach, now handled anyway). One item could not be reproduced (Building the MRTS "—"); the sentence now leaves out a missing number instead of printing "—". How each was fixed, briefly:
+
+- **Animations**: progress clamped at 0 (the first frame's time stamp can precede the click). Reproduced by making the first time stamp 40 ms early: before, both red banners; after, none.
+- **WebGL leak**: new `Microvis.react3d`: on a projection switch it releases the old context, rebuilds the figure and re-attaches its handlers. Frisch: 1 → 21 canvases before, 1 → 1 after.
+- **Numbers**: `fmt` prints |x| < 10⁻⁹ as 0 and exponents as 4.00×10⁻⁴ (superscript digits, also inside KaTeX).
+- **Error banner**: a message from `guard()` disappears when that part draws again; user messages (Production Explorer, Free Entry) are notes in the page.
+- **Subsistence / Giffen domain**: new `ConsumerUI.fitIncome` keeps the income slider where the problem has its usual solution (Stone–Geary above p·γ; the Giffen example inside its domain at both prices), with a note (UMP and EMP, Slutsky, Deadweight Loss).
+- **Indifference curves** (`ConsumerModel.indifferenceCurve`) end where they meet the axis (no flat piece along it); tested.
+- **Shutdown**: profit panels scaled by the loss at q̂ / q_max/2 (Cost Curves, One Step vs Two Steps); One Step vs Two Steps marks D = 0 and gets a deeper 3D floor.
+- **Axes and labels**: Two Technologies (explicit ranges), Market Supply, Firms That Affect Each Other, Comparative Statics, Cost Curves, Cost Minimisation, Deadweight Loss, Excess Demand, Two Elasticities, Homogeneous (Δq below the ceiling), Better/Worse, Substitution or Composition, Edgeworth (R/R′), Monopoly, Free Entry, Utility Is Ordinal (camera for V = −U).
+- **Checks**: CV ≤ ΔCS ≤ EV for a rise (signed order), Deadweight Loss approximations ✓ only within 10 %, Firms That Affect Each Other below p = c, Concavity's Largest gap (tolerance), Frisch's "diminishing".
+
+---
+
+Checked on the current `main` / branch head `9ec35e3` (after #15–#19), 33 tools. Found by moving every slider to its minimum and maximum, choosing every option and pressing every button on every tile, then 120 random moves per tile. After that I read the code and looked at screenshots. (This was the state before the fixes.)
 
 Severity: **[major]** wrong numbers, a broken figure or a red error banner. **[minor]** misleading text, or the figure loses its point. **[cosmetic]** labels, clipping, rounding.
 **Confirmed** means it was reproduced in the browser with the steps given. Default settings apply unless stated otherwise.

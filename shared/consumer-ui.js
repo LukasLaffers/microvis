@@ -34,5 +34,29 @@
   // Slider adjustment for the CES parameter, so that the number shown is the number used.
   const adjustRho = (key, v) => (key === 'rho' ? rhoAway(v) : v);
 
-  root.ConsumerUI = { formula, rhoAway, adjustRho };
+  // Incomes at which the consumer's problem has its usual solution at every price vector in ps: Stone–Geary needs income
+  // above the cost of the subsistence bundle, the Giffen example an interior solution (c p1 + p2 s/2 <= y < c p1 + p2 s).
+  function incomeBounds(u, ps) {
+    let lo = 0, hi = Infinity;
+    for (const p of ps) {
+      if (u.type === 'stonegeary') lo = Math.max(lo, p[0] * Math.max(u.g1, 0) + p[1] * Math.max(u.g2, 0));
+      if (u.type === 'giffen') { lo = Math.max(lo, u.c * p[0] + p[1] * u.s / 2); hi = Math.min(hi, u.c * p[0] + p[1] * u.s); }
+    }
+    return [lo, hi];
+  }
+  // Keep an income slider (Microvis control `ctrl` of state[key]) inside those bounds and inside its own range from the
+  // page. Returns a sentence for the page when the bounds cut into that range, '' otherwise.
+  function fitIncome(ctrl, state, key, u, ps) {
+    if (!ctrl._range0) ctrl._range0 = [ctrl.min, ctrl.max];
+    const [r0, r1] = ctrl._range0, [lo, hi] = incomeBounds(u, ps), step = Number(ctrl.range.step) || 0.05;
+    const a = Math.max(r0, Math.ceil((lo + 0.01) / step) * step), b = Math.min(Math.max(r1, a + 5), Math.floor((hi - 0.01) / step) * step);
+    if (!(a < b)) return 'No income gives an interior solution at both prices: bring the two prices closer together.';
+    if (Math.abs(ctrl.min - a) > 1e-9 || Math.abs(ctrl.max - b) > 1e-9) ctrl.setRange(Number(a.toFixed(2)), Number(b.toFixed(2)));
+    if (state[key] < a || state[key] > b) { state[key] = Number(Math.min(b, Math.max(a, state[key])).toFixed(2)); ctrl.sync(); }
+    if (u.type === 'stonegeary' && lo > r0) return `Income must exceed the cost of the subsistence bundle, ${lo.toFixed(2)}: the income slider starts there.`;
+    if (u.type === 'giffen') return `The Giffen example needs an interior solution: income between ${a.toFixed(2)} and ${b.toFixed(2)} at these prices.`;
+    return '';
+  }
+
+  root.ConsumerUI = { formula, rhoAway, adjustRho, incomeBounds, fitIncome };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

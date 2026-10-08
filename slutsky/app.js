@@ -235,6 +235,9 @@
     $('play-smooth').textContent = `▶ ${state.p1n < state.p1 ? 'Lower' : 'Raise'} p₁ smoothly`;
     document.querySelectorAll('[data-preset]').forEach(b => { const P = PRESETS[b.dataset.preset]; b.setAttribute('aria-pressed', String(Object.keys(P).every(k => state[k] === P[k]))); });
     $('type').value = state.type;
+    // Stone–Geary: income must cover subsistence; the Giffen example: an interior solution at both prices
+    const note = CU.fitIncome(ctrls.y, state, 'y', pref(), [[state.p1, state.p2], [state.p1n, state.p2]]);
+    $('income-note').hidden = !note; $('income-note').textContent = note;
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
     guard('plot', () => draw(th, S));

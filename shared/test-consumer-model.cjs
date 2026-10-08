@@ -145,4 +145,12 @@ for (const u of prefs) {
   }
 }
 
+// An indifference curve that meets the x1 axis ends there: no flat piece along the axis (quasilinear, kappa = 2, v = 3).
+{
+  const u = { type: 'quasilinear', kappa: 2 }, v = 3, pts = M.indifferenceCurve(v, u, [1, 2, 3, 5, 10, 20, 40]);
+  for (const [x1, x2] of pts) if (x2 !== null) assert.ok(Math.abs(M.utility([x1, x2], u) - v) < 1e-8, 'on the curve at x1 = ' + x1);
+  assert.ok(pts.some(p => p[1] === null), 'beyond the axis the curve has no points');
+  checks += pts.length + 1;
+}
+
 console.log(`All ${checks} consumer-model checks passed.`);

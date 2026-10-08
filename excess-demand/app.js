@@ -21,12 +21,17 @@
 
   // ---------- what depends only on the economy: equilibrium, view, curves where each market clears ----------
 
-  let cache = { key: '' };
+  let cache = { key: '' }, eqCache = { key: '' };
   function economyView() {
-    const pr = par(), key = JSON.stringify(pr);
+    const pr = par(), ek = JSON.stringify(pr);
+    if (eqCache.key !== ek) eqCache = { key: ek, eq: X.equilibrium(pr) };
+    const eq = eqCache.eq;
+    // The view: around the equilibrium, and wide enough for the current prices (in steps of 0.5, so that it does not
+    // jump with every move of a slider; the curves are recomputed only when the view changes).
+    const up = v => Math.ceil(v / 0.5) * 0.5;
+    const xmax = Math.max(1.2, 2.6 * eq.p[0], up(1.1 * state.p1)), ymax = Math.max(1.2, 2.2 * eq.p[1], up(1.1 * state.p2));
+    const key = JSON.stringify([pr, xmax, ymax]);
     if (cache.key === key) return cache;
-    const eq = X.equilibrium(pr);
-    const xmax = Math.max(1.2, 2.6 * eq.p[0]), ymax = Math.max(1.2, 2.2 * eq.p[1]);
     const n = 80, xs = [], ys = [];
     for (let i = 0; i < n; i++) { xs.push(xmax * (0.02 + 0.98 * i / (n - 1))); ys.push(ymax * (0.02 + 0.98 * i / (n - 1))); }
     const Z = [[], [], []];

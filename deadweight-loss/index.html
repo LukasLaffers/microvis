@@ -7,8 +7,8 @@
   <meta name="description" content="A commodity tax costs the consumer more than it raises: the deadweight loss as the area between the Hicksian demand curve and the tax rectangle, its approximation, and DWL per krone for 14 commodity groups. Lecture 7.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=7">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="../shared/style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=8">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -54,6 +54,7 @@
         <div class="ctrl" data-key="p10" data-label="p_1^0" data-hint="price without tax" data-min="0.5" data-max="3" data-step="0.05"></div>
         <div class="ctrl" data-key="tau" data-label="\tau" data-hint="value added tax, %" data-min="0" data-max="100" data-step="1"></div>
         <div class="ctrl" data-key="y" data-label="y" data-hint="income (p₂ = 1)" data-min="4" data-max="30" data-step="0.1"></div>
+        <p class="note" id="income-note" hidden></p>
       </div>
     </section>
 
@@ -93,12 +94,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=7"></script>
-  <script src="../shared/consumer-model.js?v=7"></script>
-  <script src="../shared/consumer-ui.js?v=7"></script>
-  <script src="model.js?v=7"></script>
-  <script src="app.js?v=7"></script>
-  <script src="../shared/theme.js?v=7"></script>
+  <script src="../shared/ui.js?v=8"></script>
+  <script src="../shared/consumer-model.js?v=8"></script>
+  <script src="../shared/consumer-ui.js?v=8"></script>
+  <script src="model.js?v=8"></script>
+  <script src="app.js?v=8"></script>
+  <script src="../shared/theme.js?v=8"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>
