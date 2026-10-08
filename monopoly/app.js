@@ -46,7 +46,7 @@
       traces.push(U.dot2([[o.q, o.p]], th.ink, 'p*, q*', 10));
       annotations.push({ x: 0, y: o.p, text: 'p*', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 13, color: th.ink } });
       annotations.push({ x: o.q, y: 0, text: 'q*', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 13, color: th.ink } });
-      if (Math.abs(o.p - o.AC) * 12 > yMax) annotations.push({ x: o.q / 2, y: (o.p + o.AC) / 2, text: 'Π', showarrow: false, font: { size: 15, color: th.ink }, bgcolor: th.panel, borderpad: 2 });
+      if (Math.abs(o.p - o.AC) * 12 > yMax && o.q > 0.06 * qMax) annotations.push({ x: o.q / 2, y: (o.p + o.AC) / 2, text: 'Π', showarrow: false, font: { size: 15, color: th.ink }, bgcolor: th.panel, borderpad: 2 });
     }
     if (comp) traces.push(U.dot2([[comp.q, comp.p]], th.ink, 'price taker: AR = MC', 9, { marker: { color: th.panel, size: 9, line: { color: th.ink, width: 1.5 } } }));
     // Curve labels at their right ends.
@@ -86,7 +86,9 @@
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     $('cap').innerHTML = `<span class="c-l2-blue"><span class="key"></span>${texStr('AR=p(q)')}</span>, <span class="c-l2-blue"><span class="key dash"></span>${texStr('MR')}</span>, <span class="c-l2-red"><span class="key"></span>${texStr('MC')}</span>, <span class="c-ink"><span class="key"></span>${texStr('AC')}</span>. ` +
       (local ? (Math.abs(o.profit) < 0.02 ? 'Entry of substitutes has pushed average revenue down until it just touches average cost: the firm still sets MR = MC, but earns zero profit.' : `The firm earns ${texStr(`\\Pi=${fmt(o.profit, 2)}`)}. Press "Substitutes enter" to let rivals take its demand.`)
-        : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.`);
+        : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.` +
+          // close to unit elasticity MR is a small fraction of the price: a tiny quantity at a very high price
+          (o.eta > -1.5 ? ` So close to ${texStr('\\eta=-1')}, marginal revenue is only ${fmt(1 + 1 / o.eta, 2)} of the price, so the markup is huge: ${texStr(`p^\\ast=${fmt(1 / (1 + 1 / o.eta), 1)}\\cdot MC`)}.` : ''));
   }
 
   function render() {

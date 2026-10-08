@@ -67,11 +67,15 @@
     }
     traces.push(U.dot2([x0], th.ink, 'x°', 11));
     traces.push(U.dot2([xp], th.accent4 || th.ink, "x'", 10, { marker: { symbol: 'diamond', size: 11, color: th.accent4 || th.ink } }));
-    annotations.push({ x: x0[0], y: x0[1], text: 'x°', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 14, color: th.ink } });
-    annotations.push({ x: xp[0], y: xp[1], text: "x'", showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 14, color: th.accent4 || th.ink } });
+    // labels turn inwards at the edges of the box (x° and x' can sit on them)
+    const tag = (z, text, color) => {
+      const right = z[0] > 0.85 * L, top = z[1] > 0.9 * L;
+      annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: right ? 'right' : 'left', yanchor: top ? 'top' : 'bottom', xshift: right ? -6 : 6, yshift: top ? -4 : 0, font: { size: 14, color } });
+    };
+    tag(x0, 'x°', th.ink); tag(xp, "x'", th.accent4 || th.ink);
     annotations.push({ xref: 'paper', yref: 'paper', x: 0.98, y: 0.98, text: 'better than x°', showarrow: false, xanchor: 'right', yanchor: 'top', font: { size: 12, color: th.ink }, bgcolor: th.panel, bordercolor: th.line, borderpad: 4, visible: P.type !== 'bliss' });
     annotations.push({ xref: 'paper', yref: 'paper', x: 0.03, y: 0.03, text: 'worse than x°', showarrow: false, xanchor: 'left', yanchor: 'bottom', font: { size: 12, color: th.ink }, bgcolor: th.panel, bordercolor: th.line, borderpad: 4, visible: P.type !== 'bliss' });
-    Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, shapes, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, 1.03 * L], constrain: 'domain' }, y: { range: [0, 1.03 * L], scaleanchor: 'x', constrain: 'domain' }, shapes, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     return { P, x0, xp, inB, seg };
   }
 

@@ -60,8 +60,9 @@
   function drawMain(th) {
     const f1 = firm(1), f2 = firm(2), firms = [f1, f2], d = dem();
     const s1 = MS.startPoint(f1), s2 = MS.startPoint(f2);
-    const pTop = Math.max(s1.pHat, s2.pHat, state.c + 1) * 1.7 + 1;
     const e = MS.equilibrium(firms, d);
+    // the price axis reaches above the equilibrium (or the gap), wherever demand puts it
+    const pTop = Math.max(Math.max(s1.pHat, s2.pHat, state.c + 1) * 1.7 + 1, 1.25 * (e.exists ? e.p : e.gapPrice || 0));
     const traces = [
       ...firmTraces(f1, pTop, th.orange, 'x', th),
       ...firmTraces(f2, pTop, th.orange, 'x2', th),
@@ -103,7 +104,8 @@
 
   function drawAverage(th) {
     const f = firm(2), N = state.N, dPer = { K: state.Kd, eps: EPS }, { qHat, pHat } = MS.startPoint(f);
-    const pTop = Math.max(pHat, state.c + 1) * 1.7 + 1, color = th.orange;
+    const eq = MS.averageEquilibrium(f, state.limit ? 1e6 : N, dPer);
+    const pTop = Math.max(Math.max(pHat, state.c + 1) * 1.7 + 1, 1.25 * eq.p), color = th.orange;
     const traces = [
       { type: 'scatter', mode: 'lines', x: [0, 0], y: [0, pHat], line: { color, width: 5 }, hoverinfo: 'skip' },
       U.line2([[MS.supplyAt(f, pHat + 1e-9), pHat], [f.alpha * (pTop - f.c), pTop]], color, 2.5, 'average supply')
@@ -114,8 +116,8 @@
     }
     const xMax = Math.max(qHat, f.alpha * (pTop - f.c)) * 1.05;
     traces.push(U.line2(U.linspace(Math.max(0.2, pTop * 0.06), pTop, 160).map(p => [MS.demand(p, dPer), p]).map(([q, p]) => [q <= xMax * 1.3 ? q : null, p]), th.ink, 2, 'demand per firm'));
-    const eq = MS.averageEquilibrium(f, state.limit ? 1e6 : N, dPer);
-    const annotations = [{ x: 0, y: pHat, text: 'p′', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 12, color: th.ink } }];
+    // p′ only exists with a fixed cost (the price at which the firm is indifferent between 0 and q-hat)
+    const annotations = f.F > 0 ? [{ x: 0, y: pHat, text: 'p′', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 12, color: th.ink } }] : [];
     if (f.F > 0 && eq.share < 1) {
       traces.push(U.dot2([[eq.avgSupply, pHat]], th.red, 'average supply closest to demand', 11));
       traces.push(U.dot2([[eq.avgDemand, pHat]], th.ink, 'average demand at p′', 7));

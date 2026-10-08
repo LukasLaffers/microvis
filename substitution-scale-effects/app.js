@@ -103,13 +103,14 @@
     if (fs >= 1 && fc >= 1) { traces.push(U.dot2([C], th.red, 'C = D(w′,p)', 11)); label(C, 'C', th.red, 8); }
     else if (fc > 0) traces.push(U.dot2([Cnow], th.red, 'moving', 9));
 
-    // Bars on the z1 axis: (B1 - A1) + (C1 - B1) = (C1 - A1).
+    // Bars at the bottom of the figure (changes in z1): (B1 - A1) + (C1 - B1) = (C1 - A1).
     if (state.anim === null) {
       const h = yr[1] - yr[0], y1 = yr[0] + 0.03 * h, y2 = yr[0] + 0.075 * h;
       shapes.push({ type: 'line', x0: A[0], x1: B[0], y0: y1, y1: y1, line: { color: th.blue, width: 5 } });
       shapes.push({ type: 'line', x0: B[0], x1: C[0], y0: y1, y1: y1, line: { color: th.red, width: 5 } });
       shapes.push({ type: 'line', x0: A[0], x1: C[0], y0: y2, y1: y2, line: { color: th.ink, width: 2 } });
-      annotations.push({ x: (A[0] + C[0]) / 2, y: y2, text: `total ${fmt(C[0] - A[0], 3)}`, showarrow: false, yanchor: 'bottom', font: { size: 11, color: th.ink } });
+      // the label left of its bar, as in the smooth picture (above it, it can sit on the bar)
+      annotations.push({ x: Math.min(A[0], C[0]), y: y2, text: `total ${U.fmtSum([B[0] - A[0], C[0] - B[0]])[2]}`, showarrow: false, xanchor: 'right', xshift: -6, font: { size: 11, color: th.ink } });
     }
 
     U.plot('plot', traces, U.base2d(th, {
@@ -189,7 +190,7 @@
     traces.push(U.dot2([C], th.muted, "C = D(w',p)", 9)); label(C, 'C', th.muted, 8);
     traces.push(U.dot2([D], th.ink, 'the firm now', 13));
 
-    // Bars on the z1 axis, growing together: substitution, scale and their sum, accumulated so far.
+    // Bars at the bottom of the figure (changes in z1), growing together: substitution, scale and their sum, accumulated so far.
     const h = yr[1] - yr[0], row = i => yr[0] + (0.035 + 0.04 * i) * h;
     const bar = (i, d, color, width, text) => {
       const show = Math.abs(d) >= 1e-9;
@@ -248,7 +249,8 @@
     const annotations = [];
     if (r.qA > 0 && Math.abs(r.qA - r.qC) > 1e-6) {
       annotations.push({ x: r.qC, y: p, ax: r.qA, ay: p, axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2, arrowcolor: th.red, text: '' });
-      annotations.push({ x: (r.qA + r.qC) / 2, y: p, text: `${fmt(r.qA)} → ${fmt(r.qC)}`, showarrow: false, yanchor: 'bottom', yshift: 8, font: { size: 12, color: th.red } });
+      // below the price line: the first-order triangle sits above it
+      annotations.push({ x: (r.qA + r.qC) / 2, y: p, text: `${fmt(r.qA)} → ${fmt(r.qC)}`, showarrow: false, yanchor: 'top', yshift: -8, font: { size: 12, color: th.red } });
     }
     // Lecture 4, (*): to first order MC shifts up by (dH1/dq) dw1 and output falls by shift / C_qq (the triangle).
     let tri = null;
@@ -271,6 +273,7 @@
   // ---------- the table ----------
 
   function renderTable(P) {
+    const TH = U.theme();   // the colours of the two effects, in the current light or dark theme
     const { s, w, r, now } = P, f = x => fmt(Math.abs(x) < 5e-10 ? 0 : x, 3);
     if (now) {
       const [s1, c1, t1] = U.fmtSum([now.substitution[0], now.scale[0]]), [s2, c2, t2] = U.fmtSum([now.substitution[1], now.scale[1]]);
@@ -294,11 +297,11 @@
       else {
         const d = SS.decomposeDerivative(w, state.p, s), e = d.input1, ok = Math.abs(e.substitution + e.scale - e.total) <= 1e-4 * Math.max(1, Math.abs(e.total));
         // total = substitution + scale, rounded so that the shown numbers add up
-        const split = (x, y) => { const [a, b, t] = U.fmtSum([x, y]); return `${t}=\\color{#4a90e2}{${a}}\\color{#d0021b}{${b.startsWith('−') ? '' : '+'}${b}}`; };
+        const split = (x, y) => { const [a, b, t] = U.fmtSum([x, y]); return `${t}=\\color{${TH.blue}}{${a}}\\color{${TH.red}}{${b.startsWith('−') ? '' : '+'}${b}}`; };
         box.innerHTML = texStr(`\\frac{\\partial D^1}{\\partial w_1}=${split(e.substitution, e.scale)}`) +
           ` <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓ sum = total' : '✗'}</span>` +
           (() => { const c = SS.scaleClosedForm(w, state.p, s), ok2 = Math.abs(c.scale - e.scale) <= 1e-4 * Math.max(1, Math.abs(e.scale));
-            return `<p class="note">Lecture 4, (∗∗): scale effect ${texStr(`\\color{#d0021b}{-\\tfrac{1}{C_{qq}}\\big(\\tfrac{\\partial H^1}{\\partial q}\\big)^2=-\\tfrac{1}{${f(c.Cqq)}}(${f(c.dHdq)})^2=${f(c.scale)}}`)} <span class="${ok2 ? 'ok-mark' : 'no-mark'}">${ok2 ? '✓ = finite difference' : '✗'}</span></p>`; })() +
+            return `<p class="note">Lecture 4, (∗∗): scale effect ${texStr(`\\color{${TH.red}}{-\\tfrac{1}{C_{qq}}\\big(\\tfrac{\\partial H^1}{\\partial q}\\big)^2=-\\tfrac{1}{${f(c.Cqq)}}(${f(c.dHdq)})^2=${f(c.scale)}}`)} <span class="${ok2 ? 'ok-mark' : 'no-mark'}">${ok2 ? '✓ = finite difference' : '✗'}</span></p>`; })() +
           `<p class="note">${texStr(`\\partial S/\\partial w_1=${f(d.dSdw1)}`)}, ${texStr(`\\partial H^1/\\partial q=${f(e.dHdq)}`)}. Cross effect: ${texStr(`\\partial D^2/\\partial w_1=${split(d.input2.substitution, d.input2.scale)}`)}</p>`;
       }
     } else box.innerHTML = '';

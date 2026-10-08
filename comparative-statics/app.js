@@ -23,6 +23,10 @@
     return { s, w, p, pts: CS.points(w, p, s, state.w1n) };
   }
 
+  // A z1 scale for when the firm produces nothing (at both prices, or at the old one): its conditional demand at the
+  // output of minimum average cost, so that the axes stay readable instead of shrinking to 0.
+  const zRef = (s, w) => { const hat = FM.minAC(w, s), q = hat.qHat > 0 ? hat.qHat : 1; return FM.condDemand(w, q, s).H[0]; };
+
   const ok = good => good ? '<span class="ok-mark">✓</span>' : '<span class="no-mark">✗</span>';
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
 
@@ -31,7 +35,7 @@
   function drawMain(th, P) {
     const { s, p, pts } = P, w1a = state.w1, w1b = state.w1n, w2 = state.w2;
     const wTop = Math.max(w1a, w1b) * 1.6, wLow = Math.max(0.15, Math.min(w1a, w1b) * 0.45);
-    const zMax = 1.45 * Math.max(pts.zStar, pts.zO, pts.zStarStar, 1e-3);
+    const zMax = 1.45 * Math.max(pts.zStar, pts.zO, pts.zStarStar, pts.zStar > 0 || pts.zStarStar > 0 ? 1e-3 : zRef(s, [w1a, w2]));
     const traces = [], annotations = [], shapes = [];
     const clipX = c => c.map(([z, w]) => [z <= zMax * 1.5 ? z : null, w]);
     traces.push(U.line2(clipX(CS.demandCurve(w2, p, s, wLow, wTop, 220)), th.ink, 2.5, 'ordinary demand D¹'));
@@ -70,7 +74,7 @@
     const curve = CS.conditionalCurve(w2, q, s, wLow, wTop, 200);
     const band = CS.conditionalCurve(w2, q, s, lo, hi, 80);
     const poly = [[0, lo], ...band, [0, hi]];
-    const zMax = 1.6 * Math.max(...band.map(b => b[0]), 1e-3);
+    const zMax = 1.6 * Math.max(...band.map(b => b[0]), q > 0 ? 1e-3 : zRef(s, w));
     const traces = [
       { type: 'scatter', mode: 'lines', x: poly.map(v => v[0]), y: poly.map(v => v[1]), fill: 'toself', fillcolor: 'rgba(155,155,155,0.35)', line: { width: 0 }, hoverinfo: 'skip' },
       U.line2(curve.map(([z, w1]) => [z <= zMax * 1.5 ? z : null, w1]), th.ink, 2.5, 'conditional demand H¹(w,q*)')
@@ -80,7 +84,9 @@
     const area = CS.areaLeftOfH(w2, q, s, lo, hi), dC = Math.abs(FM.cost([w1a, w2], q, s) - FM.cost([w1b, w2], q, s));
     Plotly.react('plotB', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'w<sub>1</sub>', x: { range: [0, zMax] }, y: { range: [0, wTop] },
-      annotations: [{ x: Math.min(zA, zB) / 2, y: (lo + hi) / 2, text: 'change in cost', showarrow: false, font: { size: 12, color: th.ink } }]
+      annotations: [q > 0
+        ? { x: Math.min(zA, zB) / 2, y: (lo + hi) / 2, text: 'change in cost', showarrow: false, font: { size: 12, color: th.ink } }
+        : { xref: 'paper', x: 0.5, y: (lo + hi) / 2, text: 'no production at the old price: q* = 0, no change in cost', showarrow: false, font: { size: 12, color: th.muted } }]
     }), U.PLOT_CONFIG);
     // As in the notes: the integral from the old to the new price is the change in cost; the shaded area is its size.
     const dCsigned = FM.cost([w1b, w2], q, s) - FM.cost([w1a, w2], q, s);
