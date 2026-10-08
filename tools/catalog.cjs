@@ -11,9 +11,9 @@ module.exports = [
   ] },
   { id: 'l2', lecture: 2, nav: 'Firm optimisation', title: 'Firm optimisation: one step and two step approach', tools: [
     ['cost-minimisation', 'Cost Minimisation', 'Push the isocost line down until it just touches the isoquant.'],
-    ['two-technologies', 'Two Technologies and a Kink', 'A firm that needs two technologies: a kinked isoquant and a range of prices at which the input mix does not move.', true],
     ['cost-curves', 'Cost Curves and Supply', 'From marginal and average cost to the supply curve, and why increasing returns and price taking do not mix.'],
     ['profit-two-ways', 'One Step vs Two Steps', 'Maximising profit directly, or minimising cost first: both give the same input bundle.'],
+    ['two-technologies', 'Two Technologies and a Kink', 'A firm that needs two technologies: a kinked isoquant and a range of prices at which the input mix does not move.', true],
     ['concavity-and-scale', 'Concavity and Returns to Scale', 'A quasi-concave production function without increasing returns that is not concave.', true]
   ] },
   { id: 'l3', lecture: 3, nav: 'Optimal behaviour', title: 'Properties of the firm’s optimal behaviour', tools: [
