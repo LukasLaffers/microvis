@@ -6,6 +6,8 @@
  *   homogeneous of degree k:  phi(alpha zhat_r) = alpha^k dq on every ray;
  *   homothetic:               phi(alpha zhat_r) is the same function of alpha on every ray;
  *   neither:                  it differs from ray to ray, and so does the MRTS along the ray.
+ * The page can also draw the isoquants through zhat = (1, 1), 2 zhat, 3 zhat, ...: for a homothetic
+ * technology these curves depend only on g, and F only sets the output on each of them.
  *
  * Works in the browser (window.HomModel) and in Node (module.exports) for tests.
  */
@@ -53,7 +55,24 @@
     return Math.max(...pts.map(p => Math.abs(p.mrts - m0) / m0));
   }
 
-  const api = { tech, levels, alongRay, tangentSegment, mrtsDrift };
+  // The multiples alpha = step, 2 step, ... (alpha < R) of zhat = (1, 1) whose isoquants are drawn, at most about ten.
+  function scaleSteps(R) {
+    const step = Math.max(1, Math.ceil(R / 10)), out = [];
+    for (let a = step; a < R * (1 - 1e-9); a += step) out.push(a);
+    return out;
+  }
+
+  // Output at alpha * zhat, its ratio to the output at zhat, and log_alpha of that ratio
+  // (the degree k for every alpha if the technology is homogeneous).
+  function scaleTable(S, zhat, alphas) {
+    const q0 = TM.phi(zhat, S);
+    return alphas.map(a => {
+      const q = TM.phi([a * zhat[0], a * zhat[1]], S), ratio = q / q0;
+      return { alpha: a, q, ratio, k: a === 1 ? NaN : Math.log(ratio) / Math.log(a) };
+    });
+  }
+
+  const api = { tech, levels, alongRay, tangentSegment, mrtsDrift, scaleSteps, scaleTable };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.HomModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

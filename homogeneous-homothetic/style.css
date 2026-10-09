@@ -9,3 +9,6 @@
 .keynums .kn.no { border-color: var(--dec); color: var(--dec); }
 .seg button { font-size: 12px; padding: 8px 2px; }
 .site-header > div { min-width: 0; max-width: 100%; }
+table.scale-table { margin-bottom: 8px; }
+table.scale-table td { cursor: default; }
+table.scale-table td:hover { outline: none; }

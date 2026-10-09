@@ -56,4 +56,37 @@ for (const Fh of ['sshape', 'log']) {
   checks += 4;
 }
 
+// isoquants through alpha zhat: the same curves for every F (they depend on g only); log_alpha of the
+// output ratio is k for a homogeneous technology and changes with alpha for the homothetic ones
+{
+  assert.deepEqual(M.scaleSteps(6), [1, 2, 3, 4, 5]);
+  assert.deepEqual(M.scaleSteps(20), [2, 4, 6, 8, 10, 12, 14, 16, 18]);
+  checks += 2;
+  for (const shape of ['cd', 'ces']) {
+    const techs = [M.tech({ ...base, shape, cls: 'homogeneous', k: 0.7 }), M.tech({ ...base, shape, cls: 'homogeneous', k: 2 }),
+      M.tech({ ...base, shape, cls: 'homothetic', Fh: 'sshape' }), M.tech({ ...base, shape, cls: 'homothetic', Fh: 'log' })];
+    for (const a of [1, 2, 3.5]) {
+      // walk along the isoquant through (a, a) of the first technology: every technology is constant there
+      const lev = techs.map(S => TM.phi([a, a], S));
+      for (const r of [0.3, 0.8, 2, 4]) {
+        const z = TM.pointOnRay(r, lev[0], techs[0]);
+        techs.forEach((S, i) => { close(TM.phi(z, S), lev[i], 1e-7, 'same isoquant'); checks++; });
+      }
+    }
+    for (const [S, k] of [[techs[0], 0.7], [techs[1], 2]]) {
+      for (const row of M.scaleTable(S, [1, 1], [1, 2, 3, 4])) {
+        close(row.ratio, Math.pow(row.alpha, k), 1e-9, 'ratio alpha^k');
+        if (row.alpha > 1) close(row.k, k, 1e-9, 'log_alpha ratio = k');
+        checks += 2;
+      }
+    }
+    for (const S of techs.slice(2)) {
+      const t = M.scaleTable(S, [1, 1], [1, 2, 3, 4]);
+      close(t[0].ratio, 1); close(t[2].q, TM.phi([3, 3], S));
+      assert.ok(Math.abs(t[1].k - t[3].k) > 0.05, 'no single k');
+      checks += 3;
+    }
+  }
+}
+
 console.log(`homogeneous-homothetic: all ${checks} checks passed`);
