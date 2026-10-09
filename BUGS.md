@@ -1,6 +1,6 @@
 # Bug list (bug hunt, 8 October 2026)
 
-## Status: all fixed on the branch (night of 8–9 October), not merged yet
+## Status: all fixed (night of 8–9 October), merged in #20
 
 Every item below has been fixed, except the two that turned out not to be bugs (Robinson Crusoe's axis margin, which leaves room for the production point; Free Entry's "no equilibrium" path, which the slider cannot reach, now handled anyway). One item could not be reproduced (Building the MRTS "—"); the sentence now leaves out a missing number instead of printing "—". How each was fixed, briefly:
 

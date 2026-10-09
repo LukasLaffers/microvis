@@ -26,7 +26,7 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 - **Excess Demand and Equilibrium** (`excess-demand/`, lecture 9, after the Edgeworth Box), from the 2021 Assignment 2: three goods, two CES firms, two Cobb-Douglas consumers; price plane with p3 = 1 and the curves where each market clears; an **Equilibrium** button. No tâtonnement arrows: the user removed them (not in the lecture). The price plane uses `Plotly.react`, not `U.plot` (with `Plotly.animate` the contour traces disappear). Numbers only, not the excess demand formulas (part 7 of the assignment).
 - **Two Technologies and a Kink** (`two-technologies/`, lecture 2 after One Step vs Two Steps on the start page, asterisk), from the 2022 Assignment 2: firm D = min{φ_A, φ_B} (kink, vertical H¹) and firm C = max (not quasi-concave, H¹ jumps). The 2022 solution has two typos: page 4 labels the counterexample φ_D (it is φ_C), page 14 writes 0.5 for q = 1.
 
-### 4. Not merged yet: the bug hunt, fixed (branch `claude/vigilant-carson-p2wfrl`)
+### 4. Merged on 9 October (#20): the bug hunt, fixed
 `BUGS.md` lists the bugs found on 8 October and, at the top, how each was fixed. New shared helpers: `Microvis.react3d` (3D figures: no WebGL leak on projection switches), `ConsumerUI.incomeBounds/fitIncome` (income slider inside the problem's domain, with a note), `ConsumerModel.indifferenceCurve` ends at the axis; `fmt` prints rounding noise as 0 and exponents as ×10⁻⁴; the banner clears a part's message when it draws again. Version tag **8**. Checks: all model tests, check-pages, check-scrollbars, and a fuzz run (every slider at min and max, every option and button, random moves) on all tools; `tools/check-fuzz.cjs` (see "Checks").
 
 ### Next
@@ -79,7 +79,7 @@ In Claude's cloud container Playwright is at `/opt/node22/lib/node_modules/playw
 - Cache: a new page with an old cached stylesheet broke the start page once → version tags + inline width/height on tile SVGs + `style="display:none"` on previews.
 
 ## History (merged PRs)
-#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position.
+#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz.
 
 ## Ideas offered, not requested
 Per-tool view counts on each tool page; tighter crops for some hover previews (Production Explorer); keep tile titles visible on hover.
