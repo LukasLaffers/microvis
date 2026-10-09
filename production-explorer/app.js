@@ -83,6 +83,7 @@
   function setMode(mode) {
     state.mode = mode;
     root.dataset.mode = mode;
+    if ($('go-note')) $('go-note').hidden = true;
     document.querySelectorAll('.seg [data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
     buildReadouts();
     schedule();
@@ -323,8 +324,9 @@
         traces.push(line3([zl, zl], [0, ql], th.muted, 2, { dash: 'dot' }));
         traces.push(marker3(zl, ql, th.accent2, 'λz̄', 7));
       }
-    } else {
-      const z2 = Math.min(state.z2fix, zmax), z1 = state.z1;
+    } else if (state.z2fix <= zmax) {
+      // (when z̄₂ is beyond the plotted range nothing is drawn here, as in the 2D panel; the warning says so)
+      const z2 = state.z2fix, z1 = state.z1;
       traces.push(flatPlane([[0, zmax], [0, zmax]], [[z2, z2], [z2, z2]], [[0, 0], [zTop, zTop]], th.accent2, 0.18));
       const path = linspace(0, zmax, 200).map(x => [x, z2]);
       traces.push(line3(path, path.map(p => M.output(p[0], z2, s)), th.accent2, 8, { name: 'output as z₁ grows' }));
@@ -343,7 +345,7 @@
       title: { text: title }, range, color: th.ink, gridcolor: th.grid, zerolinecolor: th.line,
       showbackground: true, backgroundcolor: th.panel, showspikes: false
     });
-    Plotly.react('plot3d', traces, {
+    U.react3d('plot3d', traces, {
       margin: { l: 0, r: 0, t: 0, b: 0 },
       paper_bgcolor: 'rgba(0,0,0,0)',
       font: { color: th.ink, family: th.font, size: 12 },
@@ -359,7 +361,7 @@
         yaxis: axis('z₂', [0, zmax]),
         zaxis: axis('q', [0, zTop * 1.02])
       }
-    }, U.PLOT_CONFIG);
+    }, U.PLOT_CONFIG, events3d);
   }
 
   // ---------- 2D panel A: input space ----------
@@ -635,6 +637,12 @@
 
   // ---------- init ----------
 
+  // Handlers of the 3D figure (attached again by U.react3d whenever it rebuilds the figure).
+  const events3d = {
+    // remember the camera the user rotates to, so redraws keep it
+    plotly_relayout: ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; }
+  };
+
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { onChange: schedule, adjust });
@@ -659,7 +667,9 @@
     // "Go to z̄": put the point exactly at (z1, z2), e.g. (1, 3) for Exercise 2 of the notes.
     $('go').addEventListener('click', () => {
       const z1 = Number($('go-z1').value), z2 = Number($('go-z2').value), q = M.output(z1, z2, tech());
-      if (!(z1 > 0 && z2 > 0 && q > 0)) { U.showError('Go to z̄: both inputs must be positive and produce some output.'); return; }
+      const note = $('go-note');
+      note.hidden = z1 > 0 && z2 > 0 && q > 0;
+      if (!note.hidden) return;   // an input that cannot be reached: say so next to the field, not on the error banner
       ctrls.mix.setExact(z2 / z1);
       ctrls.qbar.setExact(q);
       if (Math.max(z1, z2) > state.zmax) ctrls.zmax.set(Math.ceil(Math.max(z1, z2) * 1.2));
@@ -668,11 +678,6 @@
     setMode(state.mode);
     render();
 
-    // Remember the camera the user rotates to, so redraws keep it.
-    $('plot3d').on('plotly_relayout', ev => {
-      const cam = ev['scene.camera'];
-      if (cam) state.camera = { ...state.camera, ...clone(cam) };
-    });
     U.watchColorScheme(schedule);
   }
 

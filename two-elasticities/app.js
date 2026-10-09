@@ -130,10 +130,10 @@
     traces.push(l3([[z[0], z[1], 0], [z[0], z[1], q]], th.muted, 2, 'dot'));
     traces.push({ type: 'scatter3d', mode: 'markers+text', x: [z[0]], y: [z[1]], z: [q + lift], text: ['z̄'], textposition: 'top center', textfont: { color: th.ink, size: 14 }, marker: { size: 6, color: th.ink }, hoverinfo: 'skip' });
     const axis = (title, r) => ({ title: { text: title, font: { color: th.ink } }, range: r, color: th.muted, gridcolor: th.grid, backgroundcolor: 'rgba(0,0,0,0)', showspikes: false, tickfont: { color: th.muted } });
-    Plotly.react('plot3d', traces, {
+    U.react3d('plot3d', traces, {
       margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', font: { color: th.ink, family: th.font, size: 12 }, showlegend: false, uirevision: 'keep',
       scene: { uirevision: 'keep', camera: state.camera, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.75 }, xaxis: axis('z₁', [0, R]), yaxis: axis('z₂', [0, R]), zaxis: axis('q', [0, zmax * 1.02]) }
-    }, U.PLOT_CONFIG);
+    }, U.PLOT_CONFIG, events3d);
     const e = TM.scaleElasticity(z, T), sg = TM.sigma(z, T);
     $('cap3d').innerHTML = `The <span class="c-l2-red"><span class="key"></span>red curve</span> is output along the ray through ${texStr('\\bar z')}: how fast it climbs, in percent per percent, is ${texStr(`e(\\bar z)=${f3(e)}`)}. The <span class="c-l2-blue"><span class="key"></span>blue curve</span> is the isoquant through ${texStr('\\bar z')}, a contour of the surface at height ${texStr(`\\bar q=${f3(q)}`)}: how sharply it bends is measured by ${texStr(`\\sigma(\\bar z)=${sTex(sg)}`)}. ${shaded ? `The surface is coloured by ${isE ? texStr('e(z)') : texStr('\\sigma(z)')}, as in the shading above.` : ''} Drag to turn it around.`;
   }
@@ -166,7 +166,8 @@
     if (state.tr !== 'none') { const sA = SM.sigmaAlongIsoquant(z, A, rs); tS.push(U.line2(sA.map(p => [p.r, p.sigma]), th.muted, 2, 'σ of φ', 'dash')); sAll = sAll.concat(sA.map(p => p.sigma)); }
     tS.push(U.line2(sT.map(p => [p.r, p.sigma]), th.blue, 3, 'σ along the isoquant'));
     tS.push(U.dot2([[r0, s0]], th.blue, 'z̄', 10));
-    const sTop = Math.min(6, Math.max(1.5, ...sAll.filter(Number.isFinite)) * 1.1);
+    // up to the largest σ shown, but not up to the spikes near the axes: at least 6, or the σ at z̄ with room above it
+    const sTop = Math.min(Math.max(6, 1.3 * (Number.isFinite(s0) ? s0 : 0)), Math.max(1.5, ...sAll.filter(Number.isFinite)) * 1.1);
     Plotly.react('plotS', tS, U.base2d(th, {
       xt: 'z<sub>2</sub>/z<sub>1</sub> on the isoquant (log scale)', yt: 'σ',
       x: { type: 'log', range: [Math.log10(0.04), Math.log10(25)], tickvals: [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20], ticktext: ['0.05', '0.1', '0.2', '0.5', '1', '2', '5', '10', '20'] },
@@ -207,6 +208,11 @@
   }
 
   function render() {
+    // z̄ stays inside the plotted range
+    for (const k of ['z1', 'z2']) {
+      if (Math.abs(ctrls[k].max - state.R) > 1e-9) ctrls[k].setRange(0.2, state.R);
+      if (state[k] > state.R) { state[k] = state.R; ctrls[k].sync(); }
+    }
     const { A, T } = SM.techs(state);
     U.applyVisibility({ sshape: state.F === 'sshape', power: state.F === 'power', rho: state.g !== 'cd', mix: state.g === 'mix', trB: state.tr === 'B', trC: state.tr === 'C' });
     document.querySelectorAll('[data-tr]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tr === state.tr)));
@@ -238,6 +244,12 @@
     gd.addEventListener('pointercancel', stop, true);
   }
 
+  // Handlers of the 3D figure (attached again by U.react3d whenever it rebuilds the figure).
+  const events3d = {
+    // remember the camera the user rotates to, so redraws keep it
+    plotly_relayout: ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; }
+  };
+
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: schedule });
@@ -255,7 +267,6 @@
     document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = CAMERAS[b.dataset.cam](); schedule(); }));
     setupDrag();
     render();
-    $('plot3d').on('plotly_relayout', ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; });
     U.watchColorScheme(schedule);
   }
 

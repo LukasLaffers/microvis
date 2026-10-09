@@ -44,13 +44,15 @@
     traces.push(U.dot2([[e.q, e.p]], th.ink, 'q_N', 10));
     traces.push(U.dot2([[hat.qHat, hat.pHat]], th.ink, 'min AC', 7, { marker: { color: th.panel, size: 7, line: { color: th.ink, width: 1.5 } } }));
     const shapes = [{ type: 'line', x0: e.q, x1: e.q, y0: 0, y1: e.p, line: { color: th.muted, width: 1, dash: 'dot' } }];
-    const annotations = [
-      { x: e.q / 2, y: (e.p + e.AC) / 2, text: 'Π', showarrow: false, font: { size: 15, color: th.ink }, bgcolor: th.panel, bordercolor: th.line, borderpad: 3, visible: Math.abs(e.p - e.AC) > 0.35 },
-      { x: qMax, y: e.p, text: 'average revenue = p', showarrow: false, xanchor: 'right', yanchor: 'top', yshift: -2, font: { size: 12, color: th.blue } },
-      { x: e.q, y: 0, text: `q<sub>${state.N}</sub>`, showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 3, font: { size: 12, color: th.ink } }
-    ];
     const lastBelow = f => { for (let i = qq.length - 1; i >= 0; i--) { const v = f(qq[i]); if (v < yMax * 0.92) return [qq[i], v]; } return null; };
     const mcL = lastBelow(q => FM.MC(W, q, s)), acL = lastBelow(q => FM.AC(W, q, s));
+    const acNear = !!acL && acL[0] > 0.6 * qMax && acL[1] < e.p && e.p - acL[1] < 0.08 * yMax;
+    const annotations = [
+      { x: e.q / 2, y: (e.p + e.AC) / 2, text: 'Π', showarrow: false, font: { size: 15, color: th.ink }, bgcolor: th.panel, bordercolor: th.line, borderpad: 3, visible: Math.abs(e.p - e.AC) > 0.35 },
+      // below the price line, or above it when the average-cost label would sit there
+      { x: qMax, y: e.p, text: 'average revenue = p', showarrow: false, xanchor: 'right', yanchor: acNear ? 'bottom' : 'top', yshift: acNear ? 2 : -2, font: { size: 12, color: th.blue } },
+      { x: e.q, y: 0, text: `q<sub>${state.N}</sub>`, showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 3, font: { size: 12, color: th.ink } }
+    ];
     if (mcL) annotations.push({ x: mcL[0], y: mcL[1], text: 'marginal cost', showarrow: false, xanchor: 'right', xshift: -6, font: { size: 12, color: th.red } });
     if (acL) annotations.push({ x: acL[0], y: acL[1], text: 'average cost', showarrow: false, xanchor: 'right', xshift: -8, font: { size: 12, color: th.ink } });
     Plotly.react('plot', traces, U.base2d(th, { xt: `output of firm 1, …, ${state.N}`, yt: 'p', x: { range: [0, qMax] }, y: { range: [0, yMax] }, shapes, annotations }), U.PLOT_CONFIG);
@@ -95,7 +97,10 @@
   function render() {
     const th = U.theme(), R = solve(), s = R.s;
     tex($('formula'), `\\begin{gathered}C(w,q)=c(w)\\,G(q),\\ c(w)=2\\\\ G(q)=\\tfrac13q^3-${U.num(s.a)}q^2+${U.num(s.a * s.a + s.m)}q\\end{gathered}`, true);
-    if (!R.e) { U.showError('The market is too small for this many firms.'); return; }
+    // No equilibrium with this many firms: say so in place of the figures (not on the error banner, which is for errors)
+    $('noEq').hidden = !!R.e;
+    document.querySelector('main.layout').classList.toggle('no-eq', !R.e);
+    if (!R.e) return;
     guard('firm plot', () => drawFirm(th, R));
     guard('market plot', () => drawMarket(th, R));
     guard('entry', () => renderChecks(R));
@@ -106,10 +111,12 @@
     stop();
     const target = FE.industrySize(W, tech(), dem());
     if (target < 1) return;
+    // one firm at a time, but the whole entry in at most about 4 seconds (from 3 to 80 firms would take 20 s otherwise)
+    const ms = Math.max(40, Math.min(260, 4000 / Math.max(1, Math.abs(target - state.N))));
     timer = setInterval(() => {
       if (state.N === target) return stop();
       ctrls.N.set(state.N + (state.N < target ? 1 : -1));
-    }, 260);
+    }, ms);
   }
 
   function init() {

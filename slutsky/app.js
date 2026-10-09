@@ -160,7 +160,7 @@
     traces.push(U.dot2([d.E3], th.muted, "E₃ = D(p′, y)", 9)); label(d.E3, 'E<sub>3</sub>', th.muted, 8);
     traces.push(U.dot2([D], th.ink, 'the consumer now', 13));
 
-    // Bars on the x1 axis, growing together: substitution, income and their sum, accumulated so far.
+    // Bars at the bottom of the figure (changes in x1), growing together: substitution, income and their sum, accumulated so far.
     const row = i => (0.035 + 0.04 * i) * F.Ly;
     const bar = (i, dx, color, width, text) => {
       const show = Math.abs(dx) >= 1e-9;
@@ -173,7 +173,7 @@
 
     U.plot('plot', traces, layout(th, F, annotations, shapes), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('head').textContent = headText(S);
-    if (writeText) $('cap').innerHTML = `${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars on the ${texStr('x_1')} axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
+    if (writeText) $('cap').innerHTML = `${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars at the bottom (changes in ${texStr('x_1')}) grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
   }
 
   // ---------- demand curves ----------
@@ -202,6 +202,7 @@
   }
 
   function renderNumbers(S) {
+    const TH = U.theme();   // the colours of the two effects, in the current light or dark theme
     const { u, d, cls, now } = S, p = now ? [now.p1, S.p[1]] : S.p;   // the derivatives at the current price
     // the totals are the sums of the rounded parts, so the table adds up
     const sub = now ? now.substitution : d.substitution, inc = now ? now.income : d.income;
@@ -220,7 +221,7 @@
     const euShown = shown(e.ec[0][0]) - shown(e.eta[0]) * shown(e.b[0]);
     const kindTxt = { normal: '<span class="badge-kind c-inc">normal</span>', inferior: '<span class="badge-kind c-l2-orange">inferior</span>', giffen: '<span class="badge-kind c-l2-red">Giffen</span>' }[cls.kind];
     $('checks').innerHTML = [
-      item(same(s.total, s.substitution + s.income), `At ${texStr(`p_1=${fmt(p[0])}`)}: ${(() => { const [a, b, t] = U.fmtSum([s.substitution, s.income]); return texStr(`\\frac{\\partial D^1}{\\partial p_1}=${t}=\\color{#4a90e2}{${a}}\\color{#d0021b}{${b.startsWith('−') ? '' : '+'}${b}}`); })()}`),
+      item(same(s.total, s.substitution + s.income), `At ${texStr(`p_1=${fmt(p[0])}`)}: ${(() => { const [a, b, t] = U.fmtSum([s.substitution, s.income]); return texStr(`\\frac{\\partial D^1}{\\partial p_1}=${t}=\\color{${TH.blue}}{${a}}\\color{${TH.red}}{${b.startsWith('−') ? '' : '+'}${b}}`); })()}`),
       item(same(e.eu[0][0], e.ec[0][0] - e.eta[0] * e.b[0]), `${texStr(`\\varepsilon^u_{11}=${f3(euShown)}=\\varepsilon^c_{11}-\\eta_1b_1=${f3(e.ec[0][0])}-(${f3(e.eta[0])})(${f3(e.b[0])})`)}`),
       `<li><span class="mark na">·</span><span>Good 1 is ${kindTxt}: ${texStr(`\\eta_1=${f3(e.eta[0])}`)}${cls.kind === 'giffen' ? `, ${texStr(`\\varepsilon^u_{11}=${f3(euShown)}>0`)}` : ''}.</span></li>`
     ].join('');
@@ -234,6 +235,9 @@
     $('play-smooth').textContent = `▶ ${state.p1n < state.p1 ? 'Lower' : 'Raise'} p₁ smoothly`;
     document.querySelectorAll('[data-preset]').forEach(b => { const P = PRESETS[b.dataset.preset]; b.setAttribute('aria-pressed', String(Object.keys(P).every(k => state[k] === P[k]))); });
     $('type').value = state.type;
+    // Stone–Geary: income must cover subsistence; the Giffen example: an interior solution at both prices
+    const note = CU.fitIncome(ctrls.y, state, 'y', pref(), [[state.p1, state.p2], [state.p1n, state.p2]]);
+    $('income-note').hidden = !note; $('income-note').textContent = note;
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
     guard('plot', () => draw(th, S));
@@ -248,7 +252,7 @@
     state.playing = true; state.mode = mode;
     $('play-steps').disabled = $('play-smooth').disabled = true;
     const step = now => {
-      const f = Math.min(1, (now - start) / DURATION);
+      const f = Math.max(0, Math.min(1, (now - start) / DURATION));   // the first frame's time stamp can be earlier than the click
       frame(f);
       if (f < 1) requestAnimationFrame(step);
       else { state.playing = false; $('play-steps').disabled = $('play-smooth').disabled = false; done(); }

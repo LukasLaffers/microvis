@@ -108,7 +108,8 @@
       for (let j = i + 1; j < pts.length; j++) {
         const m = [(pts[i][0] + pts[j][0]) / 2, (pts[i][1] + pts[j][1]) / 2];
         const g = (f[i] + f[j]) / 2 - phi(m, P);
-        if (g > best.gap) best = { gap: g, z: pts[i], zp: pts[j] };
+        // a gap counts only above rounding noise (relative to the outputs involved)
+        if (g > best.gap && g > 1e-9 * Math.max(1, Math.abs(f[i]), Math.abs(f[j]))) best = { gap: g, z: pts[i], zp: pts[j] };
       }
     }
     return best;

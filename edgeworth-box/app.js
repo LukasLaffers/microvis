@@ -57,6 +57,7 @@
 
   function draw(th, S) {
     const { e, eqs, core, d, swt } = S, traces = [], annotations = [], swtMode = state.mode === 'swt';
+    let labelR = {};   // where the R label goes (set below when there is also an R')
     const va = CM.utility(e.Ra, e.ua), vb = CM.utility(X.Rb(e), e.ub);
     // b's axes: an invisible trace so that the top and right axes are drawn.
     traces.push({ type: 'scatter', x: [0, OMEGA[0]], y: [0, OMEGA[1]], xaxis: 'x2', yaxis: 'y2', mode: 'markers', marker: { opacity: 0 }, hoverinfo: 'skip' });
@@ -97,14 +98,17 @@
       if (Rn) {
         traces.push(U.line2([e.Ra, Rn.pt], th.ink, 2, 'transfer'));
         traces.push(U.dot2([Rn.pt], th.panel, "R' after the transfer", 11, { marker: { color: th.panel, size: 11, symbol: 'square', line: { color: th.ink, width: 2 } } }));
-        annotations.push({ x: Rn.pt[0], y: Rn.pt[1], text: "R'", showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 13, color: th.ink } });
+        // R' on the far side of the transfer, R (below) on the near side, so the two labels never overlap
+        const dx = Rn.pt[0] - e.Ra[0], dy = Rn.pt[1] - e.Ra[1];
+        labelR = { xanchor: dx >= 0 ? 'right' : 'left', yanchor: dy >= 0 ? 'top' : 'bottom', xshift: dx >= 0 ? -7 : 7, yshift: dy >= 0 ? -2 : 2 };
+        annotations.push({ x: Rn.pt[0], y: Rn.pt[1], text: "R'", showarrow: false, xanchor: dx >= 0 ? 'left' : 'right', yanchor: dy >= 0 ? 'bottom' : 'top', xshift: dx >= 0 ? 7 : -7, yshift: dy >= 0 ? 2 : -2, font: { size: 13, color: th.ink } });
         annotations.push({ x: Rn.pt[0], y: Rn.pt[1], ax: e.Ra[0], ay: e.Ra[1], axref: 'x', ayref: 'y', text: '', showarrow: true, arrowhead: 2, arrowsize: 1.2, arrowcolor: th.ink, standoff: 8 });
       }
       traces.push(U.dot2([swt.xa], GREEN, 'target allocation', 15, { marker: { color: GREEN, size: 15, symbol: 'star', line: { color: '#ffffff', width: 1 } } }));
     }
     if (eqs.length) traces.push(U.dot2(eqs.map(q => q.xa), th.ink, 'competitive equilibrium', 15, { marker: { color: th.ink, size: 15, symbol: 'star', line: { color: '#ffffff', width: 1 } } }));
     traces.push(U.dot2([e.Ra], th.ink, 'endowment R', 12, { marker: { color: th.ink, size: 12, symbol: 'square', line: { color: '#ffffff', width: 1.5 } } }));
-    annotations.push({ x: e.Ra[0], y: e.Ra[1], text: 'R', showarrow: false, xanchor: 'left', yanchor: 'top', xshift: 7, yshift: -2, font: { size: 14, color: th.ink } });
+    annotations.push({ x: e.Ra[0], y: e.Ra[1], text: 'R', showarrow: false, xanchor: 'left', yanchor: 'top', xshift: 7, yshift: -2, ...labelR, font: { size: 14, color: th.ink } });
     annotations.push({ x: 0, y: 0, text: '<b>O<sup>a</sup></b>', showarrow: false, xanchor: 'right', yanchor: 'top', xshift: -12, yshift: -14, font: { color: th.blue, size: 13 } });
     annotations.push({ x: OMEGA[0], y: OMEGA[1], text: '<b>O<sup>b</sup></b>', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 12, yshift: 14, font: { color: th.red, size: 13 } });
     eqs.forEach((q, i) => annotations.push({ x: q.xa[0], y: q.xa[1], text: eqs.length > 1 ? `E${i + 1}` : 'E', showarrow: false, xanchor: 'right', yanchor: 'bottom', xshift: -6, yshift: 4, font: { size: 13, color: th.ink } }));

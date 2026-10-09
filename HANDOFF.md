@@ -1,10 +1,10 @@
-# Handoff: Microvis (state on 7 October 2026)
+# Handoff: Microvis (state on 9 October 2026)
 
 Read this first, then `CLAUDE.md` (conventions, notation) and `style-kit/README.md` (the design and writing style).
 
 ## The project in two lines
 
-Interactive figures for Lukáš Lafférs' lecture notes in microeconomic theory (lectures 1–9), 32 tools.
+Interactive figures for Lukáš Lafférs' lecture notes in microeconomic theory (lectures 1–9), 33 tools.
 Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (GitHub Pages from `main`, about 1 minute after a merge).
 
 ## Start here: what is open
@@ -22,17 +22,17 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 - **Every animation button sits in the heading of its figure** (user: "the button at the same position like for these two cases"): Profit Two Ways (▶ Show the two steps, next to the camera buttons), Marshall's Law (▶ Raise w₁), Substitution or Composition (▶ Notes example). `.big-button` is gone; `.btn-row button:disabled` in `shared/style.css` → version tag 7.
 
 
-### Not merged yet (on the branch, preview sent)
-- **New tool: Excess Demand and Equilibrium** (`excess-demand/`, lecture 9, tile after the Edgeworth Box), built on the economy of the 2021 Assignment 2: three goods, two firms (CES of degree 1/2, making good 3 from goods 1 and 2), two Cobb-Douglas consumers who own the firms. Price plane with p3 = 1: curves where each market clears (all three meet: Walras' law), a draggable price point and an **Equilibrium** button. No price-adjustment arrows and no auctioneer (tâtonnement): the user removed them because the lecture does not cover them. The price plane uses `Plotly.react`, not `U.plot`: with `Plotly.animate(..., {redraw: false})` the contour traces (the three curves) disappear. Side: the three markets as demand/supply bars, the values p_i E_i that add up to zero, λ for homogeneity. Shows numbers only, not the excess demand formulas (part 7 of the assignment). `model.js` tested: Walras' law and homogeneity at random prices, budgets, firm and consumer optimality by brute force, the auctioneer converging from four corners, the assignment's equilibrium (0.794, 1.395, 1) and quantities.
+### 3. Merged on 8 October (#17–#19, from another session)
+- **Excess Demand and Equilibrium** (`excess-demand/`, lecture 9, after the Edgeworth Box), from the 2021 Assignment 2: three goods, two CES firms, two Cobb-Douglas consumers; price plane with p3 = 1 and the curves where each market clears; an **Equilibrium** button. No tâtonnement arrows: the user removed them (not in the lecture). The price plane uses `Plotly.react`, not `U.plot` (with `Plotly.animate` the contour traces disappear). Numbers only, not the excess demand formulas (part 7 of the assignment).
+- **Two Technologies and a Kink** (`two-technologies/`, lecture 2 after One Step vs Two Steps on the start page, asterisk), from the 2022 Assignment 2: firm D = min{φ_A, φ_B} (kink, vertical H¹) and firm C = max (not quasi-concave, H¹ jumps). The 2022 solution has two typos: page 4 labels the counterexample φ_D (it is φ_C), page 14 writes 0.5 for q = 1.
 
-### Not merged yet
-- Excess Demand: footer without the line about the assignment.
-- **New tool: Two Technologies and a Kink** (`two-technologies/`, lecture 2 after Cost Minimisation, asterisk), from the 2022 Assignment 2: firm D = min{φ_A, φ_B} (kinked isoquant; for β/α ≤ w₁/w₂ ≤ α/β the cheapest bundle stays at the kink, H¹ is vertical, no substitution effect) and firm C = max (not quasi-concave: chord below the isoquant, H¹ jumps at w₁ = w₂). Mirrored Cobb-Douglas φ_A = z₁^α z₂^β, φ_B = z₁^β z₂^α so the kink stays on z₁ = z₂. Panels: H¹ against w₁, C(w₁, 1, q), substitution and scale at w₁ with p chosen so that q is optimal; buttons w₁ = 0.25 and w₁ = 6 (the exercise's points). Numbers shown (user's choice). The 2022 solution has two typos: page 4 labels the counterexample φ_D (it is φ_C), page 14 writes 0.5 for q = 1.
+### 4. Merged on 9 October (#20): the bug hunt, fixed
+`BUGS.md` lists the bugs found on 8 October and, at the top, how each was fixed. New shared helpers: `Microvis.react3d` (3D figures: no WebGL leak on projection switches), `ConsumerUI.incomeBounds/fitIncome` (income slider inside the problem's domain, with a note), `ConsumerModel.indifferenceCurve` ends at the axis; `fmt` prints rounding noise as 0 and exponents as ×10⁻⁴; the banner clears a part's message when it draws again. Version tag **8**. Checks: all model tests, check-pages, check-scrollbars, and a fuzz run (every slider at min and max, every option and button, random moves) on all tools; `tools/check-fuzz.cjs` (see "Checks").
 
 ### Next
 Nothing requested. Open question to the user: does One Step vs Two Steps (3D) animate smoothly on their Mac? (Not measurable in the container: no GPU.)
 
-### 3. Visitor counter (GoatCounter)
+### 5. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
 
 ## How the user works (important)
@@ -51,7 +51,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 
 - Plain HTML/CSS/JS, no build step for pages; Plotly 2.35.2 and KaTeX 0.16.9 vendored in `shared/vendor/`; works offline and from `file://`.
 - `tools/catalog.cjs` (tools in lecture order, tile sentence) + `tools/glyphs.cjs` (64 px tile drawings) → `node tools/build-site.cjs` writes `index.html` and, in every tool page: the "Microvis /" header link, previous/next links, the light/dark switch (button + `<head>` line + `shared/theme.js`), and the GoatCounter line. Run it after any catalog/glyph change; it is idempotent.
-- Version tags: our CSS/JS are linked as `?v=N` (now **7**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=7"' index.html */index.html | xargs sed -i 's/?v=7"/?v=8"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
+- Version tags: our CSS/JS are linked as `?v=N` (now **8**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=8"' index.html */index.html | xargs sed -i 's/?v=8"/?v=9"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
 - Hover previews on tiles: `<tool>/preview.webp` and `preview-dark.webp`, made with `tools/previews.cjs` (Playwright).
 - `style-kit/`: a copy of the look for a new project (README = style guide). Keep `style-kit/shared/{style.css,ui.js,theme.js}` in step with `shared/`.
 - Dark mode: tokens on `:root`, `data-theme` set by the switch; figures redraw on the `microvis-theme` event via `Microvis.watchColorScheme`.
@@ -62,6 +62,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 for t in shared/test-*.cjs */test-model.cjs; do node $t >/dev/null || echo FAIL $t; done
 node tools/check-pages.cjs        # errors, banner, phone horizontal scroll, header links (Playwright)
 node tools/check-scrollbars.cjs   # unneeded scrollbars at 1440/1280/1024/768 (Safari shows them)
+node tools/check-fuzz.cjs         # every slider at min and max, options, buttons, random moves: banner, page and KaTeX errors
 ```
 In Claude's cloud container Playwright is at `/opt/node22/lib/node_modules/playwright` (set `PLAYWRIGHT=` to that), Chromium at `/opt/pw-browsers`. Also look at screenshots (light/dark, desktop/phone) of what changed.
 
@@ -72,10 +73,13 @@ In Claude's cloud container Playwright is at `/opt/node22/lib/node_modules/playw
 - Plotly with `scaleanchor`: use `newPlot` when the range changes (`react` keeps the old domain).
 - A line on the plot edge is drawn half-width (clipped): extend the axis range slightly (cost curves).
 - Phones keep `:hover` after a tap: put hover colours inside `@media (hover: hover)`.
+- `requestAnimationFrame`'s first time stamp can be earlier than the click: clamp animation progress at 0 (red banners otherwise).
+- Plotly 3D: switching the camera between perspective and orthographic creates a new WebGL context each time; use `U.react3d`.
+- `U.plot` only moves points when the layout is unchanged: give axes explicit ranges if they must follow the data.
 - Cache: a new page with an old cached stylesheet broke the start page once → version tags + inline width/height on tile SVGs + `style="display:none"` on previews.
 
 ## History (merged PRs)
-#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot).
+#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz.
 
 ## Ideas offered, not requested
 Per-tool view counts on each tool page; tighter crops for some hover previews (Production Explorer); keep tile titles visible on hover.

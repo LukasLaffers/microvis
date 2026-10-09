@@ -37,8 +37,10 @@
       const line = slope => [end(slope, -1), end(slope, 1)];
       traces.push(U.line2(line(hi), th.muted, 1, `slope −${fmt(hi)}`, 'dot'), U.line2(line(lo), th.muted, 1, `slope −${fmt(lo)}`, 'dot'));
       const tHi = end(hi, -1), tLo = end(lo, 1);
+      // labels at the line ends; the right one turns inwards near the right edge so that it is not cut off
+      const side = (z, pref) => (z[0] > 0.7 * R ? 'right' : pref);
       annotations.push({ x: tHi[0], y: tHi[1], text: `slope −${fmt(hi)}`, showarrow: false, xanchor: 'right', xshift: -4, font: { size: 11, color: th.muted } });
-      annotations.push({ x: tLo[0], y: tLo[1], text: `slope −${fmt(lo)}`, showarrow: false, xanchor: 'left', yanchor: 'top', font: { size: 11, color: th.muted } });
+      annotations.push({ x: tLo[0], y: tLo[1], text: `slope −${fmt(lo)}`, showarrow: false, xanchor: side(tLo, 'left'), yanchor: 'top', font: { size: 11, color: th.muted } });
     } else {
       // The chord that shows phi_C is not quasi-concave: two bundles on the isoquant, either side of the kink.
       const f = z1 => [z1, K.z2On(q, s, 'C', z1)];
@@ -81,14 +83,17 @@
     rows.forEach((row, i) => { if (i && Math.abs(row.H[0] - rows[i - 1].H[0]) > 0.2 * row.H[0]) pts.push([null, null]); pts.push([row.H[0], row.x]); });
     const [lo, hi] = K.kinkRange(s);
     const shapesH = state.firm === 'D' ? [{ type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: Math.log10(lo), y1: Math.log10(hi), fillcolor: th.accentSoft, line: { width: 0 }, layer: 'below' }] : [];
+    // explicit ranges: U.plot only moves the points while the layout stays the same, so the axes must follow q here
+    const hMax = 1.08 * Math.max(...rows.map(row => row.H[0]).filter(Number.isFinite), r.H[0], 1e-6);
+    const cMax = 1.08 * Math.max(...rows.map(row => row.C).filter(Number.isFinite), r.C, 1e-6);
     U.plot('plotH', [U.line2(pts, th.ink, 2.5, 'H¹'), U.dot2([[r.H[0], state.w1]], th.ink, 'now', 11)], U.base2d(th, {
-      xt: 'z<sub>1</sub> = H<sup>1</sup>(w<sub>1</sub>, 1, q)', yt: 'w<sub>1</sub>', y: { type: 'log', range: [-1, 1] }, shapes: shapesH
+      xt: 'z<sub>1</sub> = H<sup>1</sup>(w<sub>1</sub>, 1, q)', yt: 'w<sub>1</sub>', x: { range: [0, hMax] }, y: { type: 'log', range: [-1, 1] }, shapes: shapesH
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('capH').innerHTML = state.firm === 'D'
       ? `In the shaded band, ${texStr(`${fmt(lo)}\\le w_1/w_2\\le ${fmt(hi)}`)}, the firm stays at the kink: ${texStr('H^1')} is vertical, a change of ${texStr('w_1')} does not change the input mix.`
       : `At ${texStr('w_1=w_2')} the firm switches technology and ${texStr('H^1')} jumps: there is no price at which it would choose a bundle in between.`;
     U.plot('plotC', [U.line2(rows.map(row => [row.x, row.C]), th.ink, 2.5, 'C'), U.dot2([[state.w1, r.C]], th.ink, 'now', 11)], U.base2d(th, {
-      xt: 'w<sub>1</sub>', yt: 'C', x: { type: 'log', range: [-1, 1] }
+      xt: 'w<sub>1</sub>', yt: 'C', x: { type: 'log', range: [-1, 1] }, y: { range: [0, cMax] }
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('capC').innerHTML = `Concave in ${texStr('w_1')}, with slope ${texStr('H^1')} (Shephard's lemma)${state.firm === 'D' ? `; a straight line in the band, where ${texStr('H^1')} is fixed` : `; a corner at ${texStr('w_1=w_2')}, where ${texStr('H^1')} jumps`}. Now ${texStr(`C=${fmt(r.C)}`)}.`;
   }

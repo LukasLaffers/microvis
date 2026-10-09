@@ -14,6 +14,7 @@
   const GREEN = '#4caf50', YELLOW = '#f8e71c';
   const state = { type: 'ces', delta: 0.5, rho: 0.5, a: 0.4, g1: 1, kappa: 6, p10: 1, tau: 40, y: 12 };
   const schedule = U.scheduler(render);
+  let ctrls = null;
   const f3 = x => fmt(x, 3);
   const pref = () => state.type === 'ces' ? { type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }
     : state.type === 'stonegeary' ? { type: 'stonegeary', a: state.a, g1: state.g1, g2: 0 } : { type: 'quasilinear', kappa: state.kappa };
@@ -38,16 +39,18 @@
     traces.push(U.line2(ps.map(p => [H1(p), p]), th.blue, 2.5, 'H¹(p₁, 1, v¹)'));
     traces.push(U.line2(ps.map(p => [D(p), p]), GREEN, 2.5, 'D¹(p₁, 1, y)'));
     traces.push(U.dot2([[r.x0[0], p10], [r.x1[0], p11]], th.ink, 'x₁⁰ and x₁¹', 9));
-    const xMax = Math.max(r.x0[0], H1(p10), H0(p11)) * 1.45;
+    // (when she buys no good 1 at all, scale the axis by her demand at a low price, so that it never runs negative)
+    const xMax = Math.max(r.x0[0], H1(p10), H0(p11)) * 1.45 || Math.max(1, 1.45 * D(p10 * 0.4));
     const shapes = [p10, p11].map(p => ({ type: 'line', x0: 0, x1: xMax, y0: p, y1: p, line: { color: th.grey, width: 1, dash: 'dot' } }));
     const annotations = [
       { x: xMax, y: p10, text: `p<sub>1</sub><sup>0</sup> = ${f3(p10)}`, showarrow: false, xanchor: 'right', yanchor: 'top', font: { size: 12, color: th.muted } }
     ];
     if (p11 > p10) {
       annotations.push({ x: xMax, y: p11, text: `p<sub>1</sub><sup>1</sup> = ${f3(p11)}`, showarrow: false, xanchor: 'right', yanchor: 'bottom', font: { size: 12, color: th.muted } });
-      annotations.push({ x: r.x1[0] / 2, y: (p10 + p11) / 2, text: '<b>T</b>', showarrow: false, font: { size: 14, color: th.dark ? '#ffe45c' : '#7a6400' } });
+      // labels only on areas that are there: no revenue when the taxed demand is 0, no loss when nothing was bought
+      if (r.T > 1e-9 && r.x1[0] > 0.04 * xMax) annotations.push({ x: r.x1[0] / 2, y: (p10 + p11) / 2, text: '<b>T</b>', showarrow: false, font: { size: 14, color: th.dark ? '#ffe45c' : '#7a6400' } });
       const xm = (r.x1[0] + H1((p10 + p11) / 2)) / 2;
-      annotations.push({ x: xm, y: p10 + 0.3 * (p11 - p10), ax: 40, ay: 46, text: '<b>DWL</b>', showarrow: true, arrowhead: 2, arrowwidth: 1.5, font: { size: 13, color: th.blue }, arrowcolor: th.blue });
+      if (r.DWL > 1e-9) annotations.push({ x: xm, y: p10 + 0.3 * (p11 - p10), ax: 40, ay: 46, text: '<b>DWL</b>', showarrow: true, arrowhead: 2, arrowwidth: 1.5, font: { size: 13, color: th.blue }, arrowcolor: th.blue });
     }
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: [0, xMax] }, y: { range: [0, pTop] }, annotations, shapes, margin: { l: 56, r: 12, t: 8, b: 44 } }), U.PLOT_CONFIG);
     $('cap').innerHTML = `<span class="c-green"><span class="key"></span>${texStr('D^1(p_1,1,y)')}</span>, <span class="c-l2-blue"><span class="key"></span>${texStr('H^1(p_1,1,v^1)')}</span> (utility after the tax), <span class="c-l2-red"><span class="key dash"></span>${texStr('H^1(p_1,1,v^0)')}</span> (dotted, utility before the tax). ${texStr('D^1(p_1^1,1,y)=H^1(p_1^1,1,v^1)')}: the curves meet at the taxed price. <span class="c-yellow">Yellow: tax revenue</span> ${texStr(`T=${f3(r.T)}`)}; <span class="c-l2-blue">blue: deadweight loss</span> ${texStr(`DWL=${f3(r.DWL)}`)}.` +
@@ -61,10 +64,18 @@
       ['T', f3(r.T)], ['|EV|', f3(r.lossEV)], ['DWL=|EV|-T', `<b>${f3(r.DWL)}</b>`], ['\\varepsilon^c_{11}\\ \\text{at}\\ p_1^1', f3(r.epsC)]
     ].map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     const item = (ok, html) => `<li><span class="mark ${ok ? 'ok' : 'na'}">${ok ? '✓' : '·'}</span><span>${html}</span></li>`;
+    // an approximation earns a ✓ only when it is close (within 10 %) to the exact value
+    const near = (a, b) => b > 1e-9 && Math.abs(a - b) <= 0.1 * b;
+    if (state.tau > 0 && !(r.x0[0] > 1e-9)) {
+      $('checks').innerHTML = '<li><span class="mark na">·</span><span>At this price she buys no good 1, so the tax raises nothing and costs her nothing: no revenue, no deadweight loss.</span></li>';
+      return;
+    }
     $('checks').innerHTML = state.tau > 0 ? [
-      item(r.lossEV > r.T, `${texStr(`|EV|=${f3(r.lossEV)}>T=${f3(r.T)}`)}: the consumer loses more than the government collects`),
-      item(true, `Approximation ${texStr(`-\\tfrac12\\frac{\\partial H^1}{\\partial p_1}(p_1^1-p_1^0)^2=${f3(r.approx)}`)} vs exact ${f3(r.DWL)}`),
-      item(true, `Per krone: ${texStr(`DWL/T=${f3(r.ratio)}`)}; approximation ${texStr(`-\\tfrac12\\varepsilon^c_{11}\\frac{p_1^1-p_1^0}{p_1^1}=${f3(r.ratioApprox)}`)}. (A 14 % VAT gives ${texStr('\\tfrac{p_1^1-p_1^0}{p_1^1}=0.12')}.)`)
+      // (when the two round to the same number, show their difference instead of "4.81 > 4.81")
+      item(r.lossEV > r.T, `${texStr(f3(r.lossEV) === f3(r.T) ? `|EV|-T=${f3(r.DWL)}>0` : `|EV|=${f3(r.lossEV)}>T=${f3(r.T)}`)}: the consumer loses more than the government collects`),
+      item(near(r.approx, r.DWL), `Approximation ${texStr(`-\\tfrac12\\frac{\\partial H^1}{\\partial p_1}(p_1^1-p_1^0)^2=${f3(r.approx)}`)} vs exact ${f3(r.DWL)}`),
+      r.T > 1e-9 ? item(near(r.ratioApprox, r.ratio), `Per krone: ${texStr(`DWL/T=${f3(r.ratio)}`)}; approximation ${texStr(`-\\tfrac12\\varepsilon^c_{11}\\frac{p_1^1-p_1^0}{p_1^1}=${f3(r.ratioApprox)}`)}. (A 14 % VAT gives ${texStr('\\tfrac{p_1^1-p_1^0}{p_1^1}=0.12')}.)`)
+        : '<li><span class="mark na">·</span><span>At the taxed price she buys no good 1: the tax raises no revenue, and the whole loss is deadweight.</span></li>'
     ].join('') : '<li><span class="mark na">·</span><span>No tax: no revenue, no deadweight loss.</span></li>';
   }
 
@@ -81,6 +92,9 @@
 
   function render() {
     U.applyVisibility({ ces: state.type === 'ces', stonegeary: state.type === 'stonegeary', quasilinear: state.type === 'quasilinear' });
+    // Stone–Geary: income must cover the subsistence bundle at the taxed price too
+    const note = CU.fitIncome(ctrls.y, state, 'y', pref(), [[state.p10, 1], [state.p10 * (1 + state.tau / 100), 1]]);
+    $('income-note').hidden = !note; $('income-note').textContent = note;
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
     guard('plot', () => draw(th, S));
@@ -90,7 +104,7 @@
 
   function init() {
     U.renderStaticTex();
-    U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
+    ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
     render();
     U.watchColorScheme(schedule);

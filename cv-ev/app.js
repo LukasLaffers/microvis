@@ -91,13 +91,15 @@
     ].map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     const item = (ok, html) => `<li><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span><span>${html}</span></li>`;
     const fall = state.p11 < state.p10;
-    const ordered = state.type === 'quasilinear' ? (same(w.CV, w.EV) && same(w.dCS, w.CV)) : state.type === 'giffen' ? (fall ? w.EV <= w.dCS && w.dCS <= w.CV : w.EV >= w.dCS && w.dCS >= w.CV) : (fall ? w.CV <= w.dCS && w.dCS <= w.EV : w.CV >= w.dCS && w.dCS >= w.EV);
+    // The signed order holds for a fall and for a rise alike (for a rise all three are negative); only the sizes turn round.
+    const le = (a, b) => a <= b + 1e-9 * Math.max(1, Math.abs(a), Math.abs(b));
+    const ordered = state.type === 'quasilinear' ? (same(w.CV, w.EV) && same(w.dCS, w.CV)) : state.type === 'giffen' ? le(w.EV, w.dCS) && le(w.dCS, w.CV) : le(w.CV, w.dCS) && le(w.dCS, w.EV);
     const orderTxt = state.type === 'quasilinear' ? texStr('EV=\\Delta CS=CV') + ': no income effect on good 1' : state.type === 'giffen' ? texStr('EV\\le\\Delta CS\\le CV') + ': good 1 is inferior' : texStr('CV\\le\\Delta CS\\le EV') + ': good 1 is normal';
     $('checks').innerHTML = [
       item(same(CM.indirect([state.p11, 1], y - w.CV, u), w.v0), `(CVeq) ${texStr(`V(p^1,y-CV)=v^0`)}`),
       item(same(CM.indirect([state.p10, 1], y + w.EV, u), w.v1), `(EVeq) ${texStr(`V(p^0,y+EV)=v^1`)}`),
       item(same(w.CVarea, w.CV) && same(w.EVarea, w.EV), `Areas: ${texStr(`\\int_{p_1^1}^{p_1^0}H^1(p_1,1,v^0)\\,\\mathrm dp_1=${f3(w.CVarea)}=CV`)}, ${texStr(`\\int_{p_1^1}^{p_1^0}H^1(p_1,1,v^1)\\,\\mathrm dp_1=${f3(w.EVarea)}=EV`)}`),
-      item(ordered, `${orderTxt}${fall ? '' : ' (a price rise: the inequalities turn round)'}`)
+      item(ordered, `${orderTxt}${fall || state.type === 'quasilinear' ? '' : ' (a price rise: all three are negative, so in absolute values the order turns round)'}`)
     ].join('');
   }
 

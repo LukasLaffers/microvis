@@ -89,6 +89,9 @@
   function render() {
     U.applyVisibility({ ces: state.type === 'ces', stonegeary: state.type === 'stonegeary', quasilinear: state.type === 'quasilinear', ump: state.view === 'ump', emp: state.view === 'emp' });
     document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+    // Stone–Geary: income must cover the subsistence bundle (else utility, demand and the identities are meaningless)
+    const note = CU.fitIncome(ctrls.y, state, 'y', pref(), [[state.p1, state.p2]]);
+    $('income-note').hidden = !(note && state.view === 'ump'); $('income-note').textContent = note;
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
     guard('plot', () => draw(th, S));

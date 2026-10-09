@@ -232,7 +232,7 @@
           (t.tech === 'linear' && st.z2new === 0 ? ` (Here the step uses up all of ${texStr('z_2')}.)` : '');
       } else {
         lines.push(`MRTS_{21}(\\bar z)=\\frac{\\phi_1(\\bar z)}{\\phi_2(\\bar z)}=\\frac{${f3(g[0])}}{0}=\\infty`);
-        text = `Here ${texStr('\\phi_2=0')}: input 2 is in excess. Even a tiny step ${texStr('\\Delta z_1>0')} frees all the excess ${texStr('z_2')} down to the corner (${texStr(`-\\Delta z_2=${f3(st.giveUp)}`)}), so ${texStr('-\\Delta z_2/\\Delta z_1')} grows without bound as the step shrinks: the isoquant is vertical.`;
+        text = `Here ${texStr('\\phi_2=0')}: input 2 is in excess. Even a tiny step ${texStr('\\Delta z_1>0')} frees all the excess ${texStr('z_2')} down to the corner${st.giveUp === null ? '' : ` (${texStr(`-\\Delta z_2=${f3(st.giveUp)}`)})`}, so ${texStr('-\\Delta z_2/\\Delta z_1')} grows without bound as the step shrinks: the isoquant is vertical.`;
       }
       if (g[0] === 0) text = `Here ${texStr('\\phi_1=0')}: input 1 is in excess, so more of it saves no ${texStr('z_2')} at all (${texStr('-\\Delta z_2=0')}): the isoquant is flat and ${texStr('MRTS_{21}=0')}.`;
     } else {

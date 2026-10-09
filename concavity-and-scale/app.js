@@ -106,13 +106,13 @@
       type: 'scatter3d', mode: 'markers', x: [Zl[0]], y: [Zl[1]], z: [cl], marker: { size: 5, color: th.red }, hoverinfo: 'skip'
     });
     const axis = (title, r) => ({ title: { text: title, font: { color: th.ink } }, range: r, color: th.muted, gridcolor: th.grid, backgroundcolor: 'rgba(0,0,0,0)', showspikes: false, tickfont: { color: th.muted } });
-    Plotly.react('plot3d', traces, {
+    U.react3d('plot3d', traces, {
       margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', font: { color: th.ink, family: th.font, size: 12 }, showlegend: false, uirevision: 'keep',
       scene: {
         uirevision: 'keep', camera: state.camera, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.9 },
         xaxis: axis('z₁', [0, L]), yaxis: axis('z₂', [0, L]), zaxis: axis('q', [0, zmax * 1.02])
       }
-    }, U.PLOT_CONFIG);
+    }, U.PLOT_CONFIG, events3d);
   }
 
   // Camera looking horizontally at the segment, from the side of the origin (where the surface is lower).
@@ -204,7 +204,9 @@
       item(true, `<b>Quasi-concave.</b> Every isoquant is a straight line, so every input requirement set ${texStr('Z(q)=\\{z:\\phi(z)\\ge q\\}')} is convex.`),
       item(nr, nr
         ? homo ? `<b>No increasing returns to scale.</b> ${texStr(`e(z)=k=${U.num(P.k1)}\\le 1`)} at every ${texStr('z')}.` : `<b>No increasing returns to scale.</b> ${texStr('e(z)')} lies between ${texStr(`k_1=${U.num(P.k1)}`)} and ${texStr(`k_2=${U.num(P.k2)}`)}, so ${texStr('e(z)\\le 1')} at every ${texStr('z')}.`
-        : homo ? `<b>Increasing returns to scale</b> everywhere: ${texStr(`e(z)=k=${U.num(P.k1)}>1`)}.` : `<b>Increasing returns to scale</b> near the ${texStr(P.k1 > 1 ? 'z_1' : 'z_2')} axis, where ${texStr('e(z)')} is close to ${texStr(`k_${P.k1 > 1 ? 1 : 2}=${U.num(P.k1 > 1 ? P.k1 : P.k2)}>1`)}.`),
+        : homo ? `<b>Increasing returns to scale</b> everywhere: ${texStr(`e(z)=k=${U.num(P.k1)}>1`)}.` : (P.k1 > 1 && P.k2 > 1
+          ? `<b>Increasing returns to scale</b> everywhere: ${texStr('e(z)')} lies between ${texStr(`k_1=${U.num(P.k1)}`)} and ${texStr(`k_2=${U.num(P.k2)}`)}, both above 1.`
+          : `<b>Increasing returns to scale</b> near the ${texStr(P.k1 > 1 ? 'z_1' : 'z_2')} axis, where ${texStr('e(z)')} is close to ${texStr(`k_${P.k1 > 1 ? 1 : 2}=${U.num(P.k1 > 1 ? P.k1 : P.k2)}>1`)}.`)),
       item(homo, homo
         ? `<b>Homothetic.</b> The isoquants are parallel lines, so ${texStr('MRTS_{21}')} is the same all along each ray: ${texStr(`\\phi=(z_1+z_2)^{${U.num(P.k1)}}`)} is homogeneous of degree ${texStr(`k=${U.num(P.k1)}`)}.`
         : `<b>Not homothetic.</b> ${texStr(`MRTS_{21}=q^{1/k_2-1/k_1}`)} changes with output: on the ray through ${texStr('z')} it is ${f3(m1)} at ${texStr('z')} and ${f3(m2)} at ${texStr('2z')}. The isoquants rotate as output rises.`),
@@ -232,6 +234,12 @@
     if (lam !== undefined) ctrls.lam.setExact(lam);
   }
 
+  // Handlers of the 3D figure (attached again by U.react3d whenever it rebuilds the figure).
+  const events3d = {
+    // remember the camera the user rotates to, so redraws keep it
+    plotly_relayout: ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; }
+  };
+
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { onChange: schedule });
@@ -253,7 +261,6 @@
     });
     document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = CAMERAS[b.dataset.cam](); schedule(); }));
     render();
-    $('plot3d').on('plotly_relayout', ev => { const cam = ev['scene.camera']; if (cam) state.camera = { ...state.camera, ...clone(cam) }; });
     U.watchColorScheme(schedule);
   }
 

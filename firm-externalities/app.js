@@ -12,7 +12,10 @@
   const { $, fmt, texStr, guard } = U;
 
   const state = { e: 0.5, alpha: 1, c: 1, qa: 1, qb: 5, p: 6 };
-  const P_TOP = 12, Q_FIRM = 12, Q_MARKET = 24;
+  // P_TOP a little above the price slider's maximum 12, so the dots are never cut at the top; the q axes grow
+  // with the equilibrium output (a strong positive externality, e = −0.8, gives q = 25 each).
+  const P_TOP = 12.6;
+  let Q_FIRM = 12, Q_MARKET = 24;
   let ctrls = {};
   const schedule = U.scheduler(render);
   const model = () => ({ alpha: state.alpha, c: state.c, e: state.e });
@@ -23,6 +26,7 @@
 
   function draw(th) {
     const s = model(), eq = EM.equilibrium(s, state.p), traces = [], annotations = [], shapes = [];
+    Q_MARKET = Math.max(24, 1.15 * eq.Q); Q_FIRM = Q_MARKET / 2;
     for (const [xa, other] of [['x', 'q²'], ['x2', 'q¹']]) {
       const self = xa === 'x' ? '1' : '2';
       traces.push(curve(p => EM.supplyGiven(s, p, state.qa), xa, th.orange, 2.5, `S${self}(${other} = ${fmt(state.qa, 1)})`));
@@ -73,7 +77,9 @@
     $('checks').innerHTML = [
       item(same(eq.q1, EM.supplyGiven(s, state.p, eq.q2)) && same(eq.q2, EM.supplyGiven(s, state.p, eq.q1)),
         `Consistent outputs: ${texStr(`q^1=S^1(p;q^2)=${fmt(eq.q1, 3)}`)} and ${texStr(`q^2=S^2(p;q^1)=${fmt(eq.q2, 3)}`)}`),
-      item(same(num, EM.marketSlope(s)), `Slope of market supply ${texStr(`\\frac{\\mathrm d(q^1+q^2)}{\\mathrm dp}=\\frac{2\\alpha}{1+\\alpha e}=${fmt(EM.marketSlope(s), 3)}`)} <span class="c-muted">numerically ${fmt(num, 3)}; without the externality ${texStr(`2\\alpha=${fmt(2 * s.alpha, 3)}`)}</span>`)
+      state.p <= s.c
+        ? `<li><span class="mark na">·</span><span>Below ${texStr(`p=c=${fmt(s.c)}`)} neither firm produces: market supply is 0 there, and its slope 0.</span></li>`
+        : item(same(num, EM.marketSlope(s)), `Slope of market supply ${texStr(`\\frac{\\mathrm d(q^1+q^2)}{\\mathrm dp}=\\frac{2\\alpha}{1+\\alpha e}=${fmt(EM.marketSlope(s), 3)}`)} <span class="c-muted">numerically ${fmt(num, 3)}; without the externality ${texStr(`2\\alpha=${fmt(2 * s.alpha, 3)}`)}</span>`)
     ].join('');
     $('readouts').innerHTML = [
       ['q^1=q^2', fmt(eq.q1, 3)],

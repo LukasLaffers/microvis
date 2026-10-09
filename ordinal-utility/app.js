@@ -48,10 +48,11 @@
     const traces = [surf(Uz, rU, 'scene'), ...levels.map(u => contour(u, u, 'scene')), ...curve(uo, 'scene', rU[0]), pts(u => u, 'scene'),
       surf(Vz, rV, 'scene2'), ...levels.map(u => contour(u, T.f(u), 'scene2')), ...curve(T.f(uo), 'scene2', rV[0]), pts(T.f, 'scene2')];
     const axis = (title, r) => ({ title: { text: title, font: { color: th.ink } }, range: r, color: th.muted, gridcolor: th.grid, backgroundcolor: 'rgba(0,0,0,0)', showspikes: false, tickfont: { color: th.muted } });
-    const scene = (dom, zt, r) => ({ domain: { x: dom, y: [0, 1] }, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.75 }, camera: { eye: { x: -1.55, y: -1.55, z: 1.05 } }, xaxis: axis('x₁', [0, L]), yaxis: axis('x₂', [0, L]), zaxis: axis(zt, r), uirevision: 'keep' });
+    const scene = (dom, zt, r, eye = { x: -1.55, y: -1.55, z: 1.05 }) => ({ domain: { x: dom, y: [0, 1] }, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.75 }, camera: { eye }, xaxis: axis('x₁', [0, L]), yaxis: axis('x₂', [0, L]), zaxis: axis(zt, r), uirevision: eye.x > 0 ? 'turned' : 'keep' });
     Plotly.react('plot', traces, {
       margin: { l: 0, r: 0, t: 26, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', font: { color: th.ink, family: th.font, size: 12 }, showlegend: false, uirevision: 'keep',
-      scene: scene([0, 0.5], 'U', rU), scene2: scene([0.5, 1], 'V', rV),
+      // a decreasing f turns the surface round: look at it from the opposite corner, so that it rises away from the viewer
+      scene: scene([0, 0.5], 'U', rU), scene2: scene([0.5, 1], 'V', rV, T.increasing === false ? { x: 1.55, y: 1.55, z: 1.05 } : undefined),
       annotations: [
         { xref: 'paper', yref: 'paper', x: 0.25, y: 1.03, text: 'U(x<sub>1</sub>, x<sub>2</sub>)', showarrow: false, font: { size: 14, color: th.ink } },
         { xref: 'paper', yref: 'paper', x: 0.75, y: 1.03, text: `V = ${$('transform').selectedOptions[0].textContent.replace('V = ', '')}`, showarrow: false, font: { size: 14, color: th.ink } }

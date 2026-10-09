@@ -21,7 +21,7 @@ shared/vendor/          bundled third-party libraries (Plotly, KaTeX) with their
 plans/                  plans for groups of tools, e.g. plans/lecture-2.md
 tools/catalog.cjs       the list of tools in lecture order: title and one-sentence description of each tile
 tools/build-site.cjs    writes index.html and the header link and previous/next links of every tool page
-tools/check-pages.cjs, tools/check-scrollbars.cjs  Playwright checks to run before every preview (see HANDOFF.md)
+tools/check-pages.cjs, tools/check-scrollbars.cjs, tools/check-fuzz.cjs  Playwright checks to run before every preview (see HANDOFF.md)
 HANDOFF.md              current state, open tasks and how the user works: read it first
 style-kit/              the look, layout, writing style and safeguards packaged for a new project (README is the style guide); keep it in step when shared/style.css or shared/ui.js change
 <tool-name>/            one folder per tool, kebab-case, e.g. production-explorer/

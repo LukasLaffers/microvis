@@ -7,8 +7,8 @@
   <meta name="description" content="When an input price rises, input demand changes through a substitution effect (along the isoquant) and a scale effect (along the expansion path). Lecture 3.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=7">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="../shared/style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=8">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -87,8 +87,8 @@
       <div id="plot" class="plot plot-main"></div>
       <div class="ctrl" data-key="t" data-label="t" data-hint="0: start · 1: end of the change" data-min="0" data-max="1" data-step="0.005" data-show="smooth"></div>
       <p class="caption" id="cap-main"></p>
-      <p class="caption" data-show="steps"><span class="c-muted"><span class="key"></span>isoquants for <span class="tex" data-tex="q^\ast"></span> and <span class="tex" data-tex="S(w',p)"></span></span>; <span class="c-ink"><span class="key dash"></span>old</span> and <span class="c-ink"><span class="key"></span>new isocost line</span>; dotted rays: old and new expansion paths. The bars on the <span class="tex" data-tex="z_1"></span> axis add up: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total.</p>
-      <p class="caption" data-show="smooth"><span class="c-ink"><span class="key"></span>now</span>: isoquant, isocost line and (dotted) expansion path at the current <span class="tex" data-tex="w_1"></span>; <span class="c-muted"><span class="key"></span>faint</span>: the same at the start. The bars on the <span class="tex" data-tex="z_1"></span> axis grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total, accumulated so far.</p>
+      <p class="caption" data-show="steps"><span class="c-muted"><span class="key"></span>isoquants for <span class="tex" data-tex="q^\ast"></span> and <span class="tex" data-tex="S(w',p)"></span></span>; <span class="c-ink"><span class="key dash"></span>old</span> and <span class="c-ink"><span class="key"></span>new isocost line</span>; dotted rays: old and new expansion paths. The bars at the bottom (changes in <span class="tex" data-tex="z_1"></span>) add up: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total.</p>
+      <p class="caption" data-show="smooth"><span class="c-ink"><span class="key"></span>now</span>: isoquant, isocost line and (dotted) expansion path at the current <span class="tex" data-tex="w_1"></span>; <span class="c-muted"><span class="key"></span>faint</span>: the same at the start. The bars at the bottom (changes in <span class="tex" data-tex="z_1"></span>) grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">scale</span> = total, accumulated so far.</p>
     </section>
 
     <div class="side">
@@ -120,12 +120,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=7"></script>
-  <script src="../shared/firm-ui.js?v=7"></script>
-  <script src="../shared/firm-model.js?v=7"></script>
-  <script src="model.js?v=7"></script>
-  <script src="app.js?v=7"></script>
-  <script src="../shared/theme.js?v=7"></script>
+  <script src="../shared/ui.js?v=8"></script>
+  <script src="../shared/firm-ui.js?v=8"></script>
+  <script src="../shared/firm-model.js?v=8"></script>
+  <script src="model.js?v=8"></script>
+  <script src="app.js?v=8"></script>
+  <script src="../shared/theme.js?v=8"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>
