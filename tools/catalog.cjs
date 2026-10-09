@@ -5,7 +5,7 @@ module.exports = [
     ['production-explorer', 'Production Explorer', 'A production function in 3D, seen along an isoquant, along a ray and along an axis.'],
     ['input-requirement-sets', 'Input Requirement Sets', 'Drag two input bundles and check free disposal, convexity and constant returns to scale.'],
     ['building-the-mrts', 'Building the MRTS', 'Why the slope of the isoquant is MRTS₂₁ = φ₁/φ₂, the ratio of the marginal products.'],
-    ['homogeneous-homothetic', 'Homogeneous and Homothetic', 'Isoquants at equal output steps: what their shape and spacing say about returns to scale.'],
+    ['homogeneous-homothetic', 'Homogeneous and Homothetic', 'Homothetic isoquants all have one shape; homogeneity of degree k also fixes the output on each.'],
     ['two-elasticities', 'Two Elasticities: e(z) and σ(z)', 'The elasticity of scale along the ray, the elasticity of substitution along the isoquant, in one picture.'],
     ['frisch-chocolate', "Frisch's Chocolate Data", 'A real production function: Frisch’s 1935 measurements at the Freia chocolate factory.']
   ] },

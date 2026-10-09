@@ -8,7 +8,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../shared/style.css?v=8">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -28,11 +28,13 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>The isoquants are drawn at equal output steps, <span class="tex" data-tex="q=\Delta q,\ 2\Delta q,\dots"></span>; along each ray only the scale changes. Every homogeneous function is homothetic, but not the other way round.</p>
+          <p><b>Homothetic:</b> every isoquant is a radial blow-up of one shape, so the MRTS is the same all along a ray. The shape does not say how much an isoquant produces: any increasing <span class="tex" data-tex="F"></span> can number them. <b>Homogeneous of degree <span class="tex" data-tex="k"></span></b> also fixes the numbers: <span class="tex" data-tex="\phi(\alpha z)=\alpha^k\phi(z)"></span>.</p>
           <ul>
-          <li><b>Homogeneous:</b> the isoquants are radial blow-ups, with parallel tangents along each ray. Move <span class="tex" data-tex="k"></span>: the spacing is even for <span class="tex" data-tex="k=1"></span>, bunches up for <span class="tex" data-tex="k>1"></span>, spreads out for <span class="tex" data-tex="k<1"></span>.</li>
-          <li><b>Homothetic:</b> the same shapes and parallel tangents, but any increasing <span class="tex" data-tex="F"></span> labels them, so the spacing can change as you move out.</li>
-          <li><b>Neither:</b> the tangents along a ray turn.</li>
+          <li>Switch between Homogeneous and Homothetic: the isoquants stay where they are, only their outputs change.</li>
+          <li>With Homogeneous, move <span class="tex" data-tex="k"></span>: the same curves again, and the output at <span class="tex" data-tex="\alpha\hat z"></span> is always <span class="tex" data-tex="\alpha^k"></span> times the output at <span class="tex" data-tex="\hat z"></span>.</li>
+          <li>With Homothetic, change <span class="tex" data-tex="F"></span>: the outputs follow no power of <span class="tex" data-tex="\alpha"></span>.</li>
+          <li>Neither: the tangents along a ray turn, so the isoquants are not blow-ups of one shape.</li>
+          <li>Draw the isoquants at equal output steps: their spacing shows the returns to scale.</li>
           </ul>
         </details>
       </div>
@@ -67,13 +69,17 @@
 
       <div class="group">
         <h2>Isoquants</h2>
-        <div class="ctrl" data-key="dq" data-label="\Delta q" data-hint="output step between isoquants" data-min="0.25" data-max="3" data-step="0.05"></div>
+        <div class="seg" role="group" aria-label="Which isoquants to draw">
+          <button type="button" data-view="scale" aria-pressed="true">Through ẑ, 2ẑ, 3ẑ, …</button>
+          <button type="button" data-view="output" aria-pressed="false">At q = Δq, 2Δq, …</button>
+        </div>
+        <div class="ctrl" data-show="output" data-key="dq" data-label="\Delta q" data-hint="output step between isoquants" data-min="0.25" data-max="3" data-step="0.05"></div>
         <div class="ctrl" data-key="R" data-label="\max z_1,\ z_2" data-hint="plot range" data-min="2" data-max="20" data-step="0.5"></div>
       </div>
     </section>
 
     <section class="panel main-panel" aria-label="Isoquant map">
-      <div class="panel-head"><h2>Isoquants at equal output steps, and three rays</h2><div class="keynums" id="keynums"></div></div>
+      <div class="panel-head"><h2 id="mapTitle">Isoquants and three rays</h2><div class="keynums" id="keynums"></div></div>
       <div id="plot" class="plot plot-iso"></div>
       <p class="caption" id="cap"></p>
     </section>
@@ -88,6 +94,11 @@
         <h2>The MRTS along each ray</h2>
         <div id="plotM" class="plot plot-side"></div>
         <p class="caption" id="capM"></p>
+      </section>
+      <section class="panel readouts" aria-label="Output along the middle ray" aria-live="polite">
+        <h2>Output at <span class="tex" data-tex="\alpha\hat z"></span></h2>
+        <table class="data scale-table" id="scaleTable"></table>
+        <p class="note" id="scaleNote"></p>
       </section>
       <section class="panel readouts" aria-label="Checks" aria-live="polite">
         <h2>Checks</h2>
@@ -110,8 +121,8 @@
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
   <script src="../shared/ui.js?v=8"></script>
   <script src="../shared/technology-model.js?v=8"></script>
-  <script src="model.js?v=8"></script>
-  <script src="app.js?v=8"></script>
+  <script src="model.js?v=9"></script>
+  <script src="app.js?v=9"></script>
   <script src="../shared/theme.js?v=8"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
