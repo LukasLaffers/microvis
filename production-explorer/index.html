@@ -7,8 +7,8 @@
   <meta name="description" content="Interactive production function: substitution along an isoquant, scale along a ray, and one input at a time. Lecture 1.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=11">
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="../shared/style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=12">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -47,13 +47,42 @@
         </select>
         <div class="formula" id="formula-general"></div>
         <div class="formula" id="formula-numbers"></div>
-        <div class="formula" id="formula-extra" hidden></div>
-        <div class="formula notes-form" id="formula-notes" hidden></div>
         <p class="note" id="tech-note"></p>
       </div>
 
       <div class="group">
+        <h2>Mode</h2>
+        <div class="seg" role="group" aria-label="Mode">
+          <button type="button" data-mode="sub" aria-pressed="true">Substitution</button>
+          <button type="button" data-mode="scale" aria-pressed="false">Scale</button>
+          <button type="button" data-mode="one" aria-pressed="false">One input</button>
+        </div>
+        <p class="note" data-show="sub">Walk along the isoquant <span class="tex" data-tex="\phi(z)=\bar q"></span>: change the input mix, keep output fixed.</p>
+        <p class="note" data-show="scale">Walk along the ray: multiply both inputs by <span class="tex" data-tex="\lambda"></span>, keep the input mix fixed.</p>
+        <p class="note" data-show="one">Keep <span class="tex" data-tex="z_2"></span> fixed and change only <span class="tex" data-tex="z_1"></span>: the slope of output is the marginal product <span class="tex" data-tex="\phi_1"></span>.</p>
+        <div class="ctrl" data-key="qbar" data-label="\bar q" data-hint="output level" data-min="0.25" data-max="6" data-step="0.05" data-show="sub"></div>
+        <div class="ctrl" data-key="mix" data-label="z_2/z_1" data-hint="input mix (log scale)" data-min="0.1" data-max="10" data-log="1" data-show="sub|scale"></div>
+        <div class="ctrl" data-key="lambda" data-label="\lambda" data-hint="scale factor" data-min="0.25" data-max="3" data-step="0.01" data-show="scale"></div>
+        <div class="ctrl" data-key="z2fix" data-label="\bar z_2" data-hint="fixed level of z₂" data-min="0.1" data-max="15" data-step="0.05" data-show="one"></div>
+        <div class="ctrl" data-key="z1" data-label="z_1" data-hint="the input that varies" data-min="0.05" data-max="15" data-step="0.05" data-show="one"></div>
+        <div data-show="one">
+          <p class="note">The four shapes of Figure 10 in the notes:</p>
+          <div class="btn-row" role="group" aria-label="Figure 10 shapes">
+            <button type="button" data-preset="concave">1 · concave</button>
+            <button type="button" data-preset="leontief">2 · linear, then flat</button>
+            <button type="button" data-preset="sshape">3 · S-shaped</button>
+            <button type="button" data-preset="threshold">4 · threshold</button>
+          </div>
+        </div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Exponents, returns to scale, exact point, layers, plot range.</p>
+      <div class="group">
         <h2>Shape of the isoquants</h2>
+        <div class="formula" id="formula-extra" hidden></div>
+        <div class="formula notes-form" id="formula-notes" hidden></div>
         <label class="check" data-show="cobbpower"><input type="checkbox" id="ab" checked> <span>Enter <span class="tex" data-tex="\alpha"></span> and <span class="tex" data-tex="\beta"></span> as in the notes</span></label>
         <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="exponent of z₁" data-min="0.05" data-max="1.5" data-step="0.05" data-show="ab"></div>
         <div class="ctrl" data-key="beta" data-label="\beta" data-hint="exponent of z₂" data-min="0.05" data-max="1.5" data-step="0.05" data-show="ab"></div>
@@ -77,21 +106,8 @@
         <p class="note" id="rts-line"></p>
       </div>
 
-      <div class="group">
-        <h2>Mode</h2>
-        <div class="seg" role="group" aria-label="Mode">
-          <button type="button" data-mode="sub" aria-pressed="true">Substitution</button>
-          <button type="button" data-mode="scale" aria-pressed="false">Scale</button>
-          <button type="button" data-mode="one" aria-pressed="false">One input</button>
-        </div>
-        <p class="note" data-show="sub">Walk along the isoquant <span class="tex" data-tex="\phi(z)=\bar q"></span>: change the input mix, keep output fixed.</p>
-        <p class="note" data-show="scale">Walk along the ray: multiply both inputs by <span class="tex" data-tex="\lambda"></span>, keep the input mix fixed.</p>
-        <p class="note" data-show="one">Keep <span class="tex" data-tex="z_2"></span> fixed and change only <span class="tex" data-tex="z_1"></span>: the slope of output is the marginal product <span class="tex" data-tex="\phi_1"></span>.</p>
-        <div class="ctrl" data-key="qbar" data-label="\bar q" data-hint="output level" data-min="0.25" data-max="6" data-step="0.05" data-show="sub"></div>
-        <div class="ctrl" data-key="mix" data-label="z_2/z_1" data-hint="input mix (log scale)" data-min="0.1" data-max="10" data-log="1" data-show="sub|scale"></div>
-        <div class="ctrl" data-key="lambda" data-label="\lambda" data-hint="scale factor" data-min="0.25" data-max="3" data-step="0.01" data-show="scale"></div>
-        <div class="ctrl" data-key="z2fix" data-label="\bar z_2" data-hint="fixed level of z₂" data-min="0.1" data-max="15" data-step="0.05" data-show="one"></div>
-        <div class="ctrl" data-key="z1" data-label="z_1" data-hint="the input that varies" data-min="0.05" data-max="15" data-step="0.05" data-show="one"></div>
+      <div class="group" data-show="sub">
+        <h2>Go to a point</h2>
         <div class="go-row" data-show="sub">
           <span>Go to <span class="tex" data-tex="\bar z="></span> (</span>
           <input type="number" id="go-z1" value="1" min="0.01" step="0.1" aria-label="z1 of the point">
@@ -101,17 +117,7 @@
           <button type="button" id="go">Go</button>
         </div>
         <p class="warn" id="go-note" hidden>Both inputs must be positive and produce some output.</p>
-        <div data-show="one">
-          <p class="note">The four shapes of Figure 10 in the notes:</p>
-          <div class="btn-row" role="group" aria-label="Figure 10 shapes">
-            <button type="button" data-preset="concave">1 · concave</button>
-            <button type="button" data-preset="leontief">2 · linear, then flat</button>
-            <button type="button" data-preset="sshape">3 · S-shaped</button>
-            <button type="button" data-preset="threshold">4 · threshold</button>
-          </div>
-        </div>
       </div>
-
       <div class="group">
         <h2>Layers</h2>
         <label class="check"><input type="checkbox" id="surface" checked> Surface</label>
@@ -123,6 +129,7 @@
         <h2>Plot range</h2>
         <div class="ctrl" data-key="zmax" data-label="z_{\max}" data-hint="both axes" data-min="2" data-max="15" data-step="0.5"></div>
       </div>
+      </details>
     </section>
 
     <!-- 3D plot -->
@@ -147,7 +154,7 @@
         <section class="panel" aria-label="The hill from above: isoquants">
           <h2>The hill from above: isoquants in the input space <span class="tex" data-tex="(z_1, z_2)"></span></h2>
           <div id="plotA" class="plot plot-map"></div>
-          <p class="caption">The colours are the heights of the hill above, seen from the top; each boundary between two colours is an isoquant.</p>
+          <p class="caption"><b>Drag the point</b> to move it. The colours are the heights of the hill above, seen from the top; each boundary between two colours is an isoquant.</p>
           <p class="caption" data-show="sub"><span class="c-accent"><span class="key"></span>isoquant <span class="tex" data-tex="\bar q"></span></span>, <span class="c-accent-3"><span class="key dash"></span>tangent, slope <span class="tex" data-tex="-MRTS_{21}"></span></span>, <span class="c-muted"><span class="key dash"></span>ray through <span class="tex" data-tex="\bar z"></span></span>.</p>
           <p class="caption" data-show="scale"><span class="c-accent"><span class="key"></span>isoquants <span class="tex" data-tex="q=1,\dots,5"></span></span>; the <span class="c-accent-2">ray crosses them</span> at evenly spaced points under constant returns, spreading out under decreasing returns and bunching up under increasing returns. The S-shaped law does both along the same ray.</p>
           <p class="caption" data-show="one"><span class="c-accent-2"><span class="key"></span>the path <span class="tex" data-tex="z_2=\bar z_2"></span></span> and <span class="c-accent"><span class="key"></span>the isoquants it crosses at <span class="tex" data-tex="z_1=1,2,3,\dots"></span></span>: equal steps in <span class="tex" data-tex="z_1"></span>, and the labels show how much output each step adds.</p>
@@ -188,10 +195,10 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=11"></script>
-  <script src="model.js?v=11"></script>
-  <script src="app.js?v=11"></script>
-  <script src="../shared/theme.js?v=11"></script>
+  <script src="../shared/ui.js?v=12"></script>
+  <script src="model.js?v=12"></script>
+  <script src="app.js?v=12"></script>
+  <script src="../shared/theme.js?v=12"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

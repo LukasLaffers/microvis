@@ -2,3 +2,5 @@
 .layout > .main-col { grid-area: main; display: grid; gap: 14px; min-width: 0; align-content: start; }
 .plot-map { height: 520px; }
 @media (max-width: 800px) { .plot-map { height: 380px; } }
+/* On a phone the figures come first (the point in the map can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }
