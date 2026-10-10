@@ -103,9 +103,17 @@
       const r = 0.5 * (lo + hi);
       if (best === null || Math.abs(r - cur) < Math.abs(best - cur)) best = r;
     }
-    // no price puts the line through the pointer: the end of the range that comes closest
-    if (best === null) best = Math.abs(fs[0]) < Math.abs(fs[n]) ? a : b;
-    return Math.pow(10, best);
+    if (best !== null) return Math.pow(10, best);
+    // No price puts the line through the pointer. Pointer below every line (f > 0, f is convex): the line that comes
+    // closest, which touches the frontier above the pointer (golden section around the best grid point).
+    if (fs.every(v => v > 0)) {
+      const k = fs.indexOf(Math.min(...fs)), g = (Math.sqrt(5) - 1) / 2;
+      let lo = ls[Math.max(0, k - 1)], hi = ls[Math.min(n, k + 1)];
+      for (let it = 0; it < 30; it++) { const c = hi - g * (hi - lo), d = lo + g * (hi - lo); if (f(c) < f(d)) hi = d; else lo = c; }
+      return Math.pow(10, 0.5 * (lo + hi));
+    }
+    // pointer above every line: the end of the price range that comes closest
+    return Math.pow(10, fs[0] > fs[n] ? a : b);
   }
 
   function drawF(th, S) {
