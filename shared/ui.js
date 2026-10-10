@@ -43,8 +43,25 @@
   const texStr = src => root.katex ? root.katex.renderToString(src, { throwOnError: false }) : src;
   // In the page header, formulas separated by \qquad become separate pieces: each piece stays on one
   // line, and on a narrow screen the pieces wrap instead of the whole line scrolling.
+  // Keep a formula and the punctuation around it on one line (no lone "." or "," at the start of a line, no "(" at the end).
+  function gluePunctuation(el) {
+    // a colour wrapper around just the formula, <span class="c-l2-red"><span class="tex">, counts as the formula
+    while (el.parentNode && el.parentNode.tagName === 'SPAN' && el.parentNode.childNodes.length === 1 && !el.parentNode.classList.contains('tex-glue')) el = el.parentNode;
+    if (!el.parentNode || el.parentNode.classList.contains('tex-glue')) return;
+    const next = el.nextSibling, prev = el.previousSibling;
+    const m = next && next.nodeType === 3 && /^[.,;:!?)]+/.exec(next.nodeValue), o = prev && prev.nodeType === 3 && /[(]$/.exec(prev.nodeValue);
+    if (!m && !o) return;
+    const glue = document.createElement('span');
+    glue.className = 'tex-glue';
+    el.parentNode.insertBefore(glue, el);
+    if (o) { glue.appendChild(document.createTextNode(o[0])); prev.nodeValue = prev.nodeValue.slice(0, -o[0].length); }
+    glue.appendChild(el);
+    if (m) { glue.appendChild(document.createTextNode(m[0])); next.nodeValue = next.nodeValue.slice(m[0].length); }
+  }
+
   function renderStaticTex(scope = document) {
     scope.querySelectorAll('.tex[data-tex]').forEach(el => {
+      gluePunctuation(el);
       const src = el.dataset.tex;
       if (!el.closest('.subtitle') || !src.includes('\\qquad')) { tex(el, src); return; }
       el.textContent = '';
@@ -83,8 +100,10 @@
       `</div>`;
     tex(el.querySelector('.lbl'), el.dataset.label);
     const range = el.querySelector('input[type=range]'), box = el.querySelector('input[type=number]');
-    const dec = log ? 2 : Math.max(0, (String(step).split('.')[1] || '').length);
-    const round = v => log ? Number(v.toFixed(3)) : Number((Math.round(v / step) * step).toFixed(dec));
+    // The number box shows two decimals (whole numbers for a whole-number step), as all numbers on the pages;
+    // values are rounded to the step itself, which may be finer (0.025, 0.005).
+    const stepDec = Math.max(0, (String(step).split('.')[1] || '').length), dec = log ? 2 : stepDec === 0 ? 0 : 2;
+    const round = v => log ? Number(v.toFixed(3)) : Number((Math.round(v / step) * step).toFixed(stepDec));
 
     const c = {
       el, range, box, min, max, hintEl: el.querySelector('.hint'),

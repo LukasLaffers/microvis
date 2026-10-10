@@ -48,7 +48,8 @@
     if (X.type === 'cap') annotations.push({ x: L, y: X.cap, text: 'x̄<sub>2</sub>', showarrow: false, xanchor: 'right', yanchor: 'bottom', font: { size: 12, color: th.muted } });
     // Intercepts and slope as in the notes' figure.
     const ix = P.intercepts;
-    if (ix.x1 > 0) annotations.push({ x: ix.x1, y: 0, text: b.type === 'B1' || b.type === 'tariff' ? 'y/p<sub>1</sub>' : 'p<sup>t</sup>R/p<sub>1</sub>', showarrow: false, yanchor: 'top', yshift: -16, font: { size: 12, color: th.ink } });
+    // just above the x1 axis, right of the intercept (outside the set), so it never meets the tick labels or the axis title
+    if (ix.x1 > 0) annotations.push({ x: ix.x1, y: 0, text: b.type === 'B1' || b.type === 'tariff' ? 'y/p<sub>1</sub>' : 'p<sup>t</sup>R/p<sub>1</sub>', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, yshift: 2, font: { size: 12, color: th.ink } });
     if (ix.x2 > 0 && ix.x2 <= L) annotations.push({ x: 0, y: ix.x2, text: b.type === 'B1' ? 'y/p<sub>2</sub>' : b.type === 'tariff' ? '(y−F)/p<sub>2</sub>' : 'p<sup>t</sup>R/p<sub>2</sub>', showarrow: false, xanchor: 'left', xshift: 6, font: { size: 12, color: th.ink } });
     // The test bundle.
     const ok = BM.feasible(state.test, p, b, X);
@@ -58,19 +59,24 @@
   }
 
   function renderText(R) {
-    const { b, X, p, pn, P, Pn, ok } = R, cost = p[0] * state.test[0] + p[1] * state.test[1];
+    const { b, X, p, pn, P, Pn, ok } = R, fee = b.type === 'tariff' && state.test[1] > 1e-9 ? b.F : 0;
+    const cost = p[0] * state.test[0] + p[1] * state.test[1] + fee, costN = pn[0] * state.test[0] + pn[1] * state.test[1] + fee;
+    const okN = BM.feasible(state.test, pn, b, X);
+    // what the consumer can spend, as a formula: y, p^tR or p^tR + y (at the new prices with a prime)
+    const moneyTex = primed => ({ B1: 'y', B2: primed ? "p'^tR" : 'p^tR', B3: primed ? "p'^tR+y" : 'p^tR+y', tariff: 'y' })[b.type];
     const pivot = BM.pivot(p, b);
     const changed = Math.abs(state.p1n - state.p1) > 1e-9;
     const rows = [
-      ['\\text{money}', b.type === 'B1' ? texStr(`y=${f2(b.y)}`) : b.type === 'tariff' ? `${texStr(`y=${f2(b.y)}`)}, ${texStr(`y-F=${f2(b.y - b.F)}`)} if ${texStr('x_2>0')}` : `${texStr(`p^tR${b.type === 'B3' ? '+y' : ''}=${f2(P.money)}`)}${changed ? ` → ${f2(Pn.money)} at ${texStr("p_1'")}` : ''}`],
+      ['\\text{budget}', b.type === 'B1' ? texStr(`y=${f2(b.y)}`) : b.type === 'tariff' ? `${texStr(`y=${f2(b.y)}`)}, ${texStr(`y-F=${f2(b.y - b.F)}`)} if ${texStr('x_2>0')}` : `${texStr(`p^tR${b.type === 'B3' ? '+y' : ''}=${f2(P.money)}`)}${changed ? ` → ${f2(Pn.money)} at ${texStr("p_1'")}` : ''}`],
       ['\\text{slope}', `${texStr(`-p_1/p_2=-${f2(p[0] / p[1])}`)}${changed ? ` → ${texStr(`-${f2(pn[0] / pn[1])}`)}` : ''}`],
       ['\\text{intercepts}', `${texStr(`x_1=${f2(P.intercepts.x1)}`)}, ${texStr(`x_2=${f2(P.intercepts.x2)}`)}`],
-      ['x=(x_1,x_2)', `${f2(state.test[0])}, ${f2(state.test[1])}: ${ok ? '<span class="ok-mark">feasible</span>' : '<span class="c-l2-red">not feasible</span>'} <span class="c-muted">(${!BM.inX(state.test, X) ? 'not in X' : `costs ${f2(cost + (b.type === 'tariff' && state.test[1] > 1e-9 ? b.F : 0))}`})</span>`]
+      ['x=(x_1,x_2)', `${f2(state.test[0])}, ${f2(state.test[1])}: ${!BM.inX(state.test, X) ? '<span class="c-l2-red">not in X</span>'
+        : `${ok ? '<span class="ok-mark">feasible</span>' : '<span class="c-l2-red">not feasible</span>'} at ${texStr('p_1')} <span class="c-muted">(costs ${f2(cost)})</span>${changed ? `; ${okN ? '<span class="ok-mark">feasible</span>' : '<span class="c-l2-red">not feasible</span>'} at ${texStr("p_1'")} <span class="c-muted">(costs ${f2(costN)})</span>` : ''}`}`]
     ];
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     const convex = BM.convex(b, X);
     const items = [`<li><span class="mark ${convex ? 'ok' : 'na'}">${convex ? '✓' : '–'}</span><span>The feasible set is ${convex ? '' : '<b>not</b> '}convex${convex ? '' : (X.type === 'integer' ? ': good 2 comes in whole units' : ': the fee makes a jump at x₂ = 0')}.</span></li>`];
-    if (pivot && changed) items.push(`<li><span class="mark ok">✓</span><span>After the change the blue line still passes through ${texStr(`(${f2(pivot[0])},${f2(pivot[1])})`)}: ${texStr(`p_1'\\,${f2(pivot[0])}+p_2\\,${f2(pivot[1])}=${f2(pn[0] * pivot[0] + pn[1] * pivot[1])}`)} = money ${f2(Pn.money)}.</span></li>`);
+    if (pivot && changed) items.push(`<li><span class="mark ok">✓</span><span>After the change the blue line still passes through ${texStr(`(${f2(pivot[0])},${f2(pivot[1])})`)}: ${texStr(`p_1'\\cdot${f2(pivot[0])}+p_2\\cdot${f2(pivot[1])}=${f2(pn[0] * pivot[0] + pn[1] * pivot[1])}=${moneyTex(true)}`)}.${b.type === 'B1' ? '' : ` ${texStr(`${moneyTex(true)}=${f2(Pn.money)}`)}.`}</span></li>`);
     $('checks').innerHTML = items.join('');
     const what = {
       B1: `With income ${texStr('y')}, a rise in ${texStr('p_1')} rotates the line about ${texStr('(0,\\,y/p_2)')}: the consumer can only lose.`,
@@ -78,7 +84,7 @@
       B3: `Income and endowment: the line turns about ${texStr('(R_1,\\,R_2+y/p_2)')}.`,
       tariff: `Good 2 costs an entrance fee ${texStr('F')} on top of ${texStr('p_2')} per unit. Buying none of it avoids the fee, so the set is the smaller triangle plus the segment on the ${texStr('x_1')}-axis: not convex.`
     }[b.type];
-    $('cap').innerHTML = `<span class="c-ink">Grey: budget-feasible bundles</span>${Math.abs(state.p1n - state.p1) > 1e-9 ? `; <span class="c-l2-blue"><span class="key"></span>budget line at ${texStr(`p_1'=${f2(state.p1n)}`)}</span>` : ''}. ${what}`;
+    $('cap').innerHTML = `<span class="c-ink">Grey: budget-feasible bundles at the old price ${texStr(`p_1=${f2(state.p1)}`)}</span>${changed ? `; <span class="c-l2-blue"><span class="key"></span>budget line at the new price ${texStr(`p_1'=${f2(state.p1n)}`)}</span>` : ''}. ${what}`;
   }
 
   function render() {

@@ -193,6 +193,7 @@ main { max-width: 1600px; margin: 0 auto; padding: 0 16px 32px; }
 /* colour keys in captions: a short line, a dashed line or a dot in the colour of the curve */
 .key { display: inline-block; width: 18px; height: 0; border-top: 3px solid currentColor; vertical-align: middle; margin-right: 3px; }
 .key.dash { border-top-style: dashed; }
+.key.dotted { border-top-style: dotted; }
 .key.dot { width: 9px; height: 9px; border: 0; border-radius: 50%; background: currentColor; }
 .c-accent { color: var(--accent); }
 .c-accent-2 { color: var(--accent-2); }
@@ -204,6 +205,10 @@ main { max-width: 1600px; margin: 0 auto; padding: 0 16px 32px; }
 .c-l2-red { color: var(--l2-red); }
 .c-l2-orange { color: var(--l2-orange); }
 .c-l2-grey { color: var(--l2-grey); }
+.tex-glue { white-space: nowrap; }
+/* KaTeX \color{#d0021b} / \color{#4a90e2} in formulas follow the theme (the red is lighter in dark mode) */
+.katex [style*="color:#d0021b"] { color: var(--l2-red) !important; }
+.katex [style*="color:#4a90e2"] { color: var(--l2-blue) !important; }
 
 /* ---------- controls ---------- */
 

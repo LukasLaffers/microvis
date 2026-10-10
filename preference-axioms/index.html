@@ -28,10 +28,10 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>For a reference bundle <span class="tex" data-tex="x^\circ"></span>: blue is <span class="tex" data-tex="B(x^\circ)"></span>, the bundles at least as good; grey is <span class="tex" data-tex="W(x^\circ)"></span>, the bundles no better; the curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. The table lists which axioms hold.</p>
+          <p>For a reference bundle <span class="tex" data-tex="x^\circ"></span>: blue is <span class="tex" data-tex="B(x^\circ)"></span>, the bundles at least as good; grey is <span class="tex" data-tex="W(x^\circ)"></span>, the bundles no better; the curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. Decide which axioms hold, then press <b>Check your answer</b>.</p>
           <ul>
           <li>Click to place a test bundle <span class="tex" data-tex="x'"></span>: the page compares it with <span class="tex" data-tex="x^\circ"></span> and checks whether the segment between them stays in <span class="tex" data-tex="B(x^\circ)"></span>, as convexity requires.</li>
-          <li>Choose <b>A bliss point</b> or <b>Indifference curves bowed out</b>: the table shows which axioms fail.</li>
+          <li>Choose <b>A bliss point</b> or <b>Indifference curves bowed out</b>: which axioms fail? Check your answer.</li>
           <li>Choose <b>Lexicographic</b>: <span class="tex" data-tex="I(x^\circ)"></span> is a single point, and the preferences are not continuous.</li>
           </ul>
         </details>
@@ -67,6 +67,8 @@
     <div class="side">
       <section class="panel readouts" aria-label="Axioms" aria-live="polite">
         <h2>Axioms</h2>
+        <p class="caption" id="askAxioms">Which axioms hold for these preferences? Decide for each, then check.</p>
+        <div class="btn-row"><button type="button" id="reveal" aria-pressed="false">Check your answer</button></div>
         <ul class="checks" id="axioms"></ul>
         <p class="caption" id="repr"></p>
       </section>

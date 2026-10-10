@@ -2,7 +2,7 @@
  * UMP and EMP: Two Sides of One Tangency: tool math (lecture 6). Consumer math from shared/consumer-model.js.
  *
  * The four duality identities, Roy's identity (I5), Shephard's lemma (E5), the Kuhn-Tucker multiplier
- * lambda* = U_j / p_j = dV/dy, and the curves V(p1) (I2) and C(p1) (E4) with Shephard's tangent.
+ * lambda* = U_j / p_j = dV/dy, mu* = dC/dv = 1/lambda*, and the curves V(p1) (I2) and C(p1) (E4) with Shephard's tangent.
  *
  * Works in the browser (window.DualityModel, needs window.ConsumerModel) and in Node.
  */
@@ -22,14 +22,15 @@
     };
   }
 
-  // Roy's identity: -dV/dp1 / dV/dy against D1; Shephard's lemma: dC/dp1 against H1; lambda* = dV/dy.
+  // Roy's identity: -dV/dp1 / dV/dy against D1; Shephard's lemma: dC/dp1 against H1; lambda* = dV/dy, mu* = dC/dv.
   function envelope(p, y, v, u) {
     const hp = 1e-5 * p[0], hy = 1e-5 * y;
     const Vp = (CM.indirect([p[0] + hp, p[1]], y, u) - CM.indirect([p[0] - hp, p[1]], y, u)) / (2 * hp);
     const Vy = (CM.indirect(p, y + hy, u) - CM.indirect(p, y - hy, u)) / (2 * hy);
     const Cp = (CM.expenditure([p[0] + hp, p[1]], v, u) - CM.expenditure([p[0] - hp, p[1]], v, u)) / (2 * hp);
+    const hv = 1e-5 * Math.max(1, Math.abs(v)), Cv = (CM.expenditure(p, v + hv, u) - CM.expenditure(p, v - hv, u)) / (2 * hv);
     const x = CM.demand(p, y, u), g = CM.gradient(x, u);
-    return { roy: -Vp / Vy, D1: x[0], shephard: Cp, H1: CM.hicks(p, v, u)[0], lambda: Vy, kkt: [g[0] / p[0], g[1] / p[1]] };
+    return { roy: -Vp / Vy, D1: x[0], shephard: Cp, H1: CM.hicks(p, v, u)[0], lambda: Vy, mu: Cv, kkt: [g[0] / p[0], g[1] / p[1]] };
   }
 
   // V(p1, p2, y) and C(p1, p2, v) as functions of p1.

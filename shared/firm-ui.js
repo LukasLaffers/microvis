@@ -29,8 +29,18 @@
   /*
    * Technology formula: {general, numbers} KaTeX strings.
    * 'homog': phi = A g^k written out per technology; 'ushape': phi = F(g(z)) with G = F^{-1}.
+   * opts.crs: constant returns (A = 1, k = 1), written without A and k.
    */
-  function techFormula(s) {
+  function techFormula(s, opts = {}) {
+    if (opts.crs) {
+      const d = s.delta, g = gTex(s);
+      switch (s.tech) {
+        case 'ces': return { general: '\\phi(z)=\\big[\\delta z_1^{\\rho}+(1-\\delta)z_2^{\\rho}\\big]^{1/\\rho}', numbers: `q=${g}` };
+        case 'linear': return { general: '\\phi(z)=\\delta z_1+(1-\\delta)z_2', numbers: `q=${g}` };
+        case 'leontief': return { general: '\\phi(z)=\\min\\{z_1/\\delta,\\ z_2/(1-\\delta)\\}', numbers: `q=${g}` };
+        default: return { general: '\\phi(z)=z_1^{\\delta}z_2^{1-\\delta}', numbers: `q=${g}` };
+      }
+    }
     if (s.profile === 'ushape') {
       return {
         general: `\\begin{gathered}\\phi(z)=F\\big(g(z)\\big)\\\\ g(z)=${gTex(s)}\\end{gathered}`,

@@ -118,7 +118,7 @@
     if (isCES) {
       const eb = TL.elasticities(P, S.wbar), shb = cesShare1(S.wbar);
       const agree = same(eb.eps[0][0], -sg * (1 - shb)) && same(eb.eps[0][1], sg * (1 - shb)) && same(eb.sigma[0][1], sg);
-      cap += ` At the reference prices they equal the CES values exactly: ${texStr(`\\varepsilon^c_{11}=-\\sigma\\,sh_2=${f3(eb.eps[0][0])}`)}, ${texStr(`\\sigma_{12}=\\sigma=${f3(eb.sigma[0][1])}`)} <span class="${agree ? 'ok-mark' : 'c-l2-red'}">${agree ? '✓' : '✗'}</span>. Move the current prices away from ${texStr('\\bar w')} to see them drift.`;
+      cap += ` The table is at the current prices ${texStr('w')}. At the reference prices ${texStr('\\bar w')} the translog values equal the CES values exactly: ${texStr(`\\varepsilon^c_{11}=-\\sigma\\,sh_2=${f3(eb.eps[0][0])}`)}, ${texStr(`\\sigma_{12}=\\sigma=${f3(eb.sigma[0][1])}`)} <span class="${agree ? 'ok-mark' : 'c-l2-red'}">${agree ? '✓' : '✗'}</span>. Move the current prices away from ${texStr('\\bar w')} to see them drift.`;
     }
     $('capE').innerHTML = cap;
   }
@@ -165,10 +165,12 @@
 
   function drawAggregate(th) {
     const yE = state.yE, yK = 20 - yE, a = TL.aggregate(yE, yK), a0 = TL.aggregate(10, 10);
-    const cats = ['energy-intensive<br>firm', 'capital-intensive<br>firm', 'industry<br>total'];
+    // firm names in the colours of "Substitution or Composition?" (orange: energy-intensive, purple: capital-intensive); the bars show the inputs
+    const cK = th.accent4 || '#8e44ad', col = (c, t) => `<span style="color:${c}">${t}</span>`;
+    const cats = [col(th.orange, 'energy-intensive<br>firm'), col(cK, 'capital-intensive<br>firm'), 'industry<br>total'];
     const E = [a.firmE.E, a.firmK.E, a.E], K = [a.firmE.K, a.firmK.K, a.K];
     const traces = [
-      { type: 'bar', name: 'energy E', x: cats, y: E, marker: { color: th.orange }, text: E.map(v => fmt(v, 1)), textposition: 'outside', cliponaxis: false, hovertemplate: 'E = %{y}<extra></extra>' },
+      { type: 'bar', name: 'energy E', x: cats, y: E, marker: { color: th.ink }, text: E.map(v => fmt(v, 1)), textposition: 'outside', cliponaxis: false, hovertemplate: 'E = %{y}<extra></extra>' },
       { type: 'bar', name: 'capital K', x: cats, y: K, marker: { color: th.grey }, text: K.map(v => fmt(v, 1)), textposition: 'outside', cliponaxis: false, hovertemplate: 'K = %{y}<extra></extra>' }
     ];
     const layout = U.base2d(th, { yt: 'input use', y: { range: [0, 45] }, margin: { l: 48, r: 8, t: 8, b: 48 } });

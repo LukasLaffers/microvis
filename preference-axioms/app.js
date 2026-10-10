@@ -11,7 +11,7 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { type: 'cobb', alpha: 0.5, b1: 6, b2: 6, x1: 4, x2: 4, test: [7, 2.5] };
+  const state = { type: 'cobb', alpha: 0.5, b1: 6, b2: 6, x1: 4, x2: 4, test: [7, 2.5], reveal: false };
   const L = 10, N = 161;
   const schedule = U.scheduler(render);
   const pref = () => ({ type: state.type, alpha: state.alpha, bliss: [state.b1, state.b2] });
@@ -27,7 +27,7 @@
 
   // Why each axiom holds or fails, per preference relation.
   const WHY = {
-    complete: () => state.type === 'lex' ? 'Compare the amounts of good 1; if they are equal, compare good 2.' : 'Any two bundles can be ranked by their utility.',
+    complete: () => state.type === 'lex' ? 'Compare the amounts of good 1; if they are equal, compare good 2.' : 'For any two bundles x, y: x ≽ y or y ≽ x (here: compare U(x) and U(y)).',
     transitive: () => state.type === 'lex' ? 'The dictionary order is transitive.' : 'Utility numbers are ordered transitively.',
     continuous: ok => ok ? 'B(x) and W(x) are closed: the indifference curve belongs to both.' : 'B(x°) is not closed: the dots (x°₁ + 1/n, x°₂ − 2) are all better than x°, their limit (x°₁, x°₂ − 2) is worse. I(x°) is the single point x°.',
     monotone: ok => ok ? 'More of both goods is always strictly better.' : 'Beyond the bliss point more of both goods is worse.',
@@ -81,7 +81,15 @@
 
   function renderText({ P, x0, xp, inB, seg }) {
     const A = PM.AXIOMS[P.type];
-    $('axioms').innerHTML = NAMES.map(([k, name]) => `<li><span class="mark ${A[k] ? 'ok' : 'no'}">${A[k] ? '✓' : '✗'}</span><span><b>${name}</b><span class="why">${WHY[k](A[k])}</span></span></li>`).join('');
+    // The verdicts answer exercises: hidden until "Check your answer" (and again after a change of preferences).
+    const show = state.reveal, btn = $('reveal');
+    btn.textContent = show ? 'Hide the answer' : 'Check your answer';
+    btn.setAttribute('aria-pressed', String(show));
+    $('askAxioms').hidden = show;
+    $('axioms').innerHTML = NAMES.map(([k, name]) => show
+      ? `<li><span class="mark ${A[k] ? 'ok' : 'no'}">${A[k] ? '✓' : '✗'}</span><span><b>${name}</b><span class="why">${WHY[k](A[k])}</span></span></li>`
+      : `<li><span class="mark na">?</span><span><b>${name}</b></span></li>`).join('');
+    $('repr').hidden = !show;
     $('repr').innerHTML = P.type === 'lex'
       ? 'Continuity fails, so Proposition 1 does not apply. In fact no utility function represents lexicographic preferences (a classical result).'
       : `Complete, transitive and continuous${A.strongMonotone ? ' and strongly monotone' : ''}: the utility function ${texStr(FORMULA[P.type](P.alpha))} represents the preferences.`;
@@ -95,7 +103,10 @@
     rows.push(['\\text{segment}\\ x^\\circ x\'', inB ? (seg.allIn ? 'stays in B(x°)' : '<span class="c-l2-red">leaves B(x°): not convex</span>') : 'x′ is not in B(x°)']);
     rows.push(['x^\\circ+(1,1)', step([1, 1])], ['x^\\circ+(1,0)', step([1, 0])], ['x^\\circ+(0,1)', step([0, 1])]);
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
-    $('cap').innerHTML = `<span class="c-l2-blue">Blue: strictly better than ${texStr('x^\\circ')}</span>, <span class="c-l2-grey">grey: strictly worse</span>; ${texStr('B(x^\\circ)')} is the blue set with ${texStr('I(x^\\circ)')}, ${texStr('W(x^\\circ)')} the grey set with ${texStr('I(x^\\circ)')}. ${P.type === 'lex' ? `${texStr('I(x^\\circ)=\\{x^\\circ\\}')}. On the line ${texStr('x_1=x_1^\\circ')} the part above ${texStr('x^\\circ')} is better, the part below is worse.` : `<span class="c-ink"><span class="key"></span>the indifference curve ${texStr('I(x^\\circ)')}</span>.`}`;
+    $('cap').innerHTML = `<span class="c-l2-blue">Blue: strictly better than ${texStr('x^\\circ')}</span>; <span class="c-l2-grey">grey: strictly worse</span>; ` +
+      (P.type === 'lex'
+        ? `${texStr('I(x^\\circ)=\\{x^\\circ\\}')}. On the line ${texStr('x_1=x_1^\\circ')} the part above ${texStr('x^\\circ')} is better, the part below is worse.`
+        : `<span class="c-ink"><span class="key"></span>black: the indifference curve ${texStr('I(x^\\circ)')}</span>. ${texStr('B(x^\\circ)')} is the blue set together with ${texStr('I(x^\\circ)')}, ${texStr('W(x^\\circ)')} the grey set together with ${texStr('I(x^\\circ)')}.`);
   }
 
   function render() {
@@ -112,7 +123,8 @@
     U.controls(document, state, { onChange: schedule });
     // A test bundle that makes the point of each example visible.
     const DEMO = { cobb: [7, 2.5], subs: [7, 2.5], concave: [5.8, 0.3], bliss: [8.5, 8.5], lex: [7, 2.5] };
-    $('type').addEventListener('change', e => { state.type = e.target.value; state.test = DEMO[state.type].slice(); schedule(); });
+    $('type').addEventListener('change', e => { state.type = e.target.value; state.test = DEMO[state.type].slice(); state.reveal = false; schedule(); });
+    $('reveal').addEventListener('click', () => { state.reveal = !state.reveal; schedule(); });
     const gd = $('plot');
     gd.addEventListener('click', ev => {
       const v = U.eventToData(gd, ev);

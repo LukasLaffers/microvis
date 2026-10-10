@@ -84,10 +84,11 @@
     const H = ws.map(v => [v, DM.conditional1([v, w[1]], s, q)]);
     const z1 = eq.z[0], tan = (slope, k) => [[w1 / k, z1 * Math.pow(k, -slope)], [w1 * k, z1 * Math.pow(k, slope)]];
     const z1n = wi.D1, w1n = w1 * (1 + P.r);
+    // the tangent is drawn on top of the industry curve, in red, so its slope is visible where it touches
     const traces = [
       U.line2(H, th.blue, 2, 'conditional demand H¹(w, q) at today\'s q', 'dash'),
       U.line2(D, th.ink, 2.5, 'industry demand D¹ = H̃¹·Dem(c(w))'),
-      U.line2(tan(el.epsU, 1.9), th.red, 1.5, `slope ε^u_11 = ${fmt(el.epsU, 3)}`, 'dot'),
+      U.line2(tan(el.epsU, 1.9), th.red, 2.5, `tangent, slope ε^u_11 = ${fmt(el.epsU, 3)}`),
       U.dot2([[w1n, z1n]], th.red, 'after the wage rise', 9, { marker: { color: th.panel, size: 9, line: { color: th.red, width: 2 } } }),
       U.dot2([[w1, z1]], th.ink, 'today', 10)
     ];
@@ -98,7 +99,7 @@
       x: { type: 'log', range: [Math.log10(w1 / 4), Math.log10(w1 * 4)], ...logTicks(w1 / 4, w1 * 4) },
       y: { type: 'log', range: [Math.log10(yLo) - 0.05, Math.log10(yHi) + 0.05], ...logTicks(yLo / 1.13, yHi * 1.13) },
       annotations: [
-        { x: Math.log10(w1 * 1.9), y: Math.log10(z1 * Math.pow(1.9, el.epsU)), text: `slope ε<sup>u</sup><sub>11</sub> = ${fmt(el.epsU, 2)}`, showarrow: false, xanchor: 'left', yanchor: 'top', font: { size: 12, color: th.red } },
+        { x: Math.log10(w1 * 1.9), y: Math.log10(z1 * Math.pow(1.9, el.epsU)), text: `slope ε<sup>u</sup><sub>11</sub> = ${fmt(el.epsU, 2)}`, showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, yshift: 4, font: { size: 12, color: th.red } },
         { x: Math.log10(w1 * 4), y: Math.log10(DM.conditional1([w1 * 4, w[1]], s, q)), text: `slope ε<sup>c</sup><sub>11</sub> = ${fmt(el.epsC, 2)}`, showarrow: false, xanchor: 'right', yanchor: 'top', yshift: -4, font: { size: 12, color: th.blue } }
       ],
       margin: { l: 60, r: 12, t: 8, b: 44 }
@@ -134,8 +135,11 @@
     const { s, w, wi, wiT } = P, w1n = w[0] * (1 + P.r * state.t), wn = [w1n, w[1]];
     const h0 = FM.unitDemand(w, s).h, h1 = FM.unitDemand(wn, s).h, c0 = FM.unitCost(w, s), c1 = FM.unitCost(wn, s);
     // the frame is set by the whole wage rise, so it stays put while the wage rises
-    const hEnd = FM.unitDemand([w[0] * (1 + P.r), w[1]], s).h, zMax = 2.6 * Math.max(h0[0], h0[1], hEnd[0], hEnd[1]);
-    const iso = FM.isoquant(1, s, zMax, 300);
+    // zoomed in around H~(w), so that a 10 % wage rise gives a visible move
+    const hEnd = FM.unitDemand([w[0] * (1 + P.r), w[1]], s).h, mv = Math.hypot(hEnd[0] - h0[0], hEnd[1] - h0[1]);
+    const span = Math.max(4 * mv, 0.15 * Math.max(h0[0], h0[1])), cx = (h0[0] + hEnd[0]) / 2, cy = (h0[1] + hEnd[1]) / 2;
+    const xr = [Math.max(0, cx - span), cx + span], yr = [Math.max(0, cy - span), cy + span], zMax = Math.max(xr[1], yr[1]);
+    const iso = FM.isoquant(1, s, 4 * zMax, 600);
     const traces = [
       U.line2(iso, th.blue, 2.5, 'unit isoquant φ(z) = 1'),
       U.line2([[c0 / w[0], 0], [0, c0 / w[1]]], th.grey, 1.8, 'isocost before'),
@@ -145,8 +149,8 @@
     traces.push(U.line2(on ? [[c1 / wn[0], 0], [0, c1 / wn[1]]] : [], th.grey, 1.8, 'isocost after', 'dash'));
     traces.push(U.dot2(on ? [h1] : [], th.blue, 'H̃(w′) after', 10));
     traces.push(U.arrow2(h0, h1, th.blue, 2.5, on ? 1e-3 * zMax : Infinity));
-    U.plot('plotF', traces, U.base2d(th, { xt: 'z<sub>1</sub> (labour per unit)', yt: 'z<sub>2</sub> (capital per unit)', x: { range: [0, zMax] }, y: { range: [0, zMax] } }), U.PLOT_CONFIG);
-    $('capF').innerHTML = `Per unit of output the firm uses ${texStr(`\\widetilde H(w)=(${fmt(h0[0], 3)},${fmt(h0[1], 3)})`)}. After a ${fmt(state.r * state.t, 0)} % wage rise it moves along the <span class="c-l2-blue">unit isoquant</span> to ${texStr(`(${fmt(h1[0], 3)},${fmt(h1[1], 3)})`)}: less labour per unit of output (substitution, ${texStr('\\sigma')}). ${s.tech === 'leontief' ? 'With Leontief technology there is no substitution: the point stays put.' : ''}`;
+    U.plot('plotF', traces, U.base2d(th, { xt: 'z<sub>1</sub> (labour per unit)', yt: 'z<sub>2</sub> (capital per unit)', x: { range: xr }, y: { range: yr } }), U.PLOT_CONFIG);
+    $('capF').innerHTML = `Per unit of output the firm uses ${texStr(`\\widetilde H(w)=(${fmt(h0[0], 3)},${fmt(h0[1], 3)})`)}. After a ${fmt(state.r * state.t, 0)} % wage rise it moves along the <span class="c-l2-blue">unit isoquant</span> to ${texStr(`(${fmt(h1[0], 3)},${fmt(h1[1], 3)})`)}: less labour per unit of output (substitution, ${texStr('\\sigma')}). The view is zoomed in around ${texStr('\\widetilde H(w)')}. ${s.tech === 'leontief' ? 'With Leontief technology there is no substitution: the point stays put.' : ''}`;
   }
 
   // ---------- Marshall's rules: |eps^u_11| against sigma, -eps^D_p and sh_1 ----------
@@ -195,7 +199,7 @@
 
   function render() {
     U.applyVisibility({ ces: state.tech === 'ces' });
-    const P = solve(), th = U.theme(), fo = FU.techFormula(P.s);
+    const P = solve(), th = U.theme(), fo = FU.techFormula(P.s, { crs: true });
     tex($('formula-general'), fo.general, true);
     tex($('formula-numbers'), fo.numbers, true);
     guard('lever', () => drawLever(th, P));
