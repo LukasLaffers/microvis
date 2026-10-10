@@ -373,6 +373,51 @@
     return [xa.range[0] + fx * (xa.range[1] - xa.range[0]), ya.range[1] - fy * (ya.range[1] - ya.range[0])];
   }
 
+  /*
+   * A point in a 2D figure that can be grabbed and moved. opts.target() gives the point's data coordinates (or null),
+   * opts.move([x, y]) is called with the pointer's data coordinates while dragging; opts.start() and opts.end() (optional)
+   * when the drag begins and ends. With a mouse a press anywhere on
+   * the axes moves the point there; with a finger only a touch on the point does, so the page still scrolls elsewhere.
+   */
+  function dragPoint(id, opts) {
+    const gd = typeof id === 'string' ? document.getElementById(id) : id, GRAB = 24;
+    gd.classList.add('drag-plot');
+    const near = ev => {
+      const t = opts.target(), fl = gd._fullLayout;
+      if (!t || !fl || !fl.xaxis) return false;
+      const b = gd.getBoundingClientRect(), xa = fl.xaxis, ya = fl.yaxis;
+      const px = xa._offset + xa.c2p(t[0]), py = ya._offset + ya.c2p(t[1]);
+      return Math.hypot(ev.clientX - b.left - px, ev.clientY - b.top - py) <= GRAB;
+    };
+    let dragging = null;
+    // while dragging, a pointer outside the axes holds the point at the edge
+    const move = ev => {
+      const fl = gd._fullLayout; if (!fl || !fl.xaxis) return;
+      const b = gd.getBoundingClientRect(), xa = fl.xaxis, ya = fl.yaxis, c = v => Math.min(1, Math.max(0, v));
+      const fx = c((ev.clientX - b.left - xa._offset) / xa._length), fy = c((ev.clientY - b.top - ya._offset) / ya._length);
+      opts.move([xa.range[0] + fx * (xa.range[1] - xa.range[0]), ya.range[1] - fy * (ya.range[1] - ya.range[0])]);
+    };
+    gd.addEventListener('pointerdown', ev => {
+      if (ev.pointerType === 'mouse' ? ev.button !== 0 || !eventToData(gd, ev) : !near(ev)) return;
+      dragging = ev.pointerId;
+      try { gd.setPointerCapture(ev.pointerId); } catch (e) { /* not capturable: the drag still works inside the figure */ }
+      ev.preventDefault();   // no Plotly zoom box, no text selection
+      gd.classList.add('dragging');
+      if (opts.start) opts.start();
+      move(ev);
+    }, true);
+    gd.addEventListener('pointermove', ev => {
+      if (dragging === ev.pointerId) { ev.preventDefault(); move(ev); }
+      else if (ev.pointerType === 'mouse') gd.classList.toggle('near', near(ev));
+    }, true);
+    const end = ev => { if (dragging === ev.pointerId) { dragging = null; gd.classList.remove('dragging'); if (opts.end) opts.end(); } };
+    gd.addEventListener('pointerup', end, true);
+    gd.addEventListener('pointercancel', end, true);
+    // a finger on the point must not scroll the page
+    gd.addEventListener('touchstart', ev => { const t = ev.touches[0]; if (t && near(t)) ev.preventDefault(); }, { passive: false, capture: true });
+    gd.addEventListener('touchmove', ev => { if (dragging !== null) ev.preventDefault(); }, { passive: false, capture: true });
+  }
+
   // Redraw when the operating system switches between light and dark.
   // Redraw also when the light / dark switch (shared/theme.js) is used.
   function watchColorScheme(cb) {
@@ -494,7 +539,7 @@
   root.Microvis = {
     $, fmt, fmtSum, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
     control, controls, scheduler, applyVisibility,
-    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, arrow2, text2, plot, overlay, react3d, eventToData, watchColorScheme,
+    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, arrow2, text2, plot, overlay, dragPoint, react3d, eventToData, watchColorScheme,
     showError, guard, librariesReady
   };
 })(window);

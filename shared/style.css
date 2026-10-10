@@ -329,6 +329,18 @@ details.howto ul { margin: 8px 0 0; padding-left: 18px; }
 details.howto li { margin: 4px 0 0; }
 details.howto li::marker { color: var(--muted); }
 
+/* "More settings" at the end of the controls: what a first look does not need, folded away */
+details.more { padding-top: 14px; border-top: 1px solid var(--line); }
+details.more > summary { cursor: pointer; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+details.more > summary::marker { color: var(--muted); }
+details.more > .note { margin: 4px 0 0; }
+details.more > .group:last-child { padding-bottom: 0; }
+
+/* a point that can be dragged in a figure (Microvis.dragPoint) */
+.drag-plot .nsewdrag { cursor: crosshair !important; }
+.drag-plot.near .nsewdrag { cursor: grab !important; }
+.drag-plot.dragging .nsewdrag { cursor: grabbing !important; }
+
 details.sub-details { margin-top: 10px; font-size: 14px; }
 details.sub-details summary { cursor: pointer; color: var(--muted); font-weight: 600; }
 

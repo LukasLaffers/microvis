@@ -44,8 +44,15 @@ The user asked for a critical student's review of the lecture 4, 5 and 6 tools (
 User: "animation is not smooth for subs and income effects". Measured in the container (5.5 s of ▶ … smoothly): Slutsky 214 → 315 frames, Substitution and Scale Effects 172 → 301. Causes and fixes: `Microvis.tex` re-rendered the same KaTeX formula in every frame (now skipped when unchanged); the moving indifference curve used 200-step bisection per point (`ConsumerModel.x2On` now tries a closed form for CES, Stone–Geary, quasilinear and the Giffen example first, checked against plain bisection in the tests); the moving labels are one text trace instead of five; SSE's triangle caption is written only with the other text. Version tag **11**.
 User then: "Substitution and Scale Effects is not smooth". Fix: new `Microvis.overlay(id, traces)` (shared/ui.js) draws Plotly-like traces (lines, dots, arrow2 arrows, text) on a thin SVG layer over the figure, clipped to the axes, repainted on `plotly_afterplot` (resize, theme); in the smooth mode of both tools everything that moves (current isoquant/indifference curve, budget/isocost line, ray, path, arrows, labels, bars, current dots, MC/AC now) goes there and Plotly draws only the still parts once, so no Plotly call per frame. Now 331–333 of ~333 frames, no slow frames, in the container. The step-by-step mode still uses Plotly (it was already smooth).
 
+### 4d. 10 October, on the branch: UX prototype on Production Explorer
+After a UX review of all tools the user chose three directions: (1) less on screen at first, the rest folded away; (3) grab and move things directly in the figure; (6) on a phone the figure first. Not wanted: playful elements (missions, games); keep it professional and clear. Prototype on the first tile:
+- Visible: guide, technology (two formula lines and the σ note), mode with its own sliders. Folded into `details.more` "More settings": exponents and the F(g(z)) form, returns to scale (law, A, k, …), "Go to a point", layers, plot range.
+- The point in the map can be dragged (`Microvis.dragPoint(id, {target, move, start, end})`: mouse anywhere on the axes; finger only on the point, so the page still scrolls). In each mode it sets that mode's sliders. The map's moving parts are on `Microvis.overlay`, the hill via `U.plot` (no Plotly redraw while dragging); the 3D figure follows at most 15 times a second while dragging.
+- Phone: `grid-template-areas: "main" "controls" "side"` in the tool's style.css.
+- Version tag **12**.
+
 ### Next
-Nothing requested.
+Wait for the user's verdict on the prototype; then roll the same pattern out tile by tile.
 
 ### 5. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
@@ -66,7 +73,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 
 - Plain HTML/CSS/JS, no build step for pages; Plotly 2.35.2 and KaTeX 0.16.9 vendored in `shared/vendor/`; works offline and from `file://`.
 - `tools/catalog.cjs` (tools in lecture order, tile sentence) + `tools/glyphs.cjs` (64 px tile drawings) → `node tools/build-site.cjs` writes `index.html` and, in every tool page: the "Microvis /" header link, previous/next links, the light/dark switch (button + `<head>` line + `shared/theme.js`), and the GoatCounter line. Run it after any catalog/glyph change; it is idempotent.
-- Version tags: our CSS/JS are linked as `?v=N` (now **11**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=11"' index.html */index.html | xargs sed -i 's/?v=11"/?v=12"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
+- Version tags: our CSS/JS are linked as `?v=N` (now **12**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=12"' index.html */index.html | xargs sed -i 's/?v=12"/?v=13"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
 - Hover previews on tiles: `<tool>/preview.webp` and `preview-dark.webp`, made with `tools/previews.cjs` (Playwright).
 - `style-kit/`: a copy of the look for a new project (README = style guide). Keep `style-kit/shared/{style.css,ui.js,theme.js}` in step with `shared/`.
 - Dark mode: tokens on `:root`, `data-theme` set by the switch; figures redraw on the `microvis-theme` event via `Microvis.watchColorScheme`.

@@ -368,7 +368,8 @@
 
   function drawA(th) {
     const s = tech(), zmax = state.zmax, r = state.mix, E = rayEnd(r, zmax);
-    const traces = [], annotations = [];
+    // traces: the hill (drawn by Plotly, unchanged while the point is dragged); moving: on the fast overlay layer
+    const traces = [], moving = [], annotations = [], texts = { x: [], y: [], text: [] };
     // The hill seen from above: the same heights and colours as the 3D surface, filled between its contour levels.
     const surf = surfaceData(), step = niceStep(surf.max), lines = state.mode === 'sub';
     traces.push({
@@ -380,16 +381,16 @@
     const label = (p, text) => annotations.push({ x: p[0], y: p[1], text, showarrow: false, font: { size: 11, color: th.accent }, bgcolor: th.panel, borderpad: 1 });
     if (state.mode === 'sub') {
       const q = state.qbar, zb = M.pointOnIsoquant(q, r, s);
-      traces.push(line2([[0, 0], E], th.muted, 1.2, 'ray through z̄', 'dot'));
-      traces.push(line2(M.isoquant(q, s, zmax), th.accent, 3, `isoquant q̄ = ${fmt(q)}`));
+      moving.push(line2([[0, 0], E], th.muted, 1.2, 'ray through z̄', 'dot'));
+      moving.push(line2(M.isoquant(q, s, zmax), th.accent, 3, `isoquant q̄ = ${fmt(q)}`));
       const m = M.mrts(zb[0], zb[1], s);
-      if (m === Infinity) traces.push(line2([[zb[0], 0], [zb[0], zmax]], th.accent3, 2, 'tangent (vertical)', 'dash'));
+      if (m === Infinity) moving.push(line2([[zb[0], 0], [zb[0], zmax]], th.accent3, 2, 'tangent (vertical)', 'dash'));
       else if (m !== null && Number.isFinite(m)) {
-        traces.push(line2([[0, zb[1] + m * zb[0]], [zmax, zb[1] - m * (zmax - zb[0])]], th.accent3, 2, `tangent, slope −${fmt(m)}`, 'dash'));
+        moving.push(line2([[0, zb[1] + m * zb[0]], [zmax, zb[1] - m * (zmax - zb[0])]], th.accent3, 2, `tangent, slope −${fmt(m)}`, 'dash'));
       }
-      if (Number.isFinite(zb[0])) traces.push(dot2([zb], th.accent3, 'z̄', 11));
+      if (Number.isFinite(zb[0])) moving.push(dot2([zb], th.accent3, 'z̄ (drag it)', 15));
     } else if (state.mode === 'scale') {
-      traces.push(line2([[0, 0], E], th.accent2, 2.5, `ray z₂/z₁ = ${fmt(r)}`));
+      moving.push(line2([[0, 0], E], th.accent2, 2.5, `ray z₂/z₁ = ${fmt(r)}`));
       const labelMix = s.tech === 'leontief' ? (r >= M.kinkMix(s) ? M.kinkMix(s) / 4 : M.kinkMix(s) * 4) : (r >= 1 ? 0.3 : 3.3);
       const zb = M.pointOnIsoquant(1, r, s), crossings = [];
       for (let k = 1; k <= 5; k++) {
@@ -402,28 +403,32 @@
         const lk = M.lambdaForOutput(k, zb, s);
         if (inBox([lk * zb[0], lk * zb[1]], zmax)) crossings.push([lk * zb[0], lk * zb[1]]);
       }
-      traces.push({ ...dot2(crossings, th.panel, 'ray meets isoquant', 8), marker: { color: th.panel, size: 8, line: { color: th.accent2, width: 2 } } });
-      if (Number.isFinite(zb[0])) traces.push(dot2([[state.lambda * zb[0], state.lambda * zb[1]]], th.accent2, 'λz̄', 12));
+      moving.push({ ...dot2(crossings, th.panel, 'ray meets isoquant', 8), marker: { color: th.panel, size: 8, line: { color: th.accent2, width: 2 } } });
+      if (Number.isFinite(zb[0])) moving.push(dot2([[state.lambda * zb[0], state.lambda * zb[1]]], th.accent2, 'λz̄ (drag it)', 15));
     } else {
       const z2 = state.z2fix;
-      traces.push(line2([[0, z2], [zmax, z2]], th.accent2, 2.5, `path z₂ = ${fmt(z2)}`));
+      moving.push(line2([[0, z2], [zmax, z2]], th.accent2, 2.5, `path z₂ = ${fmt(z2)}`));
       // Isoquants through z1 = 1, 2, 3, ... on the path: equal steps in z1, unequal steps in output.
       const stepZ = zmax <= 8 ? 1 : 2;
       for (let x = stepZ; x <= zmax + 1e-9; x += stepZ) {
         const q = M.output(x, z2, s);
         if (!(q > 0)) continue;
-        traces.push(line2(M.isoquant(q, s, zmax), th.accent, 1.5, `isoquant q = ${fmt(q)}`));
-        label([x, Math.min(z2 + zmax * 0.06, zmax * 0.97)], `q=${fmt(q, 1)}`);
+        moving.push(line2(M.isoquant(q, s, zmax), th.accent, 1.5, `isoquant q = ${fmt(q)}`));
+        const at = [x, Math.min(z2 + zmax * 0.06, zmax * 0.97)];
+        texts.x.push(at[0]); texts.y.push(at[1]); texts.text.push(`q=${fmt(q, 1)}`);
       }
-      traces.push(dot2([[state.z1, z2]], th.accent3, 'z̄', 12));
+      moving.push({ type: 'scatter', mode: 'text', x: texts.x, y: texts.y, text: texts.text, textposition: 'middle center', textfont: { color: th.accent, size: 11 } });
+      moving.push(dot2([[state.z1, z2]], th.accent3, 'z̄ (drag it)', 15));
     }
     const pad = zmax * 0.02;
-    Plotly.react('plotA', traces, U.base2d(th, {
+    // U.plot: while the point is dragged the hill does not change, so Plotly has nothing to redraw (the rest is on the overlay)
+    U.plot('plotA', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
       x: { range: [0, zmax + pad], constrain: 'domain' },
       y: { range: [0, zmax + pad], scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
       annotations
     }), U.PLOT_CONFIG);
+    U.overlay('plotA', moving, th.font);
   }
 
   // ---------- 2D panel B ----------
@@ -568,7 +573,7 @@
       else if (m === null) sentence = 'At the kink both inputs bind: the MRTS is undefined (any line with slope between 0 and −∞ touches the corner).';
       else if (m === Infinity) sentence = 'Here z₁ is the binding input: extra z₂ adds no output, so the isoquant is vertical and MRTS₂₁ = ∞.';
       else if (m === 0) sentence = 'Here z₂ is the binding input: extra z₁ adds no output, so the isoquant is horizontal and MRTS₂₁ = 0.';
-      else sentence = `At z̄, one extra unit of z₁ replaces ${s.tech === 'linear' ? 'exactly' : 'about'} ${fmt(m)} units of z₂ with output unchanged. Change anything under “Output along a ray”: the MRTS at this input mix stays the same.`;
+      else sentence = `At z̄, one extra unit of z₁ replaces ${s.tech === 'linear' ? 'exactly' : 'about'} ${fmt(m)} units of z₂ with output unchanged. Change the returns to scale (under More settings): the MRTS at this input mix stays the same.`;
       if (!reachable) warn.push(`Output q̄ = ${fmt(q)} cannot be produced: the ceiling is q_max = ${fmt(s.qmax)}.`);
       else if (!inBox(zb, zmax)) warn.push('The point z̄ lies outside the plotted range: increase z_max or lower q̄.');
       else if (!M.isoquant(q, s, zmax).length) warn.push('The isoquant q̄ lies outside the plotted range: increase z_max or lower q̄.');
@@ -620,7 +625,7 @@
 
   // ---------- render loop ----------
 
-  let prevAb = null;
+  let prevAb = null, dragging = false, last3d = 0, pending3d = false;
   function render() {
     const ab = abActive();
     if (prevAb !== null && ab !== prevAb) syncAB(ab);
@@ -629,7 +634,10 @@
     guard('formula', () => { renderFormula(); renderScaleLine(); });
     const th = U.theme();
     // Draw each panel on its own, so one failing plot does not blank the others.
-    guard('3D plot', () => draw3d(th));
+    // while the point is dragged, the 3D figure (slow to redraw) follows at most 15 times a second, and exactly on release
+    const now = performance.now();
+    if (!dragging || now - last3d > 66) { last3d = now; guard('3D plot', () => draw3d(th)); }
+    else if (!pending3d) { pending3d = true; setTimeout(() => { pending3d = false; schedule(); }, 70); }
     guard('input-space plot', () => drawA(th));
     guard('second plot', () => drawB(th));
     guard('readouts', renderReadouts);
@@ -673,6 +681,31 @@
       ctrls.mix.setExact(z2 / z1);
       ctrls.qbar.setExact(q);
       if (Math.max(z1, z2) > state.zmax) ctrls.zmax.set(Math.ceil(Math.max(z1, z2) * 1.2));
+    });
+
+    // Drag the point in the map: in each mode it sets that mode's own controls.
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v));
+    U.dragPoint('plotA', {
+      start: () => { dragging = true; },
+      end: () => { dragging = false; schedule(); },
+      target: () => {
+        const s = tech();
+        if (state.mode === 'sub') return M.pointOnIsoquant(state.qbar, state.mix, s);
+        if (state.mode === 'scale') { const zb = M.pointOnIsoquant(1, state.mix, s); return [state.lambda * zb[0], state.lambda * zb[1]]; }
+        return [state.z1, state.z2fix];
+      },
+      move: ([x, y]) => {
+        const s = tech(), a = Math.max(x, 1e-3), b = Math.max(y, 1e-3);
+        if (state.mode === 'one') { ctrls.z1.setExact(lim('z1', a)); ctrls.z2fix.setExact(lim('z2fix', b)); return; }
+        const mix = lim('mix', b / a);
+        if (state.mode === 'sub') {
+          const q = M.output(a, b, s);
+          if (q > 0) { ctrls.mix.setExact(mix); ctrls.qbar.setExact(lim('qbar', q)); }
+        } else {
+          const zb = M.pointOnIsoquant(1, mix, s);
+          if (Number.isFinite(zb[0]) && zb[0] > 0) { ctrls.mix.setExact(mix); ctrls.lambda.setExact(lim('lambda', Math.hypot(a, b) / Math.hypot(zb[0], zb[1]))); }
+        }
+      }
     });
 
     setMode(state.mode);
