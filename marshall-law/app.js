@@ -106,7 +106,7 @@
       y: { type: 'log', range: [Math.log10(yLo) - 0.05, Math.log10(yHi) + 0.05], ...logTicks(yLo / 1.13, yHi * 1.13) },
       annotations: [
         { x: Math.log10(w1 * 1.9), y: Math.log10(z1 * Math.pow(1.9, el.epsU)), text: `slope ε<sup>u</sup><sub>11</sub> = ${fmt(el.epsU, 2)}`, showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, yshift: 4, font: { size: 12, color: th.red } },
-        { x: Math.log10(w1 * 4), y: Math.log10(DM.conditional1([w1 * 4, w[1]], s, q)), text: `slope ε<sup>c</sup><sub>11</sub> = ${fmt(el.epsC, 2)}`, showarrow: false, xanchor: 'right', yanchor: 'top', yshift: -4, font: { size: 12, color: th.blue } }
+        { x: Math.log10(w1 * 4), y: Math.log10(DM.conditional1([w1 * 4, w[1]], s, q)), text: `slope ε<sup>c</sup><sub>11</sub> = ${fmt(el.epsC, 2)}`, showarrow: false, xanchor: 'right', yanchor: 'bottom', yshift: 4, font: { size: 12, color: th.blue } }
       ],
       margin: { l: 60, r: 12, t: 8, b: 44 }
     }), U.PLOT_CONFIG);

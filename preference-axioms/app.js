@@ -58,7 +58,7 @@
       }
     } else {
       moving.push(U.line2(PM.indifferenceCurve(x0, P, L, 500), th.ink, 2.5, 'I(x°)'));
-      if (P.type === 'bliss') moving.push(U.dot2([P.bliss], th.ink, 'bliss point (drag it)', 14, { marker: { color: th.panel, size: 14, line: { color: th.ink, width: 3 } } }));
+      if (P.type === 'bliss') moving.push(U.dot2([P.bliss], th.ink, 'bliss point (drag it)', 14, { marker: { symbol: 'star', color: th.ink, size: 16, line: { color: th.panel, width: 1 } } }));
     }
     // Segment test between x° and x'.
     const xp = state.test, inB = PM.better(xp, x0, P), seg = PM.segmentInB(x0, xp, x0, P, 600);
@@ -69,7 +69,7 @@
     }
     const cx = th.accent4 || th.ink;
     moving.push(U.dot2([x0], th.ink, 'x° (drag it)', 14));
-    moving.push(U.dot2([xp], cx, "x' (drag it)", 14));
+    moving.push(U.dot2([xp], cx, "x' (drag it)", 14, { marker: { symbol: 'diamond', color: cx, size: 15, line: { color: th.panel, width: 1.5 } } }));
     // labels turn inwards at the edges of the box (x° and x' can sit on them)
     const tag = (z, text, color) => {
       const right = z[0] > 0.85 * L, top = z[1] > 0.9 * L;
