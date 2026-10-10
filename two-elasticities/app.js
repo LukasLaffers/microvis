@@ -71,7 +71,7 @@
     const s = R / Math.max(z[0], z[1]);
     moving.push(U.line2([[0, 0], [s * z[0], s * z[1]]], th.red, 4, 'ray through z̄'));
     moving.push(U.dot2([z], th.ink, 'z̄ (drag it)', 15));
-    moving.push(U.text2(z, ' z̄', th.ink, 'top right', 15));
+    moving.push(U.text2(z, '\u2003z̄', th.ink, 'top right', 15));
     const layout = U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>', x: { range: [0, R], constrain: 'domain' }, y: { range: [0, R], scaleanchor: 'x', constrain: 'domain' },
       margin: { l: 44, r: 10, t: 8, b: 42 }
