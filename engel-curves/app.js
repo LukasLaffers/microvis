@@ -78,7 +78,7 @@
       ? 'With a = b the utility is homothetic and the path is a ray again.'
       : `The path curves towards good ${lux}: good ${lux} (the exponent closer to 1) is a luxury and good ${3 - lux} a necessity. The income elasticities are not constant: compare them at a low and a high income.`;
     const capE = `Good 1 is normal while she has less than ${texStr(`K=${fmt(state.hK)}`)} of good 2, that is up to ${texStr(`y=p_2K(1+c/2)=${fmt(yT)}`)}; beyond that the path bends back and she buys less of good 1 as income rises: good 1 becomes inferior.`;
-    $('cap').innerHTML = { D: capD, E: capE, A: 'A homothetic (CES) consumer: the path is a ray from the origin. Doubling income doubles the demand for both goods (both income elasticities are 1).', B: 'Subsistence in good 1: the first ' + texStr(`p_1\\gamma_1=${fmt(p[0] * state.g1)}`) + ' of income goes on good 1, the rest is split. The path bends towards good 2: a luxury.', C: 'Good 1 is inferior: as income rises the path bends back, she buys less of good 1 and more of good 2. (The example is defined for incomes from ' + fmt(lo, 2) + ' to ' + fmt(hi, 2) + '.)' }[state.panel];
+    $('cap').innerHTML = { D: capD, E: capE, A: 'A homothetic (CES) consumer: the path is a ray from the origin. Doubling income doubles the demand for both goods (both income elasticities are 1).', B: 'Subsistence in good 1: the first ' + texStr(`p_1\\gamma_1=${fmt(p[0] * state.g1)}`) + ' of income goes on good 1, the rest is split. The path bends towards good 2: a luxury.', C: 'Good 1 is inferior: as income rises the path bends back, she buys less of good 1 and more of good 2.' }[state.panel];
   }
 
   function drawEngel(th, S) {
@@ -135,6 +135,7 @@
     document.querySelectorAll('[data-panel]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.panel === state.panel)));
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
+    $('formula').hidden = S.u.type === 'giffen';
     guard('plot', () => draw(th, S));
     guard('Engel curves', () => drawEngel(th, S));
     guard('numbers', () => renderNumbers(S));

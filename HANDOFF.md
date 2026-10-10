@@ -37,7 +37,8 @@ The user asked for a critical student's review of the lecture 4, 5 and 6 tools (
 - Lecture 5 consumer: Budget Sets old/new prices in the caption, the test bundle at both prices, check line with ·, group "Budget constraint"; preference-axioms caption rewritten, completeness not circular; Utility Is Ordinal 3D titles apart, bigger points.
 - Lecture 6: UMP/EMP tangency line instead of λ*, the dotted/dashed curves explained, the concavity gap shaded, "four identities, Roy and Shephard" wording; Slutsky labels away from the arrows, the Hicksian curve stops at the Giffen corner (x₂ = 0) with a note, derivatives "at the starting price"; Engel Curves good 1 black / good 2 purple (blue/red are substitution/income), log-scales switch, Engel/Cournot/homogeneity lines show their terms rounded to add up exactly, default δ = 0.65 (two different rays).
 - Shared: number boxes show two decimals (whole numbers for whole steps); `renderStaticTex` glues a formula to the punctuation around it (`.tex-glue`, no lone "." at a line start); KaTeX `\color{#d0021b}`/`{#4a90e2}` follow the theme in dark mode (CSS on the inline style, both `#hex` and `rgb()` forms); `.key.dotted`. style-kit updated. Version tag **10**.
-- Not changed, open questions to the user: the Giffen function (plan: Haagsma's; implemented: −(s−x₂)²/(x₁−c)); the quasilinear preset κ log(1+x₁)+x₂ is close to the lecture 5 exercise log x₁ + x₂.
+- Giffen good (user: "I'm not using any function … do not mention anything unless completely necessary, I don't want to overload the students"): no utility formula, no domain hint and no income note for the Giffen example in Slutsky and Engel curves (case C); the dropdown says "Giffen good". `ConsumerUI.formula` returns '' for it, the formula box is hidden.
+- Open question to the user: the quasilinear preset κ log(1+x₁)+x₂ (UMP and EMP) is close to the lecture 5 exercise log x₁ + x₂.
 
 ### Next
 Wait for the user's verdict on the raw links of 4b, then merge.

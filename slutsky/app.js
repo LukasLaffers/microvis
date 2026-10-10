@@ -215,7 +215,7 @@
     const k = S.cls.kind;
     $('capB').innerHTML = `<span style="color:#4caf50"><span class="key"></span>Marshallian</span> and <span class="c-l2-blue"><span class="key dash"></span>Hicksian</span> demand through ${texStr('E_1')}. ` +
       (k === 'normal' ? 'For a normal good the Marshallian curve is flatter: the income effect adds to the substitution effect.' : k === 'inferior' ? 'For an inferior good (not Giffen) the Marshallian curve is steeper than the Hicksian one.' : 'For a Giffen good the Marshallian curve slopes upwards; the Hicksian curve still slopes down.') +
-      (pCorner !== null ? ` Below ${texStr(`p_1=${fmt(pCorner)}`)} the cheapest way to stay on ${texStr('v^0')} is a corner with ${texStr('x_2=0')}, so the Hicksian curve stops there.` : '') +
+      (pCorner !== null ? ` Below ${texStr(`p_1=${fmt(pCorner)}`)} the Hicksian curve stops: there ${texStr('x_2=0')}.` : '') +
       ' Only the Marshallian curve can be observed.';
   }
 
@@ -258,6 +258,7 @@
     $('income-note').hidden = !note; $('income-note').textContent = note;
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
+    $('formula').hidden = S.u.type === 'giffen';
     guard('plot', () => draw(th, S));
     guard('demand plot', () => drawDemand(th, S));
     if (writeText) guard('numbers', () => renderNumbers(S));
