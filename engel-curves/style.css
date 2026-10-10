@@ -7,6 +7,7 @@
 table.effects td { cursor: default; }
 table.effects td:hover { outline: 0; }
 .kind { font-size: 12px; font-weight: 700; }
-.kind.luxury { color: var(--l2-red); }
-.kind.necessity { color: var(--l2-blue); }
-.kind.inferior { color: var(--l2-orange); }
+/* not blue and red: in lecture 6 those are the substitution and income effects */
+.kind.luxury { color: var(--inc); }
+.kind.necessity { color: var(--const); }
+.kind.inferior { color: var(--dec); }

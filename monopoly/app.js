@@ -33,6 +33,11 @@
       const fill = o.profit >= 0 ? th.profitFill : 'rgba(208,2,27,0.18)';
       traces.push({ type: 'scatter', mode: 'lines', x: [0, o.q, o.q, 0, 0], y: [o.AC, o.AC, o.p, o.p, o.AC], fill: 'toself', fillcolor: fill, line: { width: 0 }, hoverinfo: 'skip', name: 'profit' });
     }
+    // Monopoly deadweight loss: between AR and MC from q* to the price taker's output.
+    if (comp && !o.shutdown && comp.q > o.q) {
+      const qs = U.linspace(o.q, comp.q, 60), top = qs.map(q => [q, MM.price(q, d)]), bot = qs.map(q => [q, FM.MC(W, q, s)]).reverse(), poly = [...top, ...bot, top[0]];
+      traces.push({ type: 'scatter', mode: 'lines', x: poly.map(v => v[0]), y: poly.map(v => v[1]), fill: 'toself', fillcolor: 'rgba(155,155,155,0.4)', line: { width: 0 }, hoverinfo: 'skip', name: 'deadweight loss' });
+    }
     traces.push(U.line2(qq.map(q => [q, clip(FM.AC(W, q, s))]), th.ink, 2, 'average cost AC'));
     traces.push(U.line2(qq.map(q => [q, clip(FM.MC(W, q, s))]), th.red, 2.5, 'marginal cost MC'));
     if (local && Math.abs(d.A - 12) > 1e-6) traces.push(U.line2(qq.map(q => [q, clip(12 - d.B * q)]), th.blue, 1.2, 'AR before entry', 'dot', { opacity: 0.6 }));
@@ -44,22 +49,26 @@
       shapes.push({ type: 'line', x0: 0, x1: o.q, y0: o.p, y1: o.p, line: { color: th.muted, width: 1, dash: 'dot' } });
       traces.push(U.dot2([[o.q, o.MC]], th.red, 'MR = MC', 8));
       traces.push(U.dot2([[o.q, o.p]], th.ink, 'p*, q*', 10));
-      annotations.push({ x: 0, y: o.p, text: 'p*', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 13, color: th.ink } });
+      // p* on the price axis, over the tick labels (the curves start next to the axis)
+      annotations.push({ xref: 'paper', x: 0, y: o.p, text: 'p*', showarrow: false, xanchor: 'right', xshift: -3, bgcolor: th.panel, font: { size: 13, color: th.ink } });
       annotations.push({ x: o.q, y: 0, text: 'q*', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 13, color: th.ink } });
       if (Math.abs(o.p - o.AC) * 12 > yMax && o.q > 0.06 * qMax) annotations.push({ x: o.q / 2, y: (o.p + o.AC) / 2, text: 'Π', showarrow: false, font: { size: 15, color: th.ink }, bgcolor: th.panel, borderpad: 2 });
     }
     if (comp) traces.push(U.dot2([[comp.q, comp.p]], th.ink, 'price taker: AR = MC', 9, { marker: { color: th.panel, size: 9, line: { color: th.ink, width: 1.5 } } }));
     // Curve labels at their right ends.
-    const label = (f, text, color, anchor) => { for (let i = qq.length - 1; i >= 0; i--) { const v = f(qq[i]); if (v > 0.05 * yMax && v < 0.93 * yMax) { annotations.push({ x: qq[i], y: v, text, showarrow: false, xanchor: anchor, xshift: anchor === 'right' ? -6 : 6, yanchor: 'bottom', font: { size: 12, color } }); return; } } };
-    label(q => FM.MC(W, q, s), 'MC', th.red, 'right');
-    label(q => FM.AC(W, q, s), 'AC', th.ink, 'right');
-    label(q => MM.price(q, d), 'AR', th.blue, 'right');
-    label(q => MM.MR(q, d), 'MR', th.blue, 'right');
+    // Rising curves get the label above their end, falling ones below it, so that the curve does not run through it.
+    const label = (f, text, color, falling) => { for (let i = qq.length - 1; i >= 0; i--) { const v = f(qq[i]); if (v > 0.05 * yMax && v < 0.93 * yMax) { annotations.push({ x: qq[i], y: v, text, showarrow: false, xanchor: 'right', xshift: -6, yanchor: falling ? 'top' : 'bottom', yshift: falling ? -2 : 0, font: { size: 12, color } }); return; } } };
+    label(q => FM.MC(W, q, s), 'MC', th.red, false);
+    label(q => FM.AC(W, q, s), 'AC', th.ink, false);
+    label(q => MM.price(q, d), 'AR', th.blue, true);
+    label(q => MM.MR(q, d), 'MR', th.blue, true);
+    if (comp && comp.q > o.q && !o.shutdown) annotations.push({ x: (2 * o.q + comp.q) / 3, y: (o.p + o.MC + comp.p) / 3, text: 'deadweight loss', showarrow: true, arrowhead: 0, arrowwidth: 1, arrowcolor: th.muted, ax: 70, ay: -95, xanchor: 'left', yanchor: 'bottom', font: { size: 11, color: th.muted } });
     Plotly.react('plot', traces, U.base2d(th, { xt: 'q', yt: 'p', x: { range: [0, qMax] }, y: { range: [0, yMax] }, shapes, annotations }), U.PLOT_CONFIG);
-    return { s, d, o, comp };
+    const dwl = comp && !o.shutdown ? MM.deadweightLoss(W, s, d, o.q, comp.q) : null;
+    return { s, d, o, comp, dwl };
   }
 
-  function renderText({ s, d, o, comp }) {
+  function renderText({ s, d, o, comp, dwl }) {
     const item = (good, html) => `<li><span class="mark ${good ? 'ok' : 'no'}">${good ? '✓' : '✗'}</span><span>${html}</span></li>`;
     const local = state.mode === 'local', As = local ? MM.tangencyIntercept(W, s, state.BL) : null;
     $('head').textContent = !local ? 'Profit optimisation of a monopolist' : Math.abs(state.AL - As) < 0.02 ? 'Local monopolist in the long run' : 'Local monopolist in the short run';
@@ -72,7 +81,9 @@
     const lines = [
       item(same(o.MR, o.MC), `${texStr(`MR=${fmt(o.MR, 3)}`)} = ${texStr(`MC=${fmt(o.MC, 3)}`)}`),
       item(same(o.p, o.MC / (1 + 1 / o.eta)), `${texStr(`p=\\frac{MC}{1+1/\\eta}=\\frac{${fmt(o.MC, 3)}}{1+1/(${fmt(o.eta, 3)})}=${fmt(o.MC / (1 + 1 / o.eta), 3)}`)}`),
-      item(same(o.profit, (o.p - o.AC) * o.q), `${texStr(`\\Pi=(AR-AC)\\,q^\\ast=(${fmt(o.p, 3)}-${fmt(o.AC, 3)})\\cdot${fmt(o.q, 3)}=${fmt(z(o.profit), 3)}`)}`)
+      // AC shown as p minus the rounded margin, so the shown numbers fit together (at the tangency 4.38 − 4.38, not 4.38 − 4.37)
+      (() => { const pS = o.p.toFixed(2), mS = (o.p - o.AC).toFixed(2), acS = fmt(Number(pS) - Number(mS));
+        return item(same(o.profit, (o.p - o.AC) * o.q), `${texStr(`\\Pi=(AR-AC)\\,q^\\ast=(${fmt(o.p)}-${acS})\\cdot${fmt(o.q)}=${fmt(z(o.profit))}`)}`); })()
     ];
     if (local) {
       const tangent = Math.abs(o.profit) < 0.02;
@@ -83,10 +94,11 @@
     $('checks').innerHTML = lines.join('');
     const rows = [['q^\\ast,\\ p^\\ast', `${fmt(o.q, 3)}, ${fmt(o.p, 3)}`], ['\\eta(q^\\ast)', fmt(o.eta, 3)], ['\\text{markup}\\ p/MC', fmt(o.p / o.MC, 3)]];
     if (comp) rows.push(['\\text{price taker}', `${texStr(`q=${fmt(comp.q, 3)}`)}, ${texStr(`p=${fmt(comp.p, 3)}`)}`]);
+    if (dwl !== null) rows.push(['\\text{deadweight loss}', fmt(dwl)]);
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     $('cap').innerHTML = `<span class="c-l2-blue"><span class="key"></span>${texStr('AR=p(q)')}</span>, <span class="c-l2-blue"><span class="key dash"></span>${texStr('MR')}</span>, <span class="c-l2-red"><span class="key"></span>${texStr('MC')}</span>, <span class="c-ink"><span class="key"></span>${texStr('AC')}</span>. ` +
       (local ? (Math.abs(o.profit) < 0.02 ? 'Entry of substitutes has pushed average revenue down until it just touches average cost: the firm still sets MR = MC, but earns zero profit.' : `The firm earns ${texStr(`\\Pi=${fmt(o.profit, 2)}`)}. Press "Substitutes enter" to let rivals take its demand.`)
-        : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.` +
+        : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}; the <span class="c-muted">grey area</span> between ${texStr('AR')} and ${texStr('MC')} is the deadweight loss, ${fmt(dwl)}: units that buyers value above their marginal cost but that are not produced` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.` +
           // close to unit elasticity MR is a small fraction of the price: a tiny quantity at a very high price
           (o.eta > -1.5 ? ` So close to ${texStr('\\eta=-1')}, marginal revenue is only ${fmt(1 + 1 / o.eta, 2)} of the price, so the markup is huge: ${texStr(`p^\\ast=${fmt(1 / (1 + 1 / o.eta), 1)}\\cdot MC`)}.` : ''));
   }

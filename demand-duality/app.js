@@ -11,7 +11,7 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { view: 'ump', type: 'ces', delta: 0.4, rho: -1, a: 0.4, g1: 1, g2: 0.5, kappa: 5, p1: 1, p2: 1, y: 10, v: 4 };
+  const state = { reveal: false, view: 'ump', type: 'ces', delta: 0.4, rho: -1, a: 0.4, g1: 1, g2: 0.5, kappa: 5, p1: 1, p2: 1, y: 10, v: 4 };
   let ctrls = {};
   const schedule = U.scheduler(render);
   const f3 = x => fmt(x, 3);
@@ -37,7 +37,7 @@
       traces.push({ type: 'scatter', mode: 'lines', x: [0, y / p[0], 0, 0], y: [0, 0, y / p[1], 0], fill: 'toself', fillcolor: 'rgba(155,155,155,0.25)', line: { width: 0 }, hoverinfo: 'skip', name: 'budget set' });
       traces.push(line(y, th.ink, 2.5, 'budget line p·x = y'));
       for (const [k, lab] of [[0.75, 'lower: affordable, not best'], [1.3, 'higher: not affordable']]) {
-        const lv = state.type === 'quasilinear' ? v + (k - 1) * Math.abs(v) - (k - 1) * 0 : v * k;
+        const lv = state.type === 'quasilinear' ? v + (k - 1) * Math.abs(v) : v * k;
         traces.push(U.line2(ic(lv), th.muted, 1.2, lab, 'dot'));
       }
       traces.push(U.line2(ic(v), th.blue, 3, `indifference curve V(p,y) = ${f3(v)}`));
@@ -51,8 +51,8 @@
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('head').textContent = state.view === 'ump' ? 'Reach the highest indifference curve (UMP)' : 'Reach v at the lowest cost (EMP)';
     $('cap').innerHTML = state.view === 'ump'
-      ? `With income ${texStr(`y=${f3(y)}`)} the best affordable bundle is ${texStr(`D(p,y)=(${f3(x[0])},${f3(x[1])})`)} on the indifference curve ${texStr(`V(p,y)=${f3(v)}`)}. Switch to EMP: asked to reach ${texStr(`v=${f3(v)}`)} at least cost, the consumer picks the same bundle and spends exactly ${texStr('y')}.`
-      : `To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`;
+      ? `<span class="c-muted"><span class="key dotted"></span>Dotted</span>: a lower indifference curve (affordable, not the best) and a higher one (not affordable). With income ${texStr(`y=${f3(y)}`)} the best affordable bundle is ${texStr(`D(p,y)=(${f3(x[0])},${f3(x[1])})`)} on the indifference curve ${texStr(`V(p,y)=${f3(v)}`)}. Switch to EMP: asked to reach ${texStr(`v=${f3(v)}`)} at least cost, the consumer picks the same bundle and spends exactly ${texStr('y')}.`
+      : `<span class="c-muted"><span class="key dash"></span>Dashed</span>: a cheaper line that cannot reach ${texStr('v')} and a dearer one that is not the cheapest. To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`;
   }
 
   function renderChecks(S) {
@@ -70,10 +70,21 @@
     $('props').innerHTML = [
       item(same(p[0] * x[0] + p[1] * x[1], y), `(M1) adding up: ${texStr(`p^tD(p,y)=${f3(p[0] * x[0] + p[1] * x[1])}=y`)}`),
       item(same(xa[0], x[0]) && same(xa[1], x[1]), `(M2) ${texStr('D(2p,2y)=D(p,y)')}; (E3) ${texStr(`C(2p,v)=${f3(CM.expenditure([2 * p[0], 2 * p[1]], v, u))}=2C(p,v)`)}`),
-      interior ? item(same(E.kkt[0], E.kkt[1]), `Kuhn-Tucker, interior: ${texStr(`\\frac{U_1}{p_1}=${f3(E.kkt[0])}=\\frac{U_2}{p_2}=\\lambda^\\ast`)}, and ${texStr(`\\lambda^\\ast=\\partial V/\\partial y=${f3(E.lambda)}`)}`)
+      interior ? item(same(E.kkt[0], E.kkt[1]), `Tangency, interior: ${texStr(`MRS_{21}=\\frac{U_1}{U_2}=${f3(E.kkt[0] * p[0] / (E.kkt[1] * p[1]))}=\\frac{p_1}{p_2}`)}`)
         : `<li><span class="mark na">·</span><span>Corner solution: ${texStr('x_j^\\ast=0')} for one good, where ${texStr('U_j\\le\\lambda^\\ast p_j')}.</span></li>`,
       item(same(E.roy, E.D1), `(I5) Roy's identity: ${texStr(`-\\frac{\\partial V/\\partial p_1}{\\partial V/\\partial y}=${f3(E.roy)}=D^1(p,y)`)}`),
       item(same(E.shephard, E.H1), `(E5) Shephard's lemma: ${texStr(`\\frac{\\partial C}{\\partial p_1}=${f3(E.shephard)}=H^1(p,v)`)}`)
+    ].join('');
+    // lambda* and mu* answer an exercise: hidden until "Check your answer"
+    const btn = $('reveal');
+    btn.textContent = state.reveal ? 'Hide the answer' : 'Check your answer';
+    btn.setAttribute('aria-pressed', String(state.reveal));
+    $('mult').hidden = !state.reveal;
+    $('mult').innerHTML = [
+      interior ? item(same(E.kkt[0], E.lambda), `(UMP) ${texStr(`\\lambda^\\ast=\\frac{U_1}{p_1}=\\frac{U_2}{p_2}=\\frac{\\partial V}{\\partial y}=${f3(E.lambda)}`)}: the utility of one more unit of income`)
+        : item(true, `(UMP) ${texStr(`\\lambda^\\ast=\\frac{\\partial V}{\\partial y}=${f3(E.lambda)}`)}: the utility of one more unit of income`),
+      item(true, `(EMP) ${texStr(`\\mu^\\ast=\\frac{\\partial C}{\\partial v}=${f3(E.mu)}`)}: the cost of one more unit of utility`),
+      item(same(E.lambda * E.mu, 1), `${texStr(`\\lambda^\\ast\\mu^\\ast=${f3(E.lambda)}\\cdot${f3(E.mu)}=${f3(E.lambda * E.mu)}`)}: at the same tangency ${texStr('\\lambda^\\ast=1/\\mu^\\ast')}`)
     ].join('');
   }
 
@@ -81,9 +92,11 @@
     const { u, p, y, v } = S, ps = U.linspace(0.3, 4, 120);
     const Vc = DM.curveV(p[1], y, u, ps), Cc = DM.curveC(p[1], v, u, ps), H1 = CM.hicks(p, v, u)[0], Cnow = CM.expenditure(p, v, u);
     Plotly.react('plotV', [U.line2(Vc, th.blue, 2.5, 'V(p₁, p₂, y)'), U.dot2([[p[0], v]], th.ink, 'now', 8)], U.base2d(th, { xt: 'p<sub>1</sub>', yt: 'V(p, y)', margin: { l: 52, r: 8, t: 6, b: 40 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    const tan = [[0.3, Cnow + H1 * (0.3 - p[0])], [4, Cnow + H1 * (4 - p[0])]];
-    Plotly.react('plotC', [U.line2(tan, th.muted, 1.5, 'tangent, slope H¹ (Shephard)', 'dash'), U.line2(Cc, th.red, 2.5, 'C(p₁, p₂, v)'), U.dot2([[p[0], Cnow]], th.ink, 'now', 8)], U.base2d(th, { xt: 'p<sub>1</sub>', yt: 'C(p, v)', y: { range: [0, Math.max(...Cc.map(q => q[1])) * 1.1] }, margin: { l: 52, r: 8, t: 6, b: 40 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('capVC').innerHTML = `Top: maximal utility falls as ${texStr('p_1')} rises (I2). Bottom: the expenditure function rises with ${texStr('p_1')} (E2) and is concave (E4); it lies below its tangent, whose slope is ${texStr(`H^1(p,v)=${f3(H1)}`)} (E5).`;
+    // the tangent sampled at the same prices as C, so the gap between them (concavity, E4) can be shaded
+    const tan = Cc.map(([q]) => [q, Cnow + H1 * (q - p[0])]);
+    const gap = { ...U.line2(Cc, th.red, 0, ''), fill: 'tonexty', fillcolor: 'rgba(155,155,155,0.35)', hoverinfo: 'skip' };
+    Plotly.react('plotC', [U.line2(tan, th.muted, 1.5, 'tangent, slope H¹ (Shephard)', 'dash'), gap, U.line2(Cc, th.red, 2.5, 'C(p₁, p₂, v)'), U.dot2([[p[0], Cnow]], th.ink, 'now', 8)], U.base2d(th, { xt: 'p<sub>1</sub>', yt: 'C(p, v)', y: { range: [0, Math.max(...Cc.map(q => q[1])) * 1.1] }, margin: { l: 52, r: 8, t: 6, b: 40 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    $('capVC').innerHTML = `Top: maximal utility falls as ${texStr('p_1')} rises (I2). Bottom: the expenditure function rises with ${texStr('p_1')} (E2) and is concave (E4): it lies below its tangent (the grey gap), whose slope is ${texStr(`H^1(p,v)=${f3(H1)}`)} (E5).`;
   }
 
   function render() {
@@ -102,7 +115,8 @@
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
-    $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
+    $('type').addEventListener('change', e => { state.type = e.target.value; state.reveal = false; schedule(); });
+    $('reveal').addEventListener('click', () => { state.reveal = !state.reveal; schedule(); });
     // Switching view keeps the same tangency: the EMP target is the current V(p,y), the UMP income the current C(p,v).
     document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
       const S = solve();

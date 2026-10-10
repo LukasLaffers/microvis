@@ -106,16 +106,17 @@
     const item = (good, html) => `<li><span class="mark ${good ? 'ok' : 'no'}">${good ? '✓' : '✗'}</span><span>${html}</span></li>`;
     const f = x => fmt(x, 4);
     $('checks').innerHTML = [
+      `<li><span class="mark na">·</span><span>Derivatives at the starting price ${texStr(`w_1=${fmt(w[0])}`)}, ${texStr(`q^\\ast=${fmt(pts.qBefore)}`)}; the figure shows the whole change to ${texStr(`w_1'=${fmt(state.w1n)}`)}.</span></li>`,
       item(d.Cqq > 0, `SOSC: ${texStr(`C_{qq}=${f(d.Cqq)}>0`)}`),
-      item(same(sp.formula, sp.numeric), `${texStr(`\\frac{\\mathrm dq^\\ast}{\\mathrm dp}=\\frac{1}{C_{qq}}=${f(sp.formula)}`)} <span class="c-muted">slope of S: ${f(sp.numeric)}</span>`),
-      item(same(sw.formula, sw.numeric), `${texStr(`\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=-\\frac{1}{C_{qq}}\\frac{\\partial H^1}{\\partial q}=${f(sw.formula)}`)} <span class="c-muted">(∗) slope of S: ${f(sw.numeric)}</span>`),
+      item(same(sp.formula, sp.numeric), `${texStr(`\\frac{\\mathrm dq^\\ast}{\\mathrm dp}=\\frac{1}{C_{qq}}=${f(sp.formula)}`)} <span class="c-muted">finite difference ${texStr('\\partial S/\\partial p')}: ${f(sp.numeric)}</span>`),
+      item(same(sw.formula, sw.numeric), `(∗) ${texStr(`\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=-\\frac{1}{C_{qq}}\\frac{\\partial H^1}{\\partial q}=${f(sw.formula)}`)} <span class="c-muted">finite difference ${texStr('\\partial S/\\partial w_1')}: ${f(sw.numeric)}</span>`),
       item(same(d.substitution + d.scale, d.total), `(∗∗) ${texStr(`\\frac{\\partial D^1}{\\partial w_1}=\\color{#4a90e2}{${f(d.substitution)}}\\color{#d0021b}{+(${f(-1 / d.Cqq)})(${f(d.dHdq)})^2}=${f(d.substitution + d.scale)}`)} <span class="c-muted">finite difference: ${f(d.total)}</span>`)
     ].join('');
     $('readouts').innerHTML = [
       ['\\text{signs}', `${texStr('(-)\\ +\\ (-)(+)')}: both effects lower the demand for input 1 when ${texStr('w_1')} rises`],
       ['q^\\ast\\to q^{\\ast\\ast}', `${fmt(pts.qBefore, 3)} → ${fmt(pts.qAfter, 3)}`],
       ['z_1^\\ast,\\ z_1^o,\\ z_1^{\\ast\\ast}', `${fmt(pts.zStar, 3)}, <span class="c-l2-blue">${fmt(pts.zO, 3)}</span>, <span class="c-l2-red">${fmt(pts.zStarStar, 3)}</span>`],
-      ['\\text{substitution, scale}', `<span class="c-l2-blue">${fmt(pts.zO - pts.zStar, 3)}</span> + <span class="c-l2-red">${fmt(pts.zStarStar - pts.zO, 3)}</span> = ${fmt(pts.zStarStar - pts.zStar, 3)}`]
+      ['\\text{substitution, scale}', (([a, b, t]) => `<span class="c-l2-blue">${a}</span> + <span class="c-l2-red">${b}</span> = ${t}`)(U.fmtSum([pts.zO - pts.zStar, pts.zStarStar - pts.zO]))]
     ].map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
   }
 

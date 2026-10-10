@@ -20,7 +20,7 @@
       case 'quasilinear':
         return two('U(x)=\\kappa\\log(1+x_1)+x_2', `\\kappa=${num(u.kappa)}`);
       case 'giffen':
-        return two('U(x)=-\\frac{(s-x_2)^2}{x_1-c}', `c=${num(u.c)},\\ s=${num(u.s)}`);
+        return '';   // the notes take the Giffen good as given: no utility function on the pages
       case 'additive':
         return two('U(x)=\\frac{x_1^{a}}{a}+\\frac{x_2^{b}}{b}', `a=${num(u.a)},\\ b=${num(u.b)}`);
       case 'humped':
@@ -54,7 +54,6 @@
     if (Math.abs(ctrl.min - a) > 1e-9 || Math.abs(ctrl.max - b) > 1e-9) ctrl.setRange(Number(a.toFixed(2)), Number(b.toFixed(2)));
     if (state[key] < a || state[key] > b) { state[key] = Number(Math.min(b, Math.max(a, state[key])).toFixed(2)); ctrl.sync(); }
     if (u.type === 'stonegeary' && lo > r0) return `Income must exceed the cost of the subsistence bundle, ${lo.toFixed(2)}: the income slider starts there.`;
-    if (u.type === 'giffen') return `The Giffen example needs an interior solution: income between ${a.toFixed(2)} and ${b.toFixed(2)} at these prices.`;
     return '';
   }
 

@@ -11,7 +11,7 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { type: 'cobb', alpha: 0.5, rho: -1, t: 'log', a1: 3, a2: 6, b1: 6, b2: 4 };
+  const state = { type: 'cobb', alpha: 0.5, rho: -1, t: 'log', a1: 3, a2: 6, b1: 6, b2: 4, reveal: false };
   const L = 10, LO = 0.25;
   const schedule = U.scheduler(render);
   const pref = () => ({ type: state.type, alpha: state.alpha, rho: state.rho });
@@ -44,18 +44,19 @@
       { type: 'scatter3d', mode: 'lines', x: ic.map(p => p[0]), y: ic.map(p => p[1]), z: ic.map(() => h), scene, line: { color: th.dark ? '#ffffff' : '#111111', width: 7 }, hoverinfo: 'skip', name: 'indifference curve' },
       { type: 'scatter3d', mode: 'lines', x: ic.map(p => p[0]), y: ic.map(p => p[1]), z: ic.map(() => floor), scene, line: { color: th.ink, width: 4, dash: 'dash' }, hoverinfo: 'skip', name: 'projection' }
     ];
-    const pts = (f, scene) => ({ type: 'scatter3d', mode: 'markers+text', x: [xo[0], xp[0]], y: [xo[1], xp[1]], z: [f(OM.utility(xo, P)), f(OM.utility(xp, P))], text: ['x°', "x'"], textposition: 'top center', scene, marker: { size: 5, color: [th.ink, th.accent4 || th.red] }, textfont: { color: th.ink, size: 13 }, hoverinfo: 'skip' });
+    const pts = (f, scene) => ({ type: 'scatter3d', mode: 'markers+text', x: [xo[0], xp[0]], y: [xo[1], xp[1]], z: [f(OM.utility(xo, P)), f(OM.utility(xp, P))], text: ['x°', "x'"], textposition: 'top center', scene, marker: { size: 8, color: [th.ink, th.accent4 || th.red], line: { color: th.dark ? '#000000' : '#ffffff', width: 2 } }, textfont: { color: th.ink, size: 14 }, hoverinfo: 'skip' });
     const traces = [surf(Uz, rU, 'scene'), ...levels.map(u => contour(u, u, 'scene')), ...curve(uo, 'scene', rU[0]), pts(u => u, 'scene'),
       surf(Vz, rV, 'scene2'), ...levels.map(u => contour(u, T.f(u), 'scene2')), ...curve(T.f(uo), 'scene2', rV[0]), pts(T.f, 'scene2')];
     const axis = (title, r) => ({ title: { text: title, font: { color: th.ink } }, range: r, color: th.muted, gridcolor: th.grid, backgroundcolor: 'rgba(0,0,0,0)', showspikes: false, tickfont: { color: th.muted } });
-    const scene = (dom, zt, r, eye = { x: -1.55, y: -1.55, z: 1.05 }) => ({ domain: { x: dom, y: [0, 1] }, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.75 }, camera: { eye }, xaxis: axis('x₁', [0, L]), yaxis: axis('x₂', [0, L]), zaxis: axis(zt, r), uirevision: eye.x > 0 ? 'turned' : 'keep' });
+    const scene = (dom, zt, r, eye = { x: -1.7, y: -1.7, z: 1.15 }) => ({ domain: { x: dom, y: [0, 1] }, aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.75 }, camera: { eye }, xaxis: axis('x₁', [0, L]), yaxis: axis('x₂', [0, L]), zaxis: axis(zt, r), uirevision: eye.x > 0 ? 'turned' : 'keep' });
     Plotly.react('plot', traces, {
       margin: { l: 0, r: 0, t: 26, b: 0 }, paper_bgcolor: 'rgba(0,0,0,0)', font: { color: th.ink, family: th.font, size: 12 }, showlegend: false, uirevision: 'keep',
       // a decreasing f turns the surface round: look at it from the opposite corner, so that it rises away from the viewer
-      scene: scene([0, 0.5], 'U', rU), scene2: scene([0.5, 1], 'V', rV, T.increasing === false ? { x: 1.55, y: 1.55, z: 1.05 } : undefined),
+      // a gap between the two scenes keeps the x1 title of the left one apart from the x2 title of the right one
+      scene: scene([0, 0.47], 'U', rU), scene2: scene([0.53, 1], 'V', rV, T.increasing === false ? { x: 1.7, y: 1.7, z: 1.15 } : undefined),
       annotations: [
-        { xref: 'paper', yref: 'paper', x: 0.25, y: 1.03, text: 'U(x<sub>1</sub>, x<sub>2</sub>)', showarrow: false, font: { size: 14, color: th.ink } },
-        { xref: 'paper', yref: 'paper', x: 0.75, y: 1.03, text: `V = ${$('transform').selectedOptions[0].textContent.replace('V = ', '')}`, showarrow: false, font: { size: 14, color: th.ink } }
+        { xref: 'paper', yref: 'paper', x: 0.235, y: 1.03, text: 'U(x<sub>1</sub>, x<sub>2</sub>)', showarrow: false, font: { size: 14, color: th.ink } },
+        { xref: 'paper', yref: 'paper', x: 0.765, y: 1.03, text: `V = ${$('transform').selectedOptions[0].textContent.replace('V = ', '')}`, showarrow: false, font: { size: 14, color: th.ink } }
       ]
     }, U.PLOT_CONFIG);
     $('cap').innerHTML = `The black curve is the indifference curve through ${texStr('x^\\circ')}, at height ${texStr(`U=${f3(uo)}`)} on the left and ${texStr(`V=${f3(T.f(uo))}`)} on the right; its shadow on the floor is the same curve in both. ${T.increasing ? 'The thin curves are the same few indifference curves on both surfaces; only their heights differ. Drag a surface to look from above.' : 'With a decreasing f the curves are still the same, but "better" and "worse" swap: V ranks every pair the wrong way round.'}`;
@@ -103,6 +104,15 @@
       item(c <= 1e-6, `(∗) ${texStr(`z^t\\frac{\\partial^2U}{\\partial x\\partial x^t}z=${fmt(Math.abs(c) < 1e-7 ? 0 : c, 4)}`)} for the unit ${texStr('z')} with ${texStr('z^t\\nabla U=0')}. ${qc ? (P.type === 'subs' ? 'Zero: the indifference curve is the tangent line itself.' : 'Negative: moving along the tangent leads to lower indifference curves, as convex B(x) requires.') : 'Positive: along the tangent utility rises, so B(x°) is not convex and U is not quasi-concave.'}`),
       `<li><span class="mark na">·</span><span>${texStr(`MRS_{21}=\\frac{U_1}{U_2}=\\frac{${f3(g[0])}}{${f3(g[1])}}=${f3(mrs)}`)}: the indifference curve and the tangent have slope ${texStr(`-${f3(mrs)}`)} at ${texStr('x^\\circ')}.</span></li>`
     ].join('');
+    // MRS of V = f(U): answers an exercise, so hidden until "Check your answer"
+    const T = OM.TRANSFORMS[state.t], h = 1e-5, V = x => T.f(OM.utility(x, P));
+    const v1 = (V([xo[0] + h, xo[1]]) - V([xo[0] - h, xo[1]])) / (2 * h), v2 = (V([xo[0], xo[1] + h]) - V([xo[0], xo[1] - h])) / (2 * h);
+    const btn = $('revealMRS');
+    btn.textContent = state.reveal ? 'Hide the answer' : 'Check your answer';
+    btn.setAttribute('aria-pressed', String(state.reveal));
+    const sameMRS = Math.abs(v1 / v2 - mrs) <= 1e-4 * Math.max(1, Math.abs(mrs));
+    $('mrsV').hidden = !state.reveal;
+    $('mrsV').innerHTML = `<li><span class="mark ${sameMRS ? 'ok' : 'no'}">${sameMRS ? '✓' : '✗'}</span><span>${texStr(`\\frac{V_1}{V_2}=\\frac{f'(U)\\,U_1}{f'(U)\\,U_2}=\\frac{${f3(v1)}}{${f3(v2)}}=${f3(v1 / v2)}`)}: the same ${texStr('MRS_{21}')} as for ${texStr('U')}, for any ${texStr('f')} with ${texStr("f'\\ne0")}. The slope of an indifference curve does not depend on how utility is numbered.</span></li>`;
   }
 
   function render() {
@@ -119,7 +129,8 @@
     // rho = 0 is the Cobb-Douglas limit (its own option): the slider skips it so that the number shown is the number used.
     U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: schedule });
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
-    $('transform').addEventListener('change', e => { state.t = e.target.value; schedule(); });
+    $('transform').addEventListener('change', e => { state.t = e.target.value; state.reveal = false; schedule(); });
+    $('revealMRS').addEventListener('click', () => { state.reveal = !state.reveal; schedule(); });
     render();
     U.watchColorScheme(schedule);
   }

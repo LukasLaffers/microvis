@@ -65,9 +65,13 @@ for (const s of techs) for (const B of [0.5, 1, 2]) {
   close(o.profit, 15.3107, 1e-4);
   const c = M.competitive(W, s, d);
   close(c.q, (7 + Math.sqrt(65)) / 4, 1e-9);
+  // Deadweight loss: p - MC = 12 - q - 2(q^2 - 4q + 5) = 2 + 7q - 2q^2, integrated by hand from q* to the price taker's q.
+  const F = q => 2 * q + 3.5 * q * q - 2 / 3 * q ** 3;
+  close(M.deadweightLoss(W, s, d, o.q, c.q), F(c.q) - F(o.q), 1e-9, 'deadweight loss');
+  assert.ok(M.deadweightLoss(W, s, d, o.q, c.q) > 0);
   const As = M.tangencyIntercept(W, s, 1);
   close(As, 6.625, 1e-6); close(M.optimum(W, s, { type: 'linear', A: As, B: 1 }).q, 2.25, 1e-4);
-  checks += 6;
+  checks += 8;
 }
 
 console.log(`All ${checks} monopoly checks passed.`);

@@ -71,7 +71,7 @@
     const qMarketTop = f1.alpha * (pTop - f1.c) + f2.alpha * (pTop - f2.c);
     const xMax3 = qMarketTop * 1.05;
     const pd = U.linspace(Math.max(0.2, pTop * 0.06), pTop, 200).map(p => [MS.demand(p, d), p]).map(([q, p]) => [q <= xMax3 * 1.3 ? q : null, p]);
-    traces.push(U.line2(pd, th.ink, 2, 'demand D(p)', null, { xaxis: 'x3' }));
+    traces.push(U.line2(pd, th.ink, 2, 'demand Dem(p)', null, { xaxis: 'x3' }));
     const shapes = [], annotations = [];
     const hline = (p, x1ref, dash) => shapes.push({ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: p, y1: p, line: { color: th.muted, width: 1, dash } });
     if (e.exists) {
@@ -92,7 +92,7 @@
     base.xaxis3 = { ...base.xaxis, domain: [0.68, 1], range: [0, xMax3], title: { ...base.xaxis.title, text: 'q<sup>1</sup> + q<sup>2</sup>' } };
     Plotly.react('plot', traces, base, { ...U.PLOT_CONFIG, displayModeBar: false });
 
-    let cap = `<span class="c-l2-orange"><span class="key"></span>supply</span> (thick on the price axis: nothing is produced), <span class="c-ink"><span class="key"></span>demand</span> ${texStr('D(p)=K\\,p^{-1.5}')}. `;
+    let cap = `<span class="c-l2-orange"><span class="key"></span>supply</span> (thick on the price axis: nothing is produced), <span class="c-ink"><span class="key"></span>demand</span> ${texStr('Dem(p)=K\\,p^{-1.5}')}. `;
     if (f1.F === 0 && f2.F === 0) cap += 'Without fixed costs each firm\'s supply is continuous, so their sum is too, and it always meets demand.';
     else if (e.exists) cap += e.atJump ? `Demand meets one of the possible market outputs exactly at the jump price ${fmt(e.p, 2)}.` : `Demand crosses market supply at ${texStr(`p=${fmt(e.p, 2)}`)}, ${texStr(`q^1+q^2=${fmt(e.Q, 2)}`)}.`;
     else cap += `Demand passes through the gap in market supply at ${texStr(`p=${fmt(e.gapPrice, 2)}`)}: just below, the market demands more than the firms offer; just above, less. It is not clear what will happen there.`;
@@ -111,16 +111,16 @@
       U.line2([[MS.supplyAt(f, pHat + 1e-9), pHat], [f.alpha * (pTop - f.c), pTop]], color, 2.5, 'average supply')
     ];
     if (f.F > 0) {
-      if (state.limit) traces.push(U.line2([[0, pHat], [qHat, pHat]], color, 2.5, 'average supply at p′'));
-      else traces.push(U.dot2(MS.averageSupplySet(f, N, pHat).map(v => [v, pHat]), color, 'possible average supply at p′', N > 24 ? 5 : 8, { marker: { color, size: N > 24 ? 5 : 8 } }));
+      if (state.limit) traces.push(U.line2([[0, pHat], [qHat, pHat]], color, 2.5, 'average supply at p″'));
+      else traces.push(U.dot2(MS.averageSupplySet(f, N, pHat).map(v => [v, pHat]), color, 'possible average supply at p″', N > 24 ? 5 : 8, { marker: { color, size: N > 24 ? 5 : 8 } }));
     }
     const xMax = Math.max(qHat, f.alpha * (pTop - f.c)) * 1.05;
     traces.push(U.line2(U.linspace(Math.max(0.2, pTop * 0.06), pTop, 160).map(p => [MS.demand(p, dPer), p]).map(([q, p]) => [q <= xMax * 1.3 ? q : null, p]), th.ink, 2, 'demand per firm'));
-    // p′ only exists with a fixed cost (the price at which the firm is indifferent between 0 and q-hat)
-    const annotations = f.F > 0 ? [{ x: 0, y: pHat, text: 'p′', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 12, color: th.ink } }] : [];
+    // p″ only exists with a fixed cost (the price at which the firm is indifferent between 0 and q-hat)
+    const annotations = f.F > 0 ? [{ x: 0, y: pHat, text: 'p″', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 12, color: th.ink } }] : [];
     if (f.F > 0 && eq.share < 1) {
       traces.push(U.dot2([[eq.avgSupply, pHat]], th.red, 'average supply closest to demand', 11));
-      traces.push(U.dot2([[eq.avgDemand, pHat]], th.ink, 'average demand at p′', 7));
+      traces.push(U.dot2([[eq.avgDemand, pHat]], th.ink, 'average demand at p″', 7));
     } else traces.push(U.dot2([[eq.avgSupply, eq.p]], th.ink, 'equilibrium', 10));
     const ticks = f.F > 0 ? [0, 0.25, 0.5, 0.75, 1].map(t => t * qHat) : undefined;
     Plotly.react('plotB', traces, U.base2d(th, {
@@ -128,9 +128,9 @@
     }), U.PLOT_CONFIG);
     let cap;
     if (!(f.F > 0)) cap = 'Firm 2 has no fixed cost, so there is no jump to fill. Give it a fixed cost.';
-    else if (eq.share >= 1) cap = `Demand per firm is large: all firms produce, at ${texStr(`p=${fmt(eq.p, 2)}>p'`)}.`;
-    else if (state.limit) cap = `In the limit the average firm's supply is the whole segment ${texStr(`[0,${fmt(qHat, 0)}]`)} at ${texStr("p'")}: a share ${fmt(eq.share, 3)} of the firms produce ${fmt(qHat, 0)} and the rest nothing, and the market clears exactly.`;
-    else cap = `At ${texStr(`p'=${fmt(pHat, 2)}`)} each firm is indifferent between 0 and ${fmt(qHat, 0)}, so the average of ${N} firms can be any of the ${N + 1} dots. With <b>${eq.producing}</b> of the ${N} firms producing, average supply is ${fmt(eq.avgSupply, 2)} against average demand ${fmt(eq.avgDemand, 2)}: off by ${fmt(eq.gap, 2)} ≤ ${texStr('\\hat q/(2N)')} = ${fmt(qHat / (2 * N), 2)}. More firms, smaller gap.`;
+    else if (eq.share >= 1) cap = `Demand per firm is large: all firms produce, at ${texStr(`p=${fmt(eq.p, 2)}>p''`)}.`;
+    else if (state.limit) cap = `In the limit the average firm's supply is the whole segment ${texStr(`[0,${fmt(qHat, 0)}]`)} at ${texStr("p''")}: a share ${fmt(eq.share, 3)} of the firms produce ${fmt(qHat, 0)} and the rest nothing, and the market clears exactly.`;
+    else cap = `At ${texStr(`p''=${fmt(pHat, 2)}`)} each firm is indifferent between 0 and ${fmt(qHat, 0)}, so the average of ${N} firms can be any of the ${N + 1} dots. With <b>${eq.producing}</b> of the ${N} firms producing, average supply is ${fmt(eq.avgSupply, 2)} against average demand ${fmt(eq.avgDemand, 2)}: off by ${fmt(eq.gap, 2)} ≤ ${texStr('\\hat q/(2N)')} = ${fmt(qHat / (2 * N), 2)}. More firms, smaller gap.`;
     $('capB').innerHTML = cap;
   }
 

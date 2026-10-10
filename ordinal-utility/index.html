@@ -7,8 +7,8 @@
   <meta name="description" content="Two utility functions represent the same preferences when one is an increasing transformation of the other: same rankings, same indifference curves. Quasi-concavity, Theorem 1 and the marginal rate of substitution. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=8">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="../shared/style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=10">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>Left, a utility function <span class="tex" data-tex="U"></span>; right, <span class="tex" data-tex="V=f(U)"></span>. The heights differ, but the indifference curve through <span class="tex" data-tex="x^\circ"></span> is the same, and every pair of bundles is ranked the same way, as long as <span class="tex" data-tex="f"></span> is increasing. Utility only orders bundles.</p>
           <ul>
-          <li>Try other transformations: the indifference curves and <span class="tex" data-tex="MRS_{21}=U_1/U_2"></span> do not move. With <b>V = −U</b> the ranking flips.</li>
+          <li>Try other transformations: the indifference curves do not move. With <b>V = −U</b> the ranking flips. Does <span class="tex" data-tex="MRS_{21}"></span> move? Check your answer under <i>Convexity, Theorem 1 and the MRS</i>.</li>
           <li>Along the tangent line at <span class="tex" data-tex="x^\circ"></span>, a quasi-concave <span class="tex" data-tex="U"></span> is highest at <span class="tex" data-tex="x^\circ"></span> (Theorem 1). Choose <b>Bowed out</b> to see it fail.</li>
           </ul>
         </details>
@@ -84,6 +84,9 @@
         <div id="plotB" class="plot plot-2d"></div>
         <div id="plotC" class="plot plot-small"></div>
         <ul class="checks" id="thm"></ul>
+        <p class="caption">Does <span class="tex" data-tex="MRS_{21}"></span> change when you replace <span class="tex" data-tex="U"></span> by <span class="tex" data-tex="V=f(U)"></span>? Decide, then check.</p>
+        <div class="btn-row"><button type="button" id="revealMRS" aria-pressed="false">Check your answer</button></div>
+        <ul class="checks" id="mrsV" hidden></ul>
       </section>
     </div>
   </main>
@@ -100,10 +103,10 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=8"></script>
-  <script src="model.js?v=8"></script>
-  <script src="app.js?v=8"></script>
-  <script src="../shared/theme.js?v=8"></script>
+  <script src="../shared/ui.js?v=10"></script>
+  <script src="model.js?v=10"></script>
+  <script src="app.js?v=10"></script>
+  <script src="../shared/theme.js?v=10"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

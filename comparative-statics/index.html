@@ -7,8 +7,8 @@
   <meta name="description" content="How optimal output and input demand respond to prices: dq*/dp = 1/C_qq, the decomposition of the own-price effect, and the area to the left of the conditional demand curve. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=8">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="../shared/style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=10">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -30,8 +30,9 @@
           <summary>How to read this</summary>
           <p>Differentiating the first-order condition <span class="tex" data-tex="p=C_q(w,q^\ast)"></span> answers "what if" questions: a higher output price raises output, <span class="tex" data-tex="\mathrm dq^\ast/\mathrm dp=1/C_{qq}>0"></span>.</p>
           <ul>
-          <li>Lower <span class="tex" data-tex="w_1"></span>: the firm first substitutes towards input 1 at the old output (<span class="c-l2-blue"><span class="tex" data-tex="z_1^\ast\to z_1^o"></span></span>), then expands because production got cheaper (<span class="c-l2-red"><span class="tex" data-tex="z_1^o\to z_1^{\ast\ast}"></span></span>). So ordinary demand is flatter than conditional demand.</li>
-          <li>The area to the left of <span class="tex" data-tex="H^1"></span> between the two prices is the change in cost.</li>
+          <li>Set <span class="tex" data-tex="w_1'"></span> below <span class="tex" data-tex="w_1"></span>: the firm first substitutes towards input 1 at the old output (<span class="c-l2-blue"><span class="tex" data-tex="z_1^\ast\to z_1^o"></span></span>), then expands because production got cheaper (<span class="c-l2-red"><span class="tex" data-tex="z_1^o\to z_1^{\ast\ast}"></span></span>). So ordinary demand is flatter than conditional demand.</li>
+          <li>Raise <span class="tex" data-tex="p"></span>: the firm produces more, and the conditional demand curves move out with its output.</li>
+          <li>Look at the right panel: the area to the left of <span class="tex" data-tex="H^1"></span> between the two prices is the change in cost.</li>
           </ul>
         </details>
       </div>
@@ -72,7 +73,7 @@
     <section class="panel main-panel" aria-label="Ordinary and conditional demand">
       <div class="panel-head"><h2>Ordinary and conditional demand for input 1</h2></div>
       <div id="plot" class="plot plot-main"></div>
-      <p class="caption"><span class="c-ink"><span class="key"></span>ordinary demand curve <span class="tex" data-tex="D^1(w,p)"></span></span>; <span class="c-ink"><span class="key dash"></span>conditional demand curves <span class="tex" data-tex="H^1(w,q)"></span></span> for the output before and after. The ordinary demand curve is flatter than the conditional ones: when <span class="tex" data-tex="w_1"></span> falls the firm also expands output.</p>
+      <p class="caption"><span class="c-ink"><span class="key"></span>ordinary demand curve <span class="tex" data-tex="D^1(w,p)"></span></span>; conditional demand curves <span class="tex" data-tex="H^1(w,q)"></span> at the output before, <span class="c-ink"><span class="key dash"></span><span class="tex" data-tex="q^\ast"></span></span>, and after, <span class="c-muted"><span class="key dash"></span><span class="tex" data-tex="q^{\ast\ast}"></span></span>. The ordinary demand curve is flatter than the conditional ones: when <span class="tex" data-tex="w_1"></span> falls the firm also expands output.</p>
     </section>
 
     <div class="side">
@@ -101,12 +102,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=8"></script>
-  <script src="../shared/firm-ui.js?v=8"></script>
-  <script src="../shared/firm-model.js?v=8"></script>
-  <script src="model.js?v=8"></script>
-  <script src="app.js?v=8"></script>
-  <script src="../shared/theme.js?v=8"></script>
+  <script src="../shared/ui.js?v=10"></script>
+  <script src="../shared/firm-ui.js?v=10"></script>
+  <script src="../shared/firm-model.js?v=10"></script>
+  <script src="model.js?v=10"></script>
+  <script src="app.js?v=10"></script>
+  <script src="../shared/theme.js?v=10"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

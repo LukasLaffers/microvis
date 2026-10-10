@@ -29,20 +29,23 @@
     Q_MARKET = Math.max(24, 1.15 * eq.Q); Q_FIRM = Q_MARKET / 2;
     for (const [xa, other] of [['x', 'q²'], ['x2', 'q¹']]) {
       const self = xa === 'x' ? '1' : '2';
-      traces.push(curve(p => EM.supplyGiven(s, p, state.qa), xa, th.orange, 2.5, `S${self}(${other} = ${fmt(state.qa, 1)})`));
-      traces.push(curve(p => EM.supplyGiven(s, p, state.qb), xa, th.orange, 2, `S${self}(${other} = ${fmt(state.qb, 1)})`, 'dot'));
+      traces.push(curve(p => EM.supplyGiven(s, p, state.qa), xa, th.orange, 2.5, `S${self}(${other} = ${fmt(state.qa)})`));
+      traces.push(curve(p => EM.supplyGiven(s, p, state.qb), xa, th.orange, 2, `S${self}(${other} = ${fmt(state.qb)})`, 'dot'));
       // Label the higher of the two curves at the top left of it, the lower one at the bottom right (as in the notes).
       const hiQ = s.e * state.qb >= s.e * state.qa ? state.qb : state.qa;
       const lab = (qbar, upper) => {
         const q = (upper ? 0.42 : 0.55) * Q_FIRM, p = s.c + q / s.alpha + s.e * qbar;
-        if (p > 0.3 && p < P_TOP * 0.97) annotations.push({ xref: xa, yref: 'y', x: q, y: p, text: `S<sup>${self}</sup>(${other.replace('²', '<sup>2</sup>').replace('¹', '<sup>1</sup>')} = ${fmt(qbar, 1)})`, showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -8 : 8, font: { size: 11, color: th.ink } });
+        if (p > 0.3 && p < P_TOP * 0.97) annotations.push({ xref: xa, yref: 'y', x: q, y: p, text: `S<sup>${self}</sup>(${other.replace('²', '<sup>2</sup>').replace('¹', '<sup>1</sup>')} = ${fmt(qbar)})`, showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -8 : 8, font: { size: 11, color: th.ink } });
       };
       lab(hiQ, true); if (state.qa !== state.qb) lab(hiQ === state.qb ? state.qa : state.qb, false);
+      // The supply curve at the other firm's actual output: the dot lies on it.
+      const qOther = xa === 'x' ? eq.q2 : eq.q1;
+      traces.push(curve(p => EM.supplyGiven(s, p, qOther), xa, th.ink, 1.5, `S${self}(${other} = ${fmt(qOther)}), the other firm's actual output`));
       traces.push(U.dot2([[xa === 'x' ? eq.q1 : eq.q2, state.p]], th.ink, `firm ${self} at p`, 9, { xaxis: xa }));
     }
     // Market: true supply S and the sums of marginal cost curves for fixed outputs of the other firm.
-    traces.push(curve(p => EM.sumOfMC(s, p, state.qa), 'x3', th.grey, 1.8, `MC₁ + MC₂ (other at ${fmt(state.qa, 1)})`, 'dot'));
-    traces.push(curve(p => EM.sumOfMC(s, p, state.qb), 'x3', th.grey, 1.8, `MC₁ + MC₂ (other at ${fmt(state.qb, 1)})`, 'dot'));
+    traces.push(curve(p => EM.sumOfMC(s, p, state.qa), 'x3', th.grey, 1.8, `MC₁ + MC₂ (other at ${fmt(state.qa)})`, 'dot'));
+    traces.push(curve(p => EM.sumOfMC(s, p, state.qb), 'x3', th.grey, 1.8, `MC₁ + MC₂ (other at ${fmt(state.qb)})`, 'dot'));
     traces.push(curve(p => EM.marketSupply(s, p), 'x3', th.orange, 3, 'market supply S'));
     traces.push(U.dot2([[eq.Q, state.p]], th.ink, 'market at p', 10, { xaxis: 'x3' }));
     for (const qbar of [state.qa, state.qb]) {
@@ -64,10 +67,10 @@
     Plotly.react('plot', traces, base, { ...U.PLOT_CONFIG, displayModeBar: false });
 
     $('head').textContent = state.e > 0 ? 'Negative externality' : state.e < 0 ? 'Positive externality' : 'No externality';
-    const kind = state.e > 0 ? `A higher output of the other firm <b>raises</b> marginal cost, so ${texStr(`S^1(q^2=${fmt(state.qb, 1)})`)} lies above ${texStr(`S^1(q^2=${fmt(state.qa, 1)})`)}. Market supply ${texStr('S')} is steeper than ${texStr('MC_1+MC_2')}: it reacts less to the price.`
-      : state.e < 0 ? `A higher output of the other firm <b>lowers</b> marginal cost, so ${texStr(`S^1(q^2=${fmt(state.qb, 1)})`)} lies below ${texStr(`S^1(q^2=${fmt(state.qa, 1)})`)}. Market supply ${texStr('S')} is flatter than ${texStr('MC_1+MC_2')}: it reacts more to the price.`
+    const kind = state.e > 0 ? `A higher output of the other firm <b>raises</b> marginal cost, so ${texStr(`S^1(q^2=${fmt(state.qb)})`)} lies above ${texStr(`S^1(q^2=${fmt(state.qa)})`)}. Market supply ${texStr('S')} is steeper than ${texStr('MC_1+MC_2')}: it reacts less to the price.`
+      : state.e < 0 ? `A higher output of the other firm <b>lowers</b> marginal cost, so ${texStr(`S^1(q^2=${fmt(state.qb)})`)} lies below ${texStr(`S^1(q^2=${fmt(state.qa)})`)}. Market supply ${texStr('S')} is flatter than ${texStr('MC_1+MC_2')}: it reacts more to the price.`
       : `Without an externality the firms' supply curves do not depend on each other and ${texStr('S')} is simply ${texStr('MC_1+MC_2')}.`;
-    $('capMain').innerHTML = `<span class="c-l2-orange"><span class="key"></span>supply</span>, <span class="c-l2-grey"><span class="key dash"></span>${texStr('MC_1+MC_2')}</span> for the other firm's output fixed at ${fmt(state.qa, 1)} and ${fmt(state.qb, 1)}. ${kind} ${texStr('S')} meets each dotted line where both firms produce exactly that output.`;
+    $('capMain').innerHTML = `Left and middle: a firm's supply when the other firm produces <span class="c-l2-orange"><span class="key"></span>${fmt(state.qa)}</span> or <span class="c-l2-orange"><span class="key dash"></span>${fmt(state.qb)}</span>, and <span class="c-ink"><span class="key"></span>${fmt(eq.q2)}</span>, what it actually produces at this price: the dot lies on that curve. Right: <span class="c-l2-orange"><span class="key"></span>market supply</span> and <span class="c-l2-grey"><span class="key dash"></span>${texStr('MC_1+MC_2')}</span> for the other firm's output fixed at ${fmt(state.qa)} and ${fmt(state.qb)}. ${kind} ${texStr('S')} meets each dotted line where both firms produce exactly that output.`;
     return { s, eq };
   }
 

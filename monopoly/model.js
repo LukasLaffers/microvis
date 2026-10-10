@@ -56,6 +56,16 @@
     return { q, p: price(q, d) };
   }
 
+  // Deadweight loss of monopoly: the area between demand and MC from the monopoly output q* to the price taker's q
+  // (Simpson's rule; both curves are smooth there).
+  function deadweightLoss(w, s, d, qm, qc) {
+    if (!(qc > qm)) return 0;
+    const n = 200, h = (qc - qm) / n, g = q => price(q, d) - FM.MC(w, q, s);
+    let sum = g(qm) + g(qc);
+    for (let k = 1; k < n; k++) sum += (k % 2 ? 4 : 2) * g(qm + k * h);
+    return sum * h / 3;
+  }
+
   // Long run with differentiated products: the intercept A* of a linear AR (slope B) at which the best profit is 0.
   function tangencyIntercept(w, s, B) {
     const best = A => optimum(w, s, { type: 'linear', A, B }).profit;
@@ -65,7 +75,7 @@
     return hi;
   }
 
-  const api = { price, priceSlope, MR, eta, qLimit, profitAt, optimum, describe, competitive, tangencyIntercept };
+  const api = { price, priceSlope, MR, eta, qLimit, profitAt, optimum, describe, competitive, deadweightLoss, tangencyIntercept };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.MonopolyModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

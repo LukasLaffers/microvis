@@ -36,13 +36,15 @@
     ];
     // Arrows and labels move with w_E, so they are traces: an animation frame then only moves points.
     traces.push(U.arrow2(e0.firmE, e.firmE, cE, 2, 0.5), U.arrow2(e0.firmK, e.firmK, cK, 2, 0.5), U.arrow2([e0.E, e0.K], [e.E, e.K], th.ink, 2, 0.5));
-    // Labels in the free quadrant next to each corner (the isoquant runs right and up from it).
-    // Each label turns to the left near the right edge; the capital-intensive one also when the aggregate is close by.
-    const side = x => (x > 0.55 * L ? 'left' : 'right'), pad = (t, x) => (side(x) === 'left' ? `${t}  ` : `  ${t}`);
-    const kSide = e.E > e.firmK[0] && Math.abs(e.K - e.firmK[1]) < 0.15 * L ? 'left' : side(e.firmK[0]);
-    traces.push(U.text2(e.firmE, pad(`energy-intensive (${f1(e.firmE[0])}, ${f1(e.firmE[1])})`, e.firmE[0]), cE, 'bottom ' + side(e.firmE[0])));
-    traces.push(U.text2(e.firmK, kSide === 'left' ? `capital-intensive (${f1(e.firmK[0])}, ${f1(e.firmK[1])})  ` : `  capital-intensive (${f1(e.firmK[0])}, ${f1(e.firmK[1])})`, cK, 'top ' + kSide));
-    traces.push(U.text2([e.E, e.K], pad(` aggregate (${f1(e.E)}, ${f1(e.K)})`, e.E), th.ink, 'bottom ' + side(e.E)));
+    // Labels in the free quadrant next to each corner, set a little off the point so that they do not sit on the lines:
+    // the energy-intensive one below its horizontal arm, the capital-intensive one above-left of its corner.
+    const side = x => (x > 0.7 * L ? 'left' : 'right');
+    const off = (p, pos) => [p[0] + (pos.includes('right') ? 0.4 : -0.4), p[1] + (pos.includes('top') ? 0.5 : -0.5)];
+    const label = (p, text, color, pos) => U.text2(off(p, pos), text, color, pos);
+    const posE = 'bottom ' + side(e.firmE[0]), posK = e.firmK[0] > 9 ? 'top left' : 'top right', posA = e.E > 0.7 * L ? 'top left' : 'bottom right';
+    traces.push(label(e.firmE, `energy-intensive<br>(${f1(e.firmE[0])}, ${f1(e.firmE[1])})`, cE, posE));
+    traces.push(label(e.firmK, `capital-intensive<br>(${f1(e.firmK[0])}, ${f1(e.firmK[1])})`, cK, posK));
+    traces.push(label([e.E, e.K], `aggregate<br>(${f1(e.E)}, ${f1(e.K)})`, th.ink, posA));
     U.plot('plot', traces, U.base2d(th, { xt: 'Energy E', yt: 'Capital K', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('cap').innerHTML = `Open circles: ${texStr('w_E=w_K=1')}, both firms produce 10, total ${texStr('(E,K)=(30,30)')}. Now ${texStr(`w_E=${f2(state.wE)}`)}: the firms produce ${f1(e.qE)} and ${f1(e.qK)} and the total is ${texStr(`(${f1(e.E)},${f1(e.K)})`)}. Each firm's input ratio ${texStr('K/E')} is fixed (½ and 2)${Math.abs(e.K / e.E - 1) < 5e-3 ? `, and so is the aggregate ${texStr('K/E')} = 1 while both firms produce the same. Raise ${texStr('w_E')} to see it move.` : `, yet the aggregate ${texStr('K/E')} moved from 1 to ${f2(e.K / e.E)}.`}`;
     return e;

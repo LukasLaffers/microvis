@@ -90,7 +90,18 @@
       traces.push(U.dot2([d.E1], th.ink, 'E₁', 11), U.dot2([d.E2], th.blue, 'E₂', 11), U.dot2([d.E3], th.red, 'E₃', 11));
       const arrow = (a, b, color) => { if (Math.hypot(a[0] - b[0], a[1] - b[1]) > L * 0.01) annotations.push({ x: b[0], y: b[1], ax: a[0], ay: a[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2.5, arrowcolor: color, text: '' }); };
       arrow(d.E1, d.E2, th.blue); arrow(d.E2, d.E3, th.red);
-      lab(d.E1, 'E<sub>1</sub>', th.ink, 'right'); lab(d.E2, 'E<sub>2</sub>', th.blue, 'left'); lab(d.E3, 'E<sub>3</sub>', th.red, 'left');
+      // Each label on the side of its budget line away from the arrows: E1 and E2 below their lines (towards the origin),
+      // E3 above the new budget line. Next to the x1 axis a label goes beside its point instead.
+      const away = (pt, text, color, dir) => {
+        let dx = dir[0] / F.Lx, dy = dir[1] / F.Ly;
+        if (dy < 0 && pt[1] < 0.1 * F.Ly) dy = 0;
+        if (dx < 0 && pt[0] < 0.1 * F.Lx) dx = 0;
+        const n = Math.hypot(dx, dy) || 1; dx /= n; dy /= n;
+        annotations.push({ x: pt[0], y: pt[1], text, showarrow: false, xanchor: dx > 0.35 ? 'left' : dx < -0.35 ? 'right' : 'center', yanchor: dy > 0.35 ? 'bottom' : dy < -0.35 ? 'top' : 'middle', xshift: 9 * dx, yshift: 9 * dy, font: { size: 14, color } });
+      };
+      away(d.E1, 'E<sub>1</sub>', th.ink, [-p[0], -p[1]]);
+      away(d.E2, 'E<sub>2</sub>', th.blue, [-pn[0], -pn[1]]);
+      away(d.E3, 'E<sub>3</sub>', th.red, [pn[0], pn[1]]);
     } else {
       // Substitution: along v0 from E1 to E2 (blue). Income: from E2 straight to E3 (red).
       const fs = fSub(), fc = fInc(), n = 60;
@@ -186,8 +197,14 @@
       : U.linspace(Math.max(0.3, lo * 0.6), hi * 1.5, 120);
     // the two curves do not change while p1 moves: computed once per setting
     const key = JSON.stringify([u, p, state.y, state.p1n]);
-    if (demandMemo.key !== key) demandMemo = { key, D: SM.marshallCurve(p[1], state.y, u, ps), H: SM.hicksCurve(p[1], d.v0, u, ps) };
-    const { D, H } = demandMemo;
+    // Hicksian demand stops where the cheapest bundle on v0 hits x2 = 0 (a corner, as in the Giffen example at low p1)
+    const corner = p1 => CM.hicks([p1, p[1]], d.v0, u)[1] <= 1e-6;
+    if (demandMemo.key !== key) {
+      const H = SM.hicksCurve(p[1], d.v0, u, ps).map((q, i) => (corner(ps[i]) ? [null, null] : q));
+      const cut = ps.filter(corner);
+      demandMemo = { key, D: SM.marshallCurve(p[1], state.y, u, ps), H, pCorner: cut.length ? Math.max(...cut) : null };
+    }
+    const { D, H, pCorner } = demandMemo;
     const xs = [...D, ...H].map(q => q[0]).filter(Number.isFinite);
     U.plot('plotB', [
       U.line2(H, th.blue, 2.2, 'Hicksian H¹(p₁, p₂, v⁰)', 'dash'),
@@ -198,6 +215,7 @@
     const k = S.cls.kind;
     $('capB').innerHTML = `<span style="color:#4caf50"><span class="key"></span>Marshallian</span> and <span class="c-l2-blue"><span class="key dash"></span>Hicksian</span> demand through ${texStr('E_1')}. ` +
       (k === 'normal' ? 'For a normal good the Marshallian curve is flatter: the income effect adds to the substitution effect.' : k === 'inferior' ? 'For an inferior good (not Giffen) the Marshallian curve is steeper than the Hicksian one.' : 'For a Giffen good the Marshallian curve slopes upwards; the Hicksian curve still slopes down.') +
+      (pCorner !== null ? ` Below ${texStr(`p_1=${fmt(pCorner)}`)} the Hicksian curve stops: there ${texStr('x_2=0')}.` : '') +
       ' Only the Marshallian curve can be observed.';
   }
 
@@ -221,7 +239,7 @@
     const euShown = shown(e.ec[0][0]) - shown(e.eta[0]) * shown(e.b[0]);
     const kindTxt = { normal: '<span class="badge-kind c-inc">normal</span>', inferior: '<span class="badge-kind c-l2-orange">inferior</span>', giffen: '<span class="badge-kind c-l2-red">Giffen</span>' }[cls.kind];
     $('checks').innerHTML = [
-      item(same(s.total, s.substitution + s.income), `At ${texStr(`p_1=${fmt(p[0])}`)}: ${(() => { const [a, b, t] = U.fmtSum([s.substitution, s.income]); return texStr(`\\frac{\\partial D^1}{\\partial p_1}=${t}=\\color{${TH.blue}}{${a}}\\color{${TH.red}}{${b.startsWith('−') ? '' : '+'}${b}}`); })()}`),
+      item(same(s.total, s.substitution + s.income), `${now ? 'At' : 'Slopes at the starting price'} ${texStr(`p_1=${fmt(p[0])}`)}${now ? '' : ' (the table is the whole step to ' + texStr(`p_1'=${fmt(state.p1n)}`) + ')'}: ${(() => { const [a, b, t] = U.fmtSum([s.substitution, s.income]); return texStr(`\\frac{\\partial D^1}{\\partial p_1}=${t}=\\color{${TH.blue}}{${a}}\\color{${TH.red}}{${b.startsWith('−') ? '' : '+'}${b}}`); })()}`),
       item(same(e.eu[0][0], e.ec[0][0] - e.eta[0] * e.b[0]), `${texStr(`\\varepsilon^u_{11}=${f3(euShown)}=\\varepsilon^c_{11}-\\eta_1b_1=${f3(e.ec[0][0])}-(${f3(e.eta[0])})(${f3(e.b[0])})`)}`),
       `<li><span class="mark na">·</span><span>Good 1 is ${kindTxt}: ${texStr(`\\eta_1=${f3(e.eta[0])}`)}${cls.kind === 'giffen' ? `, ${texStr(`\\varepsilon^u_{11}=${f3(euShown)}>0`)}` : ''}.</span></li>`
     ].join('');
@@ -240,6 +258,7 @@
     $('income-note').hidden = !note; $('income-note').textContent = note;
     const S = solve(), th = U.theme();
     tex($('formula'), CU.formula(S.u), true);
+    $('formula').hidden = S.u.type === 'giffen';
     guard('plot', () => draw(th, S));
     guard('demand plot', () => drawDemand(th, S));
     if (writeText) guard('numbers', () => renderNumbers(S));

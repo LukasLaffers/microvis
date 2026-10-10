@@ -34,7 +34,7 @@ Colours: substitution effect blue, income effect red; budget lines red, indiffer
 **Utilities available in the lecture 6 tools** (none is an exercise function):
 - CES $U=[\delta x_1^{\rho}+(1-\delta)x_2^{\rho}]^{1/\rho}$ (default $\delta=0.5$, $\rho=-1$, so $\sigma=0.5$). Its demands come from `shared/firm-model.js`: $C(p,v)=c(p)\,v$ with `unitCost`, $H(p,v)=\widetilde H(p)\,v$ with `unitDemand`, $V(p,y)=y/c(p)$, $D(p,y)=\widetilde H(p)\,y/c(p)$ (use `tech:'ces'`, `delta`, `rho`).
 - Stone–Geary $U=(x_1-\gamma_1)^{\alpha}(x_2-\gamma_2)^{1-\alpha}$ (subsistence quantities $\gamma_j\ge0$): $D^1=\gamma_1+\alpha\,(y-p^t\gamma)/p_1$, $D^2=\gamma_2+(1-\alpha)(y-p^t\gamma)/p_2$.
-- Giffen (Haagsma 2012): $U=\alpha\ln(x_1-a)-\beta\ln(b-x_2)$ with $\alpha<\beta$ (convex preferences), $p_2=1$, $y>b$: $D^1=\dfrac{\alpha(y-b)-p_1\beta a}{p_1(\alpha-\beta)}$, valid while $D^1>a$ and $0\le D^2<b$. Defaults $\alpha=1$, $\beta=2$, $a=1$, $b=10$, $y=12$: $D^1=2-2/p_1$ for $p_1\in(2,7)$ — rises with $p_1$.
+- Giffen good: the notes take it as given, with no utility function. The pages show none (the tools use $U=-(s-x_2)^2/(x_1-c)$ internally, not on the page) and mention nothing about it that is not needed (user, 10 October).
 - Cobb-Douglas is allowed **only** as a CES special case ($\rho\to0$) and must not show closed-form demand, expenditure or indirect utility formulas (exercise 10).
 
 **Do not reproduce the lecture 6 exercises:** no linear or Leontief utility presets (exercises 4–5), no $\alpha\sqrt{x_1}+x_2$ (exercise 1), no labour-supply problem (exercise 6), no 3-good substitution matrix (exercise 7). Hide $\lambda^\ast$ and $\mu^\ast$ (exercise 3a: $\lambda^\ast=1/\mu^\ast$) behind "Check your answer".

@@ -7,8 +7,8 @@
   <meta name="description" content="The better-than set B(x), the worse-than set W(x) and the indifference set I(x) for several preferences, which axioms they satisfy, and why lexicographic preferences are not continuous. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=8">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="../shared/style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=10">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -28,10 +28,10 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>For a reference bundle <span class="tex" data-tex="x^\circ"></span>: blue is <span class="tex" data-tex="B(x^\circ)"></span>, the bundles at least as good; grey is <span class="tex" data-tex="W(x^\circ)"></span>, the bundles no better; the curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. The table lists which axioms hold.</p>
+          <p>For a reference bundle <span class="tex" data-tex="x^\circ"></span>: blue is <span class="tex" data-tex="B(x^\circ)"></span>, the bundles at least as good; grey is <span class="tex" data-tex="W(x^\circ)"></span>, the bundles no better; the curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. Decide which axioms hold, then press <b>Check your answer</b>.</p>
           <ul>
           <li>Click to place a test bundle <span class="tex" data-tex="x'"></span>: the page compares it with <span class="tex" data-tex="x^\circ"></span> and checks whether the segment between them stays in <span class="tex" data-tex="B(x^\circ)"></span>, as convexity requires.</li>
-          <li>Choose <b>A bliss point</b> or <b>Indifference curves bowed out</b>: the table shows which axioms fail.</li>
+          <li>Choose <b>A bliss point</b> or <b>Indifference curves bowed out</b>: which axioms fail? Check your answer.</li>
           <li>Choose <b>Lexicographic</b>: <span class="tex" data-tex="I(x^\circ)"></span> is a single point, and the preferences are not continuous.</li>
           </ul>
         </details>
@@ -67,6 +67,8 @@
     <div class="side">
       <section class="panel readouts" aria-label="Axioms" aria-live="polite">
         <h2>Axioms</h2>
+        <p class="caption" id="askAxioms">Which axioms hold for these preferences? Decide for each, then check.</p>
+        <div class="btn-row"><button type="button" id="reveal" aria-pressed="false">Check your answer</button></div>
         <ul class="checks" id="axioms"></ul>
         <p class="caption" id="repr"></p>
       </section>
@@ -89,10 +91,10 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=8"></script>
-  <script src="model.js?v=8"></script>
-  <script src="app.js?v=8"></script>
-  <script src="../shared/theme.js?v=8"></script>
+  <script src="../shared/ui.js?v=10"></script>
+  <script src="model.js?v=10"></script>
+  <script src="app.js?v=10"></script>
+  <script src="../shared/theme.js?v=10"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

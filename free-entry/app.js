@@ -46,16 +46,15 @@
     const shapes = [{ type: 'line', x0: e.q, x1: e.q, y0: 0, y1: e.p, line: { color: th.muted, width: 1, dash: 'dot' } }];
     const lastBelow = f => { for (let i = qq.length - 1; i >= 0; i--) { const v = f(qq[i]); if (v < yMax * 0.92) return [qq[i], v]; } return null; };
     const mcL = lastBelow(q => FM.MC(W, q, s)), acL = lastBelow(q => FM.AC(W, q, s));
-    const acNear = !!acL && acL[0] > 0.6 * qMax && acL[1] < e.p && e.p - acL[1] < 0.08 * yMax;
     const annotations = [
       { x: e.q / 2, y: (e.p + e.AC) / 2, text: 'Π', showarrow: false, font: { size: 15, color: th.ink }, bgcolor: th.panel, bordercolor: th.line, borderpad: 3, visible: Math.abs(e.p - e.AC) > 0.35 },
-      // below the price line, or above it when the average-cost label would sit there
-      { x: qMax, y: e.p, text: 'average revenue = p', showarrow: false, xanchor: 'right', yanchor: acNear ? 'bottom' : 'top', yshift: acNear ? 2 : -2, font: { size: 12, color: th.blue } },
+      // in the right margin, at the end of the price line, where no curve crosses it
+      { x: qMax, y: e.p, text: 'AR = p', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 12, color: th.blue } },
       { x: e.q, y: 0, text: `q<sub>${state.N}</sub>`, showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 3, font: { size: 12, color: th.ink } }
     ];
     if (mcL) annotations.push({ x: mcL[0], y: mcL[1], text: 'marginal cost', showarrow: false, xanchor: 'right', xshift: -6, font: { size: 12, color: th.red } });
     if (acL) annotations.push({ x: acL[0], y: acL[1], text: 'average cost', showarrow: false, xanchor: 'right', xshift: -8, font: { size: 12, color: th.ink } });
-    Plotly.react('plot', traces, U.base2d(th, { xt: `output of firm 1, …, ${state.N}`, yt: 'p', x: { range: [0, qMax] }, y: { range: [0, yMax] }, shapes, annotations }), U.PLOT_CONFIG);
+    Plotly.react('plot', traces, U.base2d(th, { xt: `output of firm 1, …, ${state.N}`, yt: 'p', x: { range: [0, qMax] }, y: { range: [0, yMax] }, shapes, annotations, margin: { l: 52, r: 52, t: 8, b: 44 } }), U.PLOT_CONFIG);
     $('headA').textContent = e.profit > 1e-6 ? 'A single firm: profit attracts entry' : e.profit < -1e-6 ? 'A single firm: a loss' : 'A single firm: zero profit';
     $('capA').innerHTML = `Each of the ${state.N} firms produces ${texStr(`q_{${state.N}}=${fmt(e.q, 3)}`)} where ${texStr(`MC=p=${fmt(e.p, 3)}`)}. Profit ${texStr(`\\Pi=(p-AC)\\,q=${fmt(e.profit, 3)}`)}${e.profit < 0 ? ': this firm would rather not have entered.' : '.'} The open circle is the bottom of average cost, ${texStr(`\\min AC=${fmt(R.hat.pHat, 3)}`)}.`;
   }
@@ -66,7 +65,7 @@
     const { s, d, e, hat } = R, qTop = d.M * P_MAX;
     const lo = FE.mcMin(W, s), pp = U.linspace(lo, P_MAX, 160);
     const traces = [
-      U.line2([[0, P_MAX], [qTop, 0]], th.ink, 2, 'demand D(p)'),
+      U.line2([[0, P_MAX], [qTop, 0]], th.ink, 2, 'demand Dem(p)'),
       U.line2(pp.filter(p => p >= hat.pHat).map(p => [state.N * FE.outputOnMC(W, p, s), p]), th.orange, 2.5, `supply of ${state.N} firms`),
       U.line2(pp.filter(p => p <= hat.pHat).map(p => [state.N * FE.outputOnMC(W, p, s), p]), th.orange, 1.5, 'below min AC: losses', 'dash'),
       U.line2([[0, hat.pHat], [qTop, hat.pHat]], th.muted, 1.5, 'long run: p = min AC', 'dot'),
@@ -74,7 +73,7 @@
     ];
     const annotations = [{ x: qTop, y: hat.pHat, text: 'min AC', showarrow: false, xanchor: 'right', yanchor: 'top', yshift: -2, font: { size: 11, color: th.muted } }];
     Plotly.react('plotB', traces, U.base2d(th, { xt: 'market output', yt: 'p', x: { range: [0, qTop] }, y: { range: [0, P_MAX * 1.05] }, annotations }), U.PLOT_CONFIG);
-    $('capB').innerHTML = `<span class="c-ink"><span class="key"></span>demand</span> ${texStr(`D(p)=${fmt(d.M, 1)}\\,(10-p)`)}, <span class="c-l2-orange"><span class="key"></span>supply of ${state.N} firms</span>. Each entrant shifts supply to the right and the price down, towards ${texStr('\\min AC')}.`;
+    $('capB').innerHTML = `<span class="c-ink"><span class="key"></span>demand</span> ${texStr(`Dem(p)=${fmt(d.M, 2)}\\,(10-p)`)}, <span class="c-l2-orange"><span class="key"></span>supply of ${state.N} firms</span> (<span class="c-l2-orange"><span class="key dash"></span>dashed</span> below ${texStr('\\min AC')}: there the firms would make a loss and rather not produce). Each entrant shifts supply to the right and the price down, towards ${texStr('\\min AC')}.`;
   }
 
   function renderChecks(R) {
@@ -90,7 +89,7 @@
       ['\\text{industry size}', `${texStr(`N=${Nstar}`)} ${state.N === Nstar ? '<span class="ok-mark">(here)</span>' : ''}`],
       ['p_N\\ \\text{vs}\\ \\min AC', eS ? `${fmt(eS.p, 3)} vs ${fmt(hat.pHat, 3)}` : '—'],
       ['\\Pi(q_N)', eS ? fmt(eS.profit, 3) : '—'],
-      ['N=\\lfloor D(\\min AC)/\\hat q\\rfloor', `⌊${fmt(FE.demand(hat.pHat, R.d), 2)} / ${fmt(hat.qHat, 2)}⌋ = ${Nstar}`]
+      ['N=\\lfloor Dem(\\min AC)/\\hat q\\rfloor', `⌊${fmt(FE.demand(hat.pHat, R.d), 2)} / ${fmt(hat.qHat, 2)}⌋ = ${Nstar}`]
     ].map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
   }
 

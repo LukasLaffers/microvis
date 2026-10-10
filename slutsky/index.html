@@ -7,8 +7,8 @@
   <meta name="description" content="The Slutsky equation: a price change splits into a substitution effect along the indifference curve and an income effect; Marshallian versus Hicksian demand; inferior and Giffen goods. Lecture 6.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=8">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="../shared/style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=10">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -48,7 +48,7 @@
         <select id="type" aria-label="Utility function">
           <option value="ces">CES</option>
           <option value="stonegeary">Stone–Geary (subsistence)</option>
-          <option value="giffen">Giffen example</option>
+          <option value="giffen">Giffen good</option>
         </select>
         <div class="formula" id="formula"></div>
         <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
@@ -56,7 +56,6 @@
         <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="stonegeary"></div>
         <div class="ctrl" data-key="g1" data-label="\gamma_1" data-hint="subsistence of good 1" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
         <div class="ctrl" data-key="g2" data-label="\gamma_2" data-hint="subsistence of good 2" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
-        <p class="hint-line" data-show="giffen">Defined for <span class="tex" data-tex="x_1>1"></span>, <span class="tex" data-tex="x_2<4"></span>. Good 1 is inferior; with <span class="tex" data-tex="y>4p_2"></span> it is a Giffen good.</p>
       </div>
       <div class="group">
         <h2>Prices and income</h2>
@@ -107,12 +106,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=8"></script>
-  <script src="../shared/consumer-model.js?v=8"></script>
-  <script src="../shared/consumer-ui.js?v=8"></script>
-  <script src="model.js?v=8"></script>
-  <script src="app.js?v=8"></script>
-  <script src="../shared/theme.js?v=8"></script>
+  <script src="../shared/ui.js?v=10"></script>
+  <script src="../shared/consumer-model.js?v=10"></script>
+  <script src="../shared/consumer-ui.js?v=10"></script>
+  <script src="model.js?v=10"></script>
+  <script src="app.js?v=10"></script>
+  <script src="../shared/theme.js?v=10"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

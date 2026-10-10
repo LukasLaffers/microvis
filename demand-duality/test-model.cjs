@@ -15,6 +15,8 @@ for (const u of prefs) for (const p of [[1, 1], [2, 0.8], [0.7, 1.6]]) for (cons
   // Kuhn-Tucker at an interior optimum: U_1/p_1 = U_2/p_2 = lambda* = dV/dy.
   const x = CM.demand(p, y, u);
   if (x[0] > 1e-6 && x[1] > 1e-6) { close(E.kkt[0], E.lambda, 1e-5, 'lambda ' + label); close(E.kkt[1], E.lambda, 1e-5); checks += 2; }
+  // The two multipliers at the same tangency: lambda*(p, C(p,v)) mu*(p,v) = 1.
+  { const Ev = M.envelope(p, CM.expenditure(p, v, u), v, u); close(Ev.lambda * Ev.mu, 1, 1e-5, 'lambda mu ' + label); checks++; }
   // (I2) V falls with p1; (E4) C is concave in p1 and (E2) rises with p1.
   const Vc = M.curveV(p[1], y, u, [0.5, 1, 1.5, 2, 2.5]).map(q => q[1]), Cc = M.curveC(p[1], v, u, [0.5, 1, 1.5, 2, 2.5]).map(q => q[1]);
   for (let i = 1; i < 5; i++) { assert.ok(Vc[i] <= Vc[i - 1] + 1e-12 && Cc[i] >= Cc[i - 1] - 1e-12); }
