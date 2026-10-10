@@ -259,7 +259,11 @@
         const q = gd._transitionData;
         if (gd._transitioning || (q && ((q._frameQueue && q._frameQueue.length) || q._animationRaf))) { requestAnimationFrame(rebuild); return; }
         const args = gd._microvisPending; gd._microvisPending = null;
-        Plotly.react(gd, ...args);
+        // with equal scales (scaleanchor) Plotly.react keeps the old domain when the axis ranges change: draw anew then
+        const L = args[1] || {}, ranges = L.yaxis && L.yaxis.scaleanchor ? JSON.stringify([L.xaxis && L.xaxis.range, L.yaxis.range]) : null;
+        if (ranges && gd._microvisRanges && gd._microvisRanges !== ranges) Plotly.newPlot(gd, ...args);
+        else Plotly.react(gd, ...args);
+        gd._microvisRanges = ranges;
       };
       rebuild();
     }
@@ -277,7 +281,8 @@
   function overlay(id, traces, font) {
     const gd = typeof id === 'string' ? document.getElementById(id) : id;
     gd._mvTraces = traces; gd._mvFont = font || gd._mvFont;
-    if (!gd._mvHooked && gd.on) { gd.on('plotly_afterplot', () => paintOverlay(gd)); gd._mvHooked = true; }
+    // repaint after every Plotly redraw; hooked again when the figure was rebuilt from scratch (Plotly.purge drops handlers)
+    if (gd.on && (!gd._mvHooked || gd._mvHookedEv !== gd._ev)) { gd.on('plotly_afterplot', () => paintOverlay(gd)); gd._mvHooked = true; gd._mvHookedEv = gd._ev; }
     paintOverlay(gd);
   }
   function paintOverlay(gd) {
