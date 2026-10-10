@@ -90,16 +90,18 @@
       traces.push(U.dot2([d.E1], th.ink, 'E₁', 11), U.dot2([d.E2], th.blue, 'E₂', 11), U.dot2([d.E3], th.red, 'E₃', 11));
       const arrow = (a, b, color) => { if (Math.hypot(a[0] - b[0], a[1] - b[1]) > L * 0.01) annotations.push({ x: b[0], y: b[1], ax: a[0], ay: a[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2.5, arrowcolor: color, text: '' }); };
       arrow(d.E1, d.E2, th.blue); arrow(d.E2, d.E3, th.red);
-      // each label on the side away from its arrows, so that no arrow runs through it
-      const unit = (a, b) => { const v = [(b[0] - a[0]) / F.Lx, (b[1] - a[1]) / F.Ly], n = Math.hypot(v[0], v[1]); return n > 1e-9 ? [v[0] / n, v[1] / n] : [0, 0]; };
+      // Each label on the side of its budget line away from the arrows: E1 and E2 below their lines (towards the origin),
+      // E3 above the new budget line. Next to the x1 axis a label goes beside its point instead.
       const away = (pt, text, color, dir) => {
-        const n = Math.hypot(dir[0], dir[1]) || 1, dx = dir[0] / n, dy = dir[1] / n;
+        let dx = dir[0] / F.Lx, dy = dir[1] / F.Ly;
+        if (dy < 0 && pt[1] < 0.1 * F.Ly) dy = 0;
+        if (dx < 0 && pt[0] < 0.1 * F.Lx) dx = 0;
+        const n = Math.hypot(dx, dy) || 1; dx /= n; dy /= n;
         annotations.push({ x: pt[0], y: pt[1], text, showarrow: false, xanchor: dx > 0.35 ? 'left' : dx < -0.35 ? 'right' : 'center', yanchor: dy > 0.35 ? 'bottom' : dy < -0.35 ? 'top' : 'middle', xshift: 9 * dx, yshift: 9 * dy, font: { size: 14, color } });
       };
-      const a12 = unit(d.E1, d.E2), a23 = unit(d.E2, d.E3);
-      away(d.E1, 'E<sub>1</sub>', th.ink, [-a12[0], -a12[1]]);
-      away(d.E2, 'E<sub>2</sub>', th.blue, [a12[0] - a23[0], a12[1] - a23[1]]);
-      away(d.E3, 'E<sub>3</sub>', th.red, a23);
+      away(d.E1, 'E<sub>1</sub>', th.ink, [-p[0], -p[1]]);
+      away(d.E2, 'E<sub>2</sub>', th.blue, [-pn[0], -pn[1]]);
+      away(d.E3, 'E<sub>3</sub>', th.red, [pn[0], pn[1]]);
     } else {
       // Substitution: along v0 from E1 to E2 (blue). Income: from E2 straight to E3 (red).
       const fs = fSub(), fc = fInc(), n = 60;

@@ -11,7 +11,7 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { panel: 'A', delta: 0.5, rho: -1, a: 0.4, g1: 3, ad1: 0.8, ad2: 0.4, hc: 2, hK: 3, p1: 1, p2: 1, y: 10, anim: null };   // anim: progress of the income animation (null when not playing)
+  const state = { panel: 'A', log: false, delta: 0.65, rho: -1, a: 0.4, g1: 3, ad1: 0.8, ad2: 0.4, hc: 2, hK: 3, p1: 1, p2: 1, y: 10, anim: null };   // anim: progress of the income animation (null when not playing)
   let ctrls = {}, memo = { key: '' }, lastNumbers = 0;
   // The expansion path and the Engel curves do not change while income moves: computed once per setting.
   function curves(u, p, lo, hi) {
@@ -21,8 +21,17 @@
   }
   const schedule = U.scheduler(render);
   const f3 = x => fmt(Math.abs(x) < 1e-7 ? 0 : x, 3);   // rounding noise of the finite differences prints as 0
-  const par = x => (x < 0 ? `(${f3(x)})` : f3(x));
   const same = (a, b) => Math.abs(a - b) <= 1e-5 * Math.max(1, Math.abs(a), Math.abs(b));
+  // Good 1 black, good 2 purple: in lecture 6 blue and red mean substitution and income.
+  const col = th => [th.ink, th.accent4 || '#8b3fb8'];
+  // Rounded to two decimals so that the shown parts add up to the exact total (largest remainders get the last cents).
+  function partsTo(parts, total) {
+    const c = parts.map(x => x * 100), fl = c.map(Math.floor);
+    let left = Math.round(total * 100) - fl.reduce((a, b) => a + b, 0);
+    c.map((x, i) => [x - fl[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { fl[i]++; left--; } });
+    return fl.map(v => (v / 100).toFixed(2).replace('-', '−'));
+  }
+  const sumTex = ps => ps.map((v, i) => (i && !v.startsWith('−') ? '+' : '') + v).join('');
   const pref = () => ({
     A: () => ({ type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }),
     B: () => ({ type: 'stonegeary', a: state.a, g1: state.g1, g2: 0 }),
@@ -48,14 +57,14 @@
     if (!anim) for (const yy of ys) {
       traces.push(U.line2([[yy / p[0], 0], [0, yy / p[1]]], th.grey, 1.2, `budget line, y = ${fmt(yy)}`));
       const v = CM.indirect(p, yy, u);
-      traces.push(U.line2(CM.indifferenceCurve(v, u, x1s).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.blue, 1, 'indifference curve', 'dot'));
+      traces.push(U.line2(CM.indifferenceCurve(v, u, x1s).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.muted, 1, 'indifference curve', 'dot'));
     }
     const { yAll, path } = curves(u, p, lo, hi);
     if (anim) {
       // the path traced so far (strong) and still ahead (faint), and the indifference curve touching the current budget line
       traces.push(U.line2(path.filter((_, i) => yAll[i] >= state.y), th.orange, 1.5, 'still ahead', 'dot'));
       traces.push(U.line2(path.filter((_, i) => yAll[i] < state.y).concat([x]), th.orange, 3.5, 'income expansion path'));
-      traces.push(U.line2(CM.indifferenceCurve(CM.indirect(p, state.y, u), u, U.linspace(Lx / 400, Lx, 150)).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.blue, 1.8, 'indifference curve'));
+      traces.push(U.line2(CM.indifferenceCurve(CM.indirect(p, state.y, u), u, U.linspace(Lx / 400, Lx, 150)).map(([a, b]) => [a, b !== null && b <= Ly ? b : null]), th.muted, 1.8, 'indifference curve'));
     } else traces.push(U.line2(path, th.orange, 3.5, 'income expansion path'));
     traces.push(U.line2([[state.y / p[0], 0], [0, state.y / p[1]]], th.ink, 2.2, anim ? 'budget line now' : `budget line, y = ${fmt(state.y)}`));
     if (state.panel === 'E') {
@@ -73,27 +82,30 @@
   }
 
   function drawEngel(th, S) {
-    const { u, p, lo, hi, x } = S, c = curves(u, p, lo, hi).engel;
+    const { u, p, lo, hi, x } = S, c = curves(u, p, lo, hi).engel, [c1, c2] = col(th);
     // When the two Engel curves coincide (e.g. equal weights in A), draw D¹ dashed on top of D² and label them once.
     const top = Math.max(...c.map(r => Math.max(r[1], r[2]))), same = c.every(r => Math.abs(r[1] - r[2]) < 1e-3 * top);
     const end = c[c.length - 1];
     const annotations = same
       ? [{ x: end[0], y: end[1], text: 'D<sup>1</sup> = D<sup>2</sup>', showarrow: false, xanchor: 'right', yanchor: 'bottom', yshift: 4, font: { size: 13, color: th.ink } }]
-      : [{ x: end[0], y: end[1], text: 'D<sup>1</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.blue } },
-         { x: end[0], y: end[2], text: 'D<sup>2</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: th.red } }];
+      : [{ x: end[0], y: end[1], text: 'D<sup>1</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: c1 } },
+         { x: end[0], y: end[2], text: 'D<sup>2</sup>', showarrow: false, xanchor: 'left', xshift: 4, font: { size: 13, color: c2 } }];
     // While income rises, the curves are drawn up to the current income (strong) and faint beyond it.
     const anim = state.anim !== null, done = c.filter(r => !anim || r[0] < state.y).concat(anim ? [[state.y, x[0], x[1]]] : []);
-    const ahead = anim ? [U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[2]]), th.red, 1, 'D² still ahead', 'dot'), U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[1]]), th.blue, 1, 'D¹ still ahead', 'dot')] : [];
+    const ahead = anim ? [U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[2]]), c2, 1, 'D² still ahead', 'dot'), U.line2(c.filter(r => r[0] >= state.y).map(r => [r[0], r[1]]), c1, 1, 'D¹ still ahead', 'dot')] : [];
     U.plot('plotB', [
       ...ahead,
-      U.line2(done.map(r => [r[0], r[2]]), th.red, 2.5, 'D²(p, y)'), U.line2(done.map(r => [r[0], r[1]]), th.blue, 2.5, 'D¹(p, y)', same ? 'dash' : 'solid'),
+      U.line2(done.map(r => [r[0], r[2]]), c2, 2.5, 'D²(p, y)'), U.line2(done.map(r => [r[0], r[1]]), c1, 2.5, 'D¹(p, y)', same ? 'dash' : 'solid'),
       U.dot2([[state.y, x[0]], [state.y, x[1]]], th.ink, 'now', anim ? 11 : 8)
     ], U.base2d(th, {
       xt: 'y', yt: 'demand', annotations, margin: { l: 52, r: 28, t: 8, b: 44 },
       shapes: state.panel === 'E' ? [{ type: 'line', x0: EM.turningIncome(p, u), x1: EM.turningIncome(p, u), yref: 'paper', y0: 0, y1: 1, line: { color: th.muted, width: 1, dash: 'dot' } }] : [],
-      x: { range: [c[0][0], c[c.length - 1][0]] }
+      x: state.log ? { type: 'log', range: [Math.log10(c[0][0]), Math.log10(c[c.length - 1][0])] } : { range: [c[0][0], c[c.length - 1][0]] },
+      y: state.log ? { type: 'log' } : {}
     }), U.PLOT_CONFIG);
-    $('capB').innerHTML = `Demand for each good as income grows, prices fixed. The slope of ${texStr('\\log D^j')} in ${texStr('\\log y')} is the income elasticity ${texStr('\\eta_j')}.`;
+    $('capB').innerHTML = `Demand for each good as income grows, prices fixed. ` + (state.log
+      ? `On log scales the slope of each curve is the income elasticity ${texStr('\\eta_j=\\frac{\\mathrm d\\log D^j}{\\mathrm d\\log y}')}: slope 1 is unit elastic, steeper is a luxury, flatter a necessity, falling an inferior good.`
+      : `The income elasticity is the slope times ${texStr('y/D^j')}; tick <b>Log scales</b> to see it as the slope itself.`);
   }
 
   function renderNumbers(S) {
@@ -108,10 +120,13 @@
       `<tr><th>${texStr('\\eta_j')}</th><td>${f3(e.eta[0])}</td><td>${f3(e.eta[1])}</td></tr>` +
       `<tr><th></th><td>${k(0)}</td><td>${k(1)}</td></tr></tbody>`;
     const item = (ok, html) => `<li><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span><span>${html}</span></li>`;
+    // every line shows its terms, rounded so that they add up to the total the condition says
+    const eng = partsTo([e.b[0] * e.eta[0], e.b[1] * e.eta[1]], 1);
+    const cour = i => partsTo([e.b[i], e.b[0] * e.eu[0][i], e.b[1] * e.eu[1][i]], 0), hom = i => partsTo([e.eu[i][0], e.eu[i][1], e.eta[i]], 0);
     $('checks').innerHTML = [
-      item(same(c.engel, 1), `Engel (from M1): ${texStr(`b_1\\eta_1+b_2\\eta_2=${f3(e.b[0])}\\cdot${par(e.eta[0])}+${f3(e.b[1])}\\cdot${par(e.eta[1])}=${f3(c.engel)}`)}`),
-      item(same(c.cournot[0] + 1, 1) && same(c.cournot[1] + 1, 1), `Cournot (from M1): ${texStr(`b_i+\\sum_jb_j\\varepsilon^u_{ji}=0`)} for ${texStr('i=1,2')}: ${f3(c.cournot[0])}, ${f3(c.cournot[1])}`),
-      item(same(c.homogeneity[0] + 1, 1) && same(c.homogeneity[1] + 1, 1), `Homogeneity (M2): ${texStr(`\\sum_j\\varepsilon^u_{ij}+\\eta_i=0`)}: ${f3(c.homogeneity[0])}, ${f3(c.homogeneity[1])}`)
+      item(same(c.engel, 1), `Engel (from M1): ${texStr(`b_1\\eta_1+b_2\\eta_2=${sumTex(eng)}=1`)}`),
+      item(same(c.cournot[0] + 1, 1) && same(c.cournot[1] + 1, 1), `Cournot (from M1): ${texStr('b_i+b_1\\varepsilon^u_{1i}+b_2\\varepsilon^u_{2i}=0')}<br>${texStr(`i=1:\\ ${sumTex(cour(0))}=0`)}<br>${texStr(`i=2:\\ ${sumTex(cour(1))}=0`)}`),
+      item(same(c.homogeneity[0] + 1, 1) && same(c.homogeneity[1] + 1, 1), `Homogeneity (M2): ${texStr('\\varepsilon^u_{i1}+\\varepsilon^u_{i2}+\\eta_i=0')}<br>${texStr(`i=1:\\ ${sumTex(hom(0))}=0`)}<br>${texStr(`i=2:\\ ${sumTex(hom(1))}=0`)}`)
     ].join('');
   }
 
@@ -151,6 +166,7 @@
       schedule();
     }));
     $('play-income').addEventListener('click', playIncome);
+    $('logScale').addEventListener('change', e => { state.log = e.target.checked; schedule(); });
     render();
     U.watchColorScheme(schedule);
   }

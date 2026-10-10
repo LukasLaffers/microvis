@@ -1,4 +1,4 @@
-# Handoff: Microvis (state on 9 October 2026)
+# Handoff: Microvis (state on 10 October 2026)
 
 Read this first, then `CLAUDE.md` (conventions, notation) and `style-kit/README.md` (the design and writing style).
 
@@ -29,8 +29,18 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 ### 4. Merged on 9 October (#20): the bug hunt, fixed
 `BUGS.md` lists the bugs found on 8 October and, at the top, how each was fixed. New shared helpers: `Microvis.react3d` (3D figures: no WebGL leak on projection switches), `ConsumerUI.incomeBounds/fitIncome` (income slider inside the problem's domain, with a note), `ConsumerModel.indifferenceCurve` ends at the axis; `fmt` prints rounding noise as 0 and exponents as ×10⁻⁴; the banner clears a part's message when it draws again. Version tag **8**. Checks: all model tests, check-pages, check-scrollbars, and a fuzz run (every slider at min and max, every option and button, random moves) on all tools; `tools/check-fuzz.cjs` (see "Checks").
 
+### 4b. 10 October, on the branch (not merged yet): review of the lecture 4–6 tools
+The user asked for a critical student's review of the lecture 4, 5 and 6 tools (taught next week), then said "fix them all". Done:
+- **"Check your answer"** (as the plans require; it did not exist before): axiom verdicts (Better, Worse, Indifferent), the MRS of V = f(U) (Utility Is Ordinal), λ* and μ* with λ*μ* = 1 (UMP and EMP; `envelope()` now returns `mu`, tested). A `.btn-row` button; the answer hides again when the example changes.
+- Lecture 4: Comparative Statics names both dashed H¹ curves, says the checks are at the starting w₁, writes ∂S/∂w₁; Marshall's Law shows the constant-returns formula (`FirmUI.techFormula(s, { crs: true })`), zooms "Inside the firm", draws the tangent on top; Translog "inelastic" wording, current vs reference prices, firm colours as in Substitution or Composition; Substitution or Composition labels off the lines.
+- Lecture 5 firm: Market Supply p″ for firm 2 everywhere, Dem(p) (also Free Entry); Externalities draws S¹ at the other firm's actual output (the dot lies on it); Free Entry explains the dashed supply, "AR = p" in the margin; Monopoly deadweight loss (shaded, value; `deadweightLoss()` tested against the hand integral), long-run Π line adds up, p*/AR/MR labels.
+- Lecture 5 consumer: Budget Sets old/new prices in the caption, the test bundle at both prices, check line with ·, group "Budget constraint"; preference-axioms caption rewritten, completeness not circular; Utility Is Ordinal 3D titles apart, bigger points.
+- Lecture 6: UMP/EMP tangency line instead of λ*, the dotted/dashed curves explained, the concavity gap shaded, "four identities, Roy and Shephard" wording; Slutsky labels away from the arrows, the Hicksian curve stops at the Giffen corner (x₂ = 0) with a note, derivatives "at the starting price"; Engel Curves good 1 black / good 2 purple (blue/red are substitution/income), log-scales switch, Engel/Cournot/homogeneity lines show their terms rounded to add up exactly, default δ = 0.65 (two different rays).
+- Shared: number boxes show two decimals (whole numbers for whole steps); `renderStaticTex` glues a formula to the punctuation around it (`.tex-glue`, no lone "." at a line start); KaTeX `\color{#d0021b}`/`{#4a90e2}` follow the theme in dark mode (CSS on the inline style, both `#hex` and `rgb()` forms); `.key.dotted`. style-kit updated. Version tag **10**.
+- Not changed, open questions to the user: the Giffen function (plan: Haagsma's; implemented: −(s−x₂)²/(x₁−c)); the quasilinear preset κ log(1+x₁)+x₂ is close to the lecture 5 exercise log x₁ + x₂.
+
 ### Next
-Nothing requested. The user confirmed on 9 October that the 3D animation in One Step vs Two Steps is smooth on their Mac.
+Wait for the user's verdict on the raw links of 4b, then merge.
 
 ### 5. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
@@ -51,7 +61,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 
 - Plain HTML/CSS/JS, no build step for pages; Plotly 2.35.2 and KaTeX 0.16.9 vendored in `shared/vendor/`; works offline and from `file://`.
 - `tools/catalog.cjs` (tools in lecture order, tile sentence) + `tools/glyphs.cjs` (64 px tile drawings) → `node tools/build-site.cjs` writes `index.html` and, in every tool page: the "Microvis /" header link, previous/next links, the light/dark switch (button + `<head>` line + `shared/theme.js`), and the GoatCounter line. Run it after any catalog/glyph change; it is idempotent.
-- Version tags: our CSS/JS are linked as `?v=N` (now **8**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=8"' index.html */index.html | xargs sed -i 's/?v=8"/?v=9"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
+- Version tags: our CSS/JS are linked as `?v=N` (now **10**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=10"' index.html */index.html | xargs sed -i 's/?v=10"/?v=11"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
 - Hover previews on tiles: `<tool>/preview.webp` and `preview-dark.webp`, made with `tools/previews.cjs` (Playwright).
 - `style-kit/`: a copy of the look for a new project (README = style guide). Keep `style-kit/shared/{style.css,ui.js,theme.js}` in step with `shared/`.
 - Dark mode: tokens on `:root`, `data-theme` set by the switch; figures redraw on the `microvis-theme` event via `Microvis.watchColorScheme`.
@@ -79,7 +89,7 @@ In Claude's cloud container Playwright is at `/opt/node22/lib/node_modules/playw
 - Cache: a new page with an old cached stylesheet broke the start page once → version tags + inline width/height on tile SVGs + `style="display:none"` on previews.
 
 ## History (merged PRs)
-#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz · #21 Homogeneous and Homothetic: same isoquants, different outputs (another session).
+#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz · #21 Homogeneous and Homothetic: same isoquants, different outputs (another session) · #22 (pending) lecture 4–6 review fixes, Check your answer.
 
 ## Ideas offered, not requested
 Per-tool view counts on each tool page; tighter crops for some hover previews (Production Explorer); keep tile titles visible on hover.

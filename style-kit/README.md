@@ -102,7 +102,7 @@ Breakpoints: below 1250px the side panels move under the figure; below 800px eve
 - `.readouts dl` key numbers; `.checks` a list with ✓ / ✗ marks; `.badge` a small outlined label.
 - 3D figures: draw with `Microvis.react3d` (it rebuilds the figure when the camera switches projection, so no WebGL contexts leak).
 - Animations: draw with `Microvis.plot` instead of `Plotly.react`; keep axes, annotations, shapes and trace names fixed while playing and make moving arrows and labels traces (`Microvis.arrow2`, `Microvis.text2`), so each frame only moves points.
-- Numbers: `Microvis.fmt(x)` gives two decimals, three when two would show 0.00 (0.004). Where parts and their total are shown together, `Microvis.fmtSum([a, b])` rounds them so that the shown numbers add up. Published tables keep their own decimals.
+- Numbers: `Microvis.fmt(x)` gives two decimals, three when two would show 0.00 (0.004). Where parts and their total are shown together, `Microvis.fmtSum([a, b])` rounds them so that the shown numbers add up. Published tables keep their own decimals. The number boxes next to the sliders show two decimals too (whole numbers for a whole-number step).
 - `.formula` a KaTeX block in the controls; `.subtitle` the header formula.
 - `.status-banner` the error box (filled by `Microvis.showError`).
 - `[data-show="a|b c"]` shown when (a or b) and c hold: `Microvis.applyVisibility(preds)`.
@@ -132,6 +132,9 @@ Academic and precise. Short. No slogans, no rhetorical questions, no "watch the 
 - **Plotly.** With `scaleanchor`, use `Plotly.newPlot` when the axis range changes (`react` keeps the old domain).
 - **Errors are visible.** `Microvis.guard('figure', fn)` and the global handlers show errors in the banner, not only in the console. A missing library is reported in plain words.
 - **Offline.** Libraries are bundled in `shared/vendor/` and loaded with relative paths. No CDN.
+- **Line breaks.** `renderStaticTex` keeps a formula together with the punctuation around it (`.tex-glue`), so no line starts with a lone "." or ends with "(".
+- **Colours in formulas.** `\color{#d0021b}` and `\color{#4a90e2}` inside KaTeX follow the theme's `--l2-red` and `--l2-blue` (a CSS rule on the inline style), so they stay readable in dark mode.
+- **Answers to exercises.** A readout that answers an exercise sits behind a `.btn-row` button "Check your answer", hidden again when the example changes.
 - **Phone.** Controls come first, so the guide starts closed; figures get smaller fixed heights; no horizontal scrolling at 375px.
 
 ## Visitor counts (optional)
