@@ -116,6 +116,7 @@
       if (fs >= 1) { traces.push(U.dot2([d.E2], th.blue, 'E₂', 11)); lab(d.E2, 'E<sub>2</sub>', th.blue, 'left'); }
       traces.push(U.dot2([now], fs < 1 ? th.blue : th.red, 'moving', 9));
     }
+    U.overlay('plot', []);
     U.plot('plot', traces, layout(th, F, annotations), { ...U.PLOT_CONFIG, displayModeBar: false });
     const fall = pn[0] < p[0];
     $('head').textContent = headText(S);
@@ -126,19 +127,20 @@
   // ---------- the smooth change ----------
 
   function drawSmooth(th, S) {
-    const { u, p, d, path, now } = S, y = state.y, F = frame(S), traces = [], annotations = [], shapes = [];
+    const { u, p, d, path, now } = S, y = state.y, F = frame(S), traces = [], moving = [], annotations = [], shapes = [];
     const pNow = [now.p1, p[1]], D = now.D, vNow = CM.utility(D, u), moved = Math.abs(now.p1 - p[0]) > 1e-9;
 
     // Where the consumer started (faint) and where she is now (strong): indifference curve and budget line.
+    // Everything that moves goes on the fast overlay layer (U.overlay), the rest is drawn by Plotly once.
     traces.push(U.line2(F.ic(d.v0), th.muted, 1.2, 'indifference curve at the start, v⁰'));
     traces.push(budget(y, p, th.muted, 1.2, `budget at the start, p₁ = ${fmt(p[0])}`, 'dash'));
-    traces.push(U.line2(F.ic(vNow, 'few'), th.ink, 2.5, 'indifference curve now'));
-    if (moved) traces.push(budget(y, pNow, th.ink, 1.8, 'budget now'));
+    moving.push(U.line2(F.ic(vNow, 'few'), th.ink, 2.5, 'indifference curve now'));
+    if (moved) moving.push(budget(y, pNow, th.ink, 1.8, 'budget now'));
 
     // The path of the consumer: travelled (black) and still ahead (faint).
     const k = now.k;
-    traces.push(U.line2(path.D.slice(k), th.muted, 1.5, 'still ahead', 'dot'));
-    traces.push(U.line2(path.D.slice(0, k + 1).concat([D]), th.ink, 4, 'path of the consumer'));
+    moving.push(U.line2(path.D.slice(k), th.muted, 1.5, 'still ahead', 'dot'));
+    moving.push(U.line2(path.D.slice(0, k + 1).concat([D]), th.ink, 4, 'path of the consumer'));
 
     // At the current point, both effects at once: substitution along the indifference curve, income across them.
     const sign = Math.sign(state.p1n - state.p1) || 1;
@@ -160,29 +162,34 @@
     const len = 0.6 * Math.max(ext, 0.15 * Math.min(F.Lx, F.Ly)) / cache.big, tip = q => [D[0] + q[0] * len, D[1] + q[1] * len], tiny = 1e-3 * ext;
     const tS = tip(v.sub), tI = tip(v.inc), tT = tip([v.sub[0] + v.inc[0], v.sub[1] + v.inc[1]]);
     const far = (z, m) => Math.hypot(z[0] - D[0], z[1] - D[1]) > m;
-    traces.push(U.line2(far(tT, tiny) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, tiny) ? [tI, tT] : [], th.blue, 1, '', 'dot'));
-    traces.push(U.arrow2(D, tS, th.blue, 3, tiny), U.arrow2(D, tI, th.red, 3, tiny), U.arrow2(D, tT, th.ink, 2, tiny));
-    const lab = (z, text, color) => U.text2(far(z, 0.04 * ext) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left');
-    traces.push(lab(tS, 'substitution', th.blue), lab(tI, 'income', th.red));
+    moving.push(U.line2(far(tT, tiny) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, tiny) ? [tI, tT] : [], th.blue, 1, '', 'dot'));
+    moving.push(U.arrow2(D, tS, th.blue, 3, tiny), U.arrow2(D, tI, th.red, 3, tiny), U.arrow2(D, tT, th.ink, 2, tiny));
+    // All moving labels in one text trace (fewer traces: each one costs Plotly time in every frame).
+    const texts = { x: [], y: [], text: [], pos: [], color: [], size: [] };
+    const put = (z, text, color, pos, size) => { texts.x.push(z ? z[0] : null); texts.y.push(z ? z[1] : null); texts.text.push(text); texts.pos.push(pos); texts.color.push(color); texts.size.push(size); };
+    const lab = (z, text, color) => put(far(z, 0.04 * ext) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left', 12);
+    lab(tS, 'substitution', th.blue); lab(tI, 'income', th.red);
 
     // Points.
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 14, color } });
-    traces.push(U.dot2([d.E1], th.ink, 'E₁ = D(p, y)', 10)); label(d.E1, 'E<sub>1</sub>', th.ink, -8);
-    traces.push(U.dot2([d.E3], th.muted, "E₃ = D(p′, y)", 9)); label(d.E3, 'E<sub>3</sub>', th.muted, 8);
-    traces.push(U.dot2([D], th.ink, 'the consumer now', 13));
+    moving.push(U.dot2([d.E1], th.ink, 'E₁ = D(p, y)', 10)); label(d.E1, 'E<sub>1</sub>', th.ink, -8);
+    moving.push(U.dot2([d.E3], th.muted, "E₃ = D(p′, y)", 9)); label(d.E3, 'E<sub>3</sub>', th.muted, 8);
+    moving.push(U.dot2([D], th.ink, 'the consumer now', 13));
 
     // Bars at the bottom of the figure (changes in x1), growing together: substitution, income and their sum, accumulated so far.
     const row = i => (0.035 + 0.04 * i) * F.Ly;
     const bar = (i, dx, color, width, text) => {
       const show = Math.abs(dx) >= 1e-9;
-      traces.push(U.line2(show ? [[d.E1[0], row(i)], [d.E1[0] + dx, row(i)]] : [], color, width, ''));
-      traces.push(U.text2(show ? [Math.min(d.E1[0], d.E1[0] + dx), row(i)] : null, text + '  ', color, 'middle left', 11));
+      moving.push(U.line2(show ? [[d.E1[0], row(i)], [d.E1[0] + dx, row(i)]] : [], color, width, ''));
+      put(show ? [Math.min(d.E1[0], d.E1[0] + dx), row(i)] : null, text + '  ', color, 'middle left', 11);
     };
     bar(2, now.substitution[0], th.blue, 5, 'substitution');
     bar(1, now.income[0], th.red, 5, 'income');
     bar(0, now.substitution[0] + now.income[0], th.ink, 2.5, 'total');
+    moving.push({ type: 'scatter', mode: 'text', x: texts.x, y: texts.y, text: texts.text, textposition: texts.pos, textfont: { color: texts.color, size: texts.size }, hoverinfo: 'skip', cliponaxis: false });
 
     U.plot('plot', traces, layout(th, F, annotations, shapes), { ...U.PLOT_CONFIG, displayModeBar: false });
+    U.overlay('plot', moving, th.font);
     $('head').textContent = headText(S);
     if (writeText) $('cap').innerHTML = `${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars at the bottom (changes in ${texStr('x_1')}) grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
   }
@@ -209,9 +216,11 @@
     U.plot('plotB', [
       U.line2(H, th.blue, 2.2, 'Hicksian H¹(p₁, p₂, v⁰)', 'dash'),
       U.line2(D, '#4caf50', 2.5, 'Marshallian D¹(p₁, p₂, y)'),
-      ...(S.now ? [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E3[0], state.p1n]], th.muted, 'E₃', 9), U.dot2([[S.now.D[0], S.now.p1]], th.ink, 'now', 12)]
+      ...(S.now ? [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E3[0], state.p1n]], th.muted, 'E₃', 9)]
         : [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E2[0], state.p1n]], th.blue, 'E₂', 9), U.dot2([[d.E3[0], state.p1n]], th.red, 'E₃', 9)])
     ], U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: [0, Math.max(...xs) * 1.1] } }), U.PLOT_CONFIG);
+    // the moving point on the fast overlay layer
+    U.overlay('plotB', S.now ? [U.dot2([[S.now.D[0], S.now.p1]], th.ink, 'now', 12)] : [], th.font);
     const k = S.cls.kind;
     $('capB').innerHTML = `<span style="color:#4caf50"><span class="key"></span>Marshallian</span> and <span class="c-l2-blue"><span class="key dash"></span>Hicksian</span> demand through ${texStr('E_1')}. ` +
       (k === 'normal' ? 'For a normal good the Marshallian curve is flatter: the income effect adds to the substitution effect.' : k === 'inferior' ? 'For an inferior good (not Giffen) the Marshallian curve is steeper than the Hicksian one.' : 'For a Giffen good the Marshallian curve slopes upwards; the Hicksian curve still slopes down.') +

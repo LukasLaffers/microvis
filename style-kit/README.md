@@ -134,6 +134,7 @@ Academic and precise. Short. No slogans, no rhetorical questions, no "watch the 
 - **Offline.** Libraries are bundled in `shared/vendor/` and loaded with relative paths. No CDN.
 - **Line breaks.** `renderStaticTex` keeps a formula together with the punctuation around it (`.tex-glue`), so no line starts with a lone "." or ends with "(".
 - **Colours in formulas.** `\color{#d0021b}` and `\color{#4a90e2}` inside KaTeX follow the theme's `--l2-red` and `--l2-blue` (a CSS rule on the inline style), so they stay readable in dark mode.
+- **Smooth animations.** Moving curves, arrows, dots and labels go on `Microvis.overlay(id, traces)`, a thin SVG layer over the Plotly figure (Plotly-like traces, repainted after every Plotly redraw); Plotly draws only the still parts once. Plotly's own per-frame redraw is too slow in Safari.
 - **Answers to exercises.** A readout that answers an exercise sits behind a `.btn-row` button "Check your answer", hidden again when the example changes.
 - **Phone.** Controls come first, so the guide starts closed; figures get smaller fixed heights; no horizontal scrolling at 375px.
 

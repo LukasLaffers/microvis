@@ -153,4 +153,23 @@ for (const u of prefs) {
   checks += pts.length + 1;
 }
 
+// x2On with its closed forms gives the same as plain bisection (an independent copy here), on and off the curve's domain.
+{
+  const bisect = (x1, v, u) => {
+    const f = x2 => M.utility([x1, x2], u) - v;
+    let lo = u.type === 'stonegeary' ? Math.max(0, u.g2) : 0, hi = u.type === 'giffen' ? Math.min(1e4, u.s - 1e-12) : 1e4;
+    if (!(f(hi) >= 0)) return null;
+    if (f(lo) >= 0) return lo;
+    for (let it = 0; it < 300; it++) { const m = 0.5 * (lo + hi); if (f(m) < 0) lo = m; else hi = m; }
+    return 0.5 * (lo + hi);
+  };
+  for (const u of prefs) for (let k = 0; k < 400; k++) {
+    const x1 = 12 * rnd() + 1e-3, v = M.utility([1 + 6 * rnd(), 0.5 + 3 * rnd()], u) * (0.3 + 1.4 * rnd());
+    const a = M.x2On(x1, v, u), b = bisect(x1, v, u);
+    if (b === null) assert.equal(a, null, `x2On null ${JSON.stringify(u)} ${x1} ${v}`);
+    else close(a, b, 1e-8, `x2On ${JSON.stringify(u)} ${x1} ${v}`);
+    checks++;
+  }
+}
+
 console.log(`All ${checks} consumer-model checks passed.`);
