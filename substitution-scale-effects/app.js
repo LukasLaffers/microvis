@@ -22,7 +22,7 @@
   let ctrls = {};
   const schedule = U.scheduler(render);
   // While an animation plays, captions and tables are rewritten at most ten times a second (each rewrite lays out the page).
-  let writeText = true, lastText = 0, costTick = 0;
+  let writeText = true, lastText = 0;
   const textDue = () => { if (!state.playing) return true; const t = performance.now(); if (t - lastText < 100) return false; lastText = t; return true; };
   const N = 160;   // steps along the smooth change
 
@@ -113,6 +113,7 @@
       annotations.push({ x: Math.min(A[0], C[0]), y: y2, text: `total ${U.fmtSum([B[0] - A[0], C[0] - B[0]])[2]}`, showarrow: false, xanchor: 'right', xshift: -6, font: { size: 11, color: th.ink } });
     }
 
+    U.overlay('plot', []);
     U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
       x: { range: xr, constrain: 'domain' }, y: { range: yr, scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
@@ -130,7 +131,7 @@
   // ---------- the smooth change ----------
 
   function drawSmooth(th, P) {
-    const { s, w, r, path, now } = P, { A, C } = r, traces = [], annotations = [], shapes = [];
+    const { s, w, r, path, now } = P, { A, C } = r, traces = [], moving = [], annotations = [], shapes = [];
     const wNow = [now.w1, w[1]], D = now.D, qNow = now.q;
     // Frame the view around the whole path, keeping equal scales on both axes.
     const pts = path.D.filter(z => z[0] > 0 || z[1] > 0);
@@ -145,21 +146,22 @@
     const moved = Math.abs(now.w1 - w[0]) > 1e-9;
 
     // Where the firm started (faint) and where it is now (strong): isoquant, isocost line, expansion path.
+    // Everything that moves goes on the fast overlay layer (U.overlay), the rest is drawn by Plotly once.
     if (r.qA > 0) {
       traces.push(U.line2(FM.isoquant(r.qA, s, zmax), th.muted, 1.2, `isoquant at the start, q = ${fmt(r.qA)}`));
       traces.push(U.line2(isocost(w, A), th.muted, 1.2, 'isocost line at the start', 'dash'));
       traces.push(ray(A, th.muted, 1, 'expansion path at the start'));
     }
     if (qNow > 0) {
-      traces.push(U.line2(FM.isoquant(qNow, s, zmax), th.ink, 2.5, 'isoquant now'));
-      if (moved) traces.push(U.line2(isocost(wNow, D), th.ink, 1.8, 'isocost line now'));
-      if (moved) traces.push(ray(D, th.ink, 1.4, 'expansion path now'));
+      moving.push(U.line2(FM.isoquant(qNow, s, zmax), th.ink, 2.5, 'isoquant now'));
+      if (moved) moving.push(U.line2(isocost(wNow, D), th.ink, 1.8, 'isocost line now'));
+      if (moved) moving.push(ray(D, th.ink, 1.4, 'expansion path now'));
     }
 
     // The path of the firm: travelled (black) and still ahead (faint).
     const k = now.k;
-    traces.push(U.line2(path.D.slice(k), th.muted, 1.5, 'still ahead', 'dot'));
-    traces.push(U.line2(path.D.slice(0, k + 1).concat([D]), th.ink, 4, 'path of the firm'));
+    moving.push(U.line2(path.D.slice(k), th.muted, 1.5, 'still ahead', 'dot'));
+    moving.push(U.line2(path.D.slice(0, k + 1).concat([D]), th.ink, 4, 'path of the firm'));
 
     // At the current point, both effects at once: substitution along the isoquant, scale along the ray.
     const sign = Math.sign(state.w1n - state.w1) || 1;
@@ -179,8 +181,8 @@
     const L = 0.45 * span / cache.big, tip = d => [D[0] + d[0] * L, D[1] + d[1] * L], min = 1e-3 * span;
     const tS = tip(v.sub), tC = tip(v.sc), tT = tip([v.sub[0] + v.sc[0], v.sub[1] + v.sc[1]]);
     const far = (z, m) => Math.hypot(z[0] - D[0], z[1] - D[1]) > m;
-    traces.push(U.line2(far(tT, min) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, min) ? [tC, tT] : [], th.blue, 1, '', 'dot'));
-    traces.push(U.arrow2(D, tS, th.blue, 3, min), U.arrow2(D, tC, th.red, 3, min), U.arrow2(D, tT, th.ink, 2, min));
+    moving.push(U.line2(far(tT, min) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, min) ? [tC, tT] : [], th.blue, 1, '', 'dot'));
+    moving.push(U.arrow2(D, tS, th.blue, 3, min), U.arrow2(D, tC, th.red, 3, min), U.arrow2(D, tT, th.ink, 2, min));
     // All moving labels in one text trace (fewer traces: each one costs Plotly time in every frame).
     const texts = { x: [], y: [], text: [], pos: [], color: [], size: [] };
     const put = (z, text, color, pos, size) => { texts.x.push(z ? z[0] : null); texts.y.push(z ? z[1] : null); texts.text.push(text); texts.pos.push(pos); texts.color.push(color); texts.size.push(size); };
@@ -189,27 +191,28 @@
 
     // Points.
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 15, color } });
-    traces.push(U.dot2([A], th.ink, 'A = D(w,p)', 10)); label(A, 'A', th.ink, 8);
-    traces.push(U.dot2([C], th.muted, "C = D(w',p)", 9)); label(C, 'C', th.muted, 8);
-    traces.push(U.dot2([D], th.ink, 'the firm now', 13));
+    moving.push(U.dot2([A], th.ink, 'A = D(w,p)', 10)); label(A, 'A', th.ink, 8);
+    moving.push(U.dot2([C], th.muted, "C = D(w',p)", 9)); label(C, 'C', th.muted, 8);
+    moving.push(U.dot2([D], th.ink, 'the firm now', 13));
 
     // Bars at the bottom of the figure (changes in z1), growing together: substitution, scale and their sum, accumulated so far.
     const h = yr[1] - yr[0], row = i => yr[0] + (0.035 + 0.04 * i) * h;
     const bar = (i, d, color, width, text) => {
       const show = Math.abs(d) >= 1e-9;
-      traces.push(U.line2(show ? [[A[0], row(i)], [A[0] + d, row(i)]] : [], color, width, ''));
+      moving.push(U.line2(show ? [[A[0], row(i)], [A[0] + d, row(i)]] : [], color, width, ''));
       put(show ? [Math.min(A[0], A[0] + d), row(i)] : null, text + '  ', color, 'middle left', 11);
     };
     bar(2, now.substitution[0], th.blue, 5, 'substitution');
     bar(1, now.scale[0], th.red, 5, 'scale');
     bar(0, now.substitution[0] + now.scale[0], th.ink, 2.5, 'total');
-    traces.push({ type: 'scatter', mode: 'text', x: texts.x, y: texts.y, text: texts.text, textposition: texts.pos, textfont: { color: texts.color, size: texts.size }, hoverinfo: 'skip', cliponaxis: false });
+    moving.push({ type: 'scatter', mode: 'text', x: texts.x, y: texts.y, text: texts.text, textposition: texts.pos, textfont: { color: texts.color, size: texts.size }, hoverinfo: 'skip', cliponaxis: false });
 
     U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
       x: { range: xr, constrain: 'domain' }, y: { range: yr, scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
       annotations, shapes
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    U.overlay('plot', moving, th.font);
 
     let cap;
     if (r.qA === 0) cap = 'At these prices the firm does not produce (p is below minimum average cost), so there is nothing to decompose.';
@@ -225,22 +228,21 @@
   function drawCosts(th, P) {
     const { s, w, r } = P, p = state.p, hat = FM.minAC(r.wNew, s);
     const qmax = Math.max(1.6 * Math.max(r.qA, r.qC, 0.5), hat.qHat ? 1.6 * hat.qHat : 0);
-    const qq = linspace(qmax / 400, qmax, P.now ? 200 : 400);   // fewer points while the curves move every frame
+    const qq = linspace(qmax / 400, qmax, 400);
     const yMax = 1.8 * p;
     const clip = v => (Number.isFinite(v) && v < 3 * yMax ? v : null);
     const curve = (f, ww, color, width, name, dash) => U.line2(qq.map(q => [q, clip(f(ww, q, s))]), color, width, name, dash);
-    let traces;
+    let traces, moving = [];   // moving: on the fast overlay layer while w1 changes smoothly
     if (P.now) {
       const wNow = [P.now.w1, w[1]];
       traces = [
         curve(FM.MC, w, th.red, 1.2, 'MC at the start'),
-        curve(FM.MC, r.wNew, th.red, 1.2, 'MC at the end', 'dot'),
-        curve(FM.MC, wNow, th.red, 3, 'MC now'),
-        curve(FM.AC, wNow, th.ink, 1.8, 'AC now')
+        curve(FM.MC, r.wNew, th.red, 1.2, 'MC at the end', 'dot')
       ];
-      if (r.qA > 0) traces.push(U.dot2([[r.qA, p]], th.muted, 'q* = S(w,p)', 9));
-      if (r.qC > 0) traces.push(U.dot2([[r.qC, p]], th.muted, "S(w',p)", 9));
-      if (P.now.q > 0) traces.push(U.dot2([[P.now.q, p]], th.red, 'output now', 12));
+      moving = [curve(FM.MC, wNow, th.red, 3, 'MC now'), curve(FM.AC, wNow, th.ink, 1.8, 'AC now')];
+      if (r.qA > 0) moving.push(U.dot2([[r.qA, p]], th.muted, 'q* = S(w,p)', 9));
+      if (r.qC > 0) moving.push(U.dot2([[r.qC, p]], th.muted, "S(w',p)", 9));
+      if (P.now.q > 0) moving.push(U.dot2([[P.now.q, p]], th.red, 'output now', 12));
     } else {
       traces = [
         curve(FM.MC, w, th.red, 1.2, 'MC before'),
@@ -272,6 +274,7 @@
       xt: 'q', yt: 'p', x: { range: [0, qmax] }, y: { range: [0, yMax] }, annotations,
       shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: p, y1: p, line: { color: th.muted, width: 1.5, dash: 'dash' } }]
     }), U.PLOT_CONFIG);
+    U.overlay('plotB', moving, th.font);
   }
 
   // ---------- the table ----------
@@ -335,8 +338,7 @@
     tex($('formula-general'), f.general, true);
     tex($('formula-numbers'), f.numbers, true);
     guard('input-space plot', () => drawMain(th, P));
-    // while w1 moves smoothly, the cost figure is updated every other frame (the figure that matters is the input space)
-    if (!(state.playing && state.mode === 'smooth' && (costTick = (costTick + 1) % 2) && state.t < 1)) guard('cost plot', () => drawCosts(th, P));
+    guard('cost plot', () => drawCosts(th, P));
     if (writeText) guard('table', () => renderTable(P));
   }
 

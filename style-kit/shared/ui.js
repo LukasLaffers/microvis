@@ -266,6 +266,83 @@
     gd._microvisKey = key;
   }
 
+  /*
+   * Moving parts of a 2D figure drawn on a thin SVG layer over the plot, not by Plotly: for animations, where Plotly's own
+   * redraw of each frame is too slow (Safari). `traces` are Plotly-like scatter traces: mode 'lines' (line color, width,
+   * dash), 'markers' (marker color, size, line), 'lines+markers' as made by arrow2, and 'text' (textposition, textfont;
+   * color and size may be arrays). Coordinates use the figure's axes; the layer is repainted after every Plotly redraw
+   * (resize, theme). overlay(id, []) clears it.
+   */
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  function overlay(id, traces, font) {
+    const gd = typeof id === 'string' ? document.getElementById(id) : id;
+    gd._mvTraces = traces; gd._mvFont = font || gd._mvFont;
+    if (!gd._mvHooked && gd.on) { gd.on('plotly_afterplot', () => paintOverlay(gd)); gd._mvHooked = true; }
+    paintOverlay(gd);
+  }
+  function paintOverlay(gd) {
+    const L = gd._fullLayout, host = gd.querySelector('.svg-container'), traces = gd._mvTraces || [];
+    if (!L || !L.xaxis || !L.yaxis || !host) return;
+    let svg = gd._mvSvg;
+    if (!traces.length) { if (svg) svg.innerHTML = ''; return; }
+    if (!svg || svg.parentNode !== host) {
+      svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('class', 'mv-overlay');
+      svg.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;overflow:visible';
+      host.appendChild(svg); gd._mvSvg = svg;
+    }
+    svg.setAttribute('width', L.width); svg.setAttribute('height', L.height);
+    const xa = L.xaxis, ya = L.yaxis;
+    const X = v => xa._offset + (xa.c2p ? xa.c2p(v) : xa.l2p(v)), Y = v => ya._offset + (ya.c2p ? ya.c2p(v) : ya.l2p(v));
+    const ok = v => v !== null && v !== undefined && Number.isFinite(v);
+    const at = (v, i) => (Array.isArray(v) ? v[i] : v);
+    const r1 = v => Math.round(v * 10) / 10;
+    // Plotly's dash patterns
+    const dash = (d, w) => { const k = Math.max(w, 3); return d === 'dot' ? `${k},${k}` : d === 'dash' ? `${3 * k},${3 * k}` : d === 'longdash' ? `${5 * k},${5 * k}` : ''; };
+    let lines = '', texts = '';
+    for (const t of traces) {
+      const xs = t.x || [], ys = t.y || [], mode = t.mode || 'lines', line = t.line || {}, mk = t.marker || {};
+      if (mode.includes('lines') && !(mode.includes('markers') && Array.isArray(mk.symbol))) {
+        let d = '', pen = false;
+        for (let i = 0; i < xs.length; i++) {
+          if (!ok(xs[i]) || !ok(ys[i])) { pen = false; continue; }
+          d += `${pen ? 'L' : 'M'}${r1(X(xs[i]))},${r1(Y(ys[i]))}`; pen = true;
+        }
+        if (d && (line.width === undefined || line.width > 0)) lines += `<path d="${d}" fill="none" stroke="${line.color}" stroke-width="${line.width === undefined ? 2 : line.width}" stroke-dasharray="${dash(line.dash, line.width || 2)}" stroke-linejoin="round" stroke-linecap="butt" opacity="${t.opacity === undefined ? 1 : t.opacity}"/>`;
+      }
+      if (mode.includes('markers') && Array.isArray(mk.symbol) && xs.length === 2 && [0, 1].every(i => ok(xs[i]) && ok(ys[i]))) {
+        // arrow2: a line with an arrowhead at its end
+        const x0 = X(xs[0]), y0 = Y(ys[0]), x1 = X(xs[1]), y1 = Y(ys[1]), len = Math.hypot(x1 - x0, y1 - y0);
+        if (len > 0.5) {
+          const ux = (x1 - x0) / len, uy = (y1 - y0) / len, h = 0.75 * at(mk.size, 1), b = 0.42 * at(mk.size, 1), cx = x1 - h * ux, cy = y1 - h * uy;
+          lines += `<path d="M${r1(x0)},${r1(y0)}L${r1(cx)},${r1(cy)}" stroke="${line.color}" stroke-width="${line.width}" fill="none"/>`;
+          lines += `<path d="M${r1(x1)},${r1(y1)}L${r1(cx - b * uy)},${r1(cy + b * ux)}L${r1(cx + b * uy)},${r1(cy - b * ux)}Z" fill="${mk.color || line.color}"/>`;
+        }
+      } else if (mode.includes('markers')) {
+        for (let i = 0; i < xs.length; i++) {
+          if (!ok(xs[i]) || !ok(ys[i])) continue;
+          const ml = mk.line || {}, rad = at(mk.size, i) / 2;
+          lines += `<circle cx="${r1(X(xs[i]))}" cy="${r1(Y(ys[i]))}" r="${rad}" fill="${at(mk.color, i)}" stroke="${ml.color || 'none'}" stroke-width="${ml.width || 0}"/>`;
+        }
+      }
+      if (mode.includes('text')) {
+        const tf = t.textfont || {}, fam = (gd._mvFont || '').replace(/"/g, "'");
+        for (let i = 0; i < xs.length; i++) {
+          if (!ok(xs[i]) || !ok(ys[i])) continue;
+          const pos = at(t.textposition, i) || 'middle center', size = at(tf.size, i) || 12;
+          const anchor = pos.includes('right') ? 'start' : pos.includes('left') ? 'end' : 'middle';
+          const dy = pos.includes('top') ? -0.45 * size : pos.includes('bottom') ? 0.95 * size : 0.35 * size;
+          const dx = anchor === 'start' ? 2 : anchor === 'end' ? -2 : 0;
+          const txt = String(at(t.text, i)).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+          texts += `<text x="${r1(X(xs[i]) + dx)}" y="${r1(Y(ys[i]) + dy)}" text-anchor="${anchor}" font-size="${size}" font-family="${fam}" fill="${at(tf.color, i)}" style="white-space:pre">${txt}</text>`;
+        }
+      }
+    }
+    const clip = `${gd.id || 'p'}-mvclip`;
+    // clipped to the axes' own box (smaller than the plot area when constrain: 'domain' keeps equal scales)
+    svg.innerHTML = `<defs><clipPath id="${clip}"><rect x="${xa._offset}" y="${ya._offset}" width="${xa._length}" height="${ya._length}"/></clipPath></defs><g clip-path="url(#${clip})">${lines}</g>${texts}`;
+  }
+
   // Plotly.react for a 3D figure. When the camera switches between perspective and orthographic, Plotly builds a new
   // WebGL context and keeps the old one; after a few switches the browser drops contexts and figures go blank (sooner on a
   // phone). So then the figure is rebuilt from scratch: the old contexts are released and the handlers in `events`
@@ -417,7 +494,7 @@
   root.Microvis = {
     $, fmt, fmtSum, num, pt, tex, texStr, renderStaticTex, linspace, logspace, clampTo,
     control, controls, scheduler, applyVisibility,
-    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, arrow2, text2, plot, react3d, eventToData, watchColorScheme,
+    theme, SURFACE_SCALE, PLOT_CONFIG, base2d, line2, dot2, arrow2, text2, plot, overlay, react3d, eventToData, watchColorScheme,
     showError, guard, librariesReady
   };
 })(window);
