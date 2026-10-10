@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>A tax raises the price of good 1 from <span class="tex" data-tex="p_1^0"></span> to <span class="tex" data-tex="p_1^1"></span>. The government collects the yellow rectangle <span class="tex" data-tex="T"></span>; the consumer loses <span class="tex" data-tex="|EV|"></span>, the area to the left of the Hicksian demand curve between the two prices. The difference is lost to everybody: the deadweight loss.</p>
           <ul>
-          <li>Raise the tax: the loss grows with the square of the tax.</li>
+          <li>Raise the tax (drag the taxed price up): the loss grows with the square of the tax.</li>
           <li>The loss exists because the Hicksian curve slopes down, for normal and inferior goods alike.</li>
           </ul>
         </details>
@@ -43,6 +43,18 @@
           <option value="quasilinear">Quasilinear</option>
         </select>
         <div class="formula" id="formula"></div>
+      </div>
+      <div class="group">
+        <h2>The tax</h2>
+        <div class="ctrl" data-key="p10" data-label="p_1^0" data-hint="price without tax" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="tau" data-label="\tau" data-hint="value added tax, %" data-min="0" data-max="100" data-step="1"></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">The parameters of the preferences and the income.</p>
+      <div class="group">
+        <h2>Shape of the preferences</h2>
         <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
         <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
         <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="stonegeary"></div>
@@ -50,12 +62,11 @@
         <div class="ctrl" data-key="kappa" data-label="\kappa" data-hint="weight of good 1" data-min="1" data-max="12" data-step="0.1" data-show="quasilinear"></div>
       </div>
       <div class="group">
-        <h2>The tax</h2>
-        <div class="ctrl" data-key="p10" data-label="p_1^0" data-hint="price without tax" data-min="0.5" data-max="3" data-step="0.05"></div>
-        <div class="ctrl" data-key="tau" data-label="\tau" data-hint="value added tax, %" data-min="0" data-max="100" data-step="1"></div>
+        <h2>Income</h2>
         <div class="ctrl" data-key="y" data-label="y" data-hint="income (p₂ = 1)" data-min="4" data-max="30" data-step="0.1"></div>
         <p class="note" id="income-note" hidden></p>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Deadweight loss">

@@ -18,6 +18,7 @@
     w1: 2, w2: 1, yE: 10
   };
   const schedule = U.scheduler(render);
+  let ctrls = {};
   const X = 1.6;   // plotted range of log(w1/w2)
 
   const ces = () => ({ tech: 'ces', delta: state.delta, rho: state.rho, profile: 'homog', A: 1, k: 1 });
@@ -46,12 +47,12 @@
     if (isCES) traces.push(U.line2(xs.map(x => [x, Math.log(cesCost([w2 * Math.exp(x), w2]))]), th.ink, 2.5, 'true CES log c'));
     traces.push(U.line2(xs.map(x => [x, TL.logUnitCost(P, [w2 * Math.exp(x), w2])]), th.accent, 2.5, 'translog approximation', isCES ? 'dash' : 'solid'));
     const xNow = Math.log(w[0] / w2);
-    traces.push(U.dot2([[xNow, TL.logUnitCost(P, w)]], th.accent, 'translog at the current prices', 9));
+    traces.push(U.dot2([[xNow, TL.logUnitCost(P, w)]], th.accent, 'current prices (drag it)', 14));
     const shapes = [{ type: 'line', x0: xNow, x1: xNow, yref: 'paper', y0: 0, y1: 1, line: { color: th.muted, width: 1, dash: 'dot' } }];
     const annotations = [{ x: xNow, yref: 'paper', y: 1, text: 'current', showarrow: false, yanchor: 'top', xanchor: 'left', xshift: 3, font: { size: 11, color: th.muted } }];
     if (isCES) {
       const xb = Math.log(S.wbar[0] / S.wbar[1]);
-      traces.push(U.dot2([[xb, Math.log(cesCost([w2 * Math.exp(xb), w2]))]], th.ink, 'reference prices', 10));
+      traces.push(U.dot2([[xb, Math.log(cesCost([w2 * Math.exp(xb), w2]))]], th.ink, 'reference prices w̄ (drag it)', 14));
       annotations.push({ x: xb, y: Math.log(cesCost([w2 * Math.exp(xb), w2])), text: 'w̄', showarrow: false, yanchor: 'top', yshift: -8, font: { size: 13, color: th.ink } });
     }
     const layout = U.base2d(th, { xt: 'log(w<sub>1</sub>/w<sub>2</sub>)', yt: 'log c', x: { range: [-X, X] }, shapes, annotations, margin: { l: 56, r: isCES ? 56 : 12, t: 8, b: 44 } });
@@ -66,10 +67,10 @@
     Plotly.react('plotA', traces, layout, U.PLOT_CONFIG);
     if (isCES) {
       const err = TL.logUnitCost(P, w) - Math.log(cesCost(w));
-      $('capA').innerHTML = `<span class="c-ink"><span class="key"></span>true CES unit cost (${texStr(`\\sigma=${f3(sigmaCES())}`)})</span>, <span class="c-accent"><span class="key dash"></span>translog</span>, <span class="c-muted"><span class="key dotted"></span>their difference (right axis)</span>, with ${texStr('\\alpha_i,\\beta_{ij}')} from the Taylor expansion around ${texStr('\\bar w')}. They touch at the reference (value, slope and curvature agree) and drift apart only at third order: at the current prices the error in ${texStr('\\log c')} is ${f4(err)}.` +
+      $('capA').innerHTML = `<b>Drag the points</b> sideways to move the current prices and the reference prices ${texStr('\\bar w')}. <span class="c-ink"><span class="key"></span>true CES unit cost (${texStr(`\\sigma=${f3(sigmaCES())}`)})</span>, <span class="c-accent"><span class="key dash"></span>translog</span>, <span class="c-muted"><span class="key dotted"></span>their difference (right axis)</span>, with ${texStr('\\alpha_i,\\beta_{ij}')} from the Taylor expansion around ${texStr('\\bar w')}. They touch at the reference (value, slope and curvature agree) and drift apart only at third order: at the current prices the error in ${texStr('\\log c')} is ${f4(err)}.` +
         (Math.abs(state.rho) < 1e-9 ? ' With ρ = 0 (Cobb-Douglas) all β are 0 and the translog is exact.' : '');
     } else {
-      $('capA').innerHTML = `${texStr('\\log c')} of your translog (with ${texStr('\\alpha_0=0')}) as ${texStr('w_1')} varies and ${texStr('w_2')} stays at its current value.`;
+      $('capA').innerHTML = `<b>Drag the point</b> sideways to change ${texStr('w_1')}. ${texStr('\\log c')} of your translog (with ${texStr('\\alpha_0=0')}) as ${texStr('w_1')} varies and ${texStr('w_2')} stays at its current value.`;
     }
   }
 
@@ -86,15 +87,15 @@
     traces.push(U.line2(xs.map(x => [x, TL.shares(P, at(x))[1]]), th.accent, 1.5, 'translog sh₂ (&)', 'dash'));
     if (!isCES) traces.push(U.line2(xs.map(x => [x, TL.shares(P, at(x)).reduce((a, b) => a + b, 0)]), th.muted, 1.5, 'sh₁ + sh₂', 'dot'));
     const xNow = Math.log(w[0] / w2), sh = TL.shares(P, w);
-    traces.push(U.dot2([[xNow, sh[0]]], th.accent, 'sh₁ at the current prices', 9));
+    traces.push(U.dot2([[xNow, sh[0]]], th.accent, 'sh₁ at the current prices (drag it)', 14));
     const shapes = [{ type: 'line', x0: xNow, x1: xNow, yref: 'paper', y0: 0, y1: 1, line: { color: th.muted, width: 1, dash: 'dot' } }];
     const ys = traces.flatMap(t => t.y).filter(Number.isFinite);
     const yr = [Math.min(-0.05, ...ys), Math.max(1.05, ...ys)];
     Plotly.react('plotS', traces, U.base2d(th, { xt: 'log(w<sub>1</sub>/w<sub>2</sub>)', yt: 'cost share', x: { range: [-X, X] }, y: { range: yr }, shapes, margin: { l: 56, r: 12, t: 8, b: 44 } }), U.PLOT_CONFIG);
     const slope = `\\beta_{11}=${f4(P.beta[0][0])}`;
-    $('capS').innerHTML = isCES
+    $('capS').innerHTML = `<b>Drag the point</b> sideways to change ${texStr('w_1')}. ` + (isCES
       ? `<span class="c-ink"><span class="key"></span>CES shares</span> bend; the <span class="c-accent"><span class="key"></span>translog shares</span> are straight lines with slope ${texStr(slope)} ${texStr(`=(1-\\sigma)\\,sh_1sh_2`)} at ${texStr('\\bar w')}, tangent to the CES curve there. Solid: ${texStr('sh_1')}; dashed: ${texStr('sh_2')}. ${sigmaCES() < 1 ? 'With σ < 1 the share of an input rises with its relative price.' : sigmaCES() > 1 ? 'With σ > 1 the share of an input falls with its relative price.' : ''}`
-      : `Your share equations (&): solid ${texStr('sh_1')}, dashed ${texStr('sh_2')}, dotted their sum (must be 1, restriction 1). Slope of ${texStr('sh_1')} in ${texStr('\\log w_1')}: ${texStr(slope)}.`;
+      : `Your share equations (&): solid ${texStr('sh_1')}, dashed ${texStr('sh_2')}, dotted their sum (must be 1, restriction 1). Slope of ${texStr('sh_1')} in ${texStr('\\log w_1')}: ${texStr(slope)}.`);
   }
 
   // ---------- elasticities (%), (#), ($) ----------
@@ -192,9 +193,47 @@
     guard('aggregation plot', () => drawAggregate(th));
   }
 
+  // Several points in one figure that can be dragged: the one nearest the pointer when it goes down is moved.
+  // points: [{ at: () => [x, y] or null, move: ([x, y]) => {} }]
+  function dragNearest(id, points, opts = {}) {
+    const gd = $(id);
+    let pick = 0, down = false;
+    const choose = ev => {
+      const fl = gd._fullLayout;
+      if (!fl || !fl.xaxis) return;
+      const b = gd.getBoundingClientRect(), xa = fl.xaxis, ya = fl.yaxis;
+      let best = Infinity;
+      points.forEach((p, i) => {
+        const t = p.at();
+        if (!t) return;
+        const d = Math.hypot(ev.clientX - b.left - xa._offset - xa.c2p(t[0]), ev.clientY - b.top - ya._offset - ya.c2p(t[1]));
+        if (d < best) { best = d; pick = i; }
+      });
+    };
+    // registered before U.dragPoint's own handlers, so the choice is made before the drag starts
+    gd.addEventListener('pointerdown', choose, true);
+    gd.addEventListener('pointermove', ev => { if (!down) choose(ev); }, true);
+    U.dragPoint(gd, {
+      target: () => points[pick].at(),
+      move: v => points[pick].move(v),
+      start: () => { down = true; if (opts.start) opts.start(); },
+      end: () => { down = false; if (opts.end) opts.end(); }
+    });
+  }
+
   function init() {
     U.renderStaticTex();
-    U.controls(document, state, { onChange: schedule });
+    ctrls = U.controls(document, state, { onChange: schedule });
+    // Drag sideways along log(w1/w2): the current point sets w1 (w2 fixed), the reference point (CES) sets w̄1 (w̄2 fixed).
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v));
+    const toW1 = ([x]) => ctrls.w1.setExact(lim('w1', state.w2 * Math.exp(x)));
+    const nowA = () => { const w = [state.w1, state.w2]; return [Math.log(w[0] / w[1]), TL.logUnitCost(solve().P, w)]; };
+    const refA = () => { if (state.mode !== 'ces') return null; const xb = Math.log(state.wb1 / state.wb2); return [xb, Math.log(cesCost([state.w2 * Math.exp(xb), state.w2]))]; };
+    dragNearest('plotA', [
+      { at: nowA, move: toW1 },
+      { at: refA, move: ([x]) => ctrls.wb1.setExact(lim('wb1', state.wb2 * Math.exp(x))) }
+    ]);
+    U.dragPoint('plotS', { target: () => { const w = [state.w1, state.w2]; return [Math.log(w[0] / w[1]), TL.shares(solve().P, w)[0]]; }, move: toW1 });
     document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { state.mode = b.dataset.mode; schedule(); }));
     guard('results tables', renderTables);
     render();

@@ -12,7 +12,7 @@
   const { $, fmt, tex, texStr, guard } = U;
 
   const state = { reveal: false, view: 'ump', type: 'ces', delta: 0.4, rho: -1, a: 0.4, g1: 1, g2: 0.5, kappa: 5, p1: 1, p2: 1, y: 10, v: 4 };
-  let ctrls = {};
+  let ctrls = {}, frozenL = null;
   const schedule = U.scheduler(render);
   const f3 = x => fmt(x, 3);
   const same = (a, b) => Math.abs(a - b) <= 1e-5 * Math.max(1, Math.abs(a), Math.abs(b));
@@ -28,8 +28,11 @@
     return { u, p, y, v, x };
   }
 
+  const plotMax = S => 1.15 * Math.max(S.y / S.p[0], S.y / S.p[1]);
+
   function draw(th, S) {
-    const { u, p, y, v, x } = S, L = 1.15 * Math.max(y / p[0], y / p[1]);
+    // the axes stay fixed while the budget line is dragged, so they do not move under the pointer
+    const { u, p, y, v, x } = S, L = frozenL || plotMax(S);
     const x1s = U.linspace(L / 400, L, 300), ic = lev => CM.indifferenceCurve(lev, u, x1s).map(([a, b]) => [a, b !== null && b <= L * 1.05 ? b : null]);
     const traces = [], annotations = [];
     const line = (m, color, width, name, dash) => U.line2([[m / p[0], 0], [0, m / p[1]]], color, width, name, dash);
@@ -47,12 +50,14 @@
       traces.push(U.line2(ic(v), th.blue, 3, `indifference curve U = v = ${f3(v)}`));
     }
     traces.push(U.dot2([x], th.red, state.view === 'ump' ? 'D(p,y)' : 'H(p,v)', 12));
+    // where the budget line meets the x1-axis, y/p1: drag it to change p1
+    if (y / p[0] <= L) traces.push(U.dot2([[y / p[0], 0]], th.ink, 'p₁: end of the budget line (drag it)', 14, { cliponaxis: false }));
     annotations.push({ x: x[0], y: x[1], text: state.view === 'ump' ? 'x* = D(p, y)' : 'x* = H(p, v)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { size: 13, color: th.red } });
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('head').textContent = state.view === 'ump' ? 'Reach the highest indifference curve (UMP)' : 'Reach v at the lowest cost (EMP)';
-    $('cap').innerHTML = state.view === 'ump'
+    $('cap').innerHTML = `<b>Drag the dot</b> on the ${texStr('x_1')}-axis to change ${texStr('p_1')}. ` + (state.view === 'ump'
       ? `<span class="c-muted"><span class="key dotted"></span>Dotted</span>: a lower indifference curve (affordable, not the best) and a higher one (not affordable). With income ${texStr(`y=${f3(y)}`)} the best affordable bundle is ${texStr(`D(p,y)=(${f3(x[0])},${f3(x[1])})`)} on the indifference curve ${texStr(`V(p,y)=${f3(v)}`)}. Switch to EMP: asked to reach ${texStr(`v=${f3(v)}`)} at least cost, the consumer picks the same bundle and spends exactly ${texStr('y')}.`
-      : `<span class="c-muted"><span class="key dash"></span>Dashed</span>: a cheaper line that cannot reach ${texStr('v')} and a dearer one that is not the cheapest. To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`;
+      : `<span class="c-muted"><span class="key dash"></span>Dashed</span>: a cheaper line that cannot reach ${texStr('v')} and a dearer one that is not the cheapest. To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`);
   }
 
   function renderChecks(S) {
@@ -91,12 +96,12 @@
   function drawCurves(th, S) {
     const { u, p, y, v } = S, ps = U.linspace(0.3, 4, 120);
     const Vc = DM.curveV(p[1], y, u, ps), Cc = DM.curveC(p[1], v, u, ps), H1 = CM.hicks(p, v, u)[0], Cnow = CM.expenditure(p, v, u);
-    Plotly.react('plotV', [U.line2(Vc, th.blue, 2.5, 'V(p₁, p₂, y)'), U.dot2([[p[0], v]], th.ink, 'now', 8)], U.base2d(th, { xt: 'p<sub>1</sub>', yt: 'V(p, y)', margin: { l: 52, r: 8, t: 6, b: 40 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    Plotly.react('plotV', [U.line2(Vc, th.blue, 2.5, 'V(p₁, p₂, y)'), U.dot2([[p[0], v]], th.ink, 'now (drag it)', 14)], U.base2d(th, { xt: 'p<sub>1</sub>', yt: 'V(p, y)', margin: { l: 52, r: 8, t: 6, b: 40 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     // the tangent sampled at the same prices as C, so the gap between them (concavity, E4) can be shaded
     const tan = Cc.map(([q]) => [q, Cnow + H1 * (q - p[0])]);
     const gap = { ...U.line2(Cc, th.red, 0, ''), fill: 'tonexty', fillcolor: 'rgba(155,155,155,0.35)', hoverinfo: 'skip' };
-    Plotly.react('plotC', [U.line2(tan, th.muted, 1.5, 'tangent, slope H¹ (Shephard)', 'dash'), gap, U.line2(Cc, th.red, 2.5, 'C(p₁, p₂, v)'), U.dot2([[p[0], Cnow]], th.ink, 'now', 8)], U.base2d(th, { xt: 'p<sub>1</sub>', yt: 'C(p, v)', y: { range: [0, Math.max(...Cc.map(q => q[1])) * 1.1] }, margin: { l: 52, r: 8, t: 6, b: 40 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('capVC').innerHTML = `Top: maximal utility falls as ${texStr('p_1')} rises (I2). Bottom: the expenditure function rises with ${texStr('p_1')} (E2) and is concave (E4): it lies below its tangent (the grey gap), whose slope is ${texStr(`H^1(p,v)=${f3(H1)}`)} (E5).`;
+    Plotly.react('plotC', [U.line2(tan, th.muted, 1.5, 'tangent, slope H¹ (Shephard)', 'dash'), gap, U.line2(Cc, th.red, 2.5, 'C(p₁, p₂, v)'), U.dot2([[p[0], Cnow]], th.ink, 'now (drag it)', 14)], U.base2d(th, { xt: 'p<sub>1</sub>', yt: 'C(p, v)', y: { range: [0, Math.max(...Cc.map(q => q[1])) * 1.1] }, margin: { l: 52, r: 8, t: 6, b: 40 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
+    $('capVC').innerHTML = `<b>Drag a dot</b> to change ${texStr('p_1')}. Top: maximal utility falls as ${texStr('p_1')} rises (I2). Bottom: the expenditure function rises with ${texStr('p_1')} (E2) and is concave (E4): it lies below its tangent (the grey gap), whose slope is ${texStr(`H^1(p,v)=${f3(H1)}`)} (E5).`;
   }
 
   function render() {
@@ -123,6 +128,29 @@
       if (b.dataset.view === 'emp') ctrls.v.setExact(S.v); else ctrls.y.setExact(S.y);
       state.view = b.dataset.view; schedule();
     }));
+    // Drag p1: at the end of the budget line in the main figure, or along the p1-axis of the two small figures.
+    const lim = v => Math.min(ctrls.p1.max, Math.max(ctrls.p1.min, v)), r2 = v => Math.round(v * 100) / 100;
+    U.dragPoint('plot', {
+      start: () => { frozenL = plotMax(solve()); },
+      end: () => { frozenL = null; schedule(); },
+      target: () => { const S = solve(); return [S.y / S.p[0], 0]; },
+      move: ([x]) => {
+        if (!(x > 0)) return;
+        // (UMP) the line ends at y/p1; (EMP) at C(p,v)/p1, which falls as p1 rises: find p1 by bisection
+        if (state.view === 'ump') { ctrls.p1.setExact(r2(lim(state.y / x))); return; }
+        const u = pref(), end = q => CM.expenditure([q, state.p2], state.v, u) / q;
+        let lo = ctrls.p1.min, hi = ctrls.p1.max;
+        if (!Number.isFinite(end(lo)) || !Number.isFinite(end(hi))) return;
+        if (end(lo) <= x) { ctrls.p1.setExact(lo); return; }
+        if (end(hi) >= x) { ctrls.p1.setExact(hi); return; }
+        for (let k = 0; k < 50; k++) { const m = (lo + hi) / 2; if (end(m) > x) lo = m; else hi = m; }
+        ctrls.p1.setExact(r2((lo + hi) / 2));
+      }
+    });
+    for (const id of ['plotV', 'plotC']) U.dragPoint(id, {
+      target: () => { const S = solve(); return [S.p[0], id === 'plotV' ? S.v : CM.expenditure(S.p, S.v, S.u)]; },
+      move: ([x]) => ctrls.p1.setExact(r2(lim(x)))
+    });
     render();
     U.watchColorScheme(schedule);
   }

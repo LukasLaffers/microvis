@@ -15,6 +15,8 @@
   const state = { mode: 'mono', dem: 'linear', A: 12, B: 1, K: 14, eta: -2, AL: 12, BL: 1, a: 2, m: 1 };
   const W = [1, 1];
   let ctrls = {}, timer = null;
+  // While the demand curve is dragged the axes stay as they were (above A = 12 they follow demand otherwise).
+  let frozen = null, lastAxes = null;
   const schedule = U.scheduler(render);
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
   const z = x => Math.abs(x) < 1e-9 ? 0 : x;   // print rounding noise as 0
@@ -24,9 +26,11 @@
 
   function draw(th) {
     const s = tech(), d = demand(), o = MM.optimum(W, s, d), comp = state.mode === 'mono' ? MM.competitive(W, s, d) : null;
-    // With differentiated products keep the short-run axes, so that AR is seen shifting down.
-    const local = state.mode === 'local', A0 = local ? Math.max(12, d.A) : d.A;
-    const qMax = d.type === 'linear' ? Math.min(A0 / d.B, 8) * 1.02 : 7, yMax = d.type === 'linear' ? A0 * 1.05 : Math.max(16, o.p * 1.4);
+    // Keep the axes of A = 12 for lower demand, so that AR is seen shifting down (as substitutes enter).
+    const local = state.mode === 'local', A0 = d.type === 'linear' ? Math.max(12, d.A) : 0;
+    const qMax = frozen ? frozen.qMax : d.type === 'linear' ? Math.min(A0 / d.B, 8) * 1.02 : 7;
+    const yMax = frozen ? frozen.yMax : d.type === 'linear' ? A0 * 1.05 : Math.max(16, o.p * 1.4);
+    lastAxes = { qMax, yMax };
     const qq = U.linspace(0.02, qMax, 400), clip = v => (v <= yMax * 1.5 && v >= -yMax) ? v : null;
     const traces = [];
     if (!o.shutdown && o.q > 0) {
@@ -55,6 +59,8 @@
       if (Math.abs(o.p - o.AC) * 12 > yMax && o.q > 0.06 * qMax) annotations.push({ x: o.q / 2, y: (o.p + o.AC) / 2, text: 'Π', showarrow: false, font: { size: 15, color: th.ink }, bgcolor: th.panel, borderpad: 2 });
     }
     if (comp) traces.push(U.dot2([[comp.q, comp.p]], th.ink, 'price taker: AR = MC', 9, { marker: { color: th.panel, size: 9, line: { color: th.ink, width: 1.5 } } }));
+    const h = handle();
+    traces.push(U.dot2([h], th.blue, d.type === 'linear' ? 'demand AR (drag it)' : 'demand AR, level K at q = 1 (drag it)', 14, { cliponaxis: false }));
     // Curve labels at their right ends.
     // Rising curves get the label above their end, falling ones below it, so that the curve does not run through it.
     const label = (f, text, color, falling) => { for (let i = qq.length - 1; i >= 0; i--) { const v = f(qq[i]); if (v > 0.05 * yMax && v < 0.93 * yMax) { annotations.push({ x: qq[i], y: v, text, showarrow: false, xanchor: 'right', xshift: -6, yanchor: falling ? 'top' : 'bottom', yshift: falling ? -2 : 0, font: { size: 12, color } }); return; } } };
@@ -68,6 +74,10 @@
     return { s, d, o, comp, dwl };
   }
 
+  // The handle on the demand curve: at q = 0.5 (linear), or at q = 1 where the level is K (constant elasticity).
+  const DRAG = '<b>Drag the blue dot</b> up or down to shift demand. ';
+  const handle = () => { const d = demand(); return d.type === 'linear' ? [0.5, d.A - 0.5 * d.B] : [1, d.K]; };
+
   function renderText({ s, d, o, comp, dwl }) {
     const item = (good, html) => `<li><span class="mark ${good ? 'ok' : 'no'}">${good ? '✓' : '✗'}</span><span>${html}</span></li>`;
     const local = state.mode === 'local', As = local ? MM.tangencyIntercept(W, s, state.BL) : null;
@@ -75,7 +85,7 @@
     if (o.shutdown) {
       $('checks').innerHTML = `<li><span class="mark na">–</span><span>Even the best output makes a loss (${texStr(`\\Pi=${fmt(o.profit, 3)}`)}), so the firm produces nothing.${local ? ' Too many substitutes: some rivals would leave.' : ''}</span></li>`;
       $('readouts').innerHTML = '';
-      $('cap').innerHTML = 'Average revenue lies below average cost everywhere: no output covers its cost.';
+      $('cap').innerHTML = DRAG + 'Average revenue lies below average cost everywhere: no output covers its cost.';
       return;
     }
     const lines = [
@@ -96,7 +106,7 @@
     if (comp) rows.push(['\\text{price taker}', `${texStr(`q=${fmt(comp.q, 3)}`)}, ${texStr(`p=${fmt(comp.p, 3)}`)}`]);
     if (dwl !== null) rows.push(['\\text{deadweight loss}', fmt(dwl)]);
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
-    $('cap').innerHTML = `<span class="c-l2-blue"><span class="key"></span>${texStr('AR=p(q)')}</span>, <span class="c-l2-blue"><span class="key dash"></span>${texStr('MR')}</span>, <span class="c-l2-red"><span class="key"></span>${texStr('MC')}</span>, <span class="c-ink"><span class="key"></span>${texStr('AC')}</span>. ` +
+    $('cap').innerHTML = DRAG + `<span class="c-l2-blue"><span class="key"></span>${texStr('AR=p(q)')}</span>, <span class="c-l2-blue"><span class="key dash"></span>${texStr('MR')}</span>, <span class="c-l2-red"><span class="key"></span>${texStr('MC')}</span>, <span class="c-ink"><span class="key"></span>${texStr('AC')}</span>. ` +
       (local ? (Math.abs(o.profit) < 0.02 ? 'Entry of substitutes has pushed average revenue down until it just touches average cost: the firm still sets MR = MC, but earns zero profit.' : `The firm earns ${texStr(`\\Pi=${fmt(o.profit, 2)}`)}. Press "Substitutes enter" to let rivals take its demand.`)
         : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}; the <span class="c-muted">grey area</span> between ${texStr('AR')} and ${texStr('MC')} is the deadweight loss, ${fmt(dwl)}: units that buyers value above their marginal cost but that are not produced` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.` +
           // close to unit elasticity MR is a small fraction of the price: a tiny quantity at a very high price
@@ -139,6 +149,14 @@
     document.querySelectorAll('[data-dem]').forEach(b => b.addEventListener('click', () => { state.dem = b.dataset.dem; schedule(); }));
     $('enter').addEventListener('click', enter);
     $('short').addEventListener('click', () => { stop(); ctrls.AL.set(12); });
+    // Drag the demand curve up or down: it sets A (the A of differentiated products), or K.
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v));
+    U.dragPoint('plot', {
+      start: () => { stop(); frozen = lastAxes; },
+      end: () => { frozen = null; schedule(); },
+      target: handle,
+      move: ([, y]) => { const k = state.mode === 'local' ? 'AL' : state.dem === 'linear' ? 'A' : 'K'; ctrls[k].setExact(lim(k, k === 'K' ? y : y + 0.5 * demand().B)); }
+    });
     render();
     U.watchColorScheme(schedule);
   }

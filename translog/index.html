@@ -45,10 +45,7 @@
         </div>
         <div data-show="ces">
           <div class="formula" id="formula-ces"></div>
-          <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on input 1" data-min="0.1" data-max="0.9" data-step="0.01"></div>
           <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ)" data-min="-4" data-max="0.8" data-step="0.05"></div>
-          <div class="ctrl" data-key="wb1" data-label="\bar w_1" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
-          <div class="ctrl" data-key="wb2" data-label="\bar w_2" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
         </div>
         <div data-show="own">
           <div class="ctrl" data-key="a1" data-label="\alpha_1" data-hint="" data-min="-0.5" data-max="1.5" data-step="0.01"></div>
@@ -65,6 +62,17 @@
         <div class="ctrl" data-key="w1" data-label="w_1" data-hint="price of input 1" data-min="0.25" data-max="4" data-log="1"></div>
         <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.25" data-max="4" data-log="1"></div>
       </div>
+
+      <details class="more" id="more" data-show="ces">
+        <summary>More settings</summary>
+        <p class="note">Weight of input 1 and the reference prices of the CES approximation.</p>
+      <div class="group">
+        <h2>CES weight and reference prices</h2>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on input 1" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="wb1" data-label="\bar w_1" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
+        <div class="ctrl" data-key="wb2" data-label="\bar w_2" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
+      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Approximation and shares">

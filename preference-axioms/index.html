@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>For a reference bundle <span class="tex" data-tex="x^\circ"></span>: blue is <span class="tex" data-tex="B(x^\circ)"></span>, the bundles at least as good; grey is <span class="tex" data-tex="W(x^\circ)"></span>, the bundles no better; the curve between them is <span class="tex" data-tex="I(x^\circ)"></span>. Decide which axioms hold, then press <b>Check your answer</b>.</p>
           <ul>
-          <li>Click to place a test bundle <span class="tex" data-tex="x'"></span>: the page compares it with <span class="tex" data-tex="x^\circ"></span> and checks whether the segment between them stays in <span class="tex" data-tex="B(x^\circ)"></span>, as convexity requires.</li>
+          <li>Drag the test bundle <span class="tex" data-tex="x'"></span> (or <span class="tex" data-tex="x^\circ"></span>): the page compares it with <span class="tex" data-tex="x^\circ"></span> and checks whether the segment between them stays in <span class="tex" data-tex="B(x^\circ)"></span>, as convexity requires.</li>
           <li>Choose <b>A bliss point</b> or <b>Indifference curves bowed out</b>: which axioms fail? Check your answer.</li>
           <li>Choose <b>Lexicographic</b>: <span class="tex" data-tex="I(x^\circ)"></span> is a single point, and the preferences are not continuous.</li>
           </ul>
@@ -46,16 +46,23 @@
           <option value="lex">Lexicographic</option>
         </select>
         <div class="formula" id="formula"></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Weights, bliss point, exact reference bundle.</p>
+      <div class="group" data-show="cobb|subs|concave|bliss">
+        <h2>Parameters</h2>
         <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="cobb|subs|concave"></div>
         <div class="ctrl" data-key="b1" data-label="b_1" data-hint="bliss point" data-min="2" data-max="9" data-step="0.1" data-show="bliss"></div>
         <div class="ctrl" data-key="b2" data-label="b_2" data-hint="bliss point" data-min="2" data-max="9" data-step="0.1" data-show="bliss"></div>
       </div>
       <div class="group">
-        <h2>Bundles</h2>
+        <h2>Reference bundle</h2>
         <div class="ctrl" data-key="x1" data-label="x^\circ_1" data-hint="reference bundle" data-min="0" data-max="10" data-step="0.1"></div>
         <div class="ctrl" data-key="x2" data-label="x^\circ_2" data-hint="reference bundle" data-min="0" data-max="10" data-step="0.1"></div>
-        <p class="hint-line">Click the plot to move the test bundle <span class="tex" data-tex="x'"></span>.</p>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Better and worse sets">

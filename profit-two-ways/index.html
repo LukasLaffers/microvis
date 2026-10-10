@@ -49,8 +49,6 @@
         </select>
         <div class="formula" id="formula-general"></div>
         <div class="formula" id="formula-numbers"></div>
-        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
-        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
       </div>
 
       <div class="group">
@@ -59,10 +57,6 @@
           <button type="button" data-profile="ushape" aria-pressed="true">U-shaped average cost</button>
           <button type="button" data-profile="homog" aria-pressed="false">Homogeneous of degree k</button>
         </div>
-        <div class="ctrl" data-key="a" data-label="a" data-hint="increasing → decreasing returns" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
-        <div class="ctrl" data-key="m" data-label="m" data-hint="lowest marginal cost / c(w)" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
-        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="0.95" data-step="0.05" data-show="homog"></div>
-        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="homog"></div>
         <p class="note" data-show="homog">With <span class="tex" data-tex="k\ge1"></span> a price taker has no unique profit maximum (profit grows without bound, or with <span class="tex" data-tex="k=1"></span> and the right price every output earns zero): see the <a href="../cost-curves/index.html">Cost Curves and Supply</a> tool.</p>
       </div>
 
@@ -73,12 +67,30 @@
         <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
       </div>
 
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Shape of the isoquants, shape of the cost curves, layers.</p>
+      <div class="group">
+        <h2>Shape of the isoquants</h2>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+
+      <div class="group">
+        <h2>Shape of the cost curves</h2>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="increasing → decreasing returns" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="m" data-label="m" data-hint="lowest marginal cost / c(w)" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="0.95" data-step="0.05" data-show="homog"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="homog"></div>
+      </div>
+
       <div class="group">
         <h2>Layers</h2>
         <label class="check"><input type="checkbox" id="surface" checked> <span>Profit surface</span></label>
         <div class="ctrl" data-key="opacity" data-label="\text{opacity}" data-hint="surface" data-min="0.1" data-max="1" data-step="0.05"></div>
         <label class="check"><input type="checkbox" id="zero" checked> <span>Zero-profit plane (the outside option)</span></label>
       </div>
+      </details>
     </section>
 
     <section class="panel plot3d-panel" aria-label="Profit surface">

@@ -4,3 +4,5 @@
 .seg-4 button + button, .seg-3 button + button { border-left: 0; }
 .seg-3 button:last-child { grid-column: 1 / -1; }
 .plot-main { cursor: crosshair; touch-action: manipulation; }
+/* On a phone the figure comes first (its points can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

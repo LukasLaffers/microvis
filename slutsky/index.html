@@ -31,7 +31,7 @@
           <p>Start at <span class="tex" data-tex="E_1"></span> and change the price of good 1. The change splits into the <span class="c-l2-blue">substitution effect</span> along the old indifference curve to <span class="tex" data-tex="E_2"></span>, where its slope equals the new price ratio, and the <span class="c-l2-red">income effect</span> to <span class="tex" data-tex="E_3"></span> on the new budget line. The two-step split is bookkeeping: as <span class="tex" data-tex="p_1"></span> changes gradually, both effects happen at once.</p>
           <ul>
           <li>Press <b>▶ Step by step</b>: first <span class="tex" data-tex="E_1\to E_2"></span>, then <span class="tex" data-tex="E_2\to E_3"></span>.</li>
-          <li>Press <b>▶ Lower p₁ smoothly</b>, then drag <span class="tex" data-tex="t"></span>: at every point the blue and red arrows add up to the black one, the direction of the path.</li>
+          <li>Press <b>▶ Lower p₁ smoothly</b>, then drag <span class="tex" data-tex="t"></span> or the consumer’s point: at every point the blue and red arrows add up to the black one, the direction of the path.</li>
           <li>Press <b>Giffen good</b>: good 1 is so inferior that the income effect wins, and she buys <em>less</em> of it when it gets cheaper.</li>
           </ul>
         </details>
@@ -51,20 +51,31 @@
           <option value="giffen">Giffen good</option>
         </select>
         <div class="formula" id="formula"></div>
+      </div>
+      <div class="group">
+        <h2>Prices and income</h2>
+        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="before" data-min="0.5" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="p1n" data-label="p_1'" data-hint="after" data-min="0.5" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="2" data-max="30" data-step="0.05"></div>
+        <p class="hint-line" id="income-note" hidden></p>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">The price of good 2; the parameters of the CES and Stone–Geary preferences.</p>
+      <div class="group">
+        <h2>Price of good 2</h2>
+        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="" data-min="0.5" data-max="3" data-step="0.05"></div>
+      </div>
+      <div class="group" data-show="ces|stonegeary">
+        <h2>Shape of the preferences</h2>
         <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
         <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
         <div class="ctrl" data-key="a" data-label="a" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="stonegeary"></div>
         <div class="ctrl" data-key="g1" data-label="\gamma_1" data-hint="subsistence of good 1" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
         <div class="ctrl" data-key="g2" data-label="\gamma_2" data-hint="subsistence of good 2" data-min="0" data-max="4" data-step="0.1" data-show="stonegeary"></div>
       </div>
-      <div class="group">
-        <h2>Prices and income</h2>
-        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="before" data-min="0.5" data-max="4" data-step="0.05"></div>
-        <div class="ctrl" data-key="p1n" data-label="p_1'" data-hint="after" data-min="0.5" data-max="4" data-step="0.05"></div>
-        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="" data-min="0.5" data-max="3" data-step="0.05"></div>
-        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="2" data-max="30" data-step="0.05"></div>
-        <p class="hint-line" id="income-note" hidden></p>
-      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="The decomposition">

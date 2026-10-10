@@ -12,3 +12,5 @@
 table.scale-table { margin-bottom: 8px; }
 table.scale-table td { cursor: default; }
 table.scale-table td:hover { outline: none; }
+/* On a phone the isoquant map comes first, the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

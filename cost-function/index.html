@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>At the prices <span class="tex" data-tex="\bar w"></span> the cheapest bundle is <span class="tex" data-tex="\bar z=H(\bar w,q)"></span>. Keeping <span class="tex" data-tex="\bar z"></span> while <span class="tex" data-tex="w_1"></span> changes would cost the black line <span class="tex" data-tex="w_1\bar z_1+\bar w_2\bar z_2"></span>. But the firm substitutes, so the true cost <span class="tex" data-tex="C(w,q)"></span> (blue) lies below that line and touches it at <span class="tex" data-tex="\bar w_1"></span>. A function below all its tangent lines is concave (C4).</p>
           <ul>
-          <li>Drag <span class="tex" data-tex="w_1"></span> in the plot: the slope where they touch is <span class="tex" data-tex="H^1(\bar w,q)"></span>, Shephard's lemma (C5).</li>
+          <li>Drag the point at <span class="tex" data-tex="\bar w_1"></span> in the plot: the slope where they touch is <span class="tex" data-tex="H^1(\bar w,q)"></span>, Shephard's lemma (C5).</li>
           <li>Scale both prices by <span class="tex" data-tex="\alpha"></span>: cost scales with them, input demand does not (C3, H3).</li>
           </ul>
         </details>
@@ -46,20 +46,11 @@
         </select>
         <div class="formula" id="formula-general"></div>
         <div class="formula" id="formula-numbers"></div>
-        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
-        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
-        <details class="sub-details">
-          <summary>Scale</summary>
-          <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05"></div>
-          <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="1.6" data-step="0.05"></div>
-        </details>
       </div>
 
       <div class="group">
-        <h2>Reference prices and output</h2>
-        <div class="ctrl" data-key="w1" data-label="\bar w_1" data-hint="drag in the plot too" data-min="0.2" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="w2" data-label="\bar w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="q" data-label="q" data-hint="output" data-min="0.5" data-max="5" data-step="0.05"></div>
+        <h2>Prices</h2>
+        <div class="ctrl" data-key="w1" data-label="\bar w_1" data-hint="drag the point in the plot too" data-min="0.2" data-max="5" data-step="0.05"></div>
         <div class="ctrl" data-key="probe" data-label="w_1" data-hint="another price to compare" data-min="0.2" data-max="5" data-step="0.05"></div>
       </div>
 
@@ -67,13 +58,31 @@
         <h2>Price scaling</h2>
         <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="multiplies both prices" data-min="0.25" data-max="3" data-step="0.05"></div>
       </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Technology parameters, the price of input 2 and the output.</p>
+      <div class="group">
+        <h2>Technology parameters</h2>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="1.6" data-step="0.05"></div>
+      </div>
+
+      <div class="group">
+        <h2>Price of input 2 and output</h2>
+        <div class="ctrl" data-key="w2" data-label="\bar w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="q" data-label="q" data-hint="output" data-min="0.5" data-max="5" data-step="0.05"></div>
+      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Cost as a function of w1">
       <div class="panel-head"><h2>Cost as a function of <span class="tex" data-tex="w_1"></span></h2></div>
       <div id="plot" class="plot plot-main"></div>
       <p class="caption" id="cap-main"></p>
-      <p class="caption"><span class="c-l2-blue"><span class="key"></span><span class="tex" data-tex="C(w,q)"></span>: inputs adjust</span>; <span class="c-ink"><span class="key"></span>cost if inputs stay at <span class="tex" data-tex="H(\bar w,q)"></span></span>; the shaded gap is the saving from substitution. Move the pointer over the plot to compare prices; drag (or tap) to move <span class="tex" data-tex="\bar w_1"></span>.</p>
+      <p class="caption"><span class="c-l2-blue"><span class="key"></span><span class="tex" data-tex="C(w,q)"></span>: inputs adjust</span>; <span class="c-ink"><span class="key"></span>cost if inputs stay at <span class="tex" data-tex="H(\bar w,q)"></span></span>; the shaded gap is the saving from substitution.</p>
     </section>
 
     <div class="side">
@@ -89,7 +98,7 @@
       </section>
       <section class="panel" aria-label="Area equals change in cost">
         <h2>Lecture 4: area = change in cost</h2>
-        <div class="ctrl" data-key="w1o" data-label="w_1^o" data-hint="second price (click the plot to move it)" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w1o" data-label="w_1^o" data-hint="second price (drag the point in the plot)" data-min="0.2" data-max="5" data-step="0.05"></div>
         <div id="plotArea" class="plot plot-2d"></div>
         <p class="caption" id="capArea"></p>
       </section>

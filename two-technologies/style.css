@@ -9,3 +9,5 @@ table.effects th:first-child { text-align: left; }
 .row-scale, .row-scale th { color: var(--l2-red); }
 .row-total th, .row-total td { font-weight: 700; }
 #decoNote { margin-top: 0; }
+/* On a phone the figures come first (the isocost line and the points can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

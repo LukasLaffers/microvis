@@ -43,15 +43,11 @@
           <option value="giffen">Inferior good 1</option>
         </select>
         <div class="formula" id="formula"></div>
-        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
-        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
-        <div class="ctrl" data-key="kappa" data-label="\kappa" data-hint="weight of good 1" data-min="1" data-max="12" data-step="0.1" data-show="quasilinear"></div>
       </div>
       <div class="group">
         <h2>The price change</h2>
         <div class="ctrl" data-key="p10" data-label="p_1^0" data-hint="before" data-min="0.5" data-max="4" data-step="0.01"></div>
         <div class="ctrl" data-key="p11" data-label="p_1^1" data-hint="after" data-min="0.5" data-max="4" data-step="0.01"></div>
-        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="2" data-max="30" data-step="0.1" data-show="ces|quasilinear"></div>
         <p class="hint-line">Good 2 is the numéraire: <span class="tex" data-tex="p_2=1"></span>.</p>
       </div>
       <div class="group">
@@ -63,6 +59,21 @@
           <button type="button" data-area="all" aria-pressed="true">all</button>
         </div>
       </div>
+
+      <details class="more" id="more" data-show="ces|quasilinear">
+        <summary>More settings</summary>
+        <p class="note">The parameters of the preferences and the income.</p>
+      <div class="group">
+        <h2>Shape of the preferences</h2>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.1" data-min="-4" data-max="0.8" data-step="0.05" data-show="ces"></div>
+        <div class="ctrl" data-key="kappa" data-label="\kappa" data-hint="weight of good 1" data-min="1" data-max="12" data-step="0.1" data-show="quasilinear"></div>
+      </div>
+      <div class="group">
+        <h2>Income</h2>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="2" data-max="30" data-step="0.1" data-show="ces|quasilinear"></div>
+      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Areas">

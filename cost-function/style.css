@@ -3,3 +3,7 @@
 dl.mini { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 8px 0 0; font-size: 14px; }
 dl.mini dt { color: var(--muted); }
 dl.mini dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* The page scrolls under a finger away from the point (Microvis.dragPoint takes a touch on the point itself). */
+.plot-main { touch-action: auto; cursor: default; }
+/* On a phone the figures come first (the points can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

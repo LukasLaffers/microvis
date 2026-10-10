@@ -5,3 +5,5 @@
 @media (max-width: 800px) { .plot-lever { height: 260px; } }
 .plot-rules { height: 230px; }
 .hint-line { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+/* On a phone the figures come first (the weights and the hollow point can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

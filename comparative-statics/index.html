@@ -46,6 +46,20 @@
         </select>
         <div class="formula" id="formula-general"></div>
         <div class="formula" id="formula-numbers"></div>
+      </div>
+
+      <div class="group">
+        <h2>Prices</h2>
+        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="before" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w1n" data-label="w_1'" data-hint="after" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="p" data-label="p" data-hint="output price" data-min="0.5" data-max="20" data-step="0.05"></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Shape of the isoquants, returns to scale, price of input 2.</p>
+      <div class="group">
+        <h2>Shape of the isoquants</h2>
         <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
         <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
       </div>
@@ -62,18 +76,16 @@
       </div>
 
       <div class="group">
-        <h2>Prices</h2>
-        <div class="ctrl" data-key="p" data-label="p" data-hint="output price" data-min="0.5" data-max="20" data-step="0.05"></div>
+        <h2>Price of input 2</h2>
         <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="before" data-min="0.2" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="w1n" data-label="w_1'" data-hint="after" data-min="0.2" data-max="5" data-step="0.05"></div>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Ordinary and conditional demand">
       <div class="panel-head"><h2>Ordinary and conditional demand for input 1</h2></div>
       <div id="plot" class="plot plot-main"></div>
-      <p class="caption"><span class="c-ink"><span class="key"></span>ordinary demand curve <span class="tex" data-tex="D^1(w,p)"></span></span>; conditional demand curves <span class="tex" data-tex="H^1(w,q)"></span> at the output before, <span class="c-ink"><span class="key dash"></span><span class="tex" data-tex="q^\ast"></span></span>, and after, <span class="c-muted"><span class="key dash"></span><span class="tex" data-tex="q^{\ast\ast}"></span></span>. The ordinary demand curve is flatter than the conditional ones: when <span class="tex" data-tex="w_1"></span> falls the firm also expands output.</p>
+      <p class="caption"><b>Drag the points</b> up or down to set the prices <span class="tex" data-tex="w_1"></span> (before) and <span class="tex" data-tex="w_1'"></span> (after). <span class="c-ink"><span class="key"></span>ordinary demand curve <span class="tex" data-tex="D^1(w,p)"></span></span>; conditional demand curves <span class="tex" data-tex="H^1(w,q)"></span> at the output before, <span class="c-ink"><span class="key dash"></span><span class="tex" data-tex="q^\ast"></span></span>, and after, <span class="c-muted"><span class="key dash"></span><span class="tex" data-tex="q^{\ast\ast}"></span></span>. The ordinary demand curve is flatter than the conditional ones: when <span class="tex" data-tex="w_1"></span> falls the firm also expands output.</p>
     </section>
 
     <div class="side">

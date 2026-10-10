@@ -32,7 +32,7 @@
       U.dot2([e0.firmE, e0.firmK, [e0.E, e0.K]], th.muted, 'at w_E = 1', 9, { marker: { color: th.panel, size: 9, line: { color: th.muted, width: 1.5 } } }),
       U.dot2([e.firmE], cE, 'energy-intensive firm', 12),
       U.dot2([e.firmK], cK, 'capital-intensive firm', 12),
-      U.dot2([[e.E, e.K]], th.ink, 'aggregate (E, K)', 13)
+      U.dot2([[e.E, e.K]], th.ink, 'aggregate (E, K) (drag it)', 14)
     ];
     // Arrows and labels move with w_E, so they are traces: an animation frame then only moves points.
     traces.push(U.arrow2(e0.firmE, e.firmE, cE, 2, 0.5), U.arrow2(e0.firmK, e.firmK, cK, 2, 0.5), U.arrow2([e0.E, e0.K], [e.E, e.K], th.ink, 2, 0.5));
@@ -46,7 +46,7 @@
     traces.push(label(e.firmK, `capital-intensive<br>(${f1(e.firmK[0])}, ${f1(e.firmK[1])})`, cK, posK));
     traces.push(label([e.E, e.K], `aggregate<br>(${f1(e.E)}, ${f1(e.K)})`, th.ink, posA));
     U.plot('plot', traces, U.base2d(th, { xt: 'Energy E', yt: 'Capital K', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('cap').innerHTML = `Open circles: ${texStr('w_E=w_K=1')}, both firms produce 10, total ${texStr('(E,K)=(30,30)')}. Now ${texStr(`w_E=${f2(state.wE)}`)}: the firms produce ${f1(e.qE)} and ${f1(e.qK)} and the total is ${texStr(`(${f1(e.E)},${f1(e.K)})`)}. Each firm's input ratio ${texStr('K/E')} is fixed (½ and 2)${Math.abs(e.K / e.E - 1) < 5e-3 ? `, and so is the aggregate ${texStr('K/E')} = 1 while both firms produce the same. Raise ${texStr('w_E')} to see it move.` : `, yet the aggregate ${texStr('K/E')} moved from 1 to ${f2(e.K / e.E)}.`}`;
+    $('cap').innerHTML = `<b>Drag the aggregate point</b> along its path to change ${texStr('w_E')}. Open circles: ${texStr('w_E=w_K=1')}, both firms produce 10, total ${texStr('(E,K)=(30,30)')}. Now ${texStr(`w_E=${f2(state.wE)}`)}: the firms produce ${f1(e.qE)} and ${f1(e.qK)} and the total is ${texStr(`(${f1(e.E)},${f1(e.K)})`)}. Each firm's input ratio ${texStr('K/E')} is fixed (½ and 2)${Math.abs(e.K / e.E - 1) < 5e-3 ? `, and so is the aggregate ${texStr('K/E')} = 1 while both firms produce the same. Raise ${texStr('w_E')} to see it move.` : `, yet the aggregate ${texStr('K/E')} moved from 1 to ${f2(e.K / e.E)}.`}`;
     return e;
   }
 
@@ -71,15 +71,19 @@
       U.dot2(r.pts, th.ink, 'aggregate data', 8),
       U.line2(xs.map(v => [v, r.intercept + r.slope * v]), th.ink, 2, `fitted line, slope ${f2(r.slope)}`),
       U.line2(xs.map(v => [v, Math.log(2)]), cK, 2, 'capital-intensive firm: slope 0'),
-      U.line2(xs.map(v => [v, Math.log(0.5)]), cE, 2, 'energy-intensive firm: slope 0')
+      U.line2(xs.map(v => [v, Math.log(0.5)]), cE, 2, 'energy-intensive firm: slope 0'),
+      U.dot2([econPoint()], th.ink, 'current price (drag it)', 14)
     ];
     const s = CM.apparentSigma(state.wE, WK, state.eta);
     U.plot('plotC', traces, U.base2d(th, { xt: 'log(w<sub>E</sub>/w<sub>K</sub>)', yt: 'log(K/E)', y: { range: [-1, 1] }, annotations: [
       { x: xs[1], y: Math.log(2), text: 'capital-intensive firm', showarrow: false, xanchor: 'right', yanchor: 'bottom', font: { size: 11, color: cK } },
       { x: xs[1], y: Math.log(0.5), text: 'energy-intensive firm', showarrow: false, xanchor: 'right', yanchor: 'top', font: { size: 11, color: cE } }
     ] }), U.PLOT_CONFIG);
-    $('capC').innerHTML = `Aggregate data: the regression of ${texStr('\\log(K/E)')} on ${texStr('\\log(w_E/w_K)')} gives ${texStr(`\\hat\\sigma=${f2(r.slope)}>0`)} (at the current price the slope is ${f2(s)}). Within each firm: ${texStr('\\sigma=0')}. That is why the study uses variation within firms over time.`;
+    $('capC').innerHTML = `<b>Drag the current point</b> sideways to change ${texStr('w_E')}. Aggregate data: the regression of ${texStr('\\log(K/E)')} on ${texStr('\\log(w_E/w_K)')} gives ${texStr(`\\hat\\sigma=${f2(r.slope)}>0`)} (at the current price the slope is ${f2(s)}). Within each firm: ${texStr('\\sigma=0')}. That is why the study uses variation within firms over time.`;
   }
+
+  // The aggregate data at the current price: (log(wE/wK), log(K/E)).
+  function econPoint() { const e = CM.economy(state.wE, WK, state.eta); return [Math.log(state.wE / WK), Math.log(e.K / e.E)]; }
 
   function render() {
     const th = U.theme();
@@ -101,6 +105,23 @@
     U.renderStaticTex();
     ctrls = U.controls(document, state, { onChange: schedule });
     $('notes').addEventListener('click', notesExample);
+    // Drag the aggregate point in the input space (to the price whose aggregate is nearest the pointer; equal axis scales),
+    // or the current price in the econometrician's figure. Either stops the notes example.
+    const W = [ctrls.wE.min, ctrls.wE.max], stop = () => { if (timer) cancelAnimationFrame(timer); timer = null; };
+    U.dragPoint('plot', {
+      start: stop,
+      target: () => { const e = CM.economy(state.wE, WK, state.eta); return [e.E, e.K]; },
+      move: ([x, y]) => {
+        const e0 = CM.economy(state.wE, WK, state.eta);
+        let best = state.wE, d = Math.hypot(e0.E - x, e0.K - y);   // stays put when nothing moves (eta = 0)
+        for (let i = 0; i <= 500; i++) {
+          const wE = W[0] + (W[1] - W[0]) * i / 500, e = CM.economy(wE, WK, state.eta), di = Math.hypot(e.E - x, e.K - y);
+          if (di < d - 1e-9) { d = di; best = wE; }
+        }
+        ctrls.wE.setExact(best);
+      }
+    });
+    U.dragPoint('plotC', { start: stop, target: econPoint, move: ([x]) => ctrls.wE.setExact(Math.min(W[1], Math.max(W[0], WK * Math.exp(x)))) });
     $('econ').addEventListener('change', ev => { state.econ = ev.target.checked; schedule(); });
     render();
     U.watchColorScheme(schedule);

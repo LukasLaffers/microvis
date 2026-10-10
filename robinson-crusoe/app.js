@@ -18,6 +18,8 @@
   };
   const state = { example: 'convex', open: false, A: 3, beta: 0.5, K: 7, g: 3, T: 10, tech: 'concave', delta: 0.5, rho: -1, wp: 2 };
   let ctrls = null;
+  // The world price line can be dragged by a handle at leisure hx (null: at x1 = T); while dragging, the axes stay put.
+  let hx = null, view = null, frozen = null, last = null;
   const schedule = U.scheduler(render);
   const f2 = x => fmt(x, 2), f3 = x => fmt(x, 3);
   const vec = x => `(${f2(x[0])},\\ ${f2(x[1])})`;
@@ -36,8 +38,8 @@
   function draw(th, S) {
     const { P, pl, omega, d, prod } = S, traces = [], annotations = [];
     const x1s = U.linspace(0, P.T, 300), fr = RM.ppf(P, x1s);
-    const xLo = Math.min(0, prod[0]) - 0.03 * P.T, xHi = P.T * 1.04;
-    const yTop = Math.max(RM.phi(P.T, P.tech), pl.x[1], d.x[1], prod[1]) * 1.25;
+    view = frozen || { xLo: Math.min(0, prod[0]) - 0.03 * P.T, xHi: P.T * 1.04, yTop: Math.max(RM.phi(P.T, P.tech), pl.x[1], d.x[1], prod[1]) * 1.25 };
+    const { xLo, xHi, yTop } = view;
     // Attainable set in the closed economy.
     traces.push({ ...U.line2([[0, 0], ...fr, [P.T, 0]], 'rgba(0,0,0,0)', 0), fill: 'toself', fillcolor: th.dark ? 'rgba(255,77,94,0.07)' : 'rgba(208,2,27,0.07)', hoverinfo: 'skip' });
     traces.push(U.line2(fr, th.red, 2.6, 'production possibility frontier x₂ = φ(T − x₁)'));
@@ -69,6 +71,7 @@
       traces.push(U.dot2([pl.x], th.ink, 'autarky optimum x*', 14, { marker: { color: th.panel, size: 14, symbol: 'star', line: { color: th.ink, width: 1.5 } } }));
       traces.push(U.dot2([prod], th.red, 'production q**', 12, { marker: { color: th.red, size: 12, symbol: 'diamond', line: { color: '#ffffff', width: 1.5 } } }));
       traces.push(U.dot2([d.x], th.blue, 'consumption x** with trade', 12));
+      traces.push(U.dot2([handle(S)], th.grey, `world price w/p = ${f3(omega)} (drag it)`, 14));
       annotations.push({ x: d.x[0], y: d.x[1], text: 'x**', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { size: 13, color: th.blue } });
       annotations.push({ x: prod[0], y: prod[1], text: 'q**', showarrow: false, xanchor: 'right', yanchor: 'top', xshift: -8, font: { size: 13, color: th.red } });
       annotations.push({ x: pl.x[0], y: pl.x[1], text: 'x*', showarrow: false, xanchor: 'right', yanchor: 'bottom', xshift: -8, font: { size: 13, color: th.ink } });
@@ -77,6 +80,32 @@
     L.shapes = [{ type: 'line', x0: P.T, x1: P.T, y0: 0, y1: yTop, line: { color: th.muted, width: 1, dash: 'dot' } }];
     L.annotations.push({ x: P.T, y: yTop, text: 'T', showarrow: false, xanchor: 'left', yanchor: 'top', xshift: 4, font: { color: th.muted, size: 13 } });
     Plotly.react('plot', traces, L, U.PLOT_CONFIG);
+  }
+
+  // The handle on the world price line: at leisure hx, or at x1 = T (height pi**/p, always in view) when hx is out of view.
+  function handle(S) {
+    const { P, omega, prod } = S, at = x => [x, prod[1] + omega * (prod[0] - x)];
+    const h = hx === null ? null : at(hx);
+    return h && view && h[0] >= view.xLo && h[0] <= P.T && h[1] >= 0 && h[1] <= view.yTop ? h : at(P.T);
+  }
+
+  // The world price at which the price line through the firm's choice passes through (x, y):
+  // pi(w/p) + (w/p)(T - x) = y, solved on a grid of log prices, refined by bisection; the root nearest the current price.
+  function priceThrough(P, x, y) {
+    const c = ctrls.wp, f = lw => { const w = Math.pow(10, lw); return RM.firm(P, w).profit + w * (P.T - x) - y; };
+    const a = Math.log10(c.min), b = Math.log10(c.max), n = 48, cur = Math.log10(state.wp);
+    const ls = Array.from({ length: n + 1 }, (_, k) => a + (b - a) * k / n), fs = ls.map(f);
+    let best = null;
+    for (let k = 0; k < n; k++) {
+      if (fs[k] * fs[k + 1] > 0) continue;
+      let lo = ls[k], hi = ls[k + 1], flo = fs[k];
+      for (let it = 0; it < 30; it++) { const m = 0.5 * (lo + hi), fm = f(m); if (fm * flo > 0) { lo = m; flo = fm; } else hi = m; }
+      const r = 0.5 * (lo + hi);
+      if (best === null || Math.abs(r - cur) < Math.abs(best - cur)) best = r;
+    }
+    // no price puts the line through the pointer: the end of the range that comes closest
+    if (best === null) best = Math.abs(fs[0]) < Math.abs(fs[n]) ? a : b;
+    return Math.pow(10, best);
   }
 
   function drawF(th, S) {
@@ -133,7 +162,7 @@
         info(`Trade: Robinson ${imp >= 0 ? 'imports' : 'exports'} ${f2(Math.abs(imp))} coconuts and ${lab >= 0 ? 'hires' : 'sells'} ${f2(Math.abs(lab))} hours of labour ${lab >= 0 ? 'from' : 'to'} the traders. The value balances: ${texStr(`(w/p)\\cdot(${f2(lab)})+(${f2(imp)})=${f3(Math.abs(omega * lab + imp) < 1e-9 ? 0 : omega * lab + imp)}`)}.`),
         info(P.tech.type === 'sshape' ? 'The frontier is not concave, but the world price line makes the consumption possibilities a straight line: trade convexifies the technology.' : `At ${texStr(`w/p=MRS(x^\\ast)=${f3(pl.omega)}`)} there is no trade and ${texStr('x^{\\ast\\ast}=x^\\ast')}.`)
       ].join('');
-      $('cap').innerHTML = `Robinson produces where the world price line touches the <span class="c-l2-red"><span class="key"></span>frontier</span> (red diamond, maximal profit at world prices) and then trades along that line to his best bundle (blue dot). The dashed triangle is the trade. The open star is the autarky optimum.`;
+      $('cap').innerHTML = `<b>Drag the grey point</b> to turn the world price line. Robinson produces where the world price line touches the <span class="c-l2-red"><span class="key"></span>frontier</span> (red diamond, maximal profit at world prices) and then trades along that line to his best bundle (blue dot). The dashed triangle is the trade. The open star is the autarky optimum.`;
     }
   }
 
@@ -146,6 +175,8 @@
     tex($('formulaT'), state.tech === 'concave' ? 'q_2=\\phi(L)=A L^{\\beta}' : 'q_2=\\phi(L)=\\frac{A L^{\\gamma}}{K^{\\gamma}+L^{\\gamma}}', true);
     tex($('formulaU'), 'U(x)=\\left(\\delta x_1^{\\rho}+(1-\\delta)x_2^{\\rho}\\right)^{1/\\rho}', true);
     const S = solve(), th = U.theme();
+    last = S;
+    $('plot').classList.toggle('drag-plot', state.open);   // only the world price can be dragged
     guard('plot', () => draw(th, S));
     guard('firm plot', () => drawF(th, S));
     guard('numbers', () => renderText(S));
@@ -169,6 +200,18 @@
       if (state.open) ctrls.wp.setExact(Number((RM.planner(params()).omega * 1.5).toFixed(3)));
       schedule();
     }));
+    // Drag the world price line (open economy): it sets w/p so that the line passes through the pointer.
+    U.dragPoint('plot', {
+      start: () => { frozen = view; },
+      end: () => { frozen = null; schedule(); },
+      target: () => (state.open && view && last ? handle(last) : null),
+      move: ([x, y]) => {
+        if (!state.open || !view) return;
+        const P = params();
+        hx = Math.min(P.T, Math.max(view.xLo, x));
+        ctrls.wp.setExact(priceThrough(P, hx, Math.max(0, y)));
+      }
+    });
     setExample('convex');
     U.watchColorScheme(schedule);
   }

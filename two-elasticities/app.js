@@ -57,35 +57,41 @@
   }
 
   function drawMain(th, A, T) {
-    const R = state.R, z = zbar(), q = TM.phi(z, T), traces = [], annotations = [];
+    const R = state.R, z = zbar(), q = TM.phi(z, T), traces = [], moving = [];
+    // traces: the shading (drawn by Plotly, unchanged while the point is dragged); moving: on the fast overlay layer
     const sh = shadeTrace(th, T);
     if (sh) traces.push(sh);
     const thin = th.dark ? 'rgba(255,255,255,0.35)' : 'rgba(29,36,51,0.3)';
     for (const a of [0.45, 0.7, 1.4, 1.9, 2.6]) {
       const lev = TM.phi([a * z[0], a * z[1]], T);
-      if (lev < TM.maxOutput(T)) traces.push(U.line2(TM.isoquant(lev, T, R, 220), thin, 1.2, ''));
+      if (lev < TM.maxOutput(T)) moving.push(U.line2(TM.isoquant(lev, T, R, 220), thin, 1.2, ''));
     }
-    if (state.tr !== 'none') traces.push(U.line2(TM.isoquant(TM.phi(z, A), A, R, 220), th.muted, 2, 'isoquant of φ through z̄', 'dash'));
-    traces.push(U.line2(TM.isoquant(q, T, R, 300), th.blue, 4, 'isoquant through z̄'));
+    if (state.tr !== 'none') moving.push(U.line2(TM.isoquant(TM.phi(z, A), A, R, 220), th.muted, 2, 'isoquant of φ through z̄', 'dash'));
+    moving.push(U.line2(TM.isoquant(q, T, R, 300), th.blue, 4, 'isoquant through z̄'));
     const s = R / Math.max(z[0], z[1]);
-    traces.push(U.line2([[0, 0], [s * z[0], s * z[1]]], th.red, 4, 'ray through z̄'));
-    traces.push(U.dot2([z], th.ink, 'z̄', 13));
-    annotations.push({ x: z[0], y: z[1], text: 'z̄', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 7, yshift: 3, font: { size: 15, color: th.ink } });
-    const draw = lastR === R ? Plotly.react : Plotly.newPlot;
-    lastR = R;
+    moving.push(U.line2([[0, 0], [s * z[0], s * z[1]]], th.red, 4, 'ray through z̄'));
+    moving.push(U.dot2([z], th.ink, 'z̄ (drag it)', 15));
+    moving.push(U.text2(z, ' z̄', th.ink, 'top right', 15));
     const layout = U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>', x: { range: [0, R], constrain: 'domain' }, y: { range: [0, R], scaleanchor: 'x', constrain: 'domain' },
-      annotations, margin: { l: 44, r: 10, t: 8, b: 42 }
+      margin: { l: 44, r: 10, t: 8, b: 42 }
     });
-    draw('plot', traces, layout, { ...U.PLOT_CONFIG, displayModeBar: false });
+    // A changed range with equal axis scales needs a fresh plot: Plotly.react would keep the old domain and
+    // stretch the range instead. Plotly.purge also drops the overlay's redraw hook, so U.overlay attaches it again.
+    const gd = $('plot');
+    if (lastR !== null && lastR !== R) { Plotly.purge(gd); gd._mvHooked = false; }
+    lastR = R;
+    // U.plot: while the point is dragged the shading does not change, so Plotly has nothing to redraw
+    U.plot(gd, traces, layout, { ...U.PLOT_CONFIG, displayModeBar: false });
+    U.overlay('plot', moving, th.font);
     const shade = state.shade === 'e'
       ? `Shading: ${texStr('e(z)')}, <span class="c-inc">green above 1</span> (increasing returns) and <span class="c-dec">brown below 1</span> (decreasing returns).`
       : state.shade === 'sigma' ? `Shading: ${texStr('\\sigma(z)')}, <span class="c-teal">teal above 1</span> (easy substitution) and <span class="c-accent-4">purple below 1</span> (hard substitution).` : '';
     const homoth = TM.isHomothetic(T);
-    $('cap').innerHTML = `The <span class="c-l2-red"><span class="key"></span>ray</span> and the <span class="c-l2-blue"><span class="key"></span>isoquant</span> through ${texStr('\\bar z')}; thin lines are other isoquants${state.tr !== 'none' ? `, the <span class="c-muted"><span class="key dash"></span>dashed one</span> is the isoquant of the original ${texStr('\\phi')} through ${texStr('\\bar z')}${state.tr === 'B' ? ' (hidden under the blue one: h does not move isoquants)' : ''}` : ''}. ${shade} ` +
+    $('cap').innerHTML = `<b>Drag the point</b> to move it. The <span class="c-l2-red"><span class="key"></span>ray</span> and the <span class="c-l2-blue"><span class="key"></span>isoquant</span> through ${texStr('\\bar z')}; thin lines are other isoquants${state.tr !== 'none' ? `, the <span class="c-muted"><span class="key dash"></span>dashed one</span> is the isoquant of the original ${texStr('\\phi')} through ${texStr('\\bar z')}${state.tr === 'B' ? ' (hidden under the blue one: h does not move isoquants)' : ''}` : ''}. ${shade} ` +
       (state.shade === 'none' ? '' : homoth
         ? (state.shade === 'e' ? 'For a homothetic technology the bands of equal e follow the isoquants: e depends on the output level only.' : 'For a homothetic technology σ is the same along every ray: it depends on the input mix only.')
-        : 'This technology is not homothetic, so the shading follows neither the rays nor the isoquants.') + ' Click or drag to move the point.';
+        : 'This technology is not homothetic, so the shading follows neither the rays nor the isoquants.');
   }
 
   // ---------- the same in 3D ----------
@@ -207,6 +213,7 @@
     $('keynums').innerHTML = `<span class="kn e">${texStr(`e(\\bar z)=${f3(e)}`)}</span><span class="kn s">${texStr(`\\sigma(\\bar z)=${sTex(s)}`)}</span>`;
   }
 
+  let dragging = false, last3d = 0, pending3d = false;
   function render() {
     // z̄ stays inside the plotted range
     for (const k of ['z1', 'z2']) {
@@ -222,26 +229,23 @@
     formula();
     const th = U.theme();
     guard('input space', () => drawMain(th, A, T));
-    guard('3D view', () => draw3d(th, T));
+    // while the point is dragged, the 3D figure (slow to redraw) follows at most 15 times a second, and exactly on release
+    const now = performance.now();
+    if (!dragging || now - last3d > 66) { last3d = now; guard('3D view', () => draw3d(th, T)); }
+    else if (!pending3d) { pending3d = true; setTimeout(() => { pending3d = false; schedule(); }, 70); }
     guard('side plots', () => drawSides(th, A, T));
     guard('numbers', () => renderMeaning(A, T));
   }
 
+  // Drag z-bar in the input space: it sets z̄1 and z̄2.
   function setupDrag() {
-    const gd = $('plot');
-    let dragging = false;
-    const move = d => { ctrls.z1.set(U.clampTo(d[0], 0.2, state.R)); ctrls.z2.set(U.clampTo(d[1], 0.2, state.R)); };
-    gd.addEventListener('pointerdown', ev => {
-      const d = U.eventToData(gd, ev);
-      if (!d) return;
-      dragging = true; move(d);
-      if (gd.setPointerCapture) gd.setPointerCapture(ev.pointerId);
-      ev.preventDefault();
-    }, true);
-    gd.addEventListener('pointermove', ev => { if (dragging) { const d = U.eventToData(gd, ev); if (d) move(d); } }, true);
-    const stop = () => { dragging = false; };
-    gd.addEventListener('pointerup', stop, true);
-    gd.addEventListener('pointercancel', stop, true);
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v));
+    U.dragPoint('plot', {
+      start: () => { dragging = true; },
+      end: () => { dragging = false; schedule(); },
+      target: zbar,
+      move: ([x, y]) => { ctrls.z1.setExact(lim('z1', x)); ctrls.z2.setExact(lim('z2', y)); }
+    });
   }
 
   // Handlers of the 3D figure (attached again by U.react3d whenever it rebuilds the figure).

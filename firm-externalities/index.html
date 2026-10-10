@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>Each firm's marginal cost depends on the other firm's output: with pollution or congestion, more <span class="tex" data-tex="q^2"></span> raises firm 1's marginal cost. For a fixed output of the other firm, adding the supply curves gives the dotted <span class="tex" data-tex="MC_1+MC_2"></span> lines. But when the price rises both firms expand and push up each other's costs, so the true market supply <span class="tex" data-tex="S"></span> (solid) is steeper.</p>
           <ul>
-          <li>Raise <span class="tex" data-tex="p"></span>: <span class="tex" data-tex="S"></span> cuts across the dotted lines.</li>
+          <li>Raise <span class="tex" data-tex="p"></span>, or drag the market dot up: <span class="tex" data-tex="S"></span> cuts across the dotted lines.</li>
           <li>Switch to <b>Positive</b> (training, networks, infrastructure): market supply becomes flatter.</li>
           </ul>
         </details>
@@ -45,16 +45,21 @@
         <div class="ctrl" data-key="e" data-label="e" data-hint="effect of the other firm's output on MC" data-min="-0.8" data-max="0.8" data-step="0.05"></div>
       </div>
       <div class="group">
+        <h2>Price</h2>
+        <div class="ctrl" data-key="p" data-label="p" data-hint="output price" data-min="0" data-max="12" data-step="0.05"></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Slope and start of the firms' supply, the two fixed outputs of the other firm.</p>
+      <div class="group">
         <h2>Firms (identical)</h2>
         <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="slope of own supply" data-min="0.5" data-max="1.2" data-step="0.05"></div>
         <div class="ctrl" data-key="c" data-label="c" data-hint="MC at zero output" data-min="0" data-max="3" data-step="0.1"></div>
         <div class="ctrl" data-key="qa" data-label="\bar q_a" data-hint="other firm's output (low)" data-min="0" data-max="8" data-step="0.5"></div>
         <div class="ctrl" data-key="qb" data-label="\bar q_b" data-hint="other firm's output (high)" data-min="0" data-max="8" data-step="0.5"></div>
       </div>
-      <div class="group">
-        <h2>Price</h2>
-        <div class="ctrl" data-key="p" data-label="p" data-hint="output price" data-min="0" data-max="12" data-step="0.05"></div>
-      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Firms and market supply">

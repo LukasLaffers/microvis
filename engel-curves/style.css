@@ -11,3 +11,5 @@ table.effects td:hover { outline: 0; }
 .kind.luxury { color: var(--inc); }
 .kind.necessity { color: var(--const); }
 .kind.inferior { color: var(--dec); }
+/* On a phone the figures come first (the bundle can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

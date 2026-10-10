@@ -20,3 +20,5 @@ table.cmp td:first-child, table.cmp th:first-child { text-align: left; }
 .layout > .main-col { grid-area: main; display: grid; gap: 14px; min-width: 0; }
 .plot-3d { height: 560px; }
 @media (max-width: 800px) { .plot-3d { height: 420px; } }
+/* On a phone the figures come first (the point in the input space can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

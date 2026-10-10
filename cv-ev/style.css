@@ -3,3 +3,5 @@
 .hint-line { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
 .seg-4 { display: grid; grid-template-columns: repeat(4, 1fr); }
 .c-green { color: #4caf50; }
+/* On a phone the figures come first (the prices can be dragged in the first one), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

@@ -8,3 +8,5 @@ table.effects th:first-child { text-align: left; }
 .row-total th, .row-total td { font-weight: 700; }
 #marginal-box { margin-top: 10px; font-size: 14px; overflow-x: hidden; overflow-y: hidden; }
 .row-head th { padding-top: 10px; color: var(--muted); font-weight: 600; text-align: left; }
+/* On a phone the figures come first (in the smooth picture the point can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

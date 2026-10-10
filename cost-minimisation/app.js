@@ -55,6 +55,8 @@
 
   // Isocost line w1 z1 + w2 z2 = c from axis to axis.
   const isocost = (c, w) => [[c / w[0], 0], [0, c / w[1]]];
+  // A point on the isocost line being moved: the cost-minimising bundle scaled to its cost level.
+  const isoHandle = P => { const f = state.iso === 'show' ? 1 : state.frac; return P.C > 0 ? [f * P.H[0], f * P.H[1]] : null; };
 
   function drawMain(th, P) {
     const { s, w, H, kind, segment, C, zmax } = P, traces = [], annotations = [], shapes = [];
@@ -106,13 +108,16 @@
     if (atMin && kind !== 'multiple') {
       shapes.push({ type: 'line', x0: H[0], x1: H[0], y0: 0, y1: H[1], line: { color: th.ink, width: 1, dash: 'dot' } });
       shapes.push({ type: 'line', x0: 0, x1: H[0], y0: H[1], y1: H[1], line: { color: th.ink, width: 1, dash: 'dot' } });
-      traces.push(U.dot2([H], th.ink, 'z* = H(w,q)', 13));
+      traces.push(U.dot2([H], th.ink, 'z* = H(w,q) (drag it)', 15));
       annotations.push({ x: H[0], y: H[1], text: 'z* = H(w,q)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, yshift: 4, font: { color: th.ink, size: 13 } });
       if (H[1] > 0.04 * zmax) annotations.push({ x: H[0], y: 0, text: 'H<sup>1</sup>(w,q)', showarrow: false, yanchor: 'bottom', yshift: 3, xshift: 2, xanchor: 'left', font: { color: th.ink, size: 11 } });
       if (H[0] > 0.04 * zmax) annotations.push({ x: 0, y: H[1], text: 'H<sup>2</sup>(w,q)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 3, font: { color: th.ink, size: 11 } });
     } else if (state.reached) {
       traces.push({ ...U.dot2([H], th.ink, 'z* (found before)', 12), marker: { color: 'rgba(0,0,0,0)', size: 12, line: { color: th.ink, width: 2 } } });
     }
+    // the handle of the isocost line: where it crosses the expansion path, so it lands on z* at the minimum
+    const handle = isoHandle(P);
+    if (handle && !(atMin && kind !== 'multiple')) traces.push(U.dot2([handle], th.ink, `isocost line, cost ${fmt(cbar)} (drag it)`, 15));
 
     Plotly.react('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
@@ -129,18 +134,18 @@
     const h1 = ws.map(v => FM.condDemand([v, state.w2], state.q, s).H[0]);
     const traces = [
       U.line2(ws.map((v, i) => [v, h1[i]]), th.blue, 3, ''),
-      U.dot2([[state.w1, H[0]]], th.blue, 'current w₁', 12)
+      U.dot2([[state.w1, H[0]]], th.blue, 'current w₁ (drag it)', 15)
     ];
     const yMax = Math.max(1, ...h1.filter(Number.isFinite).slice(5)) * 1.1;
     Plotly.react('plotB', traces, U.base2d(th, {
       // room for the whole dot at the slider's ends: w1 up to 5, and H1 at the current w1 always inside
       xt: 'w<sub>1</sub>', yt: 'H<sup>1</sup>(w,q)', x: { range: [0, 5.25] }, y: { range: [0, Math.max(Math.min(yMax, 4 * Math.max(H[0], 0.5) + 1), 1.12 * H[0])] }
     }), U.PLOT_CONFIG);
-    $('capB').innerHTML = state.tech === 'leontief'
+    $('capB').innerHTML = `<b>Drag the point</b> to change ${texStr('w_1')}. ` + (state.tech === 'leontief'
       ? 'No substitution possible: the demand does not react to prices.'
       : state.tech === 'linear'
         ? `Perfect substitutes: the firm uses only the input that is cheaper per unit of output it delivers, so the demand jumps when ${texStr('w_1/\\delta')} passes ${texStr('w_2/(1-\\delta)')}.`
-        : `Holding ${texStr('q')} fixed, a higher price of input 1 makes the firm substitute away from it.`;
+        : `Holding ${texStr('q')} fixed, a higher price of input 1 makes the firm substitute away from it.`);
   }
 
   // ---------- readouts ----------
@@ -162,7 +167,7 @@
     $('readouts').innerHTML = rows.map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
     const which = H[0] > 0 ? 1 : 2;
     $('sentence').innerHTML = {
-      interior: `At ${texStr('z^\\ast')} the isoquant and the isocost line have the same slope: ${texStr(`MRTS_{21}=w_1/w_2=${fmt(ratio)}`)}. Change ${texStr('A')} or ${texStr('k')}: ${texStr('z^\\ast')} moves along the expansion path, but the slope there stays the same.`,
+      interior: `At ${texStr('z^\\ast')} the isoquant and the isocost line have the same slope: ${texStr(`MRTS_{21}=w_1/w_2=${fmt(ratio)}`)}. Change ${texStr('A')} or ${texStr('k')} (under More settings): ${texStr('z^\\ast')} moves along the expansion path, but the slope there stays the same.`,
       kink: `Leontief: the isocost line touches only the corner of the isoquant. The MRTS is undefined there, and every price ratio gives the same ${texStr('z^\\ast')}.`,
       corner: `Linear: per unit of output it delivers, input ${which} is cheaper (${texStr(`w_1/\\delta=${fmt(w[0] / s.delta)}`)} against ${texStr(`w_2/(1-\\delta)=${fmt(w[1] / (1 - s.delta))}`)}), so only input ${which} is used: a corner solution.`,
       multiple: `Linear with ${texStr('w_1/\\delta=w_2/(1-\\delta)')}: the isocost line lies on top of the isoquant, so every bundle on the isoquant costs the same and all of them minimise cost.`
@@ -198,6 +203,23 @@
     $('cbar-num').addEventListener('change', e => { const C = solve().C; setFrac(Number(e.target.value) / C); });
     $('expansion').addEventListener('change', e => { state.expansion = e.target.checked; schedule(); });
     $('autofit').addEventListener('change', e => { state.autofit = e.target.checked; ctrls.zmax.range.disabled = state.autofit; ctrls.zmax.box.disabled = state.autofit; schedule(); });
+
+    // Drag the isocost line: its cost level is the cost of the bundle under the pointer.
+    U.dragPoint('plot', {
+      target: () => isoHandle(solve()),
+      move: ([x, y]) => {
+        const P = solve();
+        if (!(P.C > 0)) return;
+        if (state.iso !== 'find') state.iso = 'find';   // moving the line is finding it yourself
+        setFrac((P.w[0] * Math.max(x, 0) + P.w[1] * Math.max(y, 0)) / P.C);
+      }
+    });
+    // Drag the point in the demand plot: it sets w1.
+    U.dragPoint('plotB', {
+      target: () => [state.w1, solve().H[0]],
+      move: ([x]) => ctrls.w1.setExact(Number(U.clampTo(x, ctrls.w1.min, ctrls.w1.max).toFixed(2)))
+    });
+
     render();
     U.watchColorScheme(schedule);
   }

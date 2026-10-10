@@ -12,3 +12,5 @@ table.dw th { color: var(--muted); font-weight: 600; }
 table.dw td.calc { color: var(--l2-blue); font-weight: 600; }
 .c-green { color: #4caf50; }
 .c-yellow { color: #c9a400; }
+/* On a phone the figure comes first (the taxed price can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

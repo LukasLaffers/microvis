@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>The <span class="c-l2-blue">blue curve</span> is the isoquant for output <span class="tex" data-tex="q"></span>. Each grey line is an isocost line: bundles with the same cost <span class="tex" data-tex="w_1z_1+w_2z_2"></span>. The cheapest way to produce <span class="tex" data-tex="q"></span> is where a line just touches the isoquant: <span class="tex" data-tex="z^\ast=H(w,q)"></span>, with <span class="tex" data-tex="MRTS_{21}=w_1/w_2"></span>.</p>
           <ul>
-          <li><b>Find it yourself:</b> push the isocost line towards the origin until it only just touches.</li>
+          <li><b>Find it yourself:</b> drag the isocost line towards the origin until it only just touches.</li>
           <li>Raise <span class="tex" data-tex="w_1"></span>: the line tilts, and the firm substitutes towards input 2.</li>
           <li>Try <b>Linear</b> and <b>Leontief</b>: a corner and a kink, with no tangency at all.</li>
           </ul>
@@ -47,13 +47,6 @@
         </select>
         <div class="formula" id="formula-general"></div>
         <div class="formula" id="formula-numbers"></div>
-        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
-        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
-        <details class="sub-details">
-          <summary>Scale (does not change the input mix)</summary>
-          <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05"></div>
-          <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="1.6" data-step="0.05"></div>
-        </details>
       </div>
 
       <div class="group">
@@ -77,6 +70,25 @@
           </div>
           <p class="status-line" id="cbar-status"></p>
         </div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Shape of the isoquant, scale, expansion path, plot range.</p>
+      <div class="group">
+        <h2>Shape of the isoquant</h2>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+
+      <div class="group">
+        <h2>Scale (does not change the input mix)</h2>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="1.6" data-step="0.05"></div>
+      </div>
+
+      <div class="group">
+        <h2>Layers</h2>
         <label class="check"><input type="checkbox" id="expansion" checked> <span>Expansion path</span></label>
       </div>
 
@@ -85,13 +97,14 @@
         <div class="ctrl" data-key="zmax" data-label="z_{\max}" data-hint="both axes" data-min="2" data-max="20" data-step="0.5"></div>
         <label class="check"><input type="checkbox" id="autofit"> <span>Fit automatically</span></label>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Input space">
       <div class="panel-head"><h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2></div>
       <div id="plot" class="plot plot-main"></div>
-      <p class="warn" id="range-warn" hidden>The cheapest bundle lies outside the plotted range: tick <b>Fit automatically</b> or raise <span class="tex" data-tex="z_{\max}"></span>.</p>
-      <p class="caption"><span class="c-l2-blue"><span class="key"></span>isoquant <span class="tex" data-tex="\phi(z)=q"></span></span> with the <span class="c-l2-blue">shaded set <span class="tex" data-tex="Z(q)"></span></span>; <span class="c-l2-grey"><span class="key"></span>isocost lines</span>; <span class="c-ink"><span class="key"></span>your isocost line</span>; <span class="c-l2-blue"><span class="key dash"></span>expansion path</span> (the cost-minimising bundles for every <span class="tex" data-tex="q"></span>).</p>
+      <p class="warn" id="range-warn" hidden>The cheapest bundle lies outside the plotted range: tick <b>Fit automatically</b> or raise <span class="tex" data-tex="z_{\max}"></span> (under More settings).</p>
+      <p class="caption"><b>Drag the isocost line</b> by its point to change its cost level. <span class="c-l2-blue"><span class="key"></span>isoquant <span class="tex" data-tex="\phi(z)=q"></span></span> with the <span class="c-l2-blue">shaded set <span class="tex" data-tex="Z(q)"></span></span>; <span class="c-l2-grey"><span class="key"></span>isocost lines</span>; <span class="c-ink"><span class="key"></span>your isocost line</span>; <span class="c-l2-blue"><span class="key dash"></span>expansion path</span> (the cost-minimising bundles for every <span class="tex" data-tex="q"></span>).</p>
     </section>
 
     <div class="side">

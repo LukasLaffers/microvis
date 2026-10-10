@@ -1,2 +1,4 @@
 /* Cost Curves and Supply: tool-specific styles (shared look is in ../shared/style.css). */
 .plot-cost { touch-action: auto; cursor: default; }
+/* On a phone the figures come first (the price can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

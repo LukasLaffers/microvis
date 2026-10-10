@@ -1,3 +1,5 @@
 /* Concavity and Returns to Scale: tool-specific styles (shared look is in ../shared/style.css). */
 .plot-side { height: 270px; }
 @media (max-width: 800px) { .plot-side { height: 250px; } }
+/* On a phone the figures come first (the point on the segment plot can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

@@ -8,6 +8,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../shared/style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=12">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -28,7 +29,7 @@
           <summary>How to read this</summary>
           <p>In 1935 Ragnar Frisch recorded how many kilos of nut chocolate the Freia factory got from two inputs: <span class="tex" data-tex="z_1"></span>, moulding and cooling work, and <span class="tex" data-tex="z_2"></span>, cocoa fat, both valued in kroner. Each cell of the table is one point of a real production function.</p>
           <ul>
-          <li>Click a cell. Along a row only cocoa fat changes, so the differences are marginal products.</li>
+          <li>Click a cell, or drag the point in the isoquant plot. Along a row only cocoa fat changes, so the differences are marginal products.</li>
           <li>Cells on the same ray from the origin show the returns to scale.</li>
           <li>The isoquant plot redraws Frisch's own figure.</li>
           </ul>
@@ -42,15 +43,23 @@
       </div>
 
       <div class="group">
-        <h2>Show</h2>
-        <label class="check"><input type="checkbox" id="show-fit" checked> <span>Fitted Cobb-Douglas <span class="tex" data-tex="q=Az_1^{\alpha}z_2^{\beta}"></span></span></label>
-        <label class="check"><input type="checkbox" id="show-surface" checked> <span>Surface through the data (straight lines between cells)</span></label>
+        <h2>One input varies</h2>
         <div class="seg" role="group" aria-label="Which input varies in the lower plot">
           <button type="button" data-vary="2" aria-pressed="true">Vary cocoa fat</button>
           <button type="button" data-vary="1" aria-pressed="false">Vary work</button>
         </div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Fitted Cobb-Douglas, surface through the data.</p>
+      <div class="group">
+        <h2>Show</h2>
+        <label class="check"><input type="checkbox" id="show-fit" checked> <span>Fitted Cobb-Douglas <span class="tex" data-tex="q=Az_1^{\alpha}z_2^{\beta}"></span></span></label>
+        <label class="check"><input type="checkbox" id="show-surface" checked> <span>Surface through the data (straight lines between cells)</span></label>
         <p class="note" id="fit-line"></p>
       </div>
+      </details>
     </section>
 
     <section class="panel plot3d-panel" aria-label="The data in 3D">
@@ -71,7 +80,7 @@
       <section class="panel" aria-label="Isoquants">
         <h2>Isoquants in the factor diagram</h2>
         <div id="plotA" class="plot plot-2d"></div>
-        <p class="caption"><span class="c-accent"><span class="key"></span>isoquants through the data</span> (400 to 900 kg, inside the measured rectangle) and <span class="c-muted"><span class="key dash"></span>fitted Cobb-Douglas isoquants</span> at Frisch's levels 250, 500, 750 and 1000 kg. <span class="c-accent-3"><span class="key dash"></span>Rays</span> join cells with the same input mix.</p>
+        <p class="caption"><b>Drag the point</b> to pick another cell. <span class="c-accent"><span class="key"></span>isoquants through the data</span> (400 to 900 kg, inside the measured rectangle) and <span class="c-muted"><span class="key dash"></span>fitted Cobb-Douglas isoquants</span> at Frisch's levels 250, 500, 750 and 1000 kg. <span class="c-accent-3"><span class="key dash"></span>Rays</span> join cells with the same input mix.</p>
       </section>
       <section class="panel" aria-label="One input varies">
         <h2 id="titleB">Adding cocoa fat, work fixed</h2>

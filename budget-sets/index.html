@@ -32,7 +32,7 @@
           <ul>
           <li>Move <span class="tex" data-tex="p_1'"></span> (the blue line): under (B1) the line turns about the point where all money goes on good 2, under (B2) about <span class="tex" data-tex="R"></span>, which stays affordable.</li>
           <li>Try <b>Two-part tariff</b> and <b>Whole units of good 2</b>: the set is no longer convex.</li>
-          <li>Click the plot to test a bundle.</li>
+          <li>Drag the test bundle (the cross), the endowment <span class="tex" data-tex="R"></span>, or the end of the blue line on the <span class="tex" data-tex="x_1"></span>-axis.</li>
           </ul>
         </details>
       </div>
@@ -46,14 +46,10 @@
         </div>
         <div class="formula" id="formula"></div>
         <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="0" data-max="24" data-step="0.5" data-show="B1|B3|tariff"></div>
-        <div class="ctrl" data-key="R1" data-label="R_1" data-hint="endowment of good 1" data-min="0" data-max="10" data-step="0.25" data-show="B2|B3"></div>
-        <div class="ctrl" data-key="R2" data-label="R_2" data-hint="endowment of good 2" data-min="0" data-max="10" data-step="0.25" data-show="B2|B3"></div>
         <div class="ctrl" data-key="F" data-label="F" data-hint="entrance fee for good 2" data-min="0" data-max="10" data-step="0.25" data-show="tariff"></div>
       </div>
       <div class="group">
-        <h2>Prices</h2>
-        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="price of good 1" data-min="0.5" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="price of good 2" data-min="0.5" data-max="5" data-step="0.05"></div>
+        <h2>Price change</h2>
         <div class="ctrl" data-key="p1n" data-label="p_1'" data-hint="p₁ after a change (blue line)" data-min="0.5" data-max="5" data-step="0.05"></div>
       </div>
       <div class="group">
@@ -65,6 +61,21 @@
         </div>
         <div class="ctrl" data-key="cap" data-label="\bar x_2" data-hint="upper limit on good 2" data-min="0.5" data-max="20" data-step="0.5" data-show="cap"></div>
       </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Prices before the change, exact endowment.</p>
+      <div class="group">
+        <h2>Prices</h2>
+        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="price of good 1" data-min="0.5" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="price of good 2" data-min="0.5" data-max="5" data-step="0.05"></div>
+      </div>
+      <div class="group" data-show="B2|B3">
+        <h2>Endowment</h2>
+        <div class="ctrl" data-key="R1" data-label="R_1" data-hint="endowment of good 1" data-min="0" data-max="10" data-step="0.25" data-show="B2|B3"></div>
+        <div class="ctrl" data-key="R2" data-label="R_2" data-hint="endowment of good 2" data-min="0" data-max="10" data-step="0.25" data-show="B2|B3"></div>
+      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Budget set">

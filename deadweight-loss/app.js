@@ -15,6 +15,9 @@
   const state = { type: 'ces', delta: 0.5, rho: 0.5, a: 0.4, g1: 1, kappa: 6, p10: 1, tau: 40, y: 12 };
   const schedule = U.scheduler(render);
   let ctrls = null;
+  // While the taxed price is dragged the axes stay as they were at the start (they would follow the point and run away
+  // from the pointer); taxed: the point last drawn.
+  let freeze = null, taxed = null;
   const f3 = x => fmt(x, 3);
   const pref = () => state.type === 'ces' ? { type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }
     : state.type === 'stonegeary' ? { type: 'stonegeary', a: state.a, g1: state.g1, g2: 0 } : { type: 'quasilinear', kappa: state.kappa };
@@ -26,7 +29,7 @@
 
   function draw(th, S) {
     const { u, p11, r } = S, p10 = state.p10, y = state.y;
-    const pTop = Math.max(p11, p10) * 1.6, ps = U.linspace(p10 * 0.4, pTop, 160);
+    const pTop = freeze ? freeze.pTop : Math.max(p11, p10) * 1.6, ps = U.linspace(p10 * 0.4, pTop, 160);
     const D = p => CM.demand([p, 1], y, u)[0], H1 = p => CM.hicks([p, 1], r.v1, u)[0], H0 = p => CM.hicks([p, 1], r.v0, u)[0];
     const traces = [];
     if (p11 > p10) {
@@ -38,9 +41,10 @@
     traces.push(U.line2(ps.map(p => [H0(p), p]), th.red, 1.5, 'H¹(p₁, 1, v⁰)', 'dot'));
     traces.push(U.line2(ps.map(p => [H1(p), p]), th.blue, 2.5, 'H¹(p₁, 1, v¹)'));
     traces.push(U.line2(ps.map(p => [D(p), p]), GREEN, 2.5, 'D¹(p₁, 1, y)'));
-    traces.push(U.dot2([[r.x0[0], p10], [r.x1[0], p11]], th.ink, 'x₁⁰ and x₁¹', 9));
+    traces.push(U.dot2([[r.x0[0], p10]], th.ink, 'x₁⁰', 9), U.dot2([[r.x1[0], p11]], th.ink, 'x₁¹ at the taxed price p₁¹ (drag it)', 14));
+    taxed = [r.x1[0], p11];
     // (when she buys no good 1 at all, scale the axis by her demand at a low price, so that it never runs negative)
-    const xMax = Math.max(r.x0[0], H1(p10), H0(p11)) * 1.45 || Math.max(1, 1.45 * D(p10 * 0.4));
+    const xMax = freeze ? freeze.xMax : Math.max(r.x0[0], H1(p10), H0(p11)) * 1.45 || Math.max(1, 1.45 * D(p10 * 0.4));
     const shapes = [p10, p11].map(p => ({ type: 'line', x0: 0, x1: xMax, y0: p, y1: p, line: { color: th.grey, width: 1, dash: 'dot' } }));
     const annotations = [
       { x: xMax, y: p10, text: `p<sub>1</sub><sup>0</sup> = ${f3(p10)}`, showarrow: false, xanchor: 'right', yanchor: 'top', font: { size: 12, color: th.muted } }
@@ -53,7 +57,7 @@
       if (r.DWL > 1e-9) annotations.push({ x: xm, y: p10 + 0.3 * (p11 - p10), ax: 40, ay: 46, text: '<b>DWL</b>', showarrow: true, arrowhead: 2, arrowwidth: 1.5, font: { size: 13, color: th.blue }, arrowcolor: th.blue });
     }
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: [0, xMax] }, y: { range: [0, pTop] }, annotations, shapes, margin: { l: 56, r: 12, t: 8, b: 44 } }), U.PLOT_CONFIG);
-    $('cap').innerHTML = `<span class="c-green"><span class="key"></span>${texStr('D^1(p_1,1,y)')}</span>, <span class="c-l2-blue"><span class="key"></span>${texStr('H^1(p_1,1,v^1)')}</span> (utility after the tax), <span class="c-l2-red"><span class="key dash"></span>${texStr('H^1(p_1,1,v^0)')}</span> (dotted, utility before the tax). ${texStr('D^1(p_1^1,1,y)=H^1(p_1^1,1,v^1)')}: the curves meet at the taxed price. <span class="c-yellow">Yellow: tax revenue</span> ${texStr(`T=${f3(r.T)}`)}; <span class="c-l2-blue">blue: deadweight loss</span> ${texStr(`DWL=${f3(r.DWL)}`)}.` +
+    $('cap').innerHTML = `<b>Drag the taxed price</b> up or down to change the tax. <span class="c-green"><span class="key"></span>${texStr('D^1(p_1,1,y)')}</span>, <span class="c-l2-blue"><span class="key"></span>${texStr('H^1(p_1,1,v^1)')}</span> (utility after the tax), <span class="c-l2-red"><span class="key dash"></span>${texStr('H^1(p_1,1,v^0)')}</span> (dotted, utility before the tax). ${texStr('D^1(p_1^1,1,y)=H^1(p_1^1,1,v^1)')}: the curves meet at the taxed price. <span class="c-yellow">Yellow: tax revenue</span> ${texStr(`T=${f3(r.T)}`)}; <span class="c-l2-blue">blue: deadweight loss</span> ${texStr(`DWL=${f3(r.DWL)}`)}.` +
       (state.type === 'quasilinear' ? ' Quasilinear utility has no income effect on good 1, so all three curves coincide and the deadweight loss is the familiar triangle under the demand curve.' : '');
   }
 
@@ -106,6 +110,13 @@
     U.renderStaticTex();
     ctrls = U.controls(document, state, { adjust: CU.adjustRho, onChange: schedule });
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
+    // Drag the point at the taxed price: the tax rate is p1^1 / p1^0 - 1, in whole per cent.
+    U.dragPoint('plot', {
+      start: () => { const L = $('plot')._fullLayout; if (L && L.xaxis) freeze = { xMax: L.xaxis.range[1], pTop: L.yaxis.range[1] }; },
+      end: () => { freeze = null; schedule(); },
+      target: () => taxed,
+      move: ([, p]) => ctrls.tau.setExact(Math.min(ctrls.tau.max, Math.max(ctrls.tau.min, Math.round(100 * (p / state.p10 - 1)))))
+    });
     render();
     U.watchColorScheme(schedule);
   }

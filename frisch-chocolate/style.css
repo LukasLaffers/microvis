@@ -1,0 +1,3 @@
+/* Frisch's Chocolate Data: tool-specific styles (shared look is in ../shared/style.css). */
+/* On a phone the figures come first (the selected cell can be dragged in the isoquant plot), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

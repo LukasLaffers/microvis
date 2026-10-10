@@ -31,7 +31,7 @@
           <p>The firm starts at <span class="tex" data-tex="A=D(w,p)"></span>. When <span class="tex" data-tex="w_1"></span> rises, the change splits into <span class="c-l2-blue">substitution</span> along the old isoquant to <span class="tex" data-tex="B"></span> and <span class="c-l2-red">scale</span> down the new expansion path to <span class="tex" data-tex="C=D(w',p)"></span>. The two-step split is bookkeeping: as <span class="tex" data-tex="w_1"></span> rises gradually, both effects happen at once.</p>
           <ul>
           <li>Press <b>▶ Step by step</b>: first <span class="tex" data-tex="A\to B"></span>, then <span class="tex" data-tex="B\to C"></span>.</li>
-          <li>Press <b>▶ Raise w₁ smoothly</b>, then drag <span class="tex" data-tex="t"></span>: at every point the blue and red arrows add up to the black one, the direction of the path.</li>
+          <li>Press <b>▶ Raise w₁ smoothly</b>, then drag the black point along its path (or <span class="tex" data-tex="t"></span>): at every point the blue and red arrows add up to the black one, the direction of the path.</li>
           <li>Try <b>Leontief</b>: no substitution, only scale.</li>
           </ul>
         </details>
@@ -47,6 +47,19 @@
         </select>
         <div class="formula" id="formula-general"></div>
         <div class="formula" id="formula-numbers"></div>
+      </div>
+
+      <div class="group">
+        <h2>The price change</h2>
+        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="before" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w1n" data-label="w_1'" data-hint="after" data-min="0.1" data-max="15" data-step="0.05"></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Technology parameters, returns to scale, the other prices, the marginal version of the table.</p>
+      <div class="group">
+        <h2>Technology parameters</h2>
         <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
         <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
       </div>
@@ -64,16 +77,15 @@
       </div>
 
       <div class="group">
-        <h2>Prices</h2>
+        <h2>Other prices</h2>
         <div class="ctrl" data-key="p" data-label="p" data-hint="output price" data-min="0.5" data-max="20" data-step="0.05"></div>
         <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="before" data-min="0.2" data-max="5" data-step="0.05"></div>
-        <div class="ctrl" data-key="w1n" data-label="w_1'" data-hint="after" data-min="0.1" data-max="15" data-step="0.05"></div>
       </div>
 
       <div class="group">
         <label class="check"><input type="checkbox" id="marginal"> <span>Marginal (derivative) version in the table</span></label>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Input space">

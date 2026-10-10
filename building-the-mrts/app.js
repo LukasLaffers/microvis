@@ -89,7 +89,7 @@
     if (st.z2new !== null && st.giveUp > 1e-9) annotations.push({ x: x2, y: (z[1] + st.z2new) / 2, text: '−Δz<sub>2</sub>', showarrow: false, xanchor: 'right', xshift: -4, font: { size: 12, color: th.accent2 } });
     // tangent and point
     if (!Number.isNaN(m)) traces.push(U.line2(tangentLine(z, m, R), th.accent3, 2.5, 'tangent, slope −MRTS', 'dash'));
-    traces.push(U.dot2([z], th.accent3, 'z̄', 14));
+    traces.push(U.dot2([z], th.accent3, 'z̄ (drag it)', 15));
     annotations.push({ x: z[0], y: z[1], text: 'z̄', showarrow: false, xanchor: 'right', yanchor: 'top', xshift: -7, yshift: -3, font: { size: 15, color: th.ink } });
     state.pins.forEach((r, i) => {
       const p = MM.pointOnRay(r, q, t);
@@ -291,21 +291,13 @@
 
   // ---------- dragging the point along the isoquant ----------
 
+  // The point stays on the isoquant: the pointer sets the input mix z2/z1 (the ray through the pointer), q-bar stays.
   function setupDrag() {
-    const gd = $('plot');
-    let dragging = false;
-    const move = d => { if (d[0] > 1e-6 && d[1] > 1e-6) ctrls.r.set(d[1] / d[0]); };
-    gd.addEventListener('pointerdown', ev => {
-      const d = U.eventToData(gd, ev);
-      if (!d) return;
-      dragging = true; move(d);
-      if (gd.setPointerCapture) gd.setPointerCapture(ev.pointerId);
-      ev.preventDefault();
-    }, true);
-    gd.addEventListener('pointermove', ev => { if (dragging) { const d = U.eventToData(gd, ev); if (d) move(d); } }, true);
-    const stop = () => { dragging = false; };
-    gd.addEventListener('pointerup', stop, true);
-    gd.addEventListener('pointercancel', stop, true);
+    const lim = v => Math.min(ctrls.r.max, Math.max(ctrls.r.min, v));
+    U.dragPoint('plot', {
+      target: () => MM.pointOnRay(state.r, state.q, T()),
+      move: ([x, y]) => { if (x > 1e-6 && y > 1e-6) ctrls.r.setExact(lim(y / x)); }
+    });
   }
 
   function init() {

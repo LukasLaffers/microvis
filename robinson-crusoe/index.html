@@ -32,7 +32,7 @@
           <ul>
           <li>With a convex technology and <span class="tex" data-tex="w/p"></span> equal to the slope at <span class="tex" data-tex="x^\ast"></span>, both halves choose <span class="tex" data-tex="x^\ast"></span> again.</li>
           <li>Choose <b>Increasing returns at x*</b> or <b>Loss at x*</b>: the manager hires a different amount of labour, and the markets do not clear.</li>
-          <li><b>Open economy</b>: at a world price he can consume beyond his own frontier.</li>
+          <li><b>Open economy</b>: at a world price he can consume beyond his own frontier. Drag the grey price line to change the price.</li>
           </ul>
         </details>
       </div>
@@ -52,6 +52,22 @@
           <button type="button" data-tech="sshape" aria-pressed="false">S-shaped φ</button>
         </div>
         <div class="formula" id="formulaT"></div>
+      </div>
+      <div class="group">
+        <h2>Markets</h2>
+        <div class="seg seg-2" role="group" aria-label="Closed or open">
+          <button type="button" data-open="closed" aria-pressed="true">Closed economy</button>
+          <button type="button" data-open="open" aria-pressed="false">Open economy</button>
+        </div>
+        <div class="ctrl" data-key="wp" data-label="w/p" data-hint="world price of an hour, in coconuts" data-min="0.05" data-max="20" data-step="0.001" data-log="1" data-show="open"></div>
+        <p class="note" data-show="closed">In the closed economy the price is set to <span class="tex" data-tex="w/p=MRS(x^\ast)"></span>.</p>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Parameters of the technology, the hours <span class="tex" data-tex="T"></span>, preferences.</p>
+      <div class="group">
+        <h2>Technology parameters</h2>
         <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="1" data-max="60" data-step="0.5"></div>
         <div class="ctrl" data-key="beta" data-label="\beta" data-hint="curvature, &lt; 1" data-min="0.1" data-max="0.95" data-step="0.01" data-show="concave"></div>
         <div class="ctrl" data-key="K" data-label="K" data-hint="hours for half the maximum" data-min="1" data-max="12" data-step="0.1" data-show="sshape"></div>
@@ -64,15 +80,7 @@
         <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on leisure" data-min="0.05" data-max="0.95" data-step="0.01"></div>
         <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ); |ρ| ≥ 0.05" data-min="-4" data-max="0.8" data-step="0.05"></div>
       </div>
-      <div class="group">
-        <h2>Markets</h2>
-        <div class="seg seg-2" role="group" aria-label="Closed or open">
-          <button type="button" data-open="closed" aria-pressed="true">Closed economy</button>
-          <button type="button" data-open="open" aria-pressed="false">Open economy</button>
-        </div>
-        <div class="ctrl" data-key="wp" data-label="w/p" data-hint="world price of an hour, in coconuts" data-min="0.05" data-max="20" data-step="0.001" data-log="1" data-show="open"></div>
-        <p class="note" data-show="closed">In the closed economy the price is set to <span class="tex" data-tex="w/p=MRS(x^\ast)"></span>.</p>
-      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Robinson's choices">

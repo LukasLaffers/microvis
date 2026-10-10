@@ -61,6 +61,8 @@
     return { Lx, Ly, L: Math.max(Lx, Ly), ic };
   }
   let icMemo = { key: '', map: null }, demandMemo = { key: '', D: null, H: null }, lastChecks = 0;
+  // While p1' is dragged in the demand figure, its axes and the prices of its curves stay as they were at the start.
+  let freezeB = null, lastPs = null, lastS = null;   // lastS: the solution last drawn (for the drag targets)
   const budget = (m, q, color, width, name, dash) => U.line2([[m / q[0], 0], [0, m / q[1]]], color, width, name, dash);
   const layout = (th, F, annotations, shapes = []) => U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, F.Lx] }, y: { range: [0, F.Ly] }, annotations, shapes, margin: { l: 48, r: 12, t: 8, b: 44 } });
 
@@ -116,6 +118,7 @@
       if (fs >= 1) { traces.push(U.dot2([d.E2], th.blue, 'E₂', 11)); lab(d.E2, 'E<sub>2</sub>', th.blue, 'left'); }
       traces.push(U.dot2([now], fs < 1 ? th.blue : th.red, 'moving', 9));
     }
+    $('plot').classList.remove('drag-plot');   // only the consumer in the smooth change can be dragged
     U.overlay('plot', []);
     U.plot('plot', traces, layout(th, F, annotations), { ...U.PLOT_CONFIG, displayModeBar: false });
     const fall = pn[0] < p[0];
@@ -174,7 +177,7 @@
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 14, color } });
     moving.push(U.dot2([d.E1], th.ink, 'E₁ = D(p, y)', 10)); label(d.E1, 'E<sub>1</sub>', th.ink, -8);
     moving.push(U.dot2([d.E3], th.muted, "E₃ = D(p′, y)", 9)); label(d.E3, 'E<sub>3</sub>', th.muted, 8);
-    moving.push(U.dot2([D], th.ink, 'the consumer now', 13));
+    moving.push(U.dot2([D], th.ink, 'the consumer now (drag it)', 14));
 
     // Bars at the bottom of the figure (changes in x1), growing together: substitution, income and their sum, accumulated so far.
     const row = i => (0.035 + 0.04 * i) * F.Ly;
@@ -190,8 +193,9 @@
 
     U.plot('plot', traces, layout(th, F, annotations, shapes), { ...U.PLOT_CONFIG, displayModeBar: false });
     U.overlay('plot', moving, th.font);
+    $('plot').classList.add('drag-plot');
     $('head').textContent = headText(S);
-    if (writeText) $('cap').innerHTML = `${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars at the bottom (changes in ${texStr('x_1')}) grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
+    if (writeText) $('cap').innerHTML = `<b>Drag the consumer</b> along her path to move ${texStr('t')}. ${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars at the bottom (changes in ${texStr('x_1')}) grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
   }
 
   // ---------- demand curves ----------
@@ -199,11 +203,12 @@
   function drawDemand(th, S) {
     const { u, p, d } = S, lo = Math.min(p[0], state.p1n), hi = Math.max(p[0], state.p1n);
     // The Giffen example is defined for interior solutions only: (y - p2 s)/c < p1 <= (y - p2 s/2)/c, with c = 1, s = 4.
-    const ps = state.type === 'giffen'
+    const ps = freezeB ? freezeB.ps : state.type === 'giffen'
       ? U.linspace(Math.max(0.3, (state.y - 4 * p[1]) * 1.02, 0.3), Math.max((state.y - 2 * p[1]), lo + 0.1), 120)
       : U.linspace(Math.max(0.3, lo * 0.6), hi * 1.5, 120);
     // the two curves do not change while p1 moves: computed once per setting
-    const key = JSON.stringify([u, p, state.y, state.p1n]);
+    const key = JSON.stringify([u, p, state.y, ps[0], ps[ps.length - 1]]);
+    lastPs = ps;
     // Hicksian demand stops where the cheapest bundle on v0 hits x2 = 0 (a corner, as in the Giffen example at low p1)
     const corner = p1 => CM.hicks([p1, p[1]], d.v0, u)[1] <= 1e-6;
     if (demandMemo.key !== key) {
@@ -213,16 +218,17 @@
     }
     const { D, H, pCorner } = demandMemo;
     const xs = [...D, ...H].map(q => q[0]).filter(Number.isFinite);
+    // E3 (the new price p1') can be dragged in the two-step picture, the point "now" in the smooth change
     U.plot('plotB', [
       U.line2(H, th.blue, 2.2, 'Hicksian H¹(p₁, p₂, v⁰)', 'dash'),
       U.line2(D, '#4caf50', 2.5, 'Marshallian D¹(p₁, p₂, y)'),
       ...(S.now ? [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E3[0], state.p1n]], th.muted, 'E₃', 9)]
-        : [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E2[0], state.p1n]], th.blue, 'E₂', 9), U.dot2([[d.E3[0], state.p1n]], th.red, 'E₃', 9)])
-    ], U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: [0, Math.max(...xs) * 1.1] } }), U.PLOT_CONFIG);
+        : [U.dot2([[d.E1[0], p[0]]], th.ink, 'E₁', 9), U.dot2([[d.E2[0], state.p1n]], th.blue, 'E₂', 9), U.dot2([[d.E3[0], state.p1n]], th.red, 'E₃ at the new price p₁′ (drag it)', 14)])
+    ], U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: freezeB ? freezeB.xr : [0, Math.max(...xs) * 1.1] }, y: freezeB ? { range: freezeB.yr } : {} }), U.PLOT_CONFIG);
     // the moving point on the fast overlay layer
-    U.overlay('plotB', S.now ? [U.dot2([[S.now.D[0], S.now.p1]], th.ink, 'now', 12)] : [], th.font);
+    U.overlay('plotB', S.now ? [U.dot2([[S.now.D[0], S.now.p1]], th.ink, 'now (drag it)', 14)] : [], th.font);
     const k = S.cls.kind;
-    $('capB').innerHTML = `<span style="color:#4caf50"><span class="key"></span>Marshallian</span> and <span class="c-l2-blue"><span class="key dash"></span>Hicksian</span> demand through ${texStr('E_1')}. ` +
+    $('capB').innerHTML = (S.now ? `<b>Drag the black point</b> along the demand curve to move ${texStr('t')}. ` : `<b>Drag ${texStr('E_3')}</b> up or down to change the new price ${texStr("p_1'")}. `) + `<span style="color:#4caf50"><span class="key"></span>Marshallian</span> and <span class="c-l2-blue"><span class="key dash"></span>Hicksian</span> demand through ${texStr('E_1')}. ` +
       (k === 'normal' ? 'For a normal good the Marshallian curve is flatter: the income effect adds to the substitution effect.' : k === 'inferior' ? 'For an inferior good (not Giffen) the Marshallian curve is steeper than the Hicksian one.' : 'For a Giffen good the Marshallian curve slopes upwards; the Hicksian curve still slopes down.') +
       (pCorner !== null ? ` Below ${texStr(`p_1=${fmt(pCorner)}`)} the Hicksian curve stops: there ${texStr('x_2=0')}.` : '') +
       ' Only the Marshallian curve can be observed.';
@@ -266,6 +272,7 @@
     const note = CU.fitIncome(ctrls.y, state, 'y', pref(), [[state.p1, state.p2], [state.p1n, state.p2]]);
     $('income-note').hidden = !note; $('income-note').textContent = note;
     const S = solve(), th = U.theme();
+    lastS = S;
     tex($('formula'), CU.formula(S.u), true);
     $('formula').hidden = S.u.type === 'giffen';
     guard('plot', () => draw(th, S));
@@ -309,6 +316,40 @@
     }));
     $('play-steps').addEventListener('click', playSteps);
     $('play-smooth').addEventListener('click', playSmooth);
+
+    // Drag in the figures (not while an animation plays): the new price p1' (E3 in the demand figure), or t in the
+    // smooth change (the point on the demand curve, or the consumer on her path).
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v));
+    U.dragPoint('plotB', {
+      start: () => {
+        // keep the axes still while p1' moves (they would otherwise follow the point and run away from the pointer)
+        const L = $('plotB')._fullLayout;
+        if (state.mode === 'steps' && !state.playing && L && L.xaxis && lastPs) freezeB = { ps: lastPs, xr: L.xaxis.range.slice(), yr: L.yaxis.range.slice() };
+      },
+      end: () => { freezeB = null; schedule(); },
+      target: () => {
+        const S = lastS;
+        if (state.playing || !S) return null;
+        return S.now ? [S.now.D[0], S.now.p1] : [S.d.E3[0], state.p1n];
+      },
+      move: ([, p1]) => {
+        if (state.playing) return;
+        if (state.mode === 'steps') { ctrls.p1n.setExact(lim('p1n', p1)); return; }
+        if (Math.abs(state.p1n - state.p1) < 1e-9) return;
+        ctrls.t.setExact(lim('t', (p1 - state.p1) / (state.p1n - state.p1)));
+      }
+    });
+    // the consumer in the smooth change: to the point of her path nearest to the pointer
+    U.dragPoint('plot', {
+      target: () => (state.mode === 'smooth' && !state.playing && lastS && lastS.now ? lastS.now.D : null),
+      move: ([a, b]) => {
+        if (state.mode !== 'smooth' || state.playing || !lastS || !lastS.path) return;
+        const S = lastS, F = frame(S);
+        let best = 0, dist = Infinity;
+        S.path.D.forEach((z, i) => { const e = Math.hypot((z[0] - a) / F.Lx, (z[1] - b) / F.Ly); if (e < dist) { dist = e; best = i; } });
+        ctrls.t.setExact(best / N);
+      }
+    });
     render();
     U.watchColorScheme(schedule);
   }

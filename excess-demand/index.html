@@ -48,12 +48,20 @@
         <h2>The economy</h2>
         <div class="formula" id="formula"></div>
         <p class="note">Firms A and B make good 3 from goods 1 and 2. Alpha owns firm A, Beta owns firm B.</p>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Parameters of the firms and consumers; default values.</p>
+      <div class="group">
+        <h2>Parameters</h2>
         <div class="ctrl" data-key="rhoA" data-label="\rho_A" data-hint="firm A, σ = 1/(1 − ρ)" data-min="-5" data-max="0.8" data-step="0.05"></div>
         <div class="ctrl" data-key="rhoB" data-label="\rho_B" data-hint="firm B, σ = 1/(1 − ρ)" data-min="-5" data-max="0.8" data-step="0.05"></div>
         <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="Alpha's weight on good 1" data-min="0.05" data-max="0.95" data-step="0.01"></div>
         <div class="ctrl" data-key="beta" data-label="\beta" data-hint="Beta's weight on good 2" data-min="0.05" data-max="0.95" data-step="0.01"></div>
         <div class="btn-row"><button type="button" id="defaults">Default values</button></div>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="The price plane">
@@ -64,7 +72,7 @@
         </div>
       </div>
       <div id="plot" class="plot plot-main" aria-label="Price plane: drag the orange point"></div>
-      <p class="caption"><span class="c-l2-blue"><span class="key"></span><span class="tex" data-tex="E_1=0"></span></span>, <span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="E_2=0"></span></span> and <span class="c-ink"><span class="key dash"></span><span class="tex" data-tex="E_3=0"></span></span>: the prices at which market 1, 2 or 3 clears. The <span class="c-ink"><span class="key dot"></span>equilibrium</span> is where all three meet; the <span class="c-l2-orange"><span class="key dot"></span>current prices</span> can be dragged.</p>
+      <p class="caption"><b>Drag the <span class="c-l2-orange">orange point</span></b> to change the prices. <span class="c-l2-blue"><span class="key"></span><span class="tex" data-tex="E_1=0"></span></span>, <span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="E_2=0"></span></span> and <span class="c-ink"><span class="key dash"></span><span class="tex" data-tex="E_3=0"></span></span>: the prices at which market 1, 2 or 3 clears. The <span class="c-ink"><span class="key dot"></span>equilibrium</span> is where all three meet.</p>
     </section>
 
     <div class="side">

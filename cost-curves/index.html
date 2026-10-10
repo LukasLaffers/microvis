@@ -43,10 +43,7 @@
           <button type="button" data-profile="ushape" aria-pressed="true">U-shaped average cost</button>
           <button type="button" data-profile="homog" aria-pressed="false">Homogeneous of degree k</button>
         </div>
-        <div class="ctrl" data-key="a" data-label="a" data-hint="where increasing returns turn into decreasing" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
-        <div class="ctrl" data-key="m" data-label="m" data-hint="lowest marginal cost / c(w)" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
         <div class="ctrl" data-key="k" data-label="k" data-hint="" data-min="0.3" data-max="1.6" data-step="0.05" data-show="homog"></div>
-        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="homog"></div>
         <div class="formula" id="formula-G"></div>
       </div>
 
@@ -55,35 +52,44 @@
         <div class="ctrl" data-key="p" data-label="p" data-hint="price of output" data-min="0" data-max="20" data-step="0.05"></div>
       </div>
 
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Shape of the cost curves, input prices and technology, plot range.</p>
       <div class="group">
-        <details class="sub-details">
-          <summary>Input prices and technology — only shift the curves up or down</summary>
-          <div class="ctrl" data-key="w1" data-label="w_1" data-hint="price of input 1" data-min="0.2" data-max="5" data-step="0.05"></div>
-          <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
-          <select id="tech" aria-label="Technology">
-            <option value="cobb">Cobb-Douglas</option>
-            <option value="ces">CES</option>
-            <option value="linear">Linear (perfect substitutes)</option>
-            <option value="leontief">Leontief (perfect complements)</option>
-          </select>
-          <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
-          <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
-          <p class="note" id="unit-cost"></p>
-          <p class="note">These only change <span class="tex" data-tex="c(w)"></span> in <span class="tex" data-tex="C(w,q)=c(w)\,G(q)"></span>: all cost curves are stretched vertically by the same factor. The shape of the curves comes from returns to scale.</p>
-        </details>
+        <h2>Shape of the cost curves</h2>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="where increasing returns turn into decreasing" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="m" data-label="m" data-hint="lowest marginal cost / c(w)" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="homog"></div>
+      </div>
+
+      <div class="group">
+        <h2>Input prices and technology</h2>
+        <div class="ctrl" data-key="w1" data-label="w_1" data-hint="price of input 1" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
+        <select id="tech" aria-label="Technology">
+          <option value="cobb">Cobb-Douglas</option>
+          <option value="ces">CES</option>
+          <option value="linear">Linear (perfect substitutes)</option>
+          <option value="leontief">Leontief (perfect complements)</option>
+        </select>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+        <p class="note" id="unit-cost"></p>
+        <p class="note">These only change <span class="tex" data-tex="c(w)"></span> in <span class="tex" data-tex="C(w,q)=c(w)\,G(q)"></span>: all cost curves are stretched vertically by the same factor. The shape of the curves comes from returns to scale.</p>
       </div>
 
       <div class="group">
         <h2>Plot range</h2>
         <div class="ctrl" data-key="qmax" data-label="q_{\max}" data-hint="output axis" data-min="2" data-max="15" data-step="0.5"></div>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Marginal and average cost">
       <div class="panel-head"><h2>Marginal and average cost</h2></div>
       <div id="plot" class="plot plot-main plot-cost"></div>
       <p class="warn" id="range-warn" hidden></p>
-      <p class="caption"><span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="MC=C_q"></span></span>, <span class="c-ink"><span class="key"></span><span class="tex" data-tex="AC=C/q"></span></span>, <span class="c-l2-orange"><span class="key"></span>supply curve <span class="tex" data-tex="S(w,p)"></span></span>, <span class="c-muted"><span class="key dash"></span>price <span class="tex" data-tex="p"></span></span>; the green rectangle is the profit <span class="tex" data-tex="\Pi(w,p)=q^\ast\,(p-AC(q^\ast))"></span>.</p>
+      <p class="caption"><b>Drag the point</b> up or down to change the price <span class="tex" data-tex="p"></span>. <span class="c-l2-red"><span class="key"></span><span class="tex" data-tex="MC=C_q"></span></span>, <span class="c-ink"><span class="key"></span><span class="tex" data-tex="AC=C/q"></span></span>, <span class="c-l2-orange"><span class="key"></span>supply curve <span class="tex" data-tex="S(w,p)"></span></span>, <span class="c-muted"><span class="key dash"></span>price <span class="tex" data-tex="p"></span></span>; the green rectangle is the profit <span class="tex" data-tex="\Pi(w,p)=q^\ast\,(p-AC(q^\ast))"></span>.</p>
       <div class="formula" id="homog-formulas" data-show="homog"></div>
     </section>
 

@@ -46,13 +46,6 @@
           <option value="ces">CES</option>
         </select>
         <div class="formula" id="formula"></div>
-        <div class="ctrl" data-key="A" data-label="A" data-hint="" data-min="0.5" data-max="3" data-step="0.05" data-show="cd|ces"></div>
-        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="" data-min="0.1" data-max="1.5" data-step="0.05" data-show="cd"></div>
-        <div class="ctrl" data-key="beta" data-label="\beta" data-hint="" data-min="0.1" data-max="1.5" data-step="0.05" data-show="cd"></div>
-        <div class="ctrl" data-key="a" data-label="a" data-hint="" data-min="0.2" data-max="3" data-step="0.05" data-show="linear|leontief"></div>
-        <div class="ctrl" data-key="b" data-label="b" data-hint="" data-min="0.2" data-max="3" data-step="0.05" data-show="linear|leontief"></div>
-        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
-        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="ρ < 1, ρ ≠ 0" data-min="-4" data-max="0.9" data-step="0.05" data-show="ces"></div>
       </div>
 
       <div class="group">
@@ -67,17 +60,32 @@
         </div>
       </div>
 
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Parameters of the technology, plot range.</p>
+      <div class="group">
+        <h2>Parameters</h2>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="" data-min="0.5" data-max="3" data-step="0.05" data-show="cd|ces"></div>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="" data-min="0.1" data-max="1.5" data-step="0.05" data-show="cd"></div>
+        <div class="ctrl" data-key="beta" data-label="\beta" data-hint="" data-min="0.1" data-max="1.5" data-step="0.05" data-show="cd"></div>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="" data-min="0.2" data-max="3" data-step="0.05" data-show="linear|leontief"></div>
+        <div class="ctrl" data-key="b" data-label="b" data-hint="" data-min="0.2" data-max="3" data-step="0.05" data-show="linear|leontief"></div>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="" data-min="0.1" data-max="0.9" data-step="0.01" data-show="ces"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="ρ < 1, ρ ≠ 0" data-min="-4" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+
       <div class="group">
         <h2>Plot range</h2>
         <div class="ctrl" data-key="R" data-label="\max z_1,\ z_2" data-hint="" data-min="2" data-max="20" data-step="0.5"></div>
       </div>
+      </details>
     </section>
 
     <div class="main-col">
       <section class="panel" aria-label="Input space">
         <div class="panel-head"><h2>The isoquant <span class="tex" data-tex="\phi(z)=\bar q"></span> and its slope</h2><div class="keynums" id="keynums" aria-live="polite"></div></div>
         <div id="plot" class="plot plot-main" aria-label="Isoquant: drag the point"></div>
-        <p class="caption">The <span class="c-ink"><span class="key"></span>isoquant</span>, the point <span class="c-accent-3"><span class="key dot"></span><span class="tex" data-tex="\bar z"></span></span> and its <span class="c-accent-3"><span class="key dash"></span>tangent</span>, slope <span class="tex" data-tex="-MRTS_{21}"></span>. The triangle is a finite step: <span class="c-accent"><span class="key"></span><span class="tex" data-tex="\Delta z_1"></span> more of input 1</span>, then down to the isoquant (<span class="c-accent-2"><span class="key"></span><span class="tex" data-tex="-\Delta z_2"></span>, what you can give up</span>) or to the tangent (<span class="c-accent-3"><span class="key dash"></span><span class="tex" data-tex="MRTS_{21}\cdot\Delta z_1"></span></span>).</p>
+        <p class="caption"><b>Drag the point</b> along the isoquant. The <span class="c-ink"><span class="key"></span>isoquant</span>, the point <span class="c-accent-3"><span class="key dot"></span><span class="tex" data-tex="\bar z"></span></span> and its <span class="c-accent-3"><span class="key dash"></span>tangent</span>, slope <span class="tex" data-tex="-MRTS_{21}"></span>. The triangle is a finite step: <span class="c-accent"><span class="key"></span><span class="tex" data-tex="\Delta z_1"></span> more of input 1</span>, then down to the isoquant (<span class="c-accent-2"><span class="key"></span><span class="tex" data-tex="-\Delta z_2"></span>, what you can give up</span>) or to the tangent (<span class="c-accent-3"><span class="key dash"></span><span class="tex" data-tex="MRTS_{21}\cdot\Delta z_1"></span></span>).</p>
       </section>
       <section class="panel" aria-label="MRTS along the isoquant">
         <div class="panel-head">

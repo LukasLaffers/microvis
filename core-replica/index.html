@@ -31,7 +31,7 @@
           <p>Replicate the economy: <span class="tex" data-tex="N"></span> people like Alf and <span class="tex" data-tex="N"></span> like Bill. If a core allocation <span class="tex" data-tex="y"></span> is not competitive, the line from <span class="tex" data-tex="R"></span> through <span class="tex" data-tex="y"></span> gives one type a better bundle <span class="tex" data-tex="\theta y+(1-\theta)R"></span> near <span class="tex" data-tex="y"></span>. With <span class="tex" data-tex="M/N=\theta"></span>, all <span class="tex" data-tex="N"></span> of that type and <span class="tex" data-tex="M"></span> of the other can afford it from their own endowments: they block <span class="tex" data-tex="y"></span>.</p>
           <ul>
           <li>Raise <span class="tex" data-tex="N"></span>: the core shrinks towards the competitive equilibrium.</li>
-          <li>Move <span class="tex" data-tex="y"></span> towards the equilibrium: <span class="tex" data-tex="\theta"></span> must get closer to 1, so the economy must be larger.</li>
+          <li>Drag <span class="tex" data-tex="y"></span> towards the equilibrium: <span class="tex" data-tex="\theta"></span> must get closer to 1, so the economy must be larger.</li>
           </ul>
         </details>
       </div>
@@ -47,13 +47,24 @@
       <div class="group">
         <h2>Economy</h2>
         <div class="formula" id="formula"></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Preferences and the endowment <span class="tex" data-tex="R"></span>.</p>
+      <div class="group">
+        <h2>Preferences</h2>
         <div class="ctrl" data-key="da" data-label="\delta^a" data-hint="Alf's weight on good 1" data-min="0.05" data-max="0.95" data-step="0.01"></div>
         <div class="ctrl" data-key="ra" data-label="\rho^a" data-hint="Alf: σ = 1/(1 − ρ)" data-min="-4" data-max="0.8" data-step="0.1"></div>
         <div class="ctrl" data-key="db" data-label="\delta^b" data-hint="Bill's weight on good 1" data-min="0.05" data-max="0.95" data-step="0.01"></div>
         <div class="ctrl" data-key="rb" data-label="\rho^b" data-hint="Bill: σ = 1/(1 − ρ)" data-min="-4" data-max="0.8" data-step="0.1"></div>
+      </div>
+      <div class="group">
+        <h2>Endowment</h2>
         <div class="ctrl" data-key="R1" data-label="R^a_1" data-hint="Alf's endowment of good 1" data-min="0.5" data-max="9.5" data-step="0.1"></div>
         <div class="ctrl" data-key="R2" data-label="R^a_2" data-hint="Alf's endowment of good 2" data-min="0.5" data-max="9.5" data-step="0.1"></div>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Edgeworth box">

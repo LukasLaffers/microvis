@@ -8,6 +8,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../shared/style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=12">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -61,12 +62,15 @@
         <p class="note">Activities <span class="tex" data-tex="z^1=(0.2,0.5),\ z^2=(0.3,0.2),\ z^3=(0.5,0.1)"></span> each produce one unit. (iii) asks whether <span class="tex" data-tex="z^4=(0.25,0.5)"></span> is on <span class="tex" data-tex="I(1)"></span>.</p>
       </div>
 
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Exact points, the mixed point, layers.</p>
       <div class="group">
         <h2>Points</h2>
         <div class="pair-row"><span class="who c-accent-2"><span class="tex" data-tex="z"></span></span>(<input type="number" id="z-1" step="0.05" aria-label="z, first input"> , <input type="number" id="z-2" step="0.05" aria-label="z, second input">)</div>
         <div class="pair-row"><span class="who c-accent-4"><span class="tex" data-tex="z'"></span></span>(<input type="number" id="zp-1" step="0.05" aria-label="z prime, first input"> , <input type="number" id="zp-2" step="0.05" aria-label="z prime, second input">)</div>
         <div class="ctrl" data-key="lambda" data-label="\lambda" data-hint="position of the mixed point" data-min="0" data-max="1" data-step="0.01"></div>
-        <p class="note">Drag a point in the plot, or tap anywhere to move the nearer one there.</p>
+        <p class="note">Exact coordinates of the two points; or drag them in the plot.</p>
       </div>
 
       <div class="group">
@@ -75,6 +79,7 @@
         <label class="check"><input type="checkbox" id="show-cv" checked> <span>Convexity: the segment from <span class="tex" data-tex="z"></span> to <span class="tex" data-tex="z'"></span></span></label>
         <label class="check"><input type="checkbox" id="show-rs"> <span>Returns to scale: <span class="tex" data-tex="2\cdot I(q)"></span> against <span class="tex" data-tex="I(2q)"></span></span></label>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Input requirement set">
@@ -82,7 +87,7 @@
         <h2>Input space <span class="tex" data-tex="(z_1,z_2)"></span></h2>
       </div>
       <div id="plot" class="plot plot-main"></div>
-      <p class="caption"><span class="c-accent">shaded: <span class="tex" data-tex="Z(q)"></span>, <span class="key"></span>boundary: the isoquant <span class="tex" data-tex="I(q)"></span></span>;
+      <p class="caption"><b>Drag a point</b> to move it; a click moves the nearer one there. <span class="c-accent">shaded: <span class="tex" data-tex="Z(q)"></span>, <span class="key"></span>boundary: the isoquant <span class="tex" data-tex="I(q)"></span></span>;
         <span class="c-accent-2"><span class="key dot"></span><span class="tex" data-tex="z"></span></span>, <span class="c-accent-4"><span class="key dot"></span><span class="tex" data-tex="z'"></span></span>, <span class="c-muted"><span class="key dot"></span><span class="tex" data-tex="z^{\lambda}"></span></span>; a red ✕ marks a point that breaks an assumption.
         <span data-show="rs"><span class="c-accent-2"><span class="key dash"></span><span class="tex" data-tex="2\cdot I(q)"></span></span> (every point of <span class="tex" data-tex="I(q)"></span> doubled) and <span class="c-accent"><span class="key dash"></span><span class="tex" data-tex="I(2q)"></span></span>: they coincide exactly under constant returns.</span></p>
     </section>

@@ -47,24 +47,13 @@
           <button type="button" data-cls="neither" aria-pressed="false">Neither</button>
         </div>
         <div class="formula" id="formula"></div>
-        <div data-show="shape">
-          <select id="shape" aria-label="Isoquant shape">
-            <option value="ces">Isoquant shape g: CES</option>
-            <option value="cd">Isoquant shape g: Cobb-Douglas</option>
-          </select>
-          <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
-          <div class="ctrl" data-key="rho" data-label="\rho" data-hint="curvature (ρ < 1, ρ ≠ 0)" data-min="-4" data-max="0.9" data-step="0.05" data-show="ces"></div>
-        </div>
         <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="2.5" data-step="0.05" data-show="homogeneous"></div>
         <div data-show="homothetic">
           <select id="Fh" aria-label="Increasing transformation F">
             <option value="sshape">F: S-shaped, first increasing then decreasing returns</option>
             <option value="log">F: logarithmic, decreasing returns</option>
           </select>
-          <div class="ctrl" data-key="s" data-label="s" data-hint="returns turn decreasing at g = s" data-min="1" data-max="6" data-step="0.1" data-show="sshape"></div>
-          <div class="ctrl" data-key="c" data-label="c" data-hint="" data-min="0.5" data-max="5" data-step="0.1" data-show="log"></div>
         </div>
-        <div class="ctrl" data-key="a" data-label="a" data-hint="" data-min="0.5" data-max="5" data-step="0.1" data-show="neither"></div>
       </div>
 
       <div class="group">
@@ -74,8 +63,37 @@
           <button type="button" data-view="output" aria-pressed="false">At q = Δq, 2Δq, …</button>
         </div>
         <div class="ctrl" data-show="output" data-key="dq" data-label="\Delta q" data-hint="output step between isoquants" data-min="0.25" data-max="3" data-step="0.05"></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Shape of the isoquants, parameters of F, plot range.</p>
+      <div class="group" data-show="shape">
+        <h2>Shape of the isoquants</h2>
+        <select id="shape" aria-label="Isoquant shape">
+          <option value="ces">Isoquant shape g: CES</option>
+          <option value="cd">Isoquant shape g: Cobb-Douglas</option>
+        </select>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="curvature (ρ < 1, ρ ≠ 0)" data-min="-4" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+
+      <div class="group" data-show="homothetic">
+        <h2>Parameter of F</h2>
+        <div class="ctrl" data-key="s" data-label="s" data-hint="returns turn decreasing at g = s" data-min="1" data-max="6" data-step="0.1" data-show="sshape"></div>
+        <div class="ctrl" data-key="c" data-label="c" data-hint="" data-min="0.5" data-max="5" data-step="0.1" data-show="log"></div>
+      </div>
+
+      <div class="group" data-show="neither">
+        <h2>Parameter</h2>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="" data-min="0.5" data-max="5" data-step="0.1" data-show="neither"></div>
+      </div>
+
+      <div class="group">
+        <h2>Plot range</h2>
         <div class="ctrl" data-key="R" data-label="\max z_1,\ z_2" data-hint="plot range" data-min="2" data-max="20" data-step="0.5"></div>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Isoquant map">

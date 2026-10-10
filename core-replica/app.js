@@ -73,7 +73,7 @@
       }
     }
     for (const q of P.eqs) traces.push(U.dot2([q.xa], th.ink, 'competitive equilibrium', 15, { marker: { color: th.ink, size: 15, symbol: 'star', line: { color: '#ffffff', width: 1 } } }));
-    traces.push(U.dot2([y], th.ink, 'allocation y', 12, { marker: { color: th.panel, size: 12, symbol: 'diamond', line: { color: th.ink, width: 2 } } }));
+    traces.push(U.dot2([y], th.ink, 'allocation y (drag it)', 14, { marker: { color: th.panel, size: 14, symbol: 'diamond', line: { color: th.ink, width: 2 } } }));
     traces.push(U.dot2([e.Ra], th.ink, 'endowment R', 12, { marker: { color: th.ink, size: 12, symbol: 'square', line: { color: '#ffffff', width: 1.5 } } }));
     annotations.push({ x: e.Ra[0], y: e.Ra[1], text: 'R', showarrow: false, xanchor: 'left', yanchor: 'top', xshift: 7, font: { size: 14, color: th.ink } });
     annotations.push({ x: y[0], y: y[1], text: 'y', showarrow: false, xanchor: 'right', yanchor: 'bottom', xshift: -7, yshift: 3, font: { size: 14, color: th.ink } });
@@ -90,7 +90,7 @@
     traces.unshift({ type: 'scatter', x: [OMEGA[0] - xr[0]], y: [OMEGA[1] - yr[0]], xaxis: 'x2', yaxis: 'y2', mode: 'markers', marker: { opacity: 0 }, hoverinfo: 'skip' });
     L.hovermode = 'closest';
     Plotly.react('plot', traces, L, U.PLOT_CONFIG);
-    $('cap').innerHTML = `Zoomed on the lens between the indifference curves through ${texStr('R')} (Alf's from the bottom left, Bill's from the top right). <span class="c-green"><span class="key"></span>Green</span>: the part of the core that no coalition of the notes' type blocks when there are ${texStr(`N=${state.N}`)} of each; grey: blocked. Star: the competitive equilibrium, which is never blocked.`;
+    $('cap').innerHTML = `<b>Drag ${texStr('y')}</b> along the core. Zoomed on the lens between the indifference curves through ${texStr('R')} (Alf's from the bottom left, Bill's from the top right). <span class="c-green"><span class="key"></span>Green</span>: the part of the core that no coalition of the notes' type blocks when there are ${texStr(`N=${state.N}`)} of each; grey: blocked. Star: the competitive equilibrium, which is never blocked.`;
   }
 
   function drawN(th, S) {
@@ -149,6 +149,17 @@
     U.renderStaticTex();
     const ctrls = U.controls(document, state, { onChange: schedule });
     document.querySelectorAll('[data-n]').forEach(bt => bt.addEventListener('click', () => ctrls.N.set(Number(bt.dataset.n))));
+    // Drag y along the core: the nearest point of the core sets s.
+    U.dragPoint('plot', {
+      target: () => { const e = economy(), P = profile(e); return [P.core[0] + state.s * (P.core[1] - P.core[0]), X.contractX2(e, P.core[0] + state.s * (P.core[1] - P.core[0]))]; },
+      move: ([x, y]) => {
+        const e = economy(), P = profile(e);
+        if (!P.pts) P.pts = P.xs.concat(P.core).map(x1 => [x1, X.contractX2(e, x1)]);   // kept with the cached profile
+        let best = Infinity, x1 = null;
+        for (const q of P.pts) { const dist = Math.hypot(q[0] - x, q[1] - y); if (dist < best) { best = dist; x1 = q[0]; } }
+        if (x1 !== null && P.core[1] > P.core[0]) ctrls.s.setExact(U.clampTo((x1 - P.core[0]) / (P.core[1] - P.core[0]), ctrls.s.min, ctrls.s.max));
+      }
+    });
     render();
     U.watchColorScheme(schedule);
   }

@@ -18,6 +18,7 @@
   const tech = () => DM.crs({ tech: state.tech, delta: state.delta, rho: state.rho });
 
   const schedule = U.scheduler(render);
+  let ctrls = {}, hold = null;   // hold: the lever's scale, kept fixed while a weight is dragged
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
   const f = x => fmt(x, 4);
   const pct = x => `${x >= 0 ? '+' : '−'}${fmt(Math.abs(100 * x), 2)} %`;
@@ -41,12 +42,14 @@
   function drawLever(th, P) {
     const { m } = P, sg = m.sigma, eD = -epsD(), bal = m.weighted, sh = m.sh1;
     const [shownSub, shownOut, shownBal] = U.fmtSum([m.substitution, m.output]);   // the two parts and their sum, so the shown numbers add up
-    const xMax = 1.22 * Math.max(sg, eD, 0.3), bw = 0.035 * xMax;
+    const xMax = hold || 1.22 * Math.max(sg, eD, 0.3), bw = 0.035 * xMax;
+    drawLever.xMax = xMax;
     const shapes = [], annotations = [];
-    const rect = (x0, x1, y0, y1, color, opacity = 1) => shapes.push({ type: 'rect', x0, x1, y0, y1, fillcolor: color, opacity, line: { width: 0 } });
+    // beam and weights between the grid and the traces, so the handles (traces) sit on top of them
+    const rect = (x0, x1, y0, y1, color, opacity = 1) => shapes.push({ type: 'rect', layer: 'between', x0, x1, y0, y1, fillcolor: color, opacity, line: { width: 0 } });
     // Beam, the two weights on it and the fulcrum under the balance point.
     const yB = 1;
-    shapes.push({ type: 'line', x0: Math.min(sg, eD) - bw, x1: Math.max(sg, eD) + bw, y0: yB, y1: yB, line: { color: th.ink, width: 4 } });
+    shapes.push({ type: 'line', layer: 'between', x0: Math.min(sg, eD) - bw, x1: Math.max(sg, eD) + bw, y0: yB, y1: yB, line: { color: th.ink, width: 4 } });
     const hS = 0.15 + 1.1 * (1 - sh), hD = 0.15 + 1.1 * sh;
     // When the two values (nearly) coincide, put the weights side by side so both stay visible.
     const sep = Math.abs(sg - eD) < 2 * bw ? bw * (sg <= eD ? 1 : -1) : 0;
@@ -68,11 +71,14 @@
     if (m.substitution > 0.09 * xMax) annotations.push({ x: m.substitution / 2, y: (yb0 + yb1) / 2, text: 'σ(1−sh<sub>1</sub>)', showarrow: false, font: { size: 11, color: '#ffffff' } });
     if (bal - m.substitution > 0.12 * xMax) annotations.push({ x: (m.substitution + bal) / 2, y: (yb0 + yb1) / 2, text: '(−ε<sup>D</sup><sub>p</sub>)sh<sub>1</sub>', showarrow: false, font: { size: 11, color: '#ffffff' } });
 
-    U.plot('plot', [{ type: 'scatter', mode: 'markers', x: [0, xMax], y: [0, 0], marker: { opacity: 0 }, hoverinfo: 'skip' }], {
+    // the handles on the beam: sigma can be dragged only for CES (Cobb-Douglas and Leontief fix it)
+    const handle = (x, color, name) => U.dot2(x === null ? [] : [[x, yB]], color, name, 14, { hovertemplate: `${name} = %{x:.2f} (drag it)<extra></extra>` });
+    U.plot('plot', [{ type: 'scatter', mode: 'markers', x: [0, xMax], y: [0, 0], marker: { opacity: 0 }, hoverinfo: 'skip' },
+      handle(P.s.tech === 'ces' ? sg : null, th.blue, 'σ'), handle(eD, th.red, '−ε^D_p')], {
       ...U.base2d(th, { xt: 'elasticity (absolute value)', x: { range: [-0.04 * xMax, xMax] }, y: { range: [-1.15, 3.05], visible: false }, shapes, annotations, margin: { l: 16, r: 16, t: 8, b: 44 } })
     }, { ...U.PLOT_CONFIG, displayModeBar: false });
 
-    $('capA').innerHTML = `Weights ${texStr('1-sh_1')} at ${texStr('\\sigma')} and ${texStr('sh_1')} at ${texStr('-\\varepsilon^D_p')} balance at their weighted average, ${texStr('-\\varepsilon^u_{11}')}. The bar below adds the two parts: ${texStr(`\\color{#4a90e2}{${shownSub}}+\\color{#d0021b}{${shownOut}}=${shownBal}`)}. The bigger labour's cost share, the more the answer is driven by product demand.`;
+    $('capA').innerHTML = `<b>Drag a weight</b> along the beam to change ${P.s.tech === 'ces' ? `${texStr('\\sigma')} or ` : ''}${texStr('-\\varepsilon^D_p')}. Weights ${texStr('1-sh_1')} at ${texStr('\\sigma')} and ${texStr('sh_1')} at ${texStr('-\\varepsilon^D_p')} balance at their weighted average, ${texStr('-\\varepsilon^u_{11}')}. The bar below adds the two parts: ${texStr(`\\color{#4a90e2}{${shownSub}}+\\color{#d0021b}{${shownOut}}=${shownBal}`)}. The bigger labour's cost share, the more the answer is driven by product demand.`;
   }
 
   // ---------- log-log industry demand for labour vs conditional demand ----------
@@ -89,7 +95,7 @@
       U.line2(H, th.blue, 2, 'conditional demand H¹(w, q) at today\'s q', 'dash'),
       U.line2(D, th.ink, 2.5, 'industry demand D¹ = H̃¹·Dem(c(w))'),
       U.line2(tan(el.epsU, 1.9), th.red, 2.5, `tangent, slope ε^u_11 = ${fmt(el.epsU, 3)}`),
-      U.dot2([[w1n, z1n]], th.red, 'after the wage rise', 9, { marker: { color: th.panel, size: 9, line: { color: th.red, width: 2 } } }),
+      U.dot2([[w1n, z1n]], th.red, 'after the wage rise (drag it)', 14, { marker: { color: th.panel, size: 14, line: { color: th.red, width: 2.5 } } }),
       U.dot2([[w1, z1]], th.ink, 'today', 10)
     ];
     const all = [...D, ...H].map(p => p[1]).filter(v => v > 0);
@@ -104,7 +110,7 @@
       ],
       margin: { l: 60, r: 12, t: 8, b: 44 }
     }), U.PLOT_CONFIG);
-    $('capD').innerHTML = `<span class="c-ink"><span class="key"></span>industry demand ${texStr('D^1=\\widetilde H^1(w)\\,Dem(c(w))')}</span>; <span class="c-l2-blue"><span class="key dash"></span>conditional demand ${texStr('H^1(w,q)')} at today's output</span>. On log scales the slopes are the elasticities: the industry curve is steeper because a higher wage also cuts output. The hollow point is the industry after a ${fmt(state.r, 0)} % wage rise.`;
+    $('capD').innerHTML = `<b>Drag the hollow point</b> along the curve to set the size of the wage rise. <span class="c-ink"><span class="key"></span>industry demand ${texStr('D^1=\\widetilde H^1(w)\\,Dem(c(w))')}</span>; <span class="c-l2-blue"><span class="key dash"></span>conditional demand ${texStr('H^1(w,q)')} at today's output</span>. On log scales the slopes are the elasticities: the industry curve is steeper because a higher wage also cuts output. The hollow point is the industry after a ${fmt(state.r, 0)} % wage rise.`;
   }
 
   // ---------- the product market ----------
@@ -210,9 +216,48 @@
     guard('formulas', () => renderChecks(P));
   }
 
+  // Several points in one figure that can be dragged: the one nearest the pointer when it goes down is moved.
+  // points: [{ at: () => [x, y] or null, move: ([x, y]) => {} }]
+  function dragNearest(id, points, opts = {}) {
+    const gd = $(id);
+    let pick = 0, down = false;
+    const choose = ev => {
+      const fl = gd._fullLayout;
+      if (!fl || !fl.xaxis) return;
+      const b = gd.getBoundingClientRect(), xa = fl.xaxis, ya = fl.yaxis;
+      let best = Infinity;
+      points.forEach((p, i) => {
+        const t = p.at();
+        if (!t) return;
+        const d = Math.hypot(ev.clientX - b.left - xa._offset - xa.c2p(t[0]), ev.clientY - b.top - ya._offset - ya.c2p(t[1]));
+        if (d < best) { best = d; pick = i; }
+      });
+    };
+    // registered before U.dragPoint's own handlers, so the choice is made before the drag starts
+    gd.addEventListener('pointerdown', choose, true);
+    gd.addEventListener('pointermove', ev => { if (!down) choose(ev); }, true);
+    U.dragPoint(gd, {
+      target: () => points[pick].at(),
+      move: v => points[pick].move(v),
+      start: () => { down = true; if (opts.start) opts.start(); },
+      end: () => { down = false; if (opts.end) opts.end(); }
+    });
+  }
+
   function init() {
     U.renderStaticTex();
-    U.controls(document, state, { onChange: schedule });
+    ctrls = U.controls(document, state, { onChange: schedule });
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v));
+    // The lever: drag the weight at sigma (sets rho = 1 - 1/sigma, CES only) or at -eps^D_p along the beam; its scale stays put meanwhile.
+    dragNearest('plot', [
+      { at: () => state.tech === 'ces' ? [1 / (1 - state.rho), 1] : null, move: ([x]) => ctrls.rho.setExact(lim('rho', 1 - 1 / Math.max(x, 1e-3))) },
+      { at: () => [state.eta, 1], move: ([x]) => ctrls.eta.setExact(lim('eta', x)) }
+    ], { start: () => { hold = drawLever.xMax || null; }, end: () => { hold = null; schedule(); } });
+    // Industry demand: drag the hollow point along the curve to set the wage rise (log axes: the drag gives log10 w1).
+    U.dragPoint('plotD', {
+      target: () => { const w = [state.w1, state.w2], s = tech(), dem = { B, eps: epsD() }; return [state.w1 * (1 + state.r / 100), DM.whatIf(w, s, dem, state.r / 100).D1]; },
+      move: ([x]) => ctrls.r.setExact(lim('r', Math.round(100 * (Math.pow(10, x) / state.w1 - 1))))
+    });
     $('tech').addEventListener('change', e => { state.tech = e.target.value; schedule(); });
     // Animate the wage rise: both channels move together.
     $('raise').addEventListener('click', () => {
