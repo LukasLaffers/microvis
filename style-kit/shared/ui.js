@@ -37,8 +37,13 @@
   const pt = (a, b, d = 2) => `(${fmt(a, d)}, ${fmt(b, d)})`;
 
   function tex(el, src, displayMode = false) {
+    // the same formula again (every frame of an animation): nothing to do, KaTeX and the layout it causes are slow
+    // (only if the element still holds exactly what we rendered there)
+    const id = (displayMode ? 'D' : 'i') + src;
+    if (el._microvisTex === id && el.childNodes.length === 1 && el.firstChild === el._microvisTexNode) return;
     if (root.katex) root.katex.render(src, el, { throwOnError: false, displayMode });
     else el.textContent = src;
+    el._microvisTex = id; el._microvisTexNode = el.firstChild;
   }
   const texStr = src => root.katex ? root.katex.renderToString(src, { throwOnError: false }) : src;
   // In the page header, formulas separated by \qquad become separate pieces: each piece stays on one

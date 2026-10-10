@@ -40,8 +40,11 @@ The user asked for a critical student's review of the lecture 4, 5 and 6 tools (
 - Giffen good (user: "I'm not using any function … do not mention anything unless completely necessary, I don't want to overload the students"): no utility formula, no domain hint and no income note for the Giffen example in Slutsky and Engel curves (case C); the dropdown says "Giffen good". `ConsumerUI.formula` returns '' for it, the formula box is hidden.
 - The quasilinear preset κ log(1+x₁)+x₂ (UMP and EMP) stays (user, 10 October), although it is close to the lecture 5 exercise log x₁ + x₂.
 
+### 4c. 10 October, on the branch: smoother smooth animations
+User: "animation is not smooth for subs and income effects". Measured in the container (5.5 s of ▶ … smoothly): Slutsky 214 → 315 frames, Substitution and Scale Effects 172 → 301. Causes and fixes: `Microvis.tex` re-rendered the same KaTeX formula in every frame (now skipped when unchanged); the moving indifference curve used 200-step bisection per point (`ConsumerModel.x2On` now tries a closed form for CES, Stone–Geary, quasilinear and the Giffen example first, checked against plain bisection in the tests); the moving labels are one text trace instead of five; the second, small figure is redrawn every other frame while playing; SSE's triangle caption is written only with the other text. Version tag **11**.
+
 ### Next
-Nothing requested.
+Wait for the user's verdict on 4c, then merge.
 
 ### 5. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
@@ -62,7 +65,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 
 - Plain HTML/CSS/JS, no build step for pages; Plotly 2.35.2 and KaTeX 0.16.9 vendored in `shared/vendor/`; works offline and from `file://`.
 - `tools/catalog.cjs` (tools in lecture order, tile sentence) + `tools/glyphs.cjs` (64 px tile drawings) → `node tools/build-site.cjs` writes `index.html` and, in every tool page: the "Microvis /" header link, previous/next links, the light/dark switch (button + `<head>` line + `shared/theme.js`), and the GoatCounter line. Run it after any catalog/glyph change; it is idempotent.
-- Version tags: our CSS/JS are linked as `?v=N` (now **10**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=10"' index.html */index.html | xargs sed -i 's/?v=10"/?v=11"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
+- Version tags: our CSS/JS are linked as `?v=N` (now **11**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=11"' index.html */index.html | xargs sed -i 's/?v=11"/?v=12"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
 - Hover previews on tiles: `<tool>/preview.webp` and `preview-dark.webp`, made with `tools/previews.cjs` (Playwright).
 - `style-kit/`: a copy of the look for a new project (README = style guide). Keep `style-kit/shared/{style.css,ui.js,theme.js}` in step with `shared/`.
 - Dark mode: tokens on `:root`, `data-theme` set by the switch; figures redraw on the `microvis-theme` event via `Microvis.watchColorScheme`.

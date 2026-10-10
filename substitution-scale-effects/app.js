@@ -22,7 +22,7 @@
   let ctrls = {};
   const schedule = U.scheduler(render);
   // While an animation plays, captions and tables are rewritten at most ten times a second (each rewrite lays out the page).
-  let writeText = true, lastText = 0;
+  let writeText = true, lastText = 0, costTick = 0;
   const textDue = () => { if (!state.playing) return true; const t = performance.now(); if (t - lastText < 100) return false; lastText = t; return true; };
   const N = 160;   // steps along the smooth change
 
@@ -181,8 +181,11 @@
     const far = (z, m) => Math.hypot(z[0] - D[0], z[1] - D[1]) > m;
     traces.push(U.line2(far(tT, min) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, min) ? [tC, tT] : [], th.blue, 1, '', 'dot'));
     traces.push(U.arrow2(D, tS, th.blue, 3, min), U.arrow2(D, tC, th.red, 3, min), U.arrow2(D, tT, th.ink, 2, min));
-    const lab = (z, text, color) => U.text2(far(z, 0.02 * span) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left');
-    traces.push(lab(tS, 'substitution', th.blue), lab(tC, 'scale', th.red));
+    // All moving labels in one text trace (fewer traces: each one costs Plotly time in every frame).
+    const texts = { x: [], y: [], text: [], pos: [], color: [], size: [] };
+    const put = (z, text, color, pos, size) => { texts.x.push(z ? z[0] : null); texts.y.push(z ? z[1] : null); texts.text.push(text); texts.pos.push(pos); texts.color.push(color); texts.size.push(size); };
+    const lab = (z, text, color) => put(far(z, 0.02 * span) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left', 12);
+    lab(tS, 'substitution', th.blue); lab(tC, 'scale', th.red);
 
     // Points.
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 15, color } });
@@ -195,11 +198,12 @@
     const bar = (i, d, color, width, text) => {
       const show = Math.abs(d) >= 1e-9;
       traces.push(U.line2(show ? [[A[0], row(i)], [A[0] + d, row(i)]] : [], color, width, ''));
-      traces.push(U.text2(show ? [Math.min(A[0], A[0] + d), row(i)] : null, text + '  ', color, 'middle left', 11));
+      put(show ? [Math.min(A[0], A[0] + d), row(i)] : null, text + '  ', color, 'middle left', 11);
     };
     bar(2, now.substitution[0], th.blue, 5, 'substitution');
     bar(1, now.scale[0], th.red, 5, 'scale');
     bar(0, now.substitution[0] + now.scale[0], th.ink, 2.5, 'total');
+    traces.push({ type: 'scatter', mode: 'text', x: texts.x, y: texts.y, text: texts.text, textposition: texts.pos, textfont: { color: texts.color, size: texts.size }, hoverinfo: 'skip', cliponaxis: false });
 
     U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
@@ -221,7 +225,7 @@
   function drawCosts(th, P) {
     const { s, w, r } = P, p = state.p, hat = FM.minAC(r.wNew, s);
     const qmax = Math.max(1.6 * Math.max(r.qA, r.qC, 0.5), hat.qHat ? 1.6 * hat.qHat : 0);
-    const qq = linspace(qmax / 400, qmax, 400);
+    const qq = linspace(qmax / 400, qmax, P.now ? 200 : 400);   // fewer points while the curves move every frame
     const yMax = 1.8 * p;
     const clip = v => (Number.isFinite(v) && v < 3 * yMax ? v : null);
     const curve = (f, ww, color, width, name, dash) => U.line2(qq.map(q => [q, clip(f(ww, q, s))]), color, width, name, dash);
@@ -263,7 +267,7 @@
       }
     }
     const dw = r.wNew[0] - w[0];
-    $('capTri').innerHTML = tri ? `Lecture 4, (∗): by Shephard's lemma ${texStr(`\\partial MC/\\partial w_1=\\partial H^1/\\partial q=${fmt(tri.c.dHdq, 3)}`)}. A change of ${texStr(`w_1`)} by ${fmt(dw, 2)} shifts MC at ${texStr('q^\\ast')} by about ${fmt(tri.c.dHdq, 3)} × ${fmt(dw, 2)} = ${fmt(tri.shift, 3)} (the vertical side of the red triangle). MC has slope ${texStr(`C_{qq}=${fmt(tri.c.Cqq, 3)}`)}, so output changes by about ${fmt(tri.shift, 3)} / ${fmt(tri.c.Cqq, 3)} = ${fmt(tri.dq, 3)} (the horizontal side): ${texStr('\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=\\left(-\\frac{1}{C_{qq}}\\right)\\frac{\\partial H^1}{\\partial q}')}. This is a first-order estimate; the actual change is ${fmt(Math.abs(r.qA - r.qC), 3)}.` : '';
+    if (writeText) $('capTri').innerHTML = tri ? `Lecture 4, (∗): by Shephard's lemma ${texStr(`\\partial MC/\\partial w_1=\\partial H^1/\\partial q=${fmt(tri.c.dHdq, 3)}`)}. A change of ${texStr(`w_1`)} by ${fmt(dw, 2)} shifts MC at ${texStr('q^\\ast')} by about ${fmt(tri.c.dHdq, 3)} × ${fmt(dw, 2)} = ${fmt(tri.shift, 3)} (the vertical side of the red triangle). MC has slope ${texStr(`C_{qq}=${fmt(tri.c.Cqq, 3)}`)}, so output changes by about ${fmt(tri.shift, 3)} / ${fmt(tri.c.Cqq, 3)} = ${fmt(tri.dq, 3)} (the horizontal side): ${texStr('\\frac{\\mathrm dq^\\ast}{\\mathrm dw_1}=\\left(-\\frac{1}{C_{qq}}\\right)\\frac{\\partial H^1}{\\partial q}')}. This is a first-order estimate; the actual change is ${fmt(Math.abs(r.qA - r.qC), 3)}.` : '';
     U.plot('plotB', traces, U.base2d(th, {
       xt: 'q', yt: 'p', x: { range: [0, qmax] }, y: { range: [0, yMax] }, annotations,
       shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: p, y1: p, line: { color: th.muted, width: 1.5, dash: 'dash' } }]
@@ -331,7 +335,8 @@
     tex($('formula-general'), f.general, true);
     tex($('formula-numbers'), f.numbers, true);
     guard('input-space plot', () => drawMain(th, P));
-    guard('cost plot', () => drawCosts(th, P));
+    // while w1 moves smoothly, the cost figure is updated every other frame (the figure that matters is the input space)
+    if (!(state.playing && state.mode === 'smooth' && (costTick = (costTick + 1) % 2) && state.t < 1)) guard('cost plot', () => drawCosts(th, P));
     if (writeText) guard('table', () => renderTable(P));
   }
 

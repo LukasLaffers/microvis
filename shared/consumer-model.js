@@ -129,12 +129,27 @@
   }
   const hicks = (p, v, u) => demand(p, expenditure(p, v, u), u);
 
+  // x2 on U(x1, x2) = v solved in closed form where the utility function allows it (or NaN): fast enough for an
+  // indifference curve that moves in every frame of an animation. x2On checks it and falls back to bisection.
+  function x2Closed(x1, v, u) {
+    switch (u.type) {
+      case 'ces': return Math.pow((Math.pow(v, u.rho) - u.delta * Math.pow(x1, u.rho)) / (1 - u.delta), 1 / u.rho);
+      case 'stonegeary': return u.g2 + Math.pow(v / Math.pow(x1 - u.g1, u.a), 1 / (1 - u.a));
+      case 'quasilinear': return v - u.kappa * Math.log(1 + x1);
+      case 'giffen': return u.s - Math.sqrt(-v * (x1 - u.c));
+    }
+    return NaN;
+  }
+
   // x2 on the indifference curve U = v at x1 (U increasing in x2 on its domain), or null.
   function x2On(x1, v, u, hi = 1e4) {
     const f = x2 => utility([x1, x2], u) - v;
     let lo = 0;
     if (u.type === 'giffen') hi = Math.min(hi, u.s - 1e-12);
     if (u.type === 'stonegeary') lo = Math.max(0, u.g2);
+    // the closed form, when it lands inside (lo, hi) and on the curve; otherwise (axis, asymptote, domain) bisection decides
+    const c = x2Closed(x1, v, u);
+    if (Number.isFinite(c) && c > lo && c < hi && Math.abs(f(c)) <= 1e-10 * Math.max(1, Math.abs(v))) return c;
     if (!(f(hi) >= 0)) return null;
     if (f(lo) >= 0) return lo;
     for (let it = 0; it < 200; it++) { const m = 0.5 * (lo + hi); if (f(m) < 0) lo = m; else hi = m; }
@@ -178,7 +193,7 @@
     return (b >= a ? 1 : -1) * s * h / 3;
   }
 
-  const api = { utility, gradient, mrs21, demandClosed, demandNumeric, demand, indirect, expenditure, hicks, x2On, indifferenceCurve, dDdp, dDdy, dHdp, slutsky, elasticities, integrateP1 };
+  const api = { x2Closed, utility, gradient, mrs21, demandClosed, demandNumeric, demand, indirect, expenditure, hicks, x2On, indifferenceCurve, dDdp, dDdy, dHdp, slutsky, elasticities, integrateP1 };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.ConsumerModel = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

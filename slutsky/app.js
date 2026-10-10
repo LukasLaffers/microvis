@@ -60,7 +60,7 @@
     const ic = (v, n) => n === 'few' ? curve(v, few) : (icMemo.map.get(v) || (icMemo.map.set(v, curve(v, x1s)), icMemo.map.get(v)));
     return { Lx, Ly, L: Math.max(Lx, Ly), ic };
   }
-  let icMemo = { key: '', map: null }, demandMemo = { key: '', D: null, H: null }, lastChecks = 0;
+  let icMemo = { key: '', map: null }, demandMemo = { key: '', D: null, H: null }, lastChecks = 0, demandTick = 0;
   const budget = (m, q, color, width, name, dash) => U.line2([[m / q[0], 0], [0, m / q[1]]], color, width, name, dash);
   const layout = (th, F, annotations, shapes = []) => U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, F.Lx] }, y: { range: [0, F.Ly] }, annotations, shapes, margin: { l: 48, r: 12, t: 8, b: 44 } });
 
@@ -162,8 +162,11 @@
     const far = (z, m) => Math.hypot(z[0] - D[0], z[1] - D[1]) > m;
     traces.push(U.line2(far(tT, tiny) ? [tS, tT] : [], th.red, 1, '', 'dot'), U.line2(far(tT, tiny) ? [tI, tT] : [], th.blue, 1, '', 'dot'));
     traces.push(U.arrow2(D, tS, th.blue, 3, tiny), U.arrow2(D, tI, th.red, 3, tiny), U.arrow2(D, tT, th.ink, 2, tiny));
-    const lab = (z, text, color) => U.text2(far(z, 0.04 * ext) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left');
-    traces.push(lab(tS, 'substitution', th.blue), lab(tI, 'income', th.red));
+    // All moving labels in one text trace (fewer traces: each one costs Plotly time in every frame).
+    const texts = { x: [], y: [], text: [], pos: [], color: [], size: [] };
+    const put = (z, text, color, pos, size) => { texts.x.push(z ? z[0] : null); texts.y.push(z ? z[1] : null); texts.text.push(text); texts.pos.push(pos); texts.color.push(color); texts.size.push(size); };
+    const lab = (z, text, color) => put(far(z, 0.04 * ext) ? z : null, ' ' + text + ' ', color, z[0] >= D[0] ? 'middle right' : 'middle left', 12);
+    lab(tS, 'substitution', th.blue); lab(tI, 'income', th.red);
 
     // Points.
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 14, color } });
@@ -176,11 +179,12 @@
     const bar = (i, dx, color, width, text) => {
       const show = Math.abs(dx) >= 1e-9;
       traces.push(U.line2(show ? [[d.E1[0], row(i)], [d.E1[0] + dx, row(i)]] : [], color, width, ''));
-      traces.push(U.text2(show ? [Math.min(d.E1[0], d.E1[0] + dx), row(i)] : null, text + '  ', color, 'middle left', 11));
+      put(show ? [Math.min(d.E1[0], d.E1[0] + dx), row(i)] : null, text + '  ', color, 'middle left', 11);
     };
     bar(2, now.substitution[0], th.blue, 5, 'substitution');
     bar(1, now.income[0], th.red, 5, 'income');
     bar(0, now.substitution[0] + now.income[0], th.ink, 2.5, 'total');
+    traces.push({ type: 'scatter', mode: 'text', x: texts.x, y: texts.y, text: texts.text, textposition: texts.pos, textfont: { color: texts.color, size: texts.size }, hoverinfo: 'skip', cliponaxis: false });
 
     U.plot('plot', traces, layout(th, F, annotations, shapes), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('head').textContent = headText(S);
@@ -260,7 +264,8 @@
     tex($('formula'), CU.formula(S.u), true);
     $('formula').hidden = S.u.type === 'giffen';
     guard('plot', () => draw(th, S));
-    guard('demand plot', () => drawDemand(th, S));
+    // while p1 moves smoothly, the small demand figure (only its dot moves) is updated every other frame
+    if (!(state.playing && state.mode === 'smooth' && (demandTick = (demandTick + 1) % 2) && state.t < 1)) guard('demand plot', () => drawDemand(th, S));
     if (writeText) guard('numbers', () => renderNumbers(S));
   }
 
