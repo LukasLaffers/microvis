@@ -55,8 +55,6 @@
 
   // Isocost line w1 z1 + w2 z2 = c from axis to axis.
   const isocost = (c, w) => [[c / w[0], 0], [0, c / w[1]]];
-  // A point on the isocost line being moved: the cost-minimising bundle scaled to its cost level.
-  const isoHandle = P => { const f = state.iso === 'show' ? 1 : state.frac; return P.C > 0 ? [f * P.H[0], f * P.H[1]] : null; };
 
   function drawMain(th, P) {
     const { s, w, H, kind, segment, C, zmax } = P, traces = [], annotations = [], shapes = [];
@@ -108,16 +106,13 @@
     if (atMin && kind !== 'multiple') {
       shapes.push({ type: 'line', x0: H[0], x1: H[0], y0: 0, y1: H[1], line: { color: th.ink, width: 1, dash: 'dot' } });
       shapes.push({ type: 'line', x0: 0, x1: H[0], y0: H[1], y1: H[1], line: { color: th.ink, width: 1, dash: 'dot' } });
-      traces.push(U.dot2([H], th.ink, 'z* = H(w,q) (drag it)', 15));
+      traces.push(U.dot2([H], th.ink, 'z* = H(w,q)', 13));
       annotations.push({ x: H[0], y: H[1], text: 'z* = H(w,q)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, yshift: 4, font: { color: th.ink, size: 13 } });
       if (H[1] > 0.04 * zmax) annotations.push({ x: H[0], y: 0, text: 'H<sup>1</sup>(w,q)', showarrow: false, yanchor: 'bottom', yshift: 3, xshift: 2, xanchor: 'left', font: { color: th.ink, size: 11 } });
       if (H[0] > 0.04 * zmax) annotations.push({ x: 0, y: H[1], text: 'H<sup>2</sup>(w,q)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 3, font: { color: th.ink, size: 11 } });
     } else if (state.reached) {
       traces.push({ ...U.dot2([H], th.ink, 'z* (found before)', 12), marker: { color: 'rgba(0,0,0,0)', size: 12, line: { color: th.ink, width: 2 } } });
     }
-    // the handle of the isocost line: where it crosses the expansion path, so it lands on z* at the minimum
-    const handle = isoHandle(P);
-    if (handle && !(atMin && kind !== 'multiple')) traces.push(U.dot2([handle], th.ink, `isocost line, cost ${fmt(cbar)} (drag it)`, 15));
 
     Plotly.react('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
@@ -204,16 +199,6 @@
     $('expansion').addEventListener('change', e => { state.expansion = e.target.checked; schedule(); });
     $('autofit').addEventListener('change', e => { state.autofit = e.target.checked; ctrls.zmax.range.disabled = state.autofit; ctrls.zmax.box.disabled = state.autofit; schedule(); });
 
-    // Drag the isocost line: its cost level is the cost of the bundle under the pointer.
-    U.dragPoint('plot', {
-      target: () => isoHandle(solve()),
-      move: ([x, y]) => {
-        const P = solve();
-        if (!(P.C > 0)) return;
-        if (state.iso !== 'find') state.iso = 'find';   // moving the line is finding it yourself
-        setFrac((P.w[0] * Math.max(x, 0) + P.w[1] * Math.max(y, 0)) / P.C);
-      }
-    });
     // Drag the point in the demand plot: it sets w1.
     U.dragPoint('plotB', {
       target: () => [state.w1, solve().H[0]],
