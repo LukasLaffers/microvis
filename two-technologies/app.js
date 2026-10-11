@@ -16,6 +16,7 @@
   const tech = () => ({ alpha: state.alpha, beta: state.beta });
   let ctrls = {};
   const schedule = U.scheduler(render);
+  let heldR = null;   // the width of the input-space view while H is dragged
 
   // ---------- input space ----------
 
@@ -23,7 +24,7 @@
   const LOG_TICKS = { tickvals: [0.1, 0.2, 0.5, 1, 2, 5, 10], ticktext: ['0.1', '0.2', '0.5', '1', '2', '5', '10'] };
 
   function drawMain(th, s, r) {
-    const w = [state.w1, 1], q = state.q, k = s.alpha + s.beta, zk = Math.pow(q, 1 / k), R = 2.3 * zk;
+    const w = [state.w1, 1], q = state.q, k = s.alpha + s.beta, zk = Math.pow(q, 1 / k), R = heldR || 2.3 * zk;   // held still while H is dragged
     const iso = which => K.isoquant(q, s, which, 0.02 * R, 1.2 * R).filter(z => z[1] <= 1.5 * R);
     const traces = [
       U.line2([[0, 0], [R, R]], th.muted, 1, 'z₁ = z₂', 'dot'),
@@ -54,7 +55,7 @@
     // The isocost line through the cheapest bundle, and the bundle itself.
     const c = r.C;
     traces.push(U.line2([[c / w[0], 0], [0, c / w[1]]], th.grey, 2, 'isocost line'));
-    traces.push(U.dot2([r.H], th.ink, 'H(w,q)', 13));
+    traces.push(U.dot2([r.H], th.ink, 'H(w,q) (drag it)', 15));
     annotations.push({ x: r.H[0], y: r.H[1], text: 'H', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, yshift: 4, font: { size: 14, color: th.ink } });
     U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>', annotations, shapes,
@@ -72,7 +73,7 @@
     } else {
       cap = `Firm C produces with the better technology, so it needs only one of them to reach ${texStr('q')}: here ${texStr(`\\phi_${r.regime}`)}, the one that uses more of the ${r.regime === 'A' ? 'cheaper input 1' : 'cheaper input 2'}. At ${texStr('w_1=w_2')} it switches, and the cheapest bundle jumps across the kink.`;
     }
-    $('cap').innerHTML = cap;
+    $('cap').innerHTML = `<b>Drag H</b> along the isoquant (this changes ${texStr('w_1')}) or to another isoquant (this changes ${texStr('q')}). ` + cap;
   }
 
   // ---------- H1 and C against w1 ----------
@@ -143,6 +144,24 @@
     ctrls = U.controls(document, state, { onChange: schedule });
     document.querySelectorAll('[data-firm]').forEach(b => b.addEventListener('click', () => { state.firm = b.dataset.firm; schedule(); }));
     document.querySelectorAll('[data-w1]').forEach(b => b.addEventListener('click', () => ctrls.w1.setExact(Number(b.dataset.w1))));
+    // Drag H: the pointer's isoquant sets q, and w1 is the price whose cheapest bundle is nearest the pointer (at the kink
+    // of firm D many prices give the same bundle: then the one nearest the current w1, so the isocost line does not jump).
+    const GRID = U.logspace(ctrls.w1.min, ctrls.w1.max, 301);
+    U.dragPoint('plot', {
+      start: () => { const s = tech(); heldR = 2.3 * Math.pow(state.q, 1 / (s.alpha + s.beta)); },
+      end: () => { heldR = null; schedule(); },
+      target: () => now().H,
+      move: ([x, y]) => {
+        const s = tech(), z = [Math.max(x, 1e-3), Math.max(y, 1e-3)], q = U.clampTo(K.phi(z, s, state.firm), ctrls.q.min, ctrls.q.max);
+        const tol = 1e-6 * (heldR || 1), dist = w1 => { const H = K.costMin([w1, 1], q, s, state.firm).H; return Math.hypot(H[0] - z[0], H[1] - z[1]); };
+        let best = null;
+        for (const w1 of GRID) {
+          const d = dist(w1);
+          if (!best || d < best.d - tol || (d <= best.d + tol && Math.abs(Math.log(w1 / state.w1)) < Math.abs(Math.log(best.w1 / state.w1)))) best = { d, w1 };
+        }
+        ctrls.q.setExact(q); ctrls.w1.setExact(best.w1);
+      }
+    });
     // Drags: the points on H¹ and C move w1.
     const setW1 = v => { if (Number.isFinite(v)) ctrls.w1.setExact(U.clampTo(v, ctrls.w1.min, ctrls.w1.max)); };
     const now = () => K.costMin([state.w1, 1], state.q, tech(), state.firm);
