@@ -7,8 +7,8 @@
   <meta name="description" content="The translog cost function as a second-order approximation, cost shares linear in log prices, elasticities (%), (#), ($), the parameter restrictions, and the Arnberg and Bjørner (2007) results. Lecture 4.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=12">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="../shared/style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=13">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -45,10 +45,7 @@
         </div>
         <div data-show="ces">
           <div class="formula" id="formula-ces"></div>
-          <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on input 1" data-min="0.1" data-max="0.9" data-step="0.01"></div>
           <div class="ctrl" data-key="rho" data-label="\rho" data-hint="σ = 1/(1 − ρ)" data-min="-4" data-max="0.8" data-step="0.05"></div>
-          <div class="ctrl" data-key="wb1" data-label="\bar w_1" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
-          <div class="ctrl" data-key="wb2" data-label="\bar w_2" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
         </div>
         <div data-show="own">
           <div class="ctrl" data-key="a1" data-label="\alpha_1" data-hint="" data-min="-0.5" data-max="1.5" data-step="0.01"></div>
@@ -65,6 +62,17 @@
         <div class="ctrl" data-key="w1" data-label="w_1" data-hint="price of input 1" data-min="0.25" data-max="4" data-log="1"></div>
         <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.25" data-max="4" data-log="1"></div>
       </div>
+
+      <details class="more" id="more" data-show="ces">
+        <summary>More settings</summary>
+        <p class="note">Weight of input 1 and the reference prices of the CES approximation.</p>
+      <div class="group">
+        <h2>CES weight and reference prices</h2>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on input 1" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="wb1" data-label="\bar w_1" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
+        <div class="ctrl" data-key="wb2" data-label="\bar w_2" data-hint="reference price" data-min="0.25" data-max="4" data-log="1"></div>
+      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Approximation and shares">
@@ -128,11 +136,11 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=12"></script>
-  <script src="../shared/firm-model.js?v=12"></script>
-  <script src="model.js?v=12"></script>
-  <script src="app.js?v=12"></script>
-  <script src="../shared/theme.js?v=12"></script>
+  <script src="../shared/ui.js?v=13"></script>
+  <script src="../shared/firm-model.js?v=13"></script>
+  <script src="model.js?v=13"></script>
+  <script src="app.js?v=13"></script>
+  <script src="../shared/theme.js?v=13"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

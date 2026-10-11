@@ -7,8 +7,8 @@
   <meta name="description" content="Profit maximisation in one step (choose inputs directly) and in two steps (cost minimisation, then output choice) give the same answer. Lecture 2.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=12">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="../shared/style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=13">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -49,8 +49,6 @@
         </select>
         <div class="formula" id="formula-general"></div>
         <div class="formula" id="formula-numbers"></div>
-        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
-        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
       </div>
 
       <div class="group">
@@ -59,10 +57,6 @@
           <button type="button" data-profile="ushape" aria-pressed="true">U-shaped average cost</button>
           <button type="button" data-profile="homog" aria-pressed="false">Homogeneous of degree k</button>
         </div>
-        <div class="ctrl" data-key="a" data-label="a" data-hint="increasing → decreasing returns" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
-        <div class="ctrl" data-key="m" data-label="m" data-hint="lowest marginal cost / c(w)" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
-        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="0.95" data-step="0.05" data-show="homog"></div>
-        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="homog"></div>
         <p class="note" data-show="homog">With <span class="tex" data-tex="k\ge1"></span> a price taker has no unique profit maximum (profit grows without bound, or with <span class="tex" data-tex="k=1"></span> and the right price every output earns zero): see the <a href="../cost-curves/index.html">Cost Curves and Supply</a> tool.</p>
       </div>
 
@@ -73,12 +67,30 @@
         <div class="ctrl" data-key="w2" data-label="w_2" data-hint="price of input 2" data-min="0.2" data-max="5" data-step="0.05"></div>
       </div>
 
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Shape of the isoquants, shape of the cost curves, layers.</p>
+      <div class="group">
+        <h2>Shape of the isoquants</h2>
+        <div class="ctrl" data-key="delta" data-label="\delta" data-hint="weight on z₁" data-min="0.1" data-max="0.9" data-step="0.01"></div>
+        <div class="ctrl" data-key="rho" data-label="\rho" data-hint="CES curvature" data-min="-5" data-max="0.9" data-step="0.05" data-show="ces"></div>
+      </div>
+
+      <div class="group">
+        <h2>Shape of the cost curves</h2>
+        <div class="ctrl" data-key="a" data-label="a" data-hint="increasing → decreasing returns" data-min="0.5" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="m" data-label="m" data-hint="lowest marginal cost / c(w)" data-min="0.2" data-max="3" data-step="0.05" data-show="ushape"></div>
+        <div class="ctrl" data-key="k" data-label="k" data-hint="degree of homogeneity" data-min="0.3" data-max="0.95" data-step="0.05" data-show="homog"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="productivity" data-min="0.5" data-max="3" data-step="0.05" data-show="homog"></div>
+      </div>
+
       <div class="group">
         <h2>Layers</h2>
         <label class="check"><input type="checkbox" id="surface" checked> <span>Profit surface</span></label>
         <div class="ctrl" data-key="opacity" data-label="\text{opacity}" data-hint="surface" data-min="0.1" data-max="1" data-step="0.05"></div>
         <label class="check"><input type="checkbox" id="zero" checked> <span>Zero-profit plane (the outside option)</span></label>
       </div>
+      </details>
     </section>
 
     <section class="panel plot3d-panel" aria-label="Profit surface">
@@ -128,12 +140,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=12"></script>
-  <script src="../shared/firm-ui.js?v=12"></script>
-  <script src="../shared/firm-model.js?v=12"></script>
-  <script src="search.js?v=12"></script>
-  <script src="app.js?v=12"></script>
-  <script src="../shared/theme.js?v=12"></script>
+  <script src="../shared/ui.js?v=13"></script>
+  <script src="../shared/firm-ui.js?v=13"></script>
+  <script src="../shared/firm-model.js?v=13"></script>
+  <script src="search.js?v=13"></script>
+  <script src="app.js?v=13"></script>
+  <script src="../shared/theme.js?v=13"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

@@ -76,10 +76,14 @@
     marker: { color, size, symbol, line: { color: symbol.startsWith('x') ? color : '#ffffff', width: symbol.startsWith('x') ? 1 : 2 } },
     name, hovertemplate: `${name}<br>(%{x:.2f}, %{y:.2f})<extra></extra>`
   });
+  // A red cross at w: a point that breaks an assumption (a shape of fixed size in pixels).
+  const cross = (w, color) => [[-6, -6, 6, 6], [-6, 6, 6, -6]].map(([x0, y0, x1, y1]) => ({
+    type: 'line', xref: 'x', yref: 'y', xsizemode: 'pixel', ysizemode: 'pixel', xanchor: w[0], yanchor: w[1], x0, y0, x1, y1, line: { color, width: 2 }
+  }));
   const zLambda = () => [state.lambda * state.z[0] + (1 - state.lambda) * state.zp[0], state.lambda * state.z[1] + (1 - state.lambda) * state.zp[1]];
 
   function draw(th) {
-    const p = P(), box = p.box, g = gridData(), Q = q(), traces = [], shapes = [], annotations = [];
+    const p = P(), box = p.box, g = gridData(), Q = q(), traces = [], annotations = [];
     const clear = 'rgba(0,0,0,0)';
 
     // Z(q): shaded; its boundary I(q) is drawn exactly for activity technologies.
@@ -109,41 +113,48 @@
       annotations.push({ x: p.extra[0], y: p.extra[1], text: 'z<sup>4</sup>', showarrow: false, xanchor: 'left', yanchor: 'top', xshift: 6, yshift: -2, font: { color: th.accent3, size: 13 } });
     }
 
+    const layout = U.base2d(th, {
+      xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
+      x: { range: [0, box], constrain: 'domain' },
+      y: { range: [0, box], scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
+      annotations
+    });
+    // U.plot: while a point is dragged the set does not change, so Plotly has nothing to redraw
+    U.plot('plot', traces, layout, { ...U.PLOT_CONFIG, displayModeBar: false });
+
+    // Everything below moves with z and z': lines and points on the fast overlay layer; the shaded quadrant, the crosses
+    // and the labels as shapes and annotations, which Plotly.relayout redraws without redrawing the set.
+    const moving = [], shapes = [], labels = [];
     const zIn = M.inSet(state.preset, Q, state.z, opts()), zpIn = M.inSet(state.preset, Q, state.zp, opts());
+    const label = (pt, text, color, size, right) => labels.push({ x: pt[0], y: pt[1], text, showarrow: false, xanchor: right ? 'left' : 'right', yanchor: right ? 'bottom' : 'top', xshift: right ? 8 : -6, yshift: right ? 2 : 0, font: { color, size } });
 
     // Free disposal: the quadrant above and to the right of z.
     if (state.showFd) {
       shapes.push({ type: 'rect', x0: state.z[0], y0: state.z[1], x1: box, y1: box, fillcolor: th.accent2, opacity: 0.08, line: { width: 0 } });
-      shapes.push({ type: 'path', path: `M ${box} ${state.z[1]} L ${state.z[0]} ${state.z[1]} L ${state.z[0]} ${box}`, line: { color: th.accent2, width: 1.5, dash: 'dot' } });
+      moving.push(U.line2([[box, state.z[1]], state.z, [state.z[0], box]], th.accent2, 1.5, '', 'dot'));
       if (zIn) {
         const r = M.freeDisposalAt(state.preset, Q, state.z, box, opts());
-        if (!r.holds) traces.push(marker(r.witness, th.dec, 'not in Z(q)', 13, 'x-thin-open'));
+        if (!r.holds) shapes.push(...cross(r.witness, th.dec));
       }
     }
 
     // Convexity: the segment from z to z' and the point z^lambda.
     if (state.showCv) {
-      traces.push(U.line2([state.z, state.zp], th.ink, 2, 'segment'));
+      moving.push(U.line2([state.z, state.zp], th.ink, 2, 'segment'));
       if (zIn && zpIn) {
         const r = M.segmentInSet(state.preset, Q, state.z, state.zp, opts());
-        if (!r.holds) traces.push(marker(r.witness, th.dec, 'not in Z(q)', 13, 'x-thin-open'));
+        if (!r.holds) shapes.push(...cross(r.witness, th.dec));
       }
-      traces.push(marker(zLambda(), th.muted, 'z^λ', 11));
-      annotations.push({ x: zLambda()[0], y: zLambda()[1], text: 'z<sup>λ</sup>', showarrow: false, xanchor: 'right', yanchor: 'top', xshift: -6, font: { color: th.muted, size: 12 } });
+      moving.push(marker(zLambda(), th.muted, 'z^λ', 11));
+      label(zLambda(), 'z<sup>λ</sup>', th.muted, 12, false);
     }
 
-    traces.push(marker(state.zp, th.accent4, "z'", 15));
-    traces.push(marker(state.z, th.accent2, 'z', 15));
-    annotations.push({ x: state.z[0], y: state.z[1], text: 'z', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, yshift: 2, font: { color: th.accent2, size: 15 } });
-    annotations.push({ x: state.zp[0], y: state.zp[1], text: "z'", showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, yshift: 2, font: { color: th.accent4, size: 15 } });
-
-    const layout = U.base2d(th, {
-      xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>',
-      x: { range: [0, box], constrain: 'domain' },
-      y: { range: [0, box], scaleanchor: 'x', scaleratio: 1, constrain: 'domain' },
-      annotations, shapes
-    });
-    Plotly.react('plot', traces, layout, { ...U.PLOT_CONFIG, displayModeBar: false });
+    moving.push(marker(state.zp, th.accent4, "z' (drag it)", 15));
+    moving.push(marker(state.z, th.accent2, 'z (drag it)', 15));
+    label(state.z, 'z', th.accent2, 15, true);
+    label(state.zp, "z'", th.accent4, 15, true);
+    Plotly.relayout('plot', { shapes, annotations: annotations.concat(labels) });
+    U.overlay('plot', moving, th.font);
   }
 
   // ---------- checks ----------
@@ -205,7 +216,7 @@
     } else if (state.preset === 'nonconvex') {
       sentence = 'Move z and z′ to either side of the inward kink: their mix falls outside Z(q). This is the shape that convexity rules out.';
     } else if (state.preset === 'congestion') {
-      sentence = 'Put z inside the set: the quadrant above and to the right of z leaves Z(q), so free disposal fails. Turn on the returns-to-scale view: 2·I(q) and I(2q) do not coincide.';
+      sentence = 'Put z inside the set: the quadrant above and to the right of z leaves Z(q), so free disposal fails. Turn on the returns-to-scale view (under More settings): 2·I(q) and I(2q) do not coincide.';
     }
     $('sentence').innerHTML = sentence;
   }
@@ -224,27 +235,27 @@
 
   // ---------- dragging ----------
 
+  // Drag z or z': the one nearer to the pointer when it goes down (a mouse click moves that one there).
   function setupDrag() {
     const gd = $('plot');
-    let dragging = null;
-    const move = (which, d) => { state[which] = clampPoint(d); schedule(); };
-    gd.addEventListener('pointerdown', ev => {
+    let which = 'z', dragging = false;
+    const pick = ev => {
+      if (dragging) return;
       const d = U.eventToData(gd, ev);
       if (!d) return;
       const dist = p => Math.hypot(p[0] - d[0], p[1] - d[1]);
-      dragging = dist(state.z) <= dist(state.zp) ? 'z' : 'zp';
-      move(dragging, d);
-      if (gd.setPointerCapture) gd.setPointerCapture(ev.pointerId);
-      ev.preventDefault();
-    }, true);
-    gd.addEventListener('pointermove', ev => {
-      if (!dragging) return;
-      const d = U.eventToData(gd, ev);
-      if (d) move(dragging, d);
-    }, true);
-    const stop = () => { dragging = null; };
-    gd.addEventListener('pointerup', stop, true);
-    gd.addEventListener('pointercancel', stop, true);
+      which = dist(state.z) <= dist(state.zp) ? 'z' : 'zp';
+    };
+    // registered before U.dragPoint, so its target() already sees the nearer point
+    gd.addEventListener('pointerdown', pick, true);
+    gd.addEventListener('pointermove', pick, true);
+    gd.addEventListener('touchstart', ev => { if (ev.touches[0]) pick(ev.touches[0]); }, { passive: true, capture: true });
+    U.dragPoint(gd, {
+      start: () => { dragging = true; },
+      end: () => { dragging = false; },
+      target: () => state[which],
+      move: d => { state[which] = clampPoint(d); schedule(); }
+    });
   }
 
   // ---------- init ----------

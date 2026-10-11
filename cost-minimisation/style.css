@@ -1,3 +1,5 @@
 /* Cost Minimisation: tool-specific styles (shared look is in ../shared/style.css). */
 #cbar-num { width: 80px; }
 .plot-main { touch-action: auto; cursor: default; }
+/* On a phone the figures come first (the isocost line can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

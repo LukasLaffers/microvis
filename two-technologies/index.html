@@ -7,8 +7,8 @@
   <meta name="description" content="A firm that needs two Cobb-Douglas technologies, min{phi_A, phi_B}, has a kinked isoquant: for a whole range of input prices the cheapest bundle stays at the kink, conditional demand has a vertical piece and the substitution effect is zero. A firm that uses the better technology, max{phi_A, phi_B}, is not quasi-concave and its cheapest bundle jumps. Lecture 2.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=12">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="../shared/style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=13">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -48,8 +48,6 @@
       <div class="group">
         <h2>Technologies</h2>
         <div class="formula" id="formula"></div>
-        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="α > β, α + β < 1" data-min="0.3" data-max="0.85" data-step="0.01"></div>
-        <div class="ctrl" data-key="beta" data-label="\beta" data-hint="" data-min="0.05" data-max="0.45" data-step="0.01"></div>
       </div>
 
       <div class="group">
@@ -58,6 +56,16 @@
         <div class="ctrl" data-key="q" data-label="q" data-hint="output" data-min="0.5" data-max="2" data-step="0.05"></div>
         <div class="btn-row"><button type="button" id="defaults">Default values</button></div>
       </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">The exponents of the two technologies.</p>
+      <div class="group">
+        <h2>Exponents</h2>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="α > β, α + β < 1" data-min="0.3" data-max="0.85" data-step="0.01"></div>
+        <div class="ctrl" data-key="beta" data-label="\beta" data-hint="" data-min="0.05" data-max="0.45" data-step="0.01"></div>
+      </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Input space">
@@ -105,10 +113,10 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=12"></script>
-  <script src="model.js?v=12"></script>
-  <script src="app.js?v=12"></script>
-  <script src="../shared/theme.js?v=12"></script>
+  <script src="../shared/ui.js?v=13"></script>
+  <script src="model.js?v=13"></script>
+  <script src="app.js?v=13"></script>
+  <script src="../shared/theme.js?v=13"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

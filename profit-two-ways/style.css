@@ -5,3 +5,5 @@ table.compare td:hover { outline: none; }
 table.compare th:first-child { text-align: left; }
 .same { color: var(--inc); font-weight: 700; }
 .differ { color: var(--dec); font-weight: 700; }
+/* On a phone the figures come first, the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

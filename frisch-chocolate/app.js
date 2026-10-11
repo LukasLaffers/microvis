@@ -129,8 +129,13 @@
     traces.push({
       type: 'scatter', mode: 'markers', x: cells.map(c => c[0]), y: cells.map(c => c[1]), customdata: cells.map(c => [c[2], c[3]]),
       text: cells.map(c => M.value(c[2], c[3])),
-      marker: { color: th.accent2, size: cells.map(c => c[2] === si && c[3] === sj ? 15 : 9), line: { color: '#ffffff', width: 1.5 } },
+      marker: { color: th.accent2, size: 9, line: { color: '#ffffff', width: 1.5 } },
       hovertemplate: 'z₁ = %{x} kr, z₂ = %{y} kr<br>q = %{text} kg<extra></extra>'
+    });
+    // the selected cell, on top: it can be dragged to another cell
+    traces.push({
+      ...U.dot2([[D.z1[si], D.z2[sj]]], th.accent2, 'selected cell (drag it)', 15), customdata: [[si, sj]], text: [M.value(si, sj)],
+      hovertemplate: 'selected cell (drag it)<br>z₁ = %{x} kr, z₂ = %{y} kr<br>q = %{text} kg<extra></extra>'
     });
     Plotly.react('plotA', traces, U.base2d(th, {
       xt: 'z<sub>1</sub> moulding and cooling work (kr)', yt: 'z<sub>2</sub> cocoa fat (kr)',
@@ -232,6 +237,15 @@
     document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = clone(CAMERAS[b.dataset.cam]); schedule(); }));
     render();
     $('plotA').on('plotly_click', onClick);
+    // Drag the selected cell in the isoquant plot: it snaps to the nearest cell of the table.
+    const nearest = (xs, v) => xs.reduce((b, x, k) => Math.abs(x - v) < Math.abs(xs[b] - v) ? k : b, 0);
+    U.dragPoint('plotA', {
+      target: () => [D.z1[state.sel[0]], D.z2[state.sel[1]]],
+      move: ([x, y]) => {
+        const i = nearest(D.z1, x), j = nearest(D.z2, y);
+        if (i !== state.sel[0] || j !== state.sel[1]) select(i, j);
+      }
+    });
     U.watchColorScheme(schedule);
   }
 

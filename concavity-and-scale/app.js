@@ -146,7 +146,7 @@
       U.line2(seg.map(s => [s.lambda, s.phi]), th.ink, 3, 'φ(z^λ)'),
       U.line2([[lam, fl], [lam, cl]], th.red, 2),
       U.dot2([[0, fB]], th.accent4, "z'", 11), U.dot2([[1, fA]], th.orange, 'z', 11),
-      U.dot2([[lam, fl]], th.ink, 'φ(z^λ)', 8), U.dot2([[lam, cl]], th.red, 'chord', 7)
+      U.dot2([[lam, cl]], th.red, 'chord', 7), U.dot2([[lam, fl]], th.ink, 'φ(z^λ) (drag it)', 14)
     ];
     const lo = Math.min(...seg.map(s => Math.min(s.phi, s.chord))), hi = Math.max(...seg.map(s => Math.max(s.phi, s.chord)));
     const pad = Math.max(0.05, (hi - lo) * 0.12);
@@ -156,7 +156,7 @@
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
     const mg = CM.maxGap(A, B, P), tol = 1e-9 * Math.max(1, hi);
     const now = `At ${texStr(`\\lambda=${f2(lam)}`)}: ${texStr(`\\phi(z^\\lambda)=${f3(fl)}`)}, chord ${texStr(`\\lambda\\phi(z)+(1-\\lambda)\\phi(z')=${f3(cl)}`)}.`;
-    $('capSeg').innerHTML = `${now} ` + (mg.gap > tol
+    $('capSeg').innerHTML = `<b>Drag the point</b> along the curve to change ${texStr('\\lambda')}. ${now} ` + (mg.gap > tol
       ? `<span class="c-l2-red">The chord lies above ${texStr('\\phi')}</span>, by up to ${f3(mg.gap)} at ${texStr(`\\lambda=${f2(mg.lambda)}`)}: on this segment ${texStr('\\phi')} is not concave.`
       : (Math.abs(fA - fB) < tol && CM.maxGap(B, A, P).gap <= tol && seg.every(s => Math.abs(s.gap) <= tol)
         ? 'The chord and the curve coincide.'
@@ -219,10 +219,14 @@
     ].map(([l, v]) => `<dt>${texStr(l)}</dt><dd>${v}</dd>`).join('');
   }
 
+  let dragging = false, last3d = 0, pending3d = false;
   function render() {
     const P = tech(), th = U.theme();
     formula(P);
-    guard('3D plot', () => draw3d(th, P));
+    // while λ is dragged, the 3D figure (slow to redraw) follows at most 15 times a second, and exactly on release
+    const t = performance.now();
+    if (!dragging || t - last3d > 66) { last3d = t; guard('3D plot', () => draw3d(th, P)); }
+    else if (!pending3d) { pending3d = true; setTimeout(() => { pending3d = false; schedule(); }, 70); }
     let mg = { gap: 0, lambda: 0 };
     guard('segment plot', () => { mg = drawSegment(th, P); });
     guard('ray plot', () => drawRays(th, P));
@@ -258,6 +262,13 @@
       } else {
         $('capSeg').insertAdjacentHTML('beforeend', ' <span class="c-l2-blue">No pair of bundles has a chord above the surface: this technology is concave.</span>');
       }
+    });
+    // Drag the point along the segment plot: it sets λ.
+    U.dragPoint('plotSeg', {
+      start: () => { dragging = true; },
+      end: () => { dragging = false; schedule(); },
+      target: () => [state.lam, CM.phi(mix(z(), zp(), state.lam), tech())],
+      move: ([x]) => ctrls.lam.setExact(U.clampTo(Math.round(x * 1000) / 1000, ctrls.lam.min, ctrls.lam.max))
     });
     document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { state.camera = CAMERAS[b.dataset.cam](); schedule(); }));
     render();

@@ -42,7 +42,14 @@
 
   // ---------- main plot ----------
 
+  // The curves are drawn by Plotly only when the economy, the view or the theme changes (Plotly.react, not U.plot: with
+  // Plotly.animate the contour traces disappear); the current prices move on the fast overlay layer.
   function drawMain(th, V, e) {
+    const gd = $('plot'), key = V.key + JSON.stringify(th);
+    if (gd._staticKey !== key) { drawCurves(th, V); gd._staticKey = key; }
+    U.overlay(gd, [U.dot2([[state.p1, state.p2]], th.orange, 'current prices (drag it)', 15)], th.font);
+  }
+  function drawCurves(th, V) {
     const traces = [];
     const curve = (k, color, dash, name) => ({
       type: 'contour', x: V.xs, y: V.ys, z: V.Z[k], name, showscale: false, hoverinfo: 'skip',
@@ -50,7 +57,6 @@
     });
     traces.push(curve(0, th.blue, 'solid', 'E₁ = 0'), curve(1, th.red, 'solid', 'E₂ = 0'), curve(2, th.ink, 'dot', 'E₃ = 0'));
     traces.push(U.dot2([[V.eq.p[0], V.eq.p[1]]], th.ink, 'equilibrium', 13));
-    traces.push(U.dot2([[state.p1, state.p2]], th.orange, 'current prices', 15));
     const annotations = [];
     // Label the three curves near the edge of the view.
     const lab = (k, color, text) => {
@@ -96,7 +102,7 @@
     Plotly.react('plotM', traces, {
       ...U.base2d(th, { yt: 'units', y: { range: [0, 1.25 * top] }, annotations, margin: { l: 44, r: 8, t: 8, b: 74 } }),
       barmode: 'stack', showlegend: true, legend: { orientation: 'h', y: -0.32, x: 0, font: { size: 11, color: th.ink } },
-      xaxis: { type: 'multicategory', color: th.muted, tickfont: { color: th.muted, size: 11 }, fixedrange: true, linecolor: th.line }
+      xaxis: { type: 'multicategory', color: th.muted, tickfont: { color: th.muted, size: 11 }, tickangle: 0, fixedrange: true, linecolor: th.line }
     }, { ...U.PLOT_CONFIG, displayModeBar: false });
     const word = i => Math.abs(e.E[i]) < 5e-3 ? 'the market clears' : e.E[i] > 0 ? 'excess demand' : 'excess supply';
     $('capM').innerHTML = `Demand (consumers and firms' inputs) next to supply (endowments and firms' output). Good 1: ${word(0)}. Good 2: ${word(1)}. Good 3: ${word(2)}.`;
@@ -152,22 +158,19 @@
     $('defaults').addEventListener('click', () => { Object.entries(DEFAULTS).forEach(([k, v]) => ctrls[k].setExact(v)); });
     // Drag the current prices in the plane.
     const gd = $('plot');
-    let dragging = false;
-    const move = ev => {
-      const v = U.eventToData(gd, ev);
-      if (!v) return;
-      const V = economyView(), eq = V.eq.p, fl = gd._fullLayout;
-      // The equilibrium is magnetic: within about 14 pixels of it, the point snaps onto it.
-      const px = fl && fl.xaxis ? Math.hypot((v[0] - eq[0]) / V.xmax * fl.xaxis._length, (v[1] - eq[1]) / V.ymax * fl.yaxis._length) : Infinity;
-      if (px < 14) { ctrls.p1.setExact(eq[0]); ctrls.p2.setExact(eq[1]); return; }
-      ctrls.p1.setExact(U.clampTo(v[0], 0.03 * V.xmax, V.xmax));
-      ctrls.p2.setExact(U.clampTo(v[1], 0.03 * V.ymax, V.ymax));
-    };
-    gd.addEventListener('pointerdown', ev => { dragging = true; if (gd.setPointerCapture) gd.setPointerCapture(ev.pointerId); move(ev); });
-    gd.addEventListener('pointermove', ev => { if (dragging) move(ev); });
-    ['pointerup', 'pointercancel'].forEach(t => gd.addEventListener(t, () => { dragging = false; }));
+    U.dragPoint(gd, {
+      target: () => [state.p1, state.p2],
+      move: ([x, y]) => {
+        const V = economyView(), eq = V.eq.p, fl = gd._fullLayout;
+        // The equilibrium is magnetic: within about 14 pixels of it, the point snaps onto it.
+        const px = fl && fl.xaxis ? Math.hypot((x - eq[0]) / V.xmax * fl.xaxis._length, (y - eq[1]) / V.ymax * fl.yaxis._length) : Infinity;
+        if (px < 14) { ctrls.p1.setExact(eq[0]); ctrls.p2.setExact(eq[1]); return; }
+        ctrls.p1.setExact(U.clampTo(x, ctrls.p1.min, Math.min(ctrls.p1.max, V.xmax)));
+        ctrls.p2.setExact(U.clampTo(y, ctrls.p2.min, Math.min(ctrls.p2.max, V.ymax)));
+      }
+    });
     render();
-    U.watchColorScheme(() => { cache.key = ''; schedule(); });
+    U.watchColorScheme(() => { cache.key = ''; $('plot')._staticKey = ''; schedule(); });
   }
 
   if (U.librariesReady(X, 'model.js')) guard('page', init);

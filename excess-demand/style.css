@@ -4,3 +4,7 @@
 .plot-walras { height: 150px; }
 @media (max-width: 800px) { .plot-main { height: 420px; } .plot-markets { height: 280px; } }
 .btn-row button:disabled { opacity: 0.5; cursor: default; }
+/* The current prices are dragged with U.dragPoint: a finger elsewhere on the plane scrolls the page. */
+.plot-main { touch-action: auto; }
+/* On a phone the figures come first, the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

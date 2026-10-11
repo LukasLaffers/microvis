@@ -19,6 +19,15 @@
 
   // ---------- input space ----------
 
+  // The handle that turns the isocost line: a point on the line, up and to the left of H (or down and to the right
+  // when there is no room), inside the plot of width R.
+  function handle(H, R) {
+    const n = Math.hypot(1, state.w1), u = [-1 / n, state.w1 / n], L = 0.18 * R;
+    const inside = z => z[0] > 0.03 * R && z[0] < 0.97 * R && z[1] > 0.03 * R && z[1] < 0.97 * R;
+    for (const sg of [1, -1]) { const z = [H[0] + sg * L * u[0], H[1] + sg * L * u[1]]; if (inside(z)) return z; }
+    return null;
+  }
+
   function drawMain(th, s, r) {
     const w = [state.w1, 1], q = state.q, k = s.alpha + s.beta, zk = Math.pow(q, 1 / k), R = 2.3 * zk;
     const iso = which => K.isoquant(q, s, which, 0.02 * R, 1.2 * R).filter(z => z[1] <= 1.5 * R);
@@ -52,6 +61,8 @@
     const c = r.C;
     traces.push(U.line2([[c / w[0], 0], [0, c / w[1]]], th.grey, 2, 'isocost line'));
     traces.push(U.dot2([r.H], th.ink, 'H(w,q)', 13));
+    const hd = handle(r.H, R);
+    if (hd) traces.push(U.dot2([hd], th.grey, 'isocost line, slope −w₁/w₂ (drag it)', 14));
     annotations.push({ x: r.H[0], y: r.H[1], text: 'H', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, yshift: 4, font: { size: 14, color: th.ink } });
     U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>', annotations, shapes,
@@ -69,7 +80,7 @@
     } else {
       cap = `Firm C produces with the better technology, so it needs only one of them to reach ${texStr('q')}: here ${texStr(`\\phi_${r.regime}`)}, the one that uses more of the ${r.regime === 'A' ? 'cheaper input 1' : 'cheaper input 2'}. At ${texStr('w_1=w_2')} it switches, and the cheapest bundle jumps across the kink.`;
     }
-    $('cap').innerHTML = cap;
+    $('cap').innerHTML = `<b>Drag the grey handle</b> to turn the isocost line: its slope is ${texStr('-w_1/w_2')}. ` + cap;
   }
 
   // ---------- H1 and C against w1 ----------
@@ -86,16 +97,16 @@
     // explicit ranges: U.plot only moves the points while the layout stays the same, so the axes must follow q here
     const hMax = 1.08 * Math.max(...rows.map(row => row.H[0]).filter(Number.isFinite), r.H[0], 1e-6);
     const cMax = 1.08 * Math.max(...rows.map(row => row.C).filter(Number.isFinite), r.C, 1e-6);
-    U.plot('plotH', [U.line2(pts, th.ink, 2.5, 'H¹'), U.dot2([[r.H[0], state.w1]], th.ink, 'now', 11)], U.base2d(th, {
+    U.plot('plotH', [U.line2(pts, th.ink, 2.5, 'H¹'), U.dot2([[r.H[0], state.w1]], th.ink, 'now (drag it)', 14)], U.base2d(th, {
       xt: 'z<sub>1</sub> = H<sup>1</sup>(w<sub>1</sub>, 1, q)', yt: 'w<sub>1</sub>', x: { range: [0, hMax] }, y: { type: 'log', range: [-1, 1] }, shapes: shapesH
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('capH').innerHTML = state.firm === 'D'
+    $('capH').innerHTML = '<b>Drag the point</b> up or down to change ' + texStr('w_1') + '. ' + (state.firm === 'D'
       ? `In the shaded band, ${texStr(`${fmt(lo)}\\le w_1/w_2\\le ${fmt(hi)}`)}, the firm stays at the kink: ${texStr('H^1')} is vertical, a change of ${texStr('w_1')} does not change the input mix.`
-      : `At ${texStr('w_1=w_2')} the firm switches technology and ${texStr('H^1')} jumps: there is no price at which it would choose a bundle in between.`;
-    U.plot('plotC', [U.line2(rows.map(row => [row.x, row.C]), th.ink, 2.5, 'C'), U.dot2([[state.w1, r.C]], th.ink, 'now', 11)], U.base2d(th, {
+      : `At ${texStr('w_1=w_2')} the firm switches technology and ${texStr('H^1')} jumps: there is no price at which it would choose a bundle in between.`);
+    U.plot('plotC', [U.line2(rows.map(row => [row.x, row.C]), th.ink, 2.5, 'C'), U.dot2([[state.w1, r.C]], th.ink, 'now (drag it)', 14)], U.base2d(th, {
       xt: 'w<sub>1</sub>', yt: 'C', x: { type: 'log', range: [-1, 1] }, y: { range: [0, cMax] }
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('capC').innerHTML = `Concave in ${texStr('w_1')}, with slope ${texStr('H^1')} (Shephard's lemma)${state.firm === 'D' ? `; a straight line in the band, where ${texStr('H^1')} is fixed` : `; a corner at ${texStr('w_1=w_2')}, where ${texStr('H^1')} jumps`}. Now ${texStr(`C=${fmt(r.C)}`)}.`;
+    $('capC').innerHTML = `<b>Drag the point</b> to change ${texStr('w_1')}. Concave in ${texStr('w_1')}, with slope ${texStr('H^1')} (Shephard's lemma)${state.firm === 'D' ? `; a straight line in the band, where ${texStr('H^1')} is fixed` : `; a corner at ${texStr('w_1=w_2')}, where ${texStr('H^1')} jumps`}. Now ${texStr(`C=${fmt(r.C)}`)}.`;
   }
 
   // ---------- substitution and scale ----------
@@ -140,6 +151,20 @@
     ctrls = U.controls(document, state, { onChange: schedule });
     document.querySelectorAll('[data-firm]').forEach(b => b.addEventListener('click', () => { state.firm = b.dataset.firm; schedule(); }));
     document.querySelectorAll('[data-w1]').forEach(b => b.addEventListener('click', () => ctrls.w1.setExact(Number(b.dataset.w1))));
+    // Drags: the handle turns the isocost line around H (its slope is −w1/w2, w2 = 1); the points on H¹ and C move w1.
+    const setW1 = v => { if (Number.isFinite(v)) ctrls.w1.setExact(U.clampTo(v, ctrls.w1.min, ctrls.w1.max)); };
+    const now = () => K.costMin([state.w1, 1], state.q, tech(), state.firm);
+    U.dragPoint('plot', {
+      target: () => { const s = tech(), R = 2.3 * Math.pow(state.q, 1 / (s.alpha + s.beta)); return handle(now().H, R); },
+      move: ([x, y]) => {
+        // the slope of the line from H to the pointer; a pointer beside H or above it gives the flattest or the steepest line
+        const H = now().H, d = [x - H[0], y - H[1]];
+        setW1(d[0] * d[1] < 0 ? -d[1] / d[0] : Math.abs(d[0]) > Math.abs(d[1]) ? ctrls.w1.min : ctrls.w1.max);
+      }
+    });
+    // the price axes are logarithmic: the drag gives log10(w1)
+    U.dragPoint('plotH', { target: () => [now().H[0], state.w1], move: ([, y]) => setW1(Math.pow(10, y)) });
+    U.dragPoint('plotC', { target: () => [state.w1, now().C], move: ([x]) => setW1(Math.pow(10, x)) });
     $('defaults').addEventListener('click', () => { Object.entries(DEFAULTS).forEach(([k, v]) => ctrls[k].setExact(v)); state.firm = 'D'; schedule(); });
     render();
     U.watchColorScheme(schedule);

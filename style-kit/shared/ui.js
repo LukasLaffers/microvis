@@ -259,7 +259,11 @@
         const q = gd._transitionData;
         if (gd._transitioning || (q && ((q._frameQueue && q._frameQueue.length) || q._animationRaf))) { requestAnimationFrame(rebuild); return; }
         const args = gd._microvisPending; gd._microvisPending = null;
-        Plotly.react(gd, ...args);
+        // with equal scales (scaleanchor) Plotly.react keeps the old domain when the axis ranges change: draw anew then
+        const L = args[1] || {}, ranges = L.yaxis && L.yaxis.scaleanchor ? JSON.stringify([L.xaxis && L.xaxis.range, L.yaxis.range]) : null;
+        if (ranges && gd._microvisRanges && gd._microvisRanges !== ranges) Plotly.newPlot(gd, ...args);
+        else Plotly.react(gd, ...args);
+        gd._microvisRanges = ranges;
       };
       rebuild();
     }
@@ -269,7 +273,7 @@
   /*
    * Moving parts of a 2D figure drawn on a thin SVG layer over the plot, not by Plotly: for animations, where Plotly's own
    * redraw of each frame is too slow (Safari). `traces` are Plotly-like scatter traces: mode 'lines' (line color, width,
-   * dash), 'markers' (marker color, size, line), 'lines+markers' as made by arrow2, and 'text' (textposition, textfont;
+   * dash), 'markers' (marker color, size, line; symbol circle, diamond or star), 'lines+markers' as made by arrow2, and 'text' (textposition, textfont;
    * color and size may be arrays). Coordinates use the figure's axes; the layer is repainted after every Plotly redraw
    * (resize, theme). overlay(id, []) clears it.
    */
@@ -277,7 +281,8 @@
   function overlay(id, traces, font) {
     const gd = typeof id === 'string' ? document.getElementById(id) : id;
     gd._mvTraces = traces; gd._mvFont = font || gd._mvFont;
-    if (!gd._mvHooked && gd.on) { gd.on('plotly_afterplot', () => paintOverlay(gd)); gd._mvHooked = true; }
+    // repaint after every Plotly redraw; hooked again when the figure was rebuilt from scratch (Plotly.purge drops handlers)
+    if (gd.on && (!gd._mvHooked || gd._mvHookedEv !== gd._ev)) { gd.on('plotly_afterplot', () => paintOverlay(gd)); gd._mvHooked = true; gd._mvHookedEv = gd._ev; }
     paintOverlay(gd);
   }
   function paintOverlay(gd) {
@@ -321,8 +326,13 @@
       } else if (mode.includes('markers')) {
         for (let i = 0; i < xs.length; i++) {
           if (!ok(xs[i]) || !ok(ys[i])) continue;
-          const ml = mk.line || {}, rad = at(mk.size, i) / 2;
-          lines += `<circle cx="${r1(X(xs[i]))}" cy="${r1(Y(ys[i]))}" r="${rad}" fill="${at(mk.color, i)}" stroke="${ml.color || 'none'}" stroke-width="${ml.width || 0}"/>`;
+          const ml = mk.line || {}, rad = at(mk.size, i) / 2, cx = X(xs[i]), cy = Y(ys[i]), sym = at(mk.symbol, i) || 'circle';
+          const paint = `fill="${at(mk.color, i)}" stroke="${ml.color || 'none'}" stroke-width="${ml.width || 0}"`;
+          // circles, and the diamond and star of Plotly's markers
+          const poly = (n, inner) => Array.from({ length: n }, (_, k) => { const a = -Math.PI / 2 + Math.PI * k / (n / 2), r = k % 2 && inner ? rad * inner : rad * (inner ? 1.25 : 1.3); return `${r1(cx + r * Math.cos(a))},${r1(cy + r * Math.sin(a))}`; }).join(' ');
+          if (sym === 'diamond') lines += `<polygon points="${poly(4)}" ${paint}/>`;
+          else if (sym === 'star') lines += `<polygon points="${poly(10, 0.5)}" ${paint}/>`;
+          else lines += `<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${rad}" ${paint}/>`;
         }
       }
       if (mode.includes('text')) {

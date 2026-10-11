@@ -12,7 +12,7 @@
   const { $, fmt, tex, texStr, guard } = U;
 
   const state = { panel: 'A', log: false, delta: 0.65, rho: -1, a: 0.4, g1: 3, ad1: 0.8, ad2: 0.4, hc: 2, hK: 3, p1: 1, p2: 1, y: 10, anim: null };   // anim: progress of the income animation (null when not playing)
-  let ctrls = {}, memo = { key: '' }, lastNumbers = 0;
+  let ctrls = {}, memo = { key: '' }, lastNumbers = 0, lastX = null;   // lastX: the bundle last drawn (the drag target)
   // The expansion path and the Engel curves do not change while income moves: computed once per setting.
   function curves(u, p, lo, hi) {
     const key = JSON.stringify([u, p]);
@@ -71,14 +71,15 @@
       const yT = EM.turningIncome(p, u);
       if (yT > lo && yT < hi) traces.push(U.dot2([CM.demand(p, yT, u)], th.muted, 'good 1 turns inferior here', 9, { marker: { color: th.panel, size: 9, line: { color: th.ink, width: 1.5 } } }));
     }
-    traces.push(U.dot2([x], th.red, 'D(p, y)', 11));
+    traces.push(U.dot2([x], th.red, 'D(p, y) (drag it)', 14));
+    lastX = x;
     U.plot('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, Lx] }, y: { range: [0, Ly] } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     const lux = state.ad1 > state.ad2 ? 1 : 2, yT = state.panel === 'E' ? EM.turningIncome(p, u) : 0;
     const capD = Math.abs(state.ad1 - state.ad2) < 1e-9
       ? 'With a = b the utility is homothetic and the path is a ray again.'
       : `The path curves towards good ${lux}: good ${lux} (the exponent closer to 1) is a luxury and good ${3 - lux} a necessity. The income elasticities are not constant: compare them at a low and a high income.`;
     const capE = `Good 1 is normal while she has less than ${texStr(`K=${fmt(state.hK)}`)} of good 2, that is up to ${texStr(`y=p_2K(1+c/2)=${fmt(yT)}`)}; beyond that the path bends back and she buys less of good 1 as income rises: good 1 becomes inferior.`;
-    $('cap').innerHTML = { D: capD, E: capE, A: 'A homothetic (CES) consumer: the path is a ray from the origin. Doubling income doubles the demand for both goods (both income elasticities are 1).', B: 'Subsistence in good 1: the first ' + texStr(`p_1\\gamma_1=${fmt(p[0] * state.g1)}`) + ' of income goes on good 1, the rest is split. The path bends towards good 2: a luxury.', C: 'Good 1 is inferior: as income rises the path bends back, she buys less of good 1 and more of good 2.' }[state.panel];
+    $('cap').innerHTML = `<b>Drag the bundle</b> to change income: the budget line follows the pointer. ` + { D: capD, E: capE, A: 'A homothetic (CES) consumer: the path is a ray from the origin. Doubling income doubles the demand for both goods (both income elasticities are 1).', B: 'Subsistence in good 1: the first ' + texStr(`p_1\\gamma_1=${fmt(p[0] * state.g1)}`) + ' of income goes on good 1, the rest is split. The path bends towards good 2: a luxury.', C: 'Good 1 is inferior: as income rises the path bends back, she buys less of good 1 and more of good 2.' }[state.panel];
   }
 
   function drawEngel(th, S) {
@@ -168,6 +169,14 @@
     }));
     $('play-income').addEventListener('click', playIncome);
     $('logScale').addEventListener('change', e => { state.log = e.target.checked; schedule(); });
+    // Drag the bundle: income is the cost of the bundle under the pointer, y = p1 x1 + p2 x2 (not while income rises).
+    U.dragPoint('plot', {
+      target: () => (state.anim === null ? lastX : null),
+      move: ([a, b]) => {
+        if (state.anim !== null) return;
+        ctrls.y.setExact(Math.min(ctrls.y.max, Math.max(ctrls.y.min, state.p1 * Math.max(a, 0) + state.p2 * Math.max(b, 0))));
+      }
+    });
     render();
     U.watchColorScheme(schedule);
   }

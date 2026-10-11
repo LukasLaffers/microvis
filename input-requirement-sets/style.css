@@ -1,0 +1,3 @@
+/* Input Requirement Sets: tool-specific styles (shared look is in ../shared/style.css). */
+/* On a phone the figure comes first (the points in it can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

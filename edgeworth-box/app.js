@@ -18,6 +18,8 @@
   };
   const state = { ex: 'one', mode: 'market', ...EXAMPLES.one, showOffer: true, showCore: true, eqIndex: -1 };
   let ctrls = null;
+  // The handle on the price line: at distance r from R, on the side s (+1: to the right of R).
+  const priceHandle = { r: 1.5, s: 1 };
   const schedule = U.scheduler(render);
   const f2 = x => fmt(x, 2), f3 = x => fmt(x, 3);
   const vec = x => `(${f2(x[0])},\\ ${f2(x[1])})`;
@@ -55,6 +57,13 @@
     return { e, eqs, core, d, E, E2p, swt };
   }
 
+  // Where the price-line handle is drawn: on the line through R, inside the box (the other side of R if needed).
+  function priceHandlePoint(Ra, p) {
+    const n = Math.hypot(1, p), at = (s, r) => [Ra[0] + s * r / n, Ra[1] - s * r * p / n];
+    for (let r = priceHandle.r; r > 0.4; r *= 0.8) for (const s of [priceHandle.s, -priceHandle.s]) { const q = at(s, r); if (inBox(q)) return q; }
+    return at(priceHandle.s, 0.4);
+  }
+
   function draw(th, S) {
     const { e, eqs, core, d, swt } = S, traces = [], annotations = [], swtMode = state.mode === 'swt';
     let labelR = {};   // where the R label goes (set below when there is also an R')
@@ -89,6 +98,7 @@
       traces.push(U.line2(priceLine(e.Ra, state.p), th.grey, 2, `price line, slope −${f3(state.p)}`));
       traces.push(U.dot2([d.xa], th.blue, 'Alf wants', 12));
       traces.push(U.dot2([X.toB(e, d.xb)], th.red, 'Bill wants', 12, { marker: { color: th.red, size: 12, symbol: 'diamond', line: { color: '#ffffff', width: 1.5 } } }));
+      traces.push(U.dot2([priceHandlePoint(e.Ra, state.p)], th.grey, `price p₁/p₂ = ${f3(state.p)} (drag it)`, 14));
     } else {
       const ua = CM.utility(swt.xa, e.ua), ub = CM.utility(swt.xb, e.ub);
       traces.push(U.line2(boxed(icA(e, ua)), th.blue, 1.8, 'Alf at the target'));
@@ -104,10 +114,10 @@
         annotations.push({ x: Rn.pt[0], y: Rn.pt[1], text: "R'", showarrow: false, xanchor: dx >= 0 ? 'left' : 'right', yanchor: dy >= 0 ? 'bottom' : 'top', xshift: dx >= 0 ? 7 : -7, yshift: dy >= 0 ? 2 : -2, font: { size: 13, color: th.ink } });
         annotations.push({ x: Rn.pt[0], y: Rn.pt[1], ax: e.Ra[0], ay: e.Ra[1], axref: 'x', ayref: 'y', text: '', showarrow: true, arrowhead: 2, arrowsize: 1.2, arrowcolor: th.ink, standoff: 8 });
       }
-      traces.push(U.dot2([swt.xa], GREEN, 'target allocation', 15, { marker: { color: GREEN, size: 15, symbol: 'star', line: { color: '#ffffff', width: 1 } } }));
+      traces.push(U.dot2([swt.xa], GREEN, 'target allocation (drag it)', 15, { marker: { color: GREEN, size: 15, symbol: 'star', line: { color: '#ffffff', width: 1 } } }));
     }
     if (eqs.length) traces.push(U.dot2(eqs.map(q => q.xa), th.ink, 'competitive equilibrium', 15, { marker: { color: th.ink, size: 15, symbol: 'star', line: { color: '#ffffff', width: 1 } } }));
-    traces.push(U.dot2([e.Ra], th.ink, 'endowment R', 12, { marker: { color: th.ink, size: 12, symbol: 'square', line: { color: '#ffffff', width: 1.5 } } }));
+    traces.push(U.dot2([e.Ra], th.ink, 'endowment R (drag it)', 14, { marker: { color: th.ink, size: 14, symbol: 'square', line: { color: '#ffffff', width: 1.5 } } }));
     annotations.push({ x: e.Ra[0], y: e.Ra[1], text: 'R', showarrow: false, xanchor: 'left', yanchor: 'top', xshift: 7, yshift: -2, ...labelR, font: { size: 14, color: th.ink } });
     annotations.push({ x: 0, y: 0, text: '<b>O<sup>a</sup></b>', showarrow: false, xanchor: 'right', yanchor: 'top', xshift: -12, yshift: -14, font: { color: th.blue, size: 13 } });
     annotations.push({ x: OMEGA[0], y: OMEGA[1], text: '<b>O<sup>b</sup></b>', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 12, yshift: 14, font: { color: th.red, size: 13 } });
@@ -175,7 +185,7 @@
         item(Math.abs(E2p[0] - E[0]) < 1e-9, `Homogeneity: doubling both prices changes nothing, ${texStr(`E_1(2p_1,2p_2)=${f3(E2p[0])}=E_1(p_1,p_2)`)}`),
         item(clear, clear ? 'Both markets clear: a competitive equilibrium' : `Not an equilibrium: excess ${E[0] > 0 ? 'demand' : 'supply'} for good 1, so ${texStr('p')} should ${E[0] > 0 ? 'rise' : 'fall'}`)
       ].join('');
-      $('cap').innerHTML = `<span class="c-l2-blue"><span class="key dot"></span>Alf</span> and <span class="c-l2-red"><span class="key dot"></span>Bill</span> choose on the grey price line through ${texStr('R')}; their dashed offer curves trace these choices for every price. ${state.showCore ? `<span class="c-green"><span class="key"></span>Core</span>: the contract curve (dotted) inside the shaded lens. ` : ''}Stars: competitive equilibria, where the two offer curves cross. Drag ${texStr('R')} in the box.`;
+      $('cap').innerHTML = `<b>Drag ${texStr('R')}</b> to change the endowments, <b>drag the grey point</b> to turn the price line. <span class="c-l2-blue"><span class="key dot"></span>Alf</span> and <span class="c-l2-red"><span class="key dot"></span>Bill</span> choose on the grey price line through ${texStr('R')}; their dashed offer curves trace these choices for every price. ${state.showCore ? `<span class="c-green"><span class="key"></span>Core</span>: the contract curve (dotted) inside the shaded lens. ` : ''}Stars: competitive equilibria, where the two offer curves cross.`;
     } else {
       const eqT = X.equilibria(e, swt.T), hit = eqT.find(q => Math.abs(q.p - swt.p) < 1e-4 * swt.p);
       const Rn = transferPoint(e, swt);
@@ -186,7 +196,7 @@
         item(true, `The transfers balance: ${texStr(`T^a+T^b=${f3(swt.T)}+(${f3(-swt.T)})=0`)}`),
         `<li><span class="mark na">·</span><span>${Math.abs(swt.T) < 1e-3 ? 'No transfer needed: the target is a competitive equilibrium from R.' : Rn ? `Lump sum: move ${f2(Math.abs(Rn.amount))} units of good ${Rn.good} from ${swt.T > 0 ? 'Bill to Alf' : 'Alf to Bill'}${Rn.good === 2 ? ' (good 1 alone would not be enough)' : ''}.` : 'The transfer is larger than what can be moved in one good: pay it as income.'} ${inCore ? 'The target is in the core, so no coalition blocks it from R; but the market from R ends at a different point, so a transfer is still needed.' : 'The target is outside the core: one of them is worse off than at R, which only a transfer can bring about.'}</span></li>`
       ].join('');
-      $('cap').innerHTML = `Pick any Pareto-efficient point <span class="c-green">(star)</span> on the contract curve. The common tangent of the two indifference curves there gives the supporting price ${texStr(`p^*=${f3(swt.p)}`)}. A balancing lump-sum transfer moves the endowment from ${texStr('R')} to ${texStr("R'")} on that price line; from ${texStr("R'")} the market reaches the target.`;
+      $('cap').innerHTML = `<b>Drag the star</b> along the contract curve, or drag ${texStr('R')}. Pick any Pareto-efficient point <span class="c-green">(star)</span> on the contract curve. The common tangent of the two indifference curves there gives the supporting price ${texStr(`p^*=${f3(swt.p)}`)}. A balancing lump-sum transfer moves the endowment from ${texStr('R')} to ${texStr("R'")} on that price line; from ${texStr("R'")} the market reaches the target.`;
     }
   }
 
@@ -224,22 +234,53 @@
       ctrls.p.setExact(eqs[state.eqIndex].p);
       schedule();
     });
-    // Drag the endowment (market mode) or the target (second welfare theorem).
-    const gd = $('plot');
-    let dragging = false;
-    const move = ev => {
-      const v = U.eventToData(gd, ev);
-      if (!v) return;
-      if (state.mode === 'market') {
-        ctrls.R1.set(U.clampTo(Math.round(v[0] * 10) / 10, 0.2, 9.8));
-        ctrls.R2.set(U.clampTo(Math.round(v[1] * 10) / 10, 0.2, 9.8));
-        state.ex = matchExample();
-      } else ctrls.t.set(U.clampTo(Math.round(v[0] * 100) / 100, 0.3, 9.7));
-      schedule();
+    // Drag R (both modes), the price line (market) or the target on the contract curve (second welfare theorem).
+    // One U.dragPoint; the handle nearest the pointer is chosen when the press begins (else R, or the target).
+    const gd = $('plot'), GRAB = 24;
+    let which = 'R', cc = null;
+    const handles = () => {
+      const e = economy();
+      return state.mode === 'market' ? { R: e.Ra, price: priceHandlePoint(e.Ra, state.p) } : { R: e.Ra, target: X.support(e, state.t).xa };
     };
-    gd.addEventListener('pointerdown', ev => { dragging = true; if (gd.setPointerCapture) gd.setPointerCapture(ev.pointerId); move(ev); });
-    gd.addEventListener('pointermove', ev => { if (dragging) move(ev); });
-    ['pointerup', 'pointercancel'].forEach(t => gd.addEventListener(t, () => { dragging = false; }));
+    const pick = ev => {
+      const fl = gd._fullLayout;
+      which = state.mode === 'market' ? 'R' : 'target';
+      if (!fl || !fl.xaxis) return;
+      const b = gd.getBoundingClientRect(), xa = fl.xaxis, ya = fl.yaxis;
+      let best = GRAB;
+      for (const [k, q] of Object.entries(handles())) {
+        const dist = Math.hypot(ev.clientX - b.left - xa._offset - xa.c2p(q[0]), ev.clientY - b.top - ya._offset - ya.c2p(q[1]));
+        if (dist <= best) { best = dist; which = k; }
+      }
+    };
+    let held = false;
+    gd.addEventListener('pointerdown', ev => { pick(ev); held = true; }, true);
+    gd.addEventListener('pointermove', ev => { if (!held) pick(ev); }, true);
+    ['pointerup', 'pointercancel'].forEach(t => gd.addEventListener(t, () => { held = false; }, true));
+    gd.addEventListener('touchstart', ev => { if (ev.touches[0]) pick(ev.touches[0]); }, { passive: true, capture: true });
+    U.dragPoint('plot', {
+      start: () => { cc = state.mode === 'swt' ? X.contractCurve(economy(), U.linspace(0.3, 9.7, 471)) : null; },
+      target: () => handles()[which] || null,
+      move: ([x, y]) => {
+        if (which === 'R') {
+          ctrls.R1.set(U.clampTo(x, ctrls.R1.min, ctrls.R1.max));
+          ctrls.R2.set(U.clampTo(y, ctrls.R2.min, ctrls.R2.max));
+        } else if (which === 'price') {
+          const dx = x - state.R1, dy = y - state.R2, c = ctrls.p;
+          if (Math.hypot(dx, dy) < 0.3) return;   // too close to R to give a slope
+          // a line through R and the pointer; one that would slope upwards becomes the flattest or steepest price
+          const p = dx * dy < 0 ? -dy / dx : Math.abs(dy) < Math.abs(dx) ? c.min : c.max;
+          priceHandle.r = Math.hypot(dx, dy); priceHandle.s = Math.abs(dx) < 1e-9 ? priceHandle.s : Math.sign(dx);
+          c.setExact(U.clampTo(p, c.min, c.max));
+          state.eqIndex = -1;
+        } else if (cc) {
+          // the nearest point of the contract curve
+          let best = Infinity, t = state.t;
+          cc.forEach(q => { if (q && q[1] !== null) { const dist = Math.hypot(q[0] - x, q[1] - y); if (dist < best) { best = dist; t = q[0]; } } });
+          ctrls.t.set(U.clampTo(t, ctrls.t.min, ctrls.t.max));
+        }
+      }
+    });
     render();
     U.watchColorScheme(schedule);
   }

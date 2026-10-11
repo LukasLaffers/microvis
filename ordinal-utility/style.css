@@ -2,3 +2,5 @@
 .plot-two3d { height: 560px; }
 .plot-small { height: 190px; }
 @media (max-width: 800px) { .plot-two3d { height: 440px; } }
+/* On a phone the figures come first, the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

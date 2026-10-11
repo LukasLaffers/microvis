@@ -7,8 +7,8 @@
   <meta name="description" content="A monopolist sets marginal revenue equal to marginal cost, p = MC/(1 + 1/η), and earns (AR − AC)q. With differentiated products, entry of substitutes pushes average revenue down until it is tangent to average cost. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=12">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="../shared/style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=13">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -61,12 +61,17 @@
           <button type="button" id="short">Short run</button>
         </div>
       </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">The cost function and the shape of marginal cost.</p>
       <div class="group">
         <h2>Cost</h2>
         <div class="formula" id="formula-cost"></div>
         <div class="ctrl" data-key="a" data-label="a" data-hint="where MC is lowest" data-min="1" data-max="3" data-step="0.05"></div>
         <div class="ctrl" data-key="m" data-label="m" data-hint="height of MC there" data-min="0.3" data-max="2" data-step="0.05"></div>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="Revenue and cost curves">
@@ -96,11 +101,11 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=12"></script>
-  <script src="../shared/firm-model.js?v=12"></script>
-  <script src="model.js?v=12"></script>
-  <script src="app.js?v=12"></script>
-  <script src="../shared/theme.js?v=12"></script>
+  <script src="../shared/ui.js?v=13"></script>
+  <script src="../shared/firm-model.js?v=13"></script>
+  <script src="model.js?v=13"></script>
+  <script src="app.js?v=13"></script>
+  <script src="../shared/theme.js?v=13"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

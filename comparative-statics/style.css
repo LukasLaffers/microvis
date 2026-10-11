@@ -1,2 +1,4 @@
 /* What If? Comparative Statics: tool-specific styles (shared look is in ../shared/style.css). */
 .plot-main { touch-action: auto; cursor: default; }
+/* On a phone the figure comes first (its points can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

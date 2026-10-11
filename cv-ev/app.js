@@ -16,6 +16,9 @@
   // The Giffen example where good 1 is inferior but not Giffen, and demand stays interior over the plotted prices.
   const INFERIOR = { y: 3.96, p10: 1.18, p11: 0.9 };
   let ctrls = {};
+  // While a price is dragged in the area figure its axes stay as they were at the start (they would follow the point
+  // and run away from the pointer); pick: the price being dragged, the one nearer to the pointer.
+  let freeze = null, pick = 'p11', points = null;   // points: the two points last drawn
   const schedule = U.scheduler(render);
   const f3 = x => fmt(x, 3);
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
@@ -30,7 +33,7 @@
 
   function drawAreas(th, S) {
     const { u, y, b } = S, lo = Math.min(state.p10, state.p11), hi = Math.max(state.p10, state.p11);
-    const pTop = state.type === 'giffen' ? hi * 1.15 : hi * 1.6, ps = U.linspace(state.type === 'giffen' ? lo * 0.8 : Math.max(0.3, lo * 0.5), pTop, 140), band = U.linspace(lo, hi, 60);
+    const pTop = freeze ? freeze.pTop : state.type === 'giffen' ? hi * 1.15 : hi * 1.6, ps = U.linspace(state.type === 'giffen' ? lo * 0.8 : Math.max(0.3, lo * 0.5), pTop, 140), band = U.linspace(lo, hi, 60);
     const curve = f => ps.map(p1 => [f(p1), p1]);
     const D = p1 => CM.demand([p1, 1], y, u)[0], H0 = p1 => CM.hicks([p1, 1], b.v0, u)[0], H1 = p1 => CM.hicks([p1, 1], b.v1, u)[0];
     // The region between two curves (f left, g right) for p1 between the two prices; f = null means the p1 axis.
@@ -48,15 +51,17 @@
     else if (state.type === 'giffen' ? state.p11 < state.p10 : state.p11 > state.p10) traces.push(strip(null, H1, BLU), strip(H1, D, GRN), strip(D, H0, RED));
     else traces.push(strip(null, H0, RED), strip(H0, D, GRN), strip(D, H1, BLU));
     traces.push(U.line2(curve(H0), th.red, 2.2, 'H¹(p₁, 1, v⁰)'), U.line2(curve(H1), th.blue, 2.2, 'H¹(p₁, 1, v¹)'), U.line2(curve(D), GREEN, 2.8, 'D¹(p₁, 1, y)'));
-    traces.push(U.dot2([[b.x0[0], state.p10], [b.x1[0], state.p11]], th.ink, 'D¹ at the two prices', 9));
+    points = { p10: [b.x0[0], state.p10], p11: [b.x1[0], state.p11] };
+    traces.push(U.dot2([[b.x0[0], state.p10]], th.ink, 'D¹ at the old price p₁⁰ (drag it)', 14), U.dot2([[b.x1[0], state.p11]], th.ink, 'D¹ at the new price p₁¹ (drag it)', 14));
     const xs = [...ps.map(D), ...ps.map(H0), ...ps.map(H1)].filter(Number.isFinite);
     const shapes = [state.p10, state.p11].map(p => ({ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: p, y1: p, line: { color: th.muted, width: 1, dash: 'dot' } }));
     const annotations = [
       { x: 0, y: state.p10, text: 'p<sub>1</sub><sup>0</sup>', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 13, color: th.ink } },
       { x: 0, y: state.p11, text: 'p<sub>1</sub><sup>1</sup>', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 13, color: th.ink } }
     ];
-    Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: [0, Math.max(...xs) * 1.05] }, y: { range: [0, pTop] }, shapes, annotations }), U.PLOT_CONFIG);
-    $('cap').innerHTML = `<span class="c-l2-red"><span class="key"></span>${texStr('H^1(p_1,1,v^0)')}</span>, <span class="c-l2-blue"><span class="key"></span>${texStr('H^1(p_1,1,v^1)')}</span>, <span class="c-green"><span class="key"></span>${texStr('D^1(p_1,1,y)')}</span>. ` +
+    Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'p<sub>1</sub>', x: { range: freeze ? freeze.xr : [0, Math.max(...xs) * 1.05] }, y: { range: [0, pTop] }, shapes, annotations }), U.PLOT_CONFIG);
+    $('cap').innerHTML = `<b>Drag a point</b> up or down to change that price. ` +
+      `<span class="c-l2-red"><span class="key"></span>${texStr('H^1(p_1,1,v^0)')}</span>, <span class="c-l2-blue"><span class="key"></span>${texStr('H^1(p_1,1,v^1)')}</span>, <span class="c-green"><span class="key"></span>${texStr('D^1(p_1,1,y)')}</span>. ` +
       `The Hicksian curves cross the Marshallian one at the old and the new price: ${texStr('D^1(p_1^0,1,y)=H^1(p_1^0,1,v^0)')} and ${texStr('D^1(p_1^1,1,y)=H^1(p_1^1,1,v^1)')}. ` +
       (state.area === 'all' && state.type !== 'quasilinear' ? 'Shaded, from the axis: the smallest measure, then the strips that the next two add. ' : '') +
       (state.type === 'quasilinear' ? 'Without an income effect on good 1 the three curves coincide.' : state.type === 'giffen' ? 'Good 1 is inferior: the Hicksian curve for the higher utility lies to the left.' : 'Good 1 is normal: the Hicksian curve for the higher utility lies to the right.');
@@ -124,6 +129,25 @@
       schedule();
     });
     document.querySelectorAll('[data-area]').forEach(b => b.addEventListener('click', () => { state.area = b.dataset.area; schedule(); }));
+
+    // Drag the two prices in the area figure: the point nearer to the pointer is the one that moves.
+    const gd = $('plot');
+    const choose = ev => {
+      const L = gd._fullLayout, box = gd.getBoundingClientRect();
+      if (!L || !L.xaxis || !points) return;
+      const d = k => { const q = points[k]; return Math.hypot(ev.clientX - box.left - L.xaxis._offset - L.xaxis.c2p(q[0]), ev.clientY - box.top - L.yaxis._offset - L.yaxis.c2p(q[1])); };
+      pick = d('p10') < d('p11') ? 'p10' : 'p11';
+    };
+    // (registered before U.dragPoint, so the choice is made before it looks for the point)
+    gd.addEventListener('pointerdown', choose, true);
+    gd.addEventListener('pointermove', ev => { if (!freeze) choose(ev); }, true);
+    gd.addEventListener('touchstart', ev => { if (ev.touches[0]) choose(ev.touches[0]); }, { passive: true, capture: true });
+    U.dragPoint('plot', {
+      start: () => { const L = gd._fullLayout; if (L && L.xaxis) freeze = { xr: L.xaxis.range.slice(), pTop: L.yaxis.range[1] }; },
+      end: () => { freeze = null; schedule(); },
+      target: () => points && points[pick],
+      move: ([, p]) => ctrls[pick].setExact(Math.min(ctrls[pick].max, Math.max(ctrls[pick].min, p)))
+    });
     render();
     U.watchColorScheme(schedule);
   }

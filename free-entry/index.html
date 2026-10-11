@@ -7,8 +7,8 @@
   <meta name="description" content="Price-taking firms earn profits in the short run; entry pushes the price down until one more firm would make a loss. In the long run profit is zero and the price is minimum average cost. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=12">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="../shared/style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=13">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -31,7 +31,7 @@
           <p>A price taker produces where <span class="tex" data-tex="MC=p"></span>. While <span class="tex" data-tex="p"></span> is above average cost the firm makes a profit (green rectangle), and that attracts entrants: each new firm adds supply and pushes the price down. Entry stops when the next firm would make a loss.</p>
           <ul>
           <li>Press <b>One more firm</b> a few times, then <b>Free entry</b>.</li>
-          <li>Raise the market size <span class="tex" data-tex="M"></span>: more firms, and the price ends closer to the bottom of average cost. In the long run, zero profit.</li>
+          <li>Raise the market size <span class="tex" data-tex="M"></span>, or drag the firm's dot up: more firms, and the price ends closer to the bottom of average cost. In the long run, zero profit.</li>
           </ul>
         </details>
       </div>
@@ -48,12 +48,17 @@
         <h2>Market demand</h2>
         <div class="ctrl" data-key="M" data-label="M" data-hint="market size: Dem(p) = M (10 − p)" data-min="1" data-max="40" data-step="0.1"></div>
       </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">Each firm's cost function and the shape of its marginal cost.</p>
       <div class="group">
         <h2>Each firm's cost</h2>
         <div class="formula" id="formula"></div>
         <div class="ctrl" data-key="a" data-label="a" data-hint="where MC is lowest" data-min="1" data-max="3" data-step="0.05"></div>
         <div class="ctrl" data-key="m" data-label="m" data-hint="height of MC there" data-min="0.3" data-max="2" data-step="0.05"></div>
       </div>
+      </details>
     </section>
 
     <section class="panel main-panel" aria-label="A single firm">
@@ -89,11 +94,11 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=12"></script>
-  <script src="../shared/firm-model.js?v=12"></script>
-  <script src="model.js?v=12"></script>
-  <script src="app.js?v=12"></script>
-  <script src="../shared/theme.js?v=12"></script>
+  <script src="../shared/ui.js?v=13"></script>
+  <script src="../shared/firm-model.js?v=13"></script>
+  <script src="model.js?v=13"></script>
+  <script src="app.js?v=13"></script>
+  <script src="../shared/theme.js?v=13"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

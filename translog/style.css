@@ -27,3 +27,5 @@ table.tl tr.sum td { color: var(--muted); border-bottom: 0; }
 .plot-agg { height: 260px; }
 .elas-table td.ok { color: var(--inc); }
 .key.dotted { border-top-style: dotted; }
+/* On a phone the figures come first (their points can be dragged), the controls follow; the wide row stays last. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

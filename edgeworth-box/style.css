@@ -1,3 +1,7 @@
 /* The Edgeworth Box: tool-specific styles (shared look is in ../shared/style.css). */
 .plot-box { height: auto; aspect-ratio: 1 / 1; max-height: 680px; }
 .c-green { color: #3d9a40; }
+/* R, the price line and the target are dragged with U.dragPoint: a finger elsewhere on the box scrolls the page. */
+.plot-box { touch-action: auto; }
+/* On a phone the figures come first, the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

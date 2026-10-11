@@ -15,7 +15,7 @@
   const state = { tech: 'cobb', delta: 0.5, rho: -0.5, profile: 'ushape', a: 2, m: 1, k: 0.6, p: 8, w2: 1, w1: 2, w1n: 1 };
   const tech = () => ({ tech: state.tech, delta: state.delta, rho: state.rho, profile: state.profile, A: 1, k: state.k, a: state.a, m: state.m });
 
-  let ctrls = {};
+  let ctrls = {}, hold = null;   // hold: the axes of the demand figure, kept fixed while a point is dragged
   const schedule = U.scheduler(render);
 
   function solve() {
@@ -34,8 +34,9 @@
 
   function drawMain(th, P) {
     const { s, p, pts } = P, w1a = state.w1, w1b = state.w1n, w2 = state.w2;
-    const wTop = Math.max(w1a, w1b) * 1.6, wLow = Math.max(0.15, Math.min(w1a, w1b) * 0.45);
-    const zMax = 1.45 * Math.max(pts.zStar, pts.zO, pts.zStarStar, pts.zStar > 0 || pts.zStarStar > 0 ? 1e-3 : zRef(s, [w1a, w2]));
+    const wTop = hold ? hold.wTop : Math.max(w1a, w1b) * 1.6, wLow = Math.max(0.15, Math.min(w1a, w1b) * 0.45);
+    const zMax = hold ? hold.zMax : 1.45 * Math.max(pts.zStar, pts.zO, pts.zStarStar, pts.zStar > 0 || pts.zStarStar > 0 ? 1e-3 : zRef(s, [w1a, w2]));
+    drawMain.axes = { wTop, zMax };
     const traces = [], annotations = [], shapes = [];
     const clipX = c => c.map(([z, w]) => [z <= zMax * 1.5 ? z : null, w]);
     traces.push(U.line2(clipX(CS.demandCurve(w2, p, s, wLow, wTop, 220)), th.ink, 2.5, 'ordinary demand D¹'));
@@ -47,9 +48,9 @@
     shapes.push({ type: 'line', x0: 0, x1: Math.max(pts.zO, pts.zStarStar), y0: w1b, y1: w1b, line: { color: th.muted, width: 1, dash: 'dot' } });
     const drop = (z, w) => shapes.push({ type: 'line', x0: z, x1: z, y0: 0, y1: w, line: { color: th.muted, width: 1, dash: 'dot' } });
     drop(pts.zStar, w1a); drop(pts.zO, w1b); drop(pts.zStarStar, w1b);
-    traces.push(U.dot2([[pts.zStar, w1a]], th.ink, 'z₁* (before)', 11));
     traces.push(U.dot2([[pts.zO, w1b]], th.blue, 'z₁° (substitution)', 11));
-    traces.push(U.dot2([[pts.zStarStar, w1b]], th.red, 'z₁** (after)', 11));
+    traces.push(U.dot2([[pts.zStar, w1a]], th.ink, 'z₁* at w₁ (drag it)', 14));
+    traces.push(U.dot2([[pts.zStarStar, w1b]], th.red, 'z₁** at w₁′ (drag it)', 14));
     const lab = (x, text, color) => annotations.push({ x, y: 0, text, showarrow: false, yanchor: 'bottom', yshift: 16, font: { size: 13, color } });
     lab(pts.zStar, 'z<sub>1</sub><sup>*</sup>', th.ink); lab(pts.zO, 'z<sub>1</sub><sup>o</sup>', th.blue); lab(pts.zStarStar, 'z<sub>1</sub><sup>**</sup>', th.red);
     // Arrows along the z1 axis: substitution (blue) then scale (red).
@@ -133,11 +134,46 @@
     guard('formulas', () => renderChecks(P));
   }
 
+  // Several points in one figure that can be dragged: the one nearest the pointer when it goes down is moved.
+  // points: [{ at: () => [x, y] or null, move: ([x, y]) => {} }]
+  function dragNearest(id, points, opts = {}) {
+    const gd = $(id);
+    let pick = 0, down = false;
+    const choose = ev => {
+      const fl = gd._fullLayout;
+      if (!fl || !fl.xaxis) return;
+      const b = gd.getBoundingClientRect(), xa = fl.xaxis, ya = fl.yaxis;
+      let best = Infinity;
+      points.forEach((p, i) => {
+        const t = p.at();
+        if (!t) return;
+        const d = Math.hypot(ev.clientX - b.left - xa._offset - xa.c2p(t[0]), ev.clientY - b.top - ya._offset - ya.c2p(t[1]));
+        if (d < best) { best = d; pick = i; }
+      });
+    };
+    // registered before U.dragPoint's own handlers, so the choice is made before the drag starts
+    gd.addEventListener('pointerdown', choose, true);
+    gd.addEventListener('pointermove', ev => { if (!down) choose(ev); }, true);
+    U.dragPoint(gd, {
+      target: () => points[pick].at(),
+      move: v => points[pick].move(v),
+      start: () => { down = true; if (opts.start) opts.start(); },
+      end: () => { down = false; if (opts.end) opts.end(); }
+    });
+  }
+
   function init() {
     U.renderStaticTex();
     ctrls = U.controls(document, state, { onChange: schedule });
     $('tech').addEventListener('change', e => { state.tech = e.target.value; schedule(); });
     document.querySelectorAll('[data-profile]').forEach(b => b.addEventListener('click', () => { state.profile = b.dataset.profile; schedule(); }));
+    // Drag the points of the demand figure up or down: the old price w1 and the new price w1'. The axes stay put meanwhile.
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v));
+    const pts = () => CS.points([state.w1, state.w2], state.p, tech(), state.w1n);
+    dragNearest('plot', [
+      { at: () => [pts().zStar, state.w1], move: ([, y]) => ctrls.w1.setExact(lim('w1', y)) },
+      { at: () => [pts().zStarStar, state.w1n], move: ([, y]) => ctrls.w1n.setExact(lim('w1n', y)) }
+    ], { start: () => { hold = drawMain.axes || null; }, end: () => { hold = null; schedule(); } });
     render();
     U.watchColorScheme(schedule);
   }

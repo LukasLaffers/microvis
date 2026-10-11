@@ -41,7 +41,7 @@
     traces.push(U.line2(qq.map(q => [q, clip(FM.AC(W, q, s))]), th.ink, 2, 'average cost'));
     traces.push(U.line2(qq.map(q => [q, clip(FM.MC(W, q, s))]), th.red, 2.5, 'marginal cost'));
     traces.push(U.line2([[0, e.p], [qMax, e.p]], th.blue, 2, 'average revenue = marginal revenue = p'));
-    traces.push(U.dot2([[e.q, e.p]], th.ink, 'q_N', 10));
+    traces.push(U.dot2([[e.q, e.p]], th.ink, 'q_N, p (drag it)', 14, { cliponaxis: false }));
     traces.push(U.dot2([[hat.qHat, hat.pHat]], th.ink, 'min AC', 7, { marker: { color: th.panel, size: 7, line: { color: th.ink, width: 1.5 } } }));
     const shapes = [{ type: 'line', x0: e.q, x1: e.q, y0: 0, y1: e.p, line: { color: th.muted, width: 1, dash: 'dot' } }];
     const lastBelow = f => { for (let i = qq.length - 1; i >= 0; i--) { const v = f(qq[i]); if (v < yMax * 0.92) return [qq[i], v]; } return null; };
@@ -56,7 +56,7 @@
     if (acL) annotations.push({ x: acL[0], y: acL[1], text: 'average cost', showarrow: false, xanchor: 'right', xshift: -8, font: { size: 12, color: th.ink } });
     Plotly.react('plot', traces, U.base2d(th, { xt: `output of firm 1, …, ${state.N}`, yt: 'p', x: { range: [0, qMax] }, y: { range: [0, yMax] }, shapes, annotations, margin: { l: 52, r: 52, t: 8, b: 44 } }), U.PLOT_CONFIG);
     $('headA').textContent = e.profit > 1e-6 ? 'A single firm: profit attracts entry' : e.profit < -1e-6 ? 'A single firm: a loss' : 'A single firm: zero profit';
-    $('capA').innerHTML = `Each of the ${state.N} firms produces ${texStr(`q_{${state.N}}=${fmt(e.q, 3)}`)} where ${texStr(`MC=p=${fmt(e.p, 3)}`)}. Profit ${texStr(`\\Pi=(p-AC)\\,q=${fmt(e.profit, 3)}`)}${e.profit < 0 ? ': this firm would rather not have entered.' : '.'} The open circle is the bottom of average cost, ${texStr(`\\min AC=${fmt(R.hat.pHat, 3)}`)}.`;
+    $('capA').innerHTML = `<b>Drag the dot</b> up or down to set the price; the market size ${texStr('M')} follows. Each of the ${state.N} firms produces ${texStr(`q_{${state.N}}=${fmt(e.q, 3)}`)} where ${texStr(`MC=p=${fmt(e.p, 3)}`)}. Profit ${texStr(`\\Pi=(p-AC)\\,q=${fmt(e.profit, 3)}`)}${e.profit < 0 ? ': this firm would rather not have entered.' : '.'} The open circle is the bottom of average cost, ${texStr(`\\min AC=${fmt(R.hat.pHat, 3)}`)}.`;
   }
 
   // ---------- the market ----------
@@ -125,6 +125,15 @@
     $('add').addEventListener('click', () => { stop(); ctrls.N.set(state.N + 1); });
     $('entry').addEventListener('click', freeEntry);
     $('reset').addEventListener('click', () => { stop(); ctrls.N.set(3); });
+    // Drag the firm's dot along MC: the market size that gives this price with N firms, N q(p) = M (10 - p).
+    U.dragPoint('plot', {
+      start: stop,
+      target: () => { const e = FE.equilibrium(state.N, W, tech(), dem()); return e && [e.q, e.p]; },
+      move: ([, y]) => {
+        const s = tech(), p = Math.min(P_MAX - 0.05, Math.max(FE.mcMin(W, s) + 1e-3, y));
+        ctrls.M.setExact(Math.min(ctrls.M.max, Math.max(ctrls.M.min, state.N * FE.outputOnMC(W, p, s) / (P_MAX - p))));
+      }
+    });
     render();
     U.watchColorScheme(schedule);
   }

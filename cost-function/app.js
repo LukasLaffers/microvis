@@ -39,7 +39,7 @@
     const d = 0.6, H1 = zbar[0];
     shapes.push({ type: 'path', path: `M ${wbar[0]} ${Cbar} L ${wbar[0] + d} ${Cbar} L ${wbar[0] + d} ${Cbar + H1 * d}`, line: { color: th.ink, width: 1, dash: 'dot' } });
     annotations.push({ x: wbar[0] + d, y: Cbar + H1 * d / 2, text: 'slope = H<sup>1</sup>(w̄,q)  (C5)', showarrow: false, xanchor: 'left', xshift: 6, font: { size: 12, color: th.ink }, bgcolor: th.panel });
-    traces.push(U.dot2([[wbar[0], Cbar]], th.ink, 'w̄₁: C = fixed-input cost', 12));
+    traces.push(U.dot2([[wbar[0], Cbar]], th.ink, 'w̄₁: C = fixed-input cost (drag it)', 15));
     annotations.push({ x: wbar[0], y: 0, text: 'w̄<sub>1</sub>', showarrow: false, yanchor: 'bottom', yshift: 4, font: { size: 13, color: th.ink } });
     shapes.push({ type: 'line', x0: wbar[0], x1: wbar[0], y0: 0, y1: Cbar, line: { color: th.ink, width: 1, dash: 'dot' } });
     // The compared price w1: the saving from substitution.
@@ -61,9 +61,9 @@
       xt: 'w<sub>1</sub>  (w<sub>2</sub> = ' + fmt(state.w2) + ', q = ' + fmt(q) + ')', yt: 'cost',
       x: { range: [0, W1[1] + 0.1] }, y: { range: [0, yMax] }, annotations, shapes
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('cap-main').innerHTML = s.tech === 'leontief'
+    $('cap-main').innerHTML = `<b>Drag the point</b> to move ${texStr('\\bar w_1')}; move the mouse over the plot to compare another price ${texStr('w_1')}. ` + (s.tech === 'leontief'
       ? 'No substitution possible: cost is linear in w₁ and the saving is zero.'
-      : `(C4) concave in ${texStr('w')}: the cost curve lies below every such line. (C2) And it never decreases when a price rises.`;
+      : `(C4) concave in ${texStr('w')}: the cost curve lies below every such line. (C2) And it never decreases when a price rises.`);
   }
 
   // ---------- panel 2: the firm adjusts its inputs ----------
@@ -161,7 +161,7 @@
       { type: 'scatter', mode: 'lines', x: poly.map(v => v[0]), y: poly.map(v => v[1]), fill: 'toself', fillcolor: 'rgba(74,144,226,0.22)', line: { width: 0 }, hoverinfo: 'skip', name: 'area' },
       U.line2(ws.map(w => [H1(w), w]), th.blue, 2.5, 'H¹(w₁, w̄₂, q)'),
       U.dot2([[H1(wa), wa]], th.ink, 'w₁* = w̄₁', 10),
-      U.dot2([[H1(wb), wb]], th.blue, 'w₁°', 10)
+      U.dot2([[H1(wb), wb]], th.blue, 'w₁° (drag it)', 14)
     ];
     const ann = [
       { x: 0, y: wa, text: 'w<sub>1</sub>*', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 4, font: { size: 12, color: th.ink } },
@@ -171,7 +171,7 @@
     const area = CF.areaLeftOfH1(w2, q, s, wa, wb), dC = FM.cost([wb, w2], q, s) - FM.cost([wa, w2], q, s);
     const ok = Math.abs(area - Math.abs(dC)) <= 1e-4 * Math.max(1, Math.abs(dC));
     // As in the notes: the integral from w1* (= the reference price) to w1^o equals the change in cost; the shaded area is its size.
-    $('capArea').innerHTML = `Because ${texStr('H^1(w,q)=\\partial C(w,q)/\\partial w_1')}, the integral along the conditional demand curve from ${texStr(`w_1^\\ast=\\bar w_1=${fmt(wa, 2)}`)} to ${texStr(`w_1^o=${fmt(wb, 2)}`)} is the change in cost the price change induces: ${texStr(`\\int_{w_1^\\ast}^{w_1^o}H^1(w_1,\\bar w_2,q)\\,\\mathrm dw_1=C(w_1^o,\\bar w_2,q)-C(w_1^\\ast,\\bar w_2,q)=${fmt(dC, 4)}`)}. The shaded area to the left of the curve is its size, ${fmt(area, 4)} <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓' : '✗'}</span>`;
+    $('capArea').innerHTML = `<b>Drag the blue point</b> to move ${texStr('w_1^o')}. Because ${texStr('H^1(w,q)=\\partial C(w,q)/\\partial w_1')}, the integral along the conditional demand curve from ${texStr(`w_1^\\ast=\\bar w_1=${fmt(wa, 2)}`)} to ${texStr(`w_1^o=${fmt(wb, 2)}`)} is the change in cost the price change induces: ${texStr(`\\int_{w_1^\\ast}^{w_1^o}H^1(w_1,\\bar w_2,q)\\,\\mathrm dw_1=C(w_1^o,\\bar w_2,q)-C(w_1^\\ast,\\bar w_2,q)=${fmt(dC, 4)}`)}. The shaded area to the left of the curve is its size, ${fmt(area, 4)} <span class="${ok ? 'ok-mark' : 'no-mark'}">${ok ? '✓' : '✗'}</span>`;
   }
 
   // ---------- render loop ----------
@@ -188,16 +188,26 @@
     guard('area plot', () => drawArea(th, P));
   }
 
-  // Pointer on the cost plot: hover compares a price, press or drag moves the reference price.
+  // The cost plot: drag the point to move the reference price; with a mouse, hovering compares another price.
   function setupPointer() {
-    const gd = $('plot');
-    let down = false;
-    const at = ev => { const d = U.eventToData(gd, ev); return d ? U.clampTo(Number(d[0].toFixed(2)), W1[0], W1[1]) : null; };
-    gd.addEventListener('pointermove', ev => { const x = at(ev); if (x === null) return; if (down) ctrls.w1.set(x); else ctrls.probe.set(x); }, true);
-    gd.addEventListener('pointerdown', ev => { const x = at(ev); if (x === null) return; down = true; ctrls.w1.set(x); if (gd.setPointerCapture) gd.setPointerCapture(ev.pointerId); ev.preventDefault(); }, true);
-    const up = () => { down = false; };
-    gd.addEventListener('pointerup', up, true);
-    gd.addEventListener('pointercancel', up, true);
+    const gd = $('plot'), lim = (k, v) => U.clampTo(v, ctrls[k].min, ctrls[k].max);
+    let dragging = false;
+    U.dragPoint(gd, {
+      start: () => { dragging = true; },
+      end: () => { dragging = false; },
+      target: () => [state.w1, FM.cost([state.w1, state.w2], state.q, tech())],
+      move: ([x]) => ctrls.w1.setExact(lim('w1', x))
+    });
+    gd.addEventListener('pointermove', ev => {
+      if (dragging || ev.pointerType !== 'mouse') return;
+      const d = U.eventToData(gd, ev);
+      if (d) ctrls.probe.set(lim('probe', d[0]));
+    });
+    // The area plot: drag the point at the second price.
+    U.dragPoint('plotArea', {
+      target: () => [FM.condDemand([state.w1o, state.w2], state.q, tech()).H[0], state.w1o],
+      move: ([, y]) => ctrls.w1o.setExact(lim('w1o', y))
+    });
   }
 
   function init() {
@@ -206,8 +216,6 @@
     $('tech').addEventListener('change', e => { state.tech = e.target.value; schedule(); });
     render();
     setupPointer();
-    const ga = $('plotArea');
-    ga.addEventListener('click', ev => { const d = U.eventToData(ga, ev); if (d) ctrls.w1o.set(U.clampTo(d[1], W1[0], W1[1])); });
     U.watchColorScheme(schedule);
   }
 

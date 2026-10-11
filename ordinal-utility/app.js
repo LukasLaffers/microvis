@@ -13,6 +13,7 @@
 
   const state = { type: 'cobb', alpha: 0.5, rho: -1, t: 'log', a1: 3, a2: 6, b1: 6, b2: 4, reveal: false };
   const L = 10, LO = 0.25;
+  let ctrls = {}, dragging = false, last3d = 0, pending3d = false;
   const schedule = U.scheduler(render);
   const pref = () => ({ type: state.type, alpha: state.alpha, rho: state.rho });
   const f3 = v => fmt(v, 3);
@@ -85,7 +86,7 @@
       U.line2(ic, th.ink, 2.5, 'indifference curve u(x°)'),
       U.line2([[xo[0] - 8 * z[0], xo[1] - 8 * z[1]], [xo[0] + 8 * z[0], xo[1] + 8 * z[1]]], th.muted, 1.5, 'tangent line', 'dash'),
       U.dot2([[xo[0] + 1.5 * z[0], xo[1] + 1.5 * z[1]]], th.muted, "x' on the tangent", 7),
-      U.dot2([xo], th.ink, 'x°', 10)
+      U.dot2([xo], th.ink, 'x° (drag it)', 14)
     ];
     const annotations = [
       { x: arrow[0], y: arrow[1], ax: xo[0], ay: xo[1], axref: 'x', ayref: 'y', showarrow: true, arrowhead: 2, arrowwidth: 2.5, arrowcolor: th.blue, text: '' },
@@ -120,17 +121,31 @@
     tex($('formula'), FORMULA[state.type](pref()), true);
     const th = U.theme();
     let R = null;
-    guard('surfaces', () => { R = draw3d(th); });
+    // while x° is dragged, the 3D figure (slow to redraw) follows at most 15 times a second, and exactly on release
+    const now = performance.now();
+    if (!dragging || now - last3d > 66) { last3d = now; guard('surfaces', () => { R = draw3d(th); }); }
+    else {
+      if (!pending3d) { pending3d = true; setTimeout(() => { pending3d = false; schedule(); }, 70); }
+      R = { P: pref(), T: OM.TRANSFORMS[state.t], xo: [state.a1, state.a2], xp: [state.b1, state.b2] };
+    }
     if (R) { guard('ranking', () => renderRanking(R)); guard('Theorem 1', () => drawTheorem(th, R)); }
   }
 
   function init() {
     U.renderStaticTex();
     // rho = 0 is the Cobb-Douglas limit (its own option): the slider skips it so that the number shown is the number used.
-    U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: schedule });
+    ctrls = U.controls(document, state, { adjust: (k, v) => (k === 'rho' && Math.abs(v) < 0.05 ? (v < 0 ? -0.05 : 0.05) : v), onChange: schedule });
     $('type').addEventListener('change', e => { state.type = e.target.value; schedule(); });
     $('transform').addEventListener('change', e => { state.t = e.target.value; state.reveal = false; schedule(); });
     $('revealMRS').addEventListener('click', () => { state.reveal = !state.reveal; schedule(); });
+    // Drag x° in the Theorem 1 figure: it sets x°₁ and x°₂.
+    const lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v)), r2 = v => Math.round(v * 100) / 100;
+    U.dragPoint('plotB', {
+      start: () => { dragging = true; },
+      end: () => { dragging = false; schedule(); },
+      target: () => [state.a1, state.a2],
+      move: ([x, y]) => { ctrls.a1.setExact(r2(lim('a1', x))); ctrls.a2.setExact(r2(lim('a2', y))); }
+    });
     render();
     U.watchColorScheme(schedule);
   }

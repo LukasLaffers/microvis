@@ -8,3 +8,5 @@ table.effects td:hover { outline: 0; }
 .row-inc th, .row-inc td { color: var(--l2-red); }
 .badge-kind { display: inline-block; padding: 1px 8px; border-radius: 0; font-size: 12px; font-weight: 700; border: 1px solid currentColor; }
 .c-inc { color: var(--inc); }
+/* On a phone the figures come first (the points in them can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

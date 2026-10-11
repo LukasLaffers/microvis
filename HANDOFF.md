@@ -51,8 +51,18 @@ After a UX review of all tools the user chose three directions: (1) less on scre
 - Phone: `grid-template-areas: "main" "controls" "side"` in the tool's style.css.
 - Version tag **12**.
 
+### 4e. Merged on 11 October (#25): the pattern on all 33 tiles
+Done in eight parallel batches (each in its own tool folders), then reviewed and checked together. On every tile: secondary settings in `details.more` "More settings" at the end of the controls (wording that pointed to folded controls now says "(under More settings)"); natural objects draggable with `Microvis.dragPoint` (bundles, prices, endowments, level lines, test bundles, the "now" point of the smooth animations; never in 3D; not while an animation plays); captions start with what can be dragged; on phones the figure comes first (`grid-template-areas` in each tool's style.css). Notes:
+- Figures whose axes depend on the dragged value hold their axes still during the drag and rescale on release (Comparative Statics, Cost Curves, Monopoly, Budget Sets, UMP/EMP, CV/EV, Deadweight Loss, Slutsky's demand panel, Robinson Crusoe, Market Supply); one drag therefore reaches only the edge of the current frame.
+- Several handles in one figure: a small local "nearest handle" capture listener before `U.dragPoint` (budget-sets, preference-axioms, comparative-statics, marshall-law, translog, cv-ev, input-requirement-sets, edgeworth-box). A shared multi-target `dragPoint` would remove the copies (not done).
+- `dragPoint`'s move() gives axis coordinates: log10 values on log axes; the tools with log axes convert (two-technologies, translog, marshall-law).
+- Market Supply and Externalities: the market panel moved onto the main axis (firms on x2/x3) so it can be dragged.
+- No drag where nothing natural to grab: One Step vs Two Steps, Homogeneous and Homothetic, the 3D figures.
+- Shared fixes in this round: `U.overlay` draws diamond and star markers and re-hooks its repaint after a rebuild; `U.plot` uses `Plotly.newPlot` when the ranges of an equal-scale figure change (Plotly.react kept the old domain: Production Explorer's plot range squeezed the map). Version tag **13**.
+- Phones, not changed (were so before): some header formulas and long step equations scroll inside their box; the Plotly mode bar overlaps a 3D title in Utility Is Ordinal; crowded labels in the three-panel Market Supply / Externalities figures.
+
 ### Next
-The user approved the prototype ("merge it and do the same for the other tiles"): roll it out to all other tiles (see 4e).
+Nothing requested. Touch drags were tested on only some tiles; the user was asked to try a few on the iPhone.
 
 ### 5. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
@@ -73,7 +83,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 
 - Plain HTML/CSS/JS, no build step for pages; Plotly 2.35.2 and KaTeX 0.16.9 vendored in `shared/vendor/`; works offline and from `file://`.
 - `tools/catalog.cjs` (tools in lecture order, tile sentence) + `tools/glyphs.cjs` (64 px tile drawings) → `node tools/build-site.cjs` writes `index.html` and, in every tool page: the "Microvis /" header link, previous/next links, the light/dark switch (button + `<head>` line + `shared/theme.js`), and the GoatCounter line. Run it after any catalog/glyph change; it is idempotent.
-- Version tags: our CSS/JS are linked as `?v=N` (now **12**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=12"' index.html */index.html | xargs sed -i 's/?v=12"/?v=13"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
+- Version tags: our CSS/JS are linked as `?v=N` (now **13**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=13"' index.html */index.html | xargs sed -i 's/?v=13"/?v=14"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
 - Hover previews on tiles: `<tool>/preview.webp` and `preview-dark.webp`, made with `tools/previews.cjs` (Playwright).
 - `style-kit/`: a copy of the look for a new project (README = style guide). Keep `style-kit/shared/{style.css,ui.js,theme.js}` in step with `shared/`.
 - Dark mode: tokens on `:root`, `data-theme` set by the switch; figures redraw on the `microvis-theme` event via `Microvis.watchColorScheme`.
@@ -101,7 +111,7 @@ In Claude's cloud container Playwright is at `/opt/node22/lib/node_modules/playw
 - Cache: a new page with an old cached stylesheet broke the start page once → version tags + inline width/height on tile SVGs + `style="display:none"` on previews.
 
 ## History (merged PRs)
-#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz · #21 Homogeneous and Homothetic: same isoquants, different outputs (another session) · #22 lecture 4–6 review fixes, Check your answer, Giffen good without a function · #23 smooth animations on an SVG overlay (`Microvis.overlay`) · #24 Production Explorer prototype: More settings, drag the point, figures first on phones.
+#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz · #21 Homogeneous and Homothetic: same isoquants, different outputs (another session) · #22 lecture 4–6 review fixes, Check your answer, Giffen good without a function · #23 smooth animations on an SVG overlay (`Microvis.overlay`) · #24 Production Explorer prototype: More settings, drag the point, figures first on phones · #25 the same pattern on all tiles.
 
 ## Ideas offered, not requested
 Per-tool view counts on each tool page; tighter crops for some hover previews (Production Explorer); keep tile titles visible on hover.

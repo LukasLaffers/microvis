@@ -21,9 +21,10 @@
 
   let ctrls = {};
   const schedule = U.scheduler(render);
-  // While an animation plays, captions and tables are rewritten at most ten times a second (each rewrite lays out the page).
-  let writeText = true, lastText = 0;
-  const textDue = () => { if (!state.playing) return true; const t = performance.now(); if (t - lastText < 100) return false; lastText = t; return true; };
+  // While an animation plays or the point is dragged, captions and tables are rewritten at most ten times a second
+  // (each rewrite lays out the page).
+  let writeText = true, lastText = 0, dragging = false;
+  const textDue = () => { if (!state.playing && !dragging) return true; const t = performance.now(); if (t - lastText < 100) return false; lastText = t; return true; };
   const N = 160;   // steps along the smooth change
 
   // The smooth change of w1 is computed only in that mode, and again only when a parameter other than t changes.
@@ -193,7 +194,7 @@
     const label = (z, text, color, dx) => annotations.push({ x: z[0], y: z[1], text, showarrow: false, xanchor: dx > 0 ? 'left' : 'right', yanchor: 'bottom', xshift: dx, yshift: 4, font: { size: 15, color } });
     moving.push(U.dot2([A], th.ink, 'A = D(w,p)', 10)); label(A, 'A', th.ink, 8);
     moving.push(U.dot2([C], th.muted, "C = D(w',p)", 9)); label(C, 'C', th.muted, 8);
-    moving.push(U.dot2([D], th.ink, 'the firm now', 13));
+    moving.push(U.dot2([D], th.ink, 'the firm now (drag it)', 15));
 
     // Bars at the bottom of the figure (changes in z1), growing together: substitution, scale and their sum, accumulated so far.
     const h = yr[1] - yr[0], row = i => yr[0] + (0.035 + 0.04 * i) * h;
@@ -220,7 +221,7 @@
     else if (s.tech === 'linear') cap = 'Linear: the firm uses only the cheaper input, so when w₁ passes the switch price the bundle jumps to the other axis.';
     else if (!writeText) cap = null;
     else cap = `${texStr(`w_1=${fmt(now.w1)}`)}, output ${texStr(`q=${fmt(qNow)}`)}. The firm moves along the black path from A to C. At every moment it substitutes (blue arrow, along the current isoquant) and scales down (red arrow, along the current expansion path) at the same time; the two arrows add up to the black one, the direction of the path.`;
-    if (cap !== null) $('cap-main').innerHTML = cap;
+    if (cap !== null) $('cap-main').innerHTML = (r.qA > 0 ? `<b>Drag the black point</b> along the path to change ${texStr('t')}. ` : '') + cap;
   }
 
   // ---------- why output falls ----------
@@ -331,6 +332,7 @@
     $('play-steps').setAttribute('aria-pressed', String(state.mode === 'steps'));
     $('play-smooth').setAttribute('aria-pressed', String(state.mode === 'smooth'));
     document.querySelectorAll('[data-profile]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.profile === state.profile)));
+    $('plot').classList.toggle('drag-plot', state.mode === 'smooth');   // the grab cursor only where there is a point to drag
     // "w1 after" ranges from half to three times "w1 before".
     ctrls.w1n.setRange(Number((0.5 * state.w1).toFixed(2)), Number((3 * state.w1).toFixed(2)));
     if (state.w1n < ctrls.w1n.min || state.w1n > ctrls.w1n.max) { state.w1n = U.clampTo(state.w1n, ctrls.w1n.min, ctrls.w1n.max); ctrls.w1n.sync(); }
@@ -375,6 +377,26 @@
     $('marginal').addEventListener('change', e => { state.marginal = e.target.checked; schedule(); });
     $('play-steps').addEventListener('click', playSteps);
     $('play-smooth').addEventListener('click', playSmooth);
+    // In the smooth picture, drag the firm's point along its path: it sets t (the moving parts stay on the overlay).
+    const smoothPath = () => (state.mode === 'smooth' && !state.playing && cache.path ? cache.path : null);
+    U.dragPoint('plot', {
+      start: () => { dragging = true; },
+      end: () => { dragging = false; schedule(); },   // the last frame writes the captions and the table in full
+      target: () => { const P = smoothPath(); return P ? at(P, state.t).D : null; },
+      move: ([x, y]) => {
+        const P = smoothPath();
+        if (!P) return;
+        // the point of the path nearest to the pointer
+        let best = Infinity, tBest = state.t;
+        for (let i = 0; i < N; i++) {
+          const a = P.D[i], b = P.D[i + 1], d = [b[0] - a[0], b[1] - a[1]], dd = d[0] * d[0] + d[1] * d[1];
+          const f = dd > 0 ? U.clampTo(((x - a[0]) * d[0] + (y - a[1]) * d[1]) / dd, 0, 1) : 0;
+          const e = Math.hypot(a[0] + f * d[0] - x, a[1] + f * d[1] - y);
+          if (e < best) { best = e; tBest = (i + f) / N; }
+        }
+        ctrls.t.setExact(U.clampTo(tBest, ctrls.t.min, ctrls.t.max));
+      }
+    });
     render();
     U.watchColorScheme(schedule);
   }

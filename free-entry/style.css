@@ -2,3 +2,5 @@
 .plot-firm { height: 480px; }
 @media (max-width: 800px) { .plot-firm { height: 360px; } }
 .no-eq .plot, .no-eq .caption, .no-eq #checks, .no-eq #readouts { visibility: hidden; }
+/* On a phone the figures come first (a point in them can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

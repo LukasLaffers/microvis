@@ -3,3 +3,5 @@
 .c-green { color: #3d9a40; }
 .plot-box { touch-action: auto; cursor: default; }
 #nButtons { margin-top: 4px; }
+/* On a phone the figures come first (y can be dragged along the core), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

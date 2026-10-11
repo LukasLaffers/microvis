@@ -35,13 +35,17 @@
   }
 
   const isHomog = () => state.profile === 'homog';
+  const priceHandle = P => [P.qs > 0 ? P.qs : 0, P.p];
+  let dragYMax = null, lastYMax = null;
   const kOne = () => Math.abs(state.k - 1) < 1e-9;
 
   // ---------- main plot: MC, AC, supply ----------
 
   function drawMain(th, P) {
     const { s, w, p, S, hat, qs, Pi } = P, qmax = state.qmax, traces = [], annotations = [], shapes = [];
-    const pm = priceMax(), yMax = Math.max(0.6 * pm, 1.25 * p, hat.pHat ? 1.6 * hat.pHat : 0, 1);
+    // while the price is dragged the price axis stays as it was, so the point follows the pointer
+    const pm = priceMax(), yMax = dragYMax || Math.max(0.6 * pm, 1.25 * p, hat.pHat ? 1.6 * hat.pHat : 0, 1);
+    lastYMax = yMax;
     const qq = linspace(qmax / 600, qmax, 600);
     const mc = qq.map(q => FM.MC(w, q, s)), ac = qq.map(q => FM.AC(w, q, s));
     const clip = v => (Number.isFinite(v) && v < yMax * 3 ? v : null);
@@ -86,7 +90,6 @@
       box('Increasing returns to scale: MC is falling and lies below AC.<br>Profit grows without limit for any price, so there is<br>no optimal output under price taking (compare lecture 1:<br>a > 1 is not meaningful).');
     } else if (kOne()) {
       box(S.kind === 'zero' ? 'Price below unit cost: produce nothing.' : S.kind === 'indeterminate' ? 'Any output is optimal (zero profit).' : 'Profit grows without limit: no optimal output.');
-      if (S.kind === 'zero') traces.push(U.dot2([[0, p]], th.ink, 'q* = 0', 12));
     } else {
       if (S.kind === 'indifferent') box('Indifferent between q = 0 and q = q̂ (zero profit).');
       if (Pi > 1e-9) {
@@ -97,10 +100,11 @@
       if (qs > 0) {
         shapes.push({ type: 'line', x0: qs, x1: qs, y0: 0, y1: p, line: { color: th.ink, width: 1, dash: 'dot' } });
         annotations.push({ x: qs, y: 0, text: 'q* = S(w,p)', showarrow: false, yanchor: 'bottom', xanchor: 'left', xshift: 4, yshift: 4, font: { size: 12, color: th.ink } });
-        traces.push(U.dot2([[qs, p]], th.ink, 'optimum (q*, p)', 13));
       }
-      if (S.kind === 'zero' || S.kind === 'indifferent') traces.push(U.dot2([[0, p]], th.ink, 'q* = 0', 12));
+      if (S.kind === 'indifferent') traces.push(U.dot2([[0, p]], th.ink, 'q* = 0', 12));
     }
+    // The point that sets the price: the optimum (q*, p), or p on the vertical axis when there is none.
+    traces.push(U.dot2([priceHandle(P)], th.ink, qs > 0 ? 'optimum (q*, p) (drag it)' : S.kind === 'zero' ? 'q* = 0 at price p (drag it)' : 'price p (drag it)', 15));
 
     Plotly.react('plot', traces, U.base2d(th, {
       xt: 'q', yt: 'p', x: { range: [-0.012 * qmax, qmax] }, y: { range: [0, yMax] }, annotations, shapes,
@@ -223,6 +227,13 @@
     ctrls = U.controls(document, state, { onChange: schedule });
     document.querySelectorAll('[data-profile]').forEach(b => b.addEventListener('click', () => { state.profile = b.dataset.profile; schedule(); }));
     $('tech').addEventListener('change', e => { state.tech = e.target.value; schedule(); });
+    // Drag the point up or down: it sets the output price p (the optimum follows along the supply curve).
+    U.dragPoint('plot', {
+      start: () => { dragYMax = lastYMax; },
+      end: () => { dragYMax = null; schedule(); },
+      target: () => priceHandle(solve()),
+      move: ([, y]) => ctrls.p.setExact(Number(U.clampTo(y, ctrls.p.min, ctrls.p.max).toFixed(2)))
+    });
     render();
     U.watchColorScheme(schedule);
   }
