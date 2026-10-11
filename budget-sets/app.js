@@ -42,8 +42,6 @@
       const pv = BM.pivot(p, b);
       if (pv) traces.push(U.dot2([pv], th.blue, 'stays affordable at any p₁', 11));
     }
-    // The end of the blue line on the x1-axis: drag it to change p1'.
-    if (Pn.intercepts.x1 <= L) traces.push(U.dot2([[Pn.intercepts.x1, 0]], th.blue, "p₁′: end of the blue line (drag it)", 14, { cliponaxis: false }));
     if (b.type === 'B2' || b.type === 'B3') {
       traces.push(U.dot2([[state.R1, state.R2]], th.ink, 'endowment R (drag it)', 14, { cliponaxis: false }));
       annotations.push({ x: state.R1, y: state.R2, text: 'R', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 6, font: { size: 14, color: th.ink } });
@@ -88,7 +86,7 @@
       B3: `Income and endowment: the line turns about ${texStr('(R_1,\\,R_2+y/p_2)')}.`,
       tariff: `Good 2 costs an entrance fee ${texStr('F')} on top of ${texStr('p_2')} per unit. Buying none of it avoids the fee, so the set is the smaller triangle plus the segment on the ${texStr('x_1')}-axis: not convex.`
     }[b.type];
-    const drag = `<b>Drag the cross</b> to test a bundle${b.type === 'B2' || b.type === 'B3' ? `, ${texStr('R')} to move the endowment` : ''}, the blue dot on the ${texStr('x_1')}-axis to change ${texStr("p_1'")}. `;
+    const drag = `<b>Drag the cross</b> to test a bundle${b.type === 'B2' || b.type === 'B3' ? `, ${texStr('R')} to move the endowment` : ''}. `;
     $('cap').innerHTML = `${drag}<span class="c-ink">Grey: budget-feasible bundles at the old price ${texStr(`p_1=${f2(state.p1)}`)}</span>${changed ? `; <span class="c-l2-blue"><span class="key"></span>budget line at the new price ${texStr(`p_1'=${f2(state.p1n)}`)}</span>` : ''}. ${what}`;
   }
 
@@ -111,13 +109,12 @@
     ctrls = U.controls(document, state, { onChange: schedule });
     document.querySelectorAll('[data-b]').forEach(e => e.addEventListener('click', () => { state.b = e.dataset.b; schedule(); }));
     document.querySelectorAll('[data-x]').forEach(e => e.addEventListener('click', () => { state.X = e.dataset.x; schedule(); }));
-    // Three points can be grabbed: the test bundle, the endowment R and the end of the blue line (p1').
+    // Two points can be grabbed: the test bundle and the endowment R.
     // A press within 24 px of one takes it; a mouse press anywhere else moves the test bundle there.
     const gd = $('plot'), lim = (k, v) => Math.min(ctrls[k].max, Math.max(ctrls[k].min, v)), r2 = v => Math.round(v * 100) / 100;
     const HANDLES = {
       test: () => state.test,
-      R: () => (state.b === 'B2' || state.b === 'B3' ? [state.R1, state.R2] : null),
-      p1n: () => [BM.pieces([state.p1n, state.p2], budget(), feasSet()).intercepts.x1, 0]
+      R: () => (state.b === 'B2' || state.b === 'B3' ? [state.R1, state.R2] : null)
     };
     let grab = 'test', dragging = false;
     const pick = ev => {
@@ -140,13 +137,6 @@
       move: ([x, y]) => {
         x = Math.max(0, x); y = Math.max(0, y);
         if (grab === 'R') { ctrls.R1.setExact(r2(lim('R1', x))); ctrls.R2.setExact(r2(lim('R2', y))); return; }
-        if (grab === 'p1n') {
-          // the blue line meets the x1-axis at y/p1' (B1, tariff) or at R1 + (p2 R2 [+ y])/p1' (B2, B3)
-          const b = budget(), c = b.type === 'B1' || b.type === 'tariff' ? b.y : state.p2 * state.R2 + (b.type === 'B3' ? b.y : 0);
-          const x0 = b.type === 'B1' || b.type === 'tariff' ? 0 : state.R1;
-          if (c > 0) ctrls.p1n.setExact(r2(lim('p1n', x > x0 ? c / (x - x0) : ctrls.p1n.max)));
-          return;
-        }
         state.test = [Math.round(x * 20) / 20, state.X === 'integer' ? Math.round(y) : Math.round(y * 20) / 20];
         schedule();
       }

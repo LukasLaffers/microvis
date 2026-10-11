@@ -12,7 +12,7 @@
   const { $, fmt, tex, texStr, guard } = U;
 
   const state = { reveal: false, view: 'ump', type: 'ces', delta: 0.4, rho: -1, a: 0.4, g1: 1, g2: 0.5, kappa: 5, p1: 1, p2: 1, y: 10, v: 4 };
-  let ctrls = {}, frozenL = null;
+  let ctrls = {};
   const schedule = U.scheduler(render);
   const f3 = x => fmt(x, 3);
   const same = (a, b) => Math.abs(a - b) <= 1e-5 * Math.max(1, Math.abs(a), Math.abs(b));
@@ -32,7 +32,7 @@
 
   function draw(th, S) {
     // the axes stay fixed while the budget line is dragged, so they do not move under the pointer
-    const { u, p, y, v, x } = S, L = frozenL || plotMax(S);
+    const { u, p, y, v, x } = S, L = plotMax(S);
     const x1s = U.linspace(L / 400, L, 300), ic = lev => CM.indifferenceCurve(lev, u, x1s).map(([a, b]) => [a, b !== null && b <= L * 1.05 ? b : null]);
     const traces = [], annotations = [];
     const line = (m, color, width, name, dash) => U.line2([[m / p[0], 0], [0, m / p[1]]], color, width, name, dash);
@@ -50,12 +50,10 @@
       traces.push(U.line2(ic(v), th.blue, 3, `indifference curve U = v = ${f3(v)}`));
     }
     traces.push(U.dot2([x], th.red, state.view === 'ump' ? 'D(p,y)' : 'H(p,v)', 12));
-    // where the budget line meets the x1-axis, y/p1: drag it to change p1
-    if (y / p[0] <= L) traces.push(U.dot2([[y / p[0], 0]], th.ink, 'p₁: end of the budget line (drag it)', 14, { cliponaxis: false }));
     annotations.push({ x: x[0], y: x[1], text: state.view === 'ump' ? 'x* = D(p, y)' : 'x* = H(p, v)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { size: 13, color: th.red } });
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('head').textContent = state.view === 'ump' ? 'Reach the highest indifference curve (UMP)' : 'Reach v at the lowest cost (EMP)';
-    $('cap').innerHTML = `<b>Drag the dot</b> on the ${texStr('x_1')}-axis to change ${texStr('p_1')}. ` + (state.view === 'ump'
+    $('cap').innerHTML = (state.view === 'ump'
       ? `<span class="c-muted"><span class="key dotted"></span>Dotted</span>: a lower indifference curve (affordable, not the best) and a higher one (not affordable). With income ${texStr(`y=${f3(y)}`)} the best affordable bundle is ${texStr(`D(p,y)=(${f3(x[0])},${f3(x[1])})`)} on the indifference curve ${texStr(`V(p,y)=${f3(v)}`)}. Switch to EMP: asked to reach ${texStr(`v=${f3(v)}`)} at least cost, the consumer picks the same bundle and spends exactly ${texStr('y')}.`
       : `<span class="c-muted"><span class="key dash"></span>Dashed</span>: a cheaper line that cannot reach ${texStr('v')} and a dearer one that is not the cheapest. To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`);
   }
@@ -128,25 +126,8 @@
       if (b.dataset.view === 'emp') ctrls.v.setExact(S.v); else ctrls.y.setExact(S.y);
       state.view = b.dataset.view; schedule();
     }));
-    // Drag p1: at the end of the budget line in the main figure, or along the p1-axis of the two small figures.
+    // Drag p1 along the p1-axis of the two small figures.
     const lim = v => Math.min(ctrls.p1.max, Math.max(ctrls.p1.min, v)), r2 = v => Math.round(v * 100) / 100;
-    U.dragPoint('plot', {
-      start: () => { frozenL = plotMax(solve()); },
-      end: () => { frozenL = null; schedule(); },
-      target: () => { const S = solve(); return [S.y / S.p[0], 0]; },
-      move: ([x]) => {
-        if (!(x > 0)) return;
-        // (UMP) the line ends at y/p1; (EMP) at C(p,v)/p1, which falls as p1 rises: find p1 by bisection
-        if (state.view === 'ump') { ctrls.p1.setExact(r2(lim(state.y / x))); return; }
-        const u = pref(), end = q => CM.expenditure([q, state.p2], state.v, u) / q;
-        let lo = ctrls.p1.min, hi = ctrls.p1.max;
-        if (!Number.isFinite(end(lo)) || !Number.isFinite(end(hi))) return;
-        if (end(lo) <= x) { ctrls.p1.setExact(lo); return; }
-        if (end(hi) >= x) { ctrls.p1.setExact(hi); return; }
-        for (let k = 0; k < 50; k++) { const m = (lo + hi) / 2; if (end(m) > x) lo = m; else hi = m; }
-        ctrls.p1.setExact(r2((lo + hi) / 2));
-      }
-    });
     for (const id of ['plotV', 'plotC']) U.dragPoint(id, {
       target: () => { const S = solve(); return [S.p[0], id === 'plotV' ? S.v : CM.expenditure(S.p, S.v, S.u)]; },
       move: ([x]) => ctrls.p1.setExact(r2(lim(x)))
