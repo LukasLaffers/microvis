@@ -19,14 +19,8 @@
 
   // ---------- input space ----------
 
-  // The handle that turns the isocost line: a point on the line, up and to the left of H (or down and to the right
-  // when there is no room), inside the plot of width R.
-  function handle(H, R) {
-    const n = Math.hypot(1, state.w1), u = [-1 / n, state.w1 / n], L = 0.18 * R;
-    const inside = z => z[0] > 0.03 * R && z[0] < 0.97 * R && z[1] > 0.03 * R && z[1] < 0.97 * R;
-    for (const sg of [1, -1]) { const z = [H[0] + sg * L * u[0], H[1] + sg * L * u[1]]; if (inside(z)) return z; }
-    return null;
-  }
+  // log price axes from 0.1 to 10 labelled in full (Plotly's own minor labels read 0.5 as "5")
+  const LOG_TICKS = { tickvals: [0.1, 0.2, 0.5, 1, 2, 5, 10], ticktext: ['0.1', '0.2', '0.5', '1', '2', '5', '10'] };
 
   function drawMain(th, s, r) {
     const w = [state.w1, 1], q = state.q, k = s.alpha + s.beta, zk = Math.pow(q, 1 / k), R = 2.3 * zk;
@@ -60,9 +54,7 @@
     // The isocost line through the cheapest bundle, and the bundle itself.
     const c = r.C;
     traces.push(U.line2([[c / w[0], 0], [0, c / w[1]]], th.grey, 2, 'isocost line'));
-    traces.push(U.dot2([r.H], th.ink, 'H(w,q)', 13));
-    const hd = handle(r.H, R);
-    if (hd) traces.push(U.dot2([hd], th.grey, 'isocost line, slope −w₁/w₂ (drag it)', 14));
+    traces.push(U.dot2([r.H], th.ink, 'H(w,q) (drag it)', 15));
     annotations.push({ x: r.H[0], y: r.H[1], text: 'H', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, yshift: 4, font: { size: 14, color: th.ink } });
     U.plot('plot', traces, U.base2d(th, {
       xt: 'z<sub>1</sub>', yt: 'z<sub>2</sub>', annotations, shapes,
@@ -80,7 +72,7 @@
     } else {
       cap = `Firm C produces with the better technology, so it needs only one of them to reach ${texStr('q')}: here ${texStr(`\\phi_${r.regime}`)}, the one that uses more of the ${r.regime === 'A' ? 'cheaper input 1' : 'cheaper input 2'}. At ${texStr('w_1=w_2')} it switches, and the cheapest bundle jumps across the kink.`;
     }
-    $('cap').innerHTML = `<b>Drag the grey handle</b> to turn the isocost line: its slope is ${texStr('-w_1/w_2')}. ` + cap;
+    $('cap').innerHTML = `<b>Drag H</b> along the isoquant: the price ${texStr('w_1')} that makes it the cheapest bundle follows. ` + cap;
   }
 
   // ---------- H1 and C against w1 ----------
@@ -93,18 +85,18 @@
     const pts = [];
     rows.forEach((row, i) => { if (i && Math.abs(row.H[0] - rows[i - 1].H[0]) > 0.2 * row.H[0]) pts.push([null, null]); pts.push([row.H[0], row.x]); });
     const [lo, hi] = K.kinkRange(s);
-    const shapesH = state.firm === 'D' ? [{ type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: Math.log10(lo), y1: Math.log10(hi), fillcolor: th.accentSoft, line: { width: 0 }, layer: 'below' }] : [];
+    const shapesH = state.firm === 'D' ? [{ type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: lo, y1: hi, fillcolor: th.accentSoft, line: { width: 0 }, layer: 'below' }] : [];
     // explicit ranges: U.plot only moves the points while the layout stays the same, so the axes must follow q here
     const hMax = 1.08 * Math.max(...rows.map(row => row.H[0]).filter(Number.isFinite), r.H[0], 1e-6);
     const cMax = 1.08 * Math.max(...rows.map(row => row.C).filter(Number.isFinite), r.C, 1e-6);
     U.plot('plotH', [U.line2(pts, th.ink, 2.5, 'H¹'), U.dot2([[r.H[0], state.w1]], th.ink, 'now (drag it)', 14)], U.base2d(th, {
-      xt: 'z<sub>1</sub> = H<sup>1</sup>(w<sub>1</sub>, 1, q)', yt: 'w<sub>1</sub>', x: { range: [0, hMax] }, y: { type: 'log', range: [-1, 1] }, shapes: shapesH
+      xt: 'z<sub>1</sub> = H<sup>1</sup>(w<sub>1</sub>, 1, q)', yt: 'w<sub>1</sub>', x: { range: [0, hMax] }, y: { type: 'log', range: [-1, 1], ...LOG_TICKS }, shapes: shapesH
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('capH').innerHTML = '<b>Drag the point</b> up or down to change ' + texStr('w_1') + '. ' + (state.firm === 'D'
       ? `In the shaded band, ${texStr(`${fmt(lo)}\\le w_1/w_2\\le ${fmt(hi)}`)}, the firm stays at the kink: ${texStr('H^1')} is vertical, a change of ${texStr('w_1')} does not change the input mix.`
       : `At ${texStr('w_1=w_2')} the firm switches technology and ${texStr('H^1')} jumps: there is no price at which it would choose a bundle in between.`);
     U.plot('plotC', [U.line2(rows.map(row => [row.x, row.C]), th.ink, 2.5, 'C'), U.dot2([[state.w1, r.C]], th.ink, 'now (drag it)', 14)], U.base2d(th, {
-      xt: 'w<sub>1</sub>', yt: 'C', x: { type: 'log', range: [-1, 1] }, y: { range: [0, cMax] }
+      xt: 'w<sub>1</sub>', yt: 'C', x: { type: 'log', range: [-1, 1], ...LOG_TICKS }, y: { range: [0, cMax] }
     }), { ...U.PLOT_CONFIG, displayModeBar: false });
     $('capC').innerHTML = `<b>Drag the point</b> to change ${texStr('w_1')}. Concave in ${texStr('w_1')}, with slope ${texStr('H^1')} (Shephard's lemma)${state.firm === 'D' ? `; a straight line in the band, where ${texStr('H^1')} is fixed` : `; a corner at ${texStr('w_1=w_2')}, where ${texStr('H^1')} jumps`}. Now ${texStr(`C=${fmt(r.C)}`)}.`;
   }
@@ -151,17 +143,24 @@
     ctrls = U.controls(document, state, { onChange: schedule });
     document.querySelectorAll('[data-firm]').forEach(b => b.addEventListener('click', () => { state.firm = b.dataset.firm; schedule(); }));
     document.querySelectorAll('[data-w1]').forEach(b => b.addEventListener('click', () => ctrls.w1.setExact(Number(b.dataset.w1))));
-    // Drags: the handle turns the isocost line around H (its slope is −w1/w2, w2 = 1); the points on H¹ and C move w1.
-    const setW1 = v => { if (Number.isFinite(v)) ctrls.w1.setExact(U.clampTo(v, ctrls.w1.min, ctrls.w1.max)); };
-    const now = () => K.costMin([state.w1, 1], state.q, tech(), state.firm);
+    // Drag H along the isoquant (q stays): w1 is the price whose cheapest bundle is nearest the pointer (at the kink of
+    // firm D many prices give the same bundle: then the one nearest the current w1, so the isocost line does not jump).
+    const GRID = U.logspace(ctrls.w1.min, ctrls.w1.max, 301);
     U.dragPoint('plot', {
-      target: () => { const s = tech(), R = 2.3 * Math.pow(state.q, 1 / (s.alpha + s.beta)); return handle(now().H, R); },
+      target: () => now().H,
       move: ([x, y]) => {
-        // the slope of the line from H to the pointer; a pointer beside H or above it gives the flattest or the steepest line
-        const H = now().H, d = [x - H[0], y - H[1]];
-        setW1(d[0] * d[1] < 0 ? -d[1] / d[0] : Math.abs(d[0]) > Math.abs(d[1]) ? ctrls.w1.min : ctrls.w1.max);
+        const s = tech(), z = [x, y], q = state.q, tol = 1e-9, dist = w1 => { const H = K.costMin([w1, 1], q, s, state.firm).H; return Math.hypot(H[0] - z[0], H[1] - z[1]); };
+        let best = null;
+        for (const w1 of GRID) {
+          const d = dist(w1);
+          if (!best || d < best.d - tol || (d <= best.d + tol && Math.abs(Math.log(w1 / state.w1)) < Math.abs(Math.log(best.w1 / state.w1)))) best = { d, w1 };
+        }
+        ctrls.w1.setExact(best.w1);
       }
     });
+    // Drags: the points on H¹ and C move w1.
+    const setW1 = v => { if (Number.isFinite(v)) ctrls.w1.setExact(U.clampTo(v, ctrls.w1.min, ctrls.w1.max)); };
+    const now = () => K.costMin([state.w1, 1], state.q, tech(), state.firm);
     // the price axes are logarithmic: the drag gives log10(w1)
     U.dragPoint('plotH', { target: () => [now().H[0], state.w1], move: ([, y]) => setW1(Math.pow(10, y)) });
     U.dragPoint('plotC', { target: () => [state.w1, now().C], move: ([x]) => setW1(Math.pow(10, x)) });
