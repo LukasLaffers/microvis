@@ -61,8 +61,11 @@ Done in eight parallel batches (each in its own tool folders), then reviewed and
 - Shared fixes in this round: `U.overlay` draws diamond and star markers and re-hooks its repaint after a rebuild; `U.plot` uses `Plotly.newPlot` when the ranges of an equal-scale figure change (Plotly.react kept the old domain: Production Explorer's plot range squeezed the map). Version tag **13**.
 - Phones, not changed (were so before): some header formulas and long step equations scroll inside their box; the Plotly mode bar overlaps a 3D title in Utility Is Ordinal; crowded labels in the three-panel Market Supply / Externalities figures.
 
+### 4f. 11 October, on the branch: Two Technologies
+User: the grey point in the main figure "looks like a bug", the drag "wonky". It was a handle (added in #25) that turned the isocost line around H: removed; the main figure has no drag again, the two side figures keep theirs (they move w₁ smoothly). Also fixed there: the shaded kink band in the H¹ panel was drawn at w₁ 0.1–0.5 instead of 0.33–3 (shape coordinates on a log axis are data values, not log10), and the log price axes now label 0.2 and 0.5 in full. Lesson: a drag handle that is not an economic object of the figure confuses; only grab things the figure is about.
+
 ### Next
-Nothing requested. Touch drags were tested on only some tiles; the user was asked to try a few on the iPhone.
+Wait for the user's verdict on 4f, then merge.
 
 ### 5. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
