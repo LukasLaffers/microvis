@@ -4,7 +4,7 @@ Read this first, then `CLAUDE.md` (conventions, notation) and `style-kit/README.
 
 ## The project in two lines
 
-Interactive figures for Lukáš Lafférs' lecture notes in microeconomic theory (lectures 1–9), 33 tools.
+Interactive figures for Lukáš Lafférs' lecture notes in microeconomic theory (lectures 1–9), 34 tools.
 Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (GitHub Pages from `main`, about 1 minute after a merge).
 
 ## Start here: what is open
@@ -66,6 +66,9 @@ User: the grey point in the main figure "looks like a bug", the drag "wonky". It
 
 ### 4g. Merged on 11 October (#27, #28): only economic objects can be dragged
 User agreed to remove the handles added in #25 that are not economic objects: the dot at the end of the budget line on the x₁-axis (Budget Sets, UMP and EMP), the grey points on the price lines (Robinson Crusoe, Edgeworth Box), the dot on AR (Monopoly), the dots on demand (Market Supply, both panels). Robinson Crusoe, Monopoly and Market Supply have no drag now (their app.js is back to #24, their More settings and phone order stay). Still draggable: test bundle and R (Budget Sets), the "now" points on V and C (UMP/EMP), R and the target star (Edgeworth Box), and the other tiles' real objects. Then (#28) also the handle on Cost Minimisation's isocost line (where it crossed the expansion path): the main figure has no drag, the cost level is set with its slider again; the point on the H¹(w₁) figure stays draggable. Version tag **15**.
+
+### 4h. Not merged yet (12 October): Cross-Price Effects
+New tool `cross-price-effects/` (lecture 4, after What If? Comparative Statics), from the exercise at the top of page 4 of the lecture 4 notes (∂Dⁱ/∂wⱼ, j ≠ i; predict ∂Dʲ/∂wᵢ). The user first wanted a mock-up, then asked for the math to be checked rigorously and for uncluttered cases. Three firms φ = g^{1/2} (CES g, δ = 0.5) that differ only in σ (3, 2, 0.5; under More settings), all start at z = (1, 1), q = 1 (w = (1, 1), p = 4). w₂′ (slider, or drag C in a lower figure) gives A → B → C per firm: input 1 rises / does not move (σ = 2 = 1/(1−k): the effects cancel exactly) / falls. Table at w = (1, 1): substitution σ/2, scale −1; the ∂D²/∂w₁ column behind "Check your answer". No decomposition formula on the page (it is the exercise's answer). Layout: the table goes under the three firms (tool CSS overrides the grid). `model.js` uses `shared/firm-model.js`; `test-model.cjs` compares with an independent brute-force firm.
 
 ### Next
 Nothing open. Touch drags tested on only some tiles.

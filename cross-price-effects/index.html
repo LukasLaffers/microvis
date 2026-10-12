@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cross-Price Effects · Microvis</title>
+  <meta name="description" content="A higher price of input 2: three firms that differ only in the elasticity of substitution use more, the same or less of input 1. Substitution and scale effects of a cross-price change, and the symmetry of the cross effects. Lecture 4.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=15">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div>
+      <p class="eyebrow"><a href="../index.html#l4">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 4 · Theory of the firm</p>
+      <h1>Cross-Price Effects</h1>
+      <p class="subtitle">Input 2 gets dearer. Does the firm use more or less of input 1?</p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>When <span class="tex" data-tex="w_2"></span> rises, the firm first substitutes towards input 1 at the old output (<span class="c-l2-blue">A → B</span>), then produces less and uses less of both inputs (<span class="c-l2-red">B → C</span>). The first effect raises the demand for input 1, the second lowers it; which one wins depends on how easily the inputs substitute.</p>
+          <ul>
+          <li>Compare the three firms: they start at the same bundle and differ only in <span class="tex" data-tex="\sigma"></span>.</li>
+          <li>Change <span class="tex" data-tex="w_2'"></span>, or drag C in a lower figure: each firm keeps the direction of its response.</li>
+          <li>Predict <span class="tex" data-tex="\partial D^2/\partial w_1"></span> from the table, then press <b>Check your answer</b>.</li>
+          </ul>
+        </details>
+      </div>
+
+      <div class="group">
+        <h2>The three firms</h2>
+        <div class="formula" id="formula"></div>
+        <p class="note">At <span class="tex" data-tex="w=(1,1)"></span> and <span class="tex" data-tex="p=4"></span> each firm produces <span class="tex" data-tex="q=1"></span> with <span class="tex" data-tex="z=(1,1)"></span>.</p>
+      </div>
+
+      <div class="group">
+        <h2>Price change</h2>
+        <div class="ctrl" data-key="w2n" data-label="w_2'" data-hint="new price of input 2 (was 1)" data-min="0.25" data-max="4" data-step="0.05"></div>
+        <div class="btn-row"><button type="button" id="defaults">Default values</button></div>
+      </div>
+
+      <details class="more" id="more">
+        <summary>More settings</summary>
+        <p class="note">The elasticity of substitution of each firm.</p>
+        <div class="group">
+          <div class="ctrl" data-key="sigA" data-label="\sigma_{\text{left}}" data-hint="" data-min="0.2" data-max="5" data-step="0.05"></div>
+          <div class="ctrl" data-key="sigB" data-label="\sigma_{\text{middle}}" data-hint="" data-min="0.2" data-max="5" data-step="0.05"></div>
+          <div class="ctrl" data-key="sigC" data-label="\sigma_{\text{right}}" data-hint="" data-min="0.2" data-max="5" data-step="0.05"></div>
+        </div>
+      </details>
+    </section>
+
+    <section class="panel main-panel" aria-label="Three firms">
+      <div class="panel-head"><h2 id="mainTitle">One price change, three firms</h2></div>
+      <div class="cases" id="cases"></div>
+      <p class="caption"><b>Drag C</b> up or down in a lower figure to set <span class="tex" data-tex="w_2'"></span>. Top: <span class="c-ink"><span class="key"></span>isoquant</span> of the old output and <span class="c-muted"><span class="key dotted"></span>of the new one</span>, <span class="c-l2-grey"><span class="key"></span>isocost lines</span> at A (old prices) and B (new prices). Bottom: <span class="c-l2-blue"><span class="key dash"></span>conditional demand <span class="tex" data-tex="H^1"></span> at the old output</span> and <span class="c-ink"><span class="key"></span>unconditional demand <span class="tex" data-tex="D^1"></span></span>, against <span class="tex" data-tex="w_2"></span>.</p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="Marginal effects" aria-live="polite">
+        <h2>Marginal effects at <span class="tex" data-tex="w=(1,1)"></span></h2>
+        <table class="data effects" id="effects"></table>
+        <div class="btn-row"><button type="button" id="reveal" aria-pressed="false">Check your answer</button></div>
+        <p class="note" id="answer" hidden></p>
+      </section>
+    </div>
+  </main>
+
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../comparative-statics/index.html"><span>Previous</span>What If? Comparative Statics</a>
+    <a class="all" href="../index.html#l4">All tools</a>
+    <a class="next" href="../marshall-law/index.html"><span>Next</span>Marshall's Law of Derived Demand</a>
+  </nav>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js?v=15"></script>
+  <script src="../shared/firm-model.js?v=15"></script>
+  <script src="model.js?v=15"></script>
+  <script src="app.js?v=15"></script>
+  <script src="../shared/theme.js?v=15"></script>
+  <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
+</body>
+</html>

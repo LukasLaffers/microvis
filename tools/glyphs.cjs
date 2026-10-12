@@ -72,6 +72,9 @@ G['substitution-scale-effects'] = svg(AX + L(iso(500)) + S(iso(230)) + D(31, 32.
 
 // Lecture 4
 G['comparative-statics'] = svg(AX + L([[18.8, 8], [39.8, 55]]) + A([[9, 12], [52, 55]]) + D(30, 33));
+// three demand curves for input 1 against w2 through one starting point: input 1 rises, stays, falls
+G['cross-price-effects'] = svg(AX + S(fn(y => 34 - 0.004 * (y - 31) * Math.abs(y - 31) - 0.35 * (y - 31), 8, 54).map(([y, x]) => [x, y])) +
+  L([[34, 8], [34, 54]]) + A(fn(y => 34 + 0.004 * (y - 31) * Math.abs(y - 31) + 0.35 * (y - 31), 8, 54).map(([y, x]) => [x, y])) + D(34, 31));
 G['marshall-law'] = svg(AX + L(fn(x => 55 - 280 / (x - 3), 10, 59)) + A([[12, 12], [56, 50]], 2) + S([[24, 22.4], [38, 22.4], [38, 34.6]]) + D(24, 22.4));
 { // cost share against log price: data and a straight line
   const pts = [[14, 46], [19, 44], [23, 38], [28, 39], [32, 33], [37, 31], [41, 27], [46, 25], [50, 19], [55, 18]];
