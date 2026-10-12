@@ -45,7 +45,7 @@
       }
       traces.push(U.line2(ic(v), th.blue, 3, `indifference curve V(p,y) = ${f3(v)}`));
     } else {
-      for (const k of [0.75, 1.25]) traces.push(line(y * k, th.grey, 1.2, k < 1 ? 'cheaper: cannot reach v' : 'dearer: not the cheapest', 'dash'));
+      for (const k of [0.75, 1.25]) traces.push(line(y * k, th.grey, 1.2, k < 1 ? 'cheaper: cannot reach v' : 'more expensive: not the cheapest', 'dash'));
       traces.push(line(y, th.ink, 2.5, `cheapest expenditure line p·x = C(p,v) = ${f3(y)}`));
       traces.push(U.line2(ic(v), th.blue, 3, `indifference curve U = v = ${f3(v)}`));
     }
@@ -55,7 +55,7 @@
     $('head').textContent = state.view === 'ump' ? 'Reach the highest indifference curve (UMP)' : 'Reach v at the lowest cost (EMP)';
     $('cap').innerHTML = (state.view === 'ump'
       ? `<span class="c-muted"><span class="key dotted"></span>Dotted</span>: a lower indifference curve (affordable, not the best) and a higher one (not affordable). With income ${texStr(`y=${f3(y)}`)} the best affordable bundle is ${texStr(`D(p,y)=(${f3(x[0])},${f3(x[1])})`)} on the indifference curve ${texStr(`V(p,y)=${f3(v)}`)}. Switch to EMP: asked to reach ${texStr(`v=${f3(v)}`)} at least cost, the consumer picks the same bundle and spends exactly ${texStr('y')}.`
-      : `<span class="c-muted"><span class="key dash"></span>Dashed</span>: a cheaper line that cannot reach ${texStr('v')} and a dearer one that is not the cheapest. To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`);
+      : `<span class="c-muted"><span class="key dash"></span>Dashed</span>: a cheaper line that cannot reach ${texStr('v')} and a more expensive one that is not the cheapest. To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`);
   }
 
   function renderChecks(S) {

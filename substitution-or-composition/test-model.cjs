@@ -26,7 +26,7 @@ for (const eta of [0, 0.5, 2, M.NOTES_ETA, 8]) for (const wK of [0.7, 1, 1.6]) f
   // (iii) Apparent substitution: positive for eta > 0, zero for eta = 0.
   const s = M.apparentSigma(wE, wK, eta);
   if (eta === 0) close(s, 0, 1e-9); else assert.ok(s > 0, 'apparent sigma > 0');
-  // A dearer energy price moves output to the capital-intensive firm.
+  // A higher energy price moves output to the capital-intensive firm.
   if (eta > 0) assert.ok(M.economy(wE * 1.1, wK, eta).qE < e.qE);
   // (iv) Over a small range of prices the regression slope equals the derivative.
   const r = M.regression([0.99, 0.995, 1, 1.005, 1.01].map(v => v * wE), wK, eta);

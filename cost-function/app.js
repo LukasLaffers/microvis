@@ -95,7 +95,7 @@
     }
     Plotly.react('plotA', box.traces, box.layout(), U.PLOT_CONFIG);
     $('capA').innerHTML = `At ${texStr(`\\bar w_1=${fmt(wbar[0])}`)}: ${texStr('H=')}${U.pt(zbar[0], zbar[1], 3)}. At ${texStr(`w_1=${fmt(wp[0])}`)}: ${texStr('H=')}${U.pt(zp[0], zp[1], 3)}` +
-      (P.s.tech === 'leontief' ? ' — the same bundle: no substitution.' : ': the firm moves along the isoquant, away from the input that became dearer.');
+      (P.s.tech === 'leontief' ? ' — the same bundle: no substitution.' : ': the firm moves along the isoquant, away from the input whose price rose.');
   }
 
   // ---------- panel 3: scaling all prices ----------

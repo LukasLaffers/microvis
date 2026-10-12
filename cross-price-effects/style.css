@@ -1,0 +1,21 @@
+/* Cross-Price Effects: tool-specific styles (shared look is in ../shared/style.css). */
+/* The three firms need the width: the table goes under the figures. */
+.layout { grid-template-columns: 300px minmax(0, 1fr); grid-template-areas: "controls main" "controls side"; }
+.layout > .side { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 1250px) { .layout { grid-template-areas: "main main" "controls side"; } }
+/* On a phone the figures come first, the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }
+
+.cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 10px 18px; }
+.case h3 { margin: 0; font-size: 15px; }
+.case .sub { margin: 2px 0 4px; font-size: 13px; color: var(--muted); }
+.case .plot-iso { height: 290px; }
+.case .plot-dem { height: 240px; }
+.case .line { margin: 2px 0 0; font-size: 13px; font-variant-numeric: tabular-nums; }
+.plot-dem { touch-action: auto; }
+
+table.effects td { cursor: default; }
+table.effects td:hover { outline: none; }
+table.effects th:first-child { text-align: left; }
+table.effects td.hidden-answer { color: var(--muted); }
+.readouts .btn-row { margin-top: 10px; }
