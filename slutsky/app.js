@@ -124,7 +124,7 @@
     const fall = pn[0] < p[0];
     $('head').textContent = headText(S);
     $('cap').innerHTML = `The price of good 1 ${fall ? 'falls' : 'rises'} from ${fmt(p[0])} to ${fmt(pn[0])}. ${texStr('E_1\\to E_2')}: <span class="c-l2-blue">substitution</span> along the indifference curve ${texStr('v^0')}, to where its slope equals the new price ratio (the dotted blue line is the budget line that would just let her stay on ${texStr('v^0')}, with income ${texStr(`C(p',v^0)=${f3(d.yc)}`)}). ${texStr('E_2\\to E_3')}: <span class="c-l2-red">income effect</span>, a parallel shift to the actual new budget line.` +
-      (S.cls.kind === 'giffen' ? ` Here the income effect on good 1 (${f3(d.income[0])}) outweighs the substitution effect (${f3(d.substitution[0])}): she buys ${fall ? 'less' : 'more'} of good 1 although it got ${fall ? 'cheaper' : 'dearer'}.` : '');
+      (S.cls.kind === 'giffen' ? ` Here the income effect on good 1 (${f3(d.income[0])}) outweighs the substitution effect (${f3(d.substitution[0])}): she buys ${fall ? 'less' : 'more'} of good 1 although its price ${fall ? 'fell' : 'rose'}.` : '');
   }
 
   // ---------- the smooth change ----------

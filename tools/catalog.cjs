@@ -22,7 +22,7 @@ module.exports = [
   ] },
   { id: 'l4', lecture: 4, nav: 'Comparative statics', title: 'Comparative statics: “what if” questions', tools: [
     ['comparative-statics', 'What If? Comparative Statics', 'How output and input demand respond to prices, and why ordinary demand is flatter than conditional demand.'],
-    ['cross-price-effects', 'Cross-Price Effects', 'When input 2 gets dearer, a firm can use more, the same or less of input 1.'],
+    ['cross-price-effects', 'Cross-Price Effects', 'When the price of input 2 rises, a firm can use more, the same or less of input 1.'],
     ['marshall-law', "Marshall's Law of Derived Demand", 'The elasticity of labour demand as a weighted average of substitution and product demand.'],
     ['translog', 'Translog Cost Shares', 'Cost shares that are linear in log prices, and what Arnberg and Bjørner (2007) found.'],
     ['substitution-or-composition', 'Substitution or Composition?', 'Two firms that cannot substitute, whose aggregate data still look like substitution.']
