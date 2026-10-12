@@ -1,4 +1,4 @@
-# Handoff: Microvis (state on 10 October 2026)
+# Handoff: Microvis (state on 12 October 2026)
 
 Read this first, then `CLAUDE.md` (conventions, notation) and `style-kit/README.md` (the design and writing style).
 
@@ -6,6 +6,14 @@ Read this first, then `CLAUDE.md` (conventions, notation) and `style-kit/README.
 
 Interactive figures for Lukáš Lafférs' lecture notes in microeconomic theory (lectures 1–9), 34 tools.
 Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (GitHub Pages from `main`, about 1 minute after a merge).
+
+## Continuing in a new session (another account)
+
+1. Read this file, `CLAUDE.md` and `style-kit/README.md`; `git log --oneline -15 origin/main` shows the latest merges.
+2. Work on the branch the new session is given (this session used `claude/vigilant-carson-p2wfrl`; in the commands below, use your own branch name). Start it from `origin/main`.
+3. Use the new account's commit and PR trailers; no model names anywhere.
+4. Run the checks below before every preview; previews are raw.githack links with the full commit SHA; merge only on "merge it".
+5. Main is at #30 (12 October); nothing is unmerged.
 
 ## Start here: what is open
 
@@ -67,11 +75,22 @@ User: the grey point in the main figure "looks like a bug", the drag "wonky". It
 ### 4g. Merged on 11 October (#27, #28): only economic objects can be dragged
 User agreed to remove the handles added in #25 that are not economic objects: the dot at the end of the budget line on the x₁-axis (Budget Sets, UMP and EMP), the grey points on the price lines (Robinson Crusoe, Edgeworth Box), the dot on AR (Monopoly), the dots on demand (Market Supply, both panels). Robinson Crusoe, Monopoly and Market Supply have no drag now (their app.js is back to #24, their More settings and phone order stay). Still draggable: test bundle and R (Budget Sets), the "now" points on V and C (UMP/EMP), R and the target star (Edgeworth Box), and the other tiles' real objects. Then (#28) also the handle on Cost Minimisation's isocost line (where it crossed the expansion path): the main figure has no drag, the cost level is set with its slider again; the point on the H¹(w₁) figure stays draggable. Version tag **15**.
 
-### 4h. Not merged yet (12 October): Cross-Price Effects
-New tool `cross-price-effects/` (lecture 4, after What If? Comparative Statics), from the exercise at the top of page 4 of the lecture 4 notes (∂Dⁱ/∂wⱼ, j ≠ i; predict ∂Dʲ/∂wᵢ). The user first wanted a mock-up, then asked for the math to be checked rigorously and for uncluttered cases. Three firms φ = g^{1/2} (CES g, δ = 0.5) that differ only in σ (3, 2, 0.5; under More settings), all start at z = (1, 1), q = 1 (w = (1, 1), p = 4). w₂′ (slider, or drag C in a lower figure) gives A → B → C per firm: input 1 rises / does not move (σ = 2 = 1/(1−k): the effects cancel exactly) / falls. Table at w = (1, 1): substitution σ/2, scale −1; the ∂D²/∂w₁ column behind "Check your answer". The decomposition formula is in the header (user's wish, 12 October). The word "dearer" was replaced on every page (user does not like it): say "the price of … rises" or "more expensive". Layout: the table goes under the three firms (tool CSS overrides the grid). `model.js` uses `shared/firm-model.js`; `test-model.cjs` compares with an independent brute-force firm.
+### 4h. Merged on 12 October (#29, #30): Cross-Price Effects; no "dearer"
+- **New tool `cross-price-effects/`** (lecture 4, after What If? Comparative Statics; 34 tiles now), from the exercise at the top of page 4 of the lecture 4 notes (∂Dⁱ/∂wⱼ, j ≠ i; "can you predict ∂Dʲ/∂wᵢ?"). How it came about: the user first asked for a mock-up only ("before producing any tile, just plot it"), then for the math to be checked rigorously and for uncluttered cases, then for the tile.
+- Three firms φ = g^{1/2} (CES g, δ = 0.5) that differ only in σ (3, 2, 0.5; the three σ under More settings). At w = (1, 1), p = 4 all three produce q = 1 with z = (1, 1) (c(1,1) = 2 for every σ when δ = 0.5). w₂′ (slider, or drag C in a lower figure; axes held during the drag) gives A → B (substitution, blue) → C (scale, red) per firm: input 1 rises (gross substitutes) / does not move (σ = 2 = 1/(1−k): the effects cancel exactly, D¹ is vertical) / falls (gross complements). The direction does not depend on w₂′: ∂ln D¹/∂ln w₂ = s₂(σ − 1/(1−k)).
+- Top figures: isoquants of the old and new output, short isocost pieces at A and B, dotted drop lines from A and C. Bottom figures: z₁ against w₂, H¹ at the old output (dashed blue) and D¹ (black). All three firms share the axes.
+- Table at w = (1, 1): substitution σ/2, scale −1, ∂D¹/∂w₂ (fmtSum); the ∂D²/∂w₁ column shows "?" until **Check your answer**.
+- The decomposition formula is in the header (the user wanted it, although it is the exercise's answer): ∂D¹(w,p)/∂w₂ = ∂H¹/∂w₂ + (−1/C_qq)(∂H¹/∂q)(∂H²/∂q).
+- Layout: the table goes under the three firms (`cross-price-effects/style.css` overrides the grid: "controls main" / "controls side"; ≤1250 px "main main" / "controls side"; phone: figures first).
+- `model.js` uses `shared/firm-model.js`; `test-model.cjs` (298 checks) compares everything with an independent brute-force firm written in the test (cost minimisation along the isoquant, golden-section profit maximisation): A, B, C, the decomposition, dS/dw₂ = −(1/C_qq)∂H²/∂q, symmetry term by term, Hotelling (−Π₁₂), the elasticity formula, the default numbers.
+- **"Dearer" removed from every page** (the user does not like the word): use "the price of … rises" or "more expensive".
+- #30: header formulas write D with its arguments, ∂Dⁱ(w,p)/∂wᵢ (user), in Cross-Price Effects and What If? Comparative Statics; Comparative Statics' "+" was blue (see Lessons: `\textcolor`).
 
 ### Next
-Nothing open. Touch drags tested on only some tiles.
+Nothing requested. Open, small:
+- Lecture 4 is taught on 13 October (date on the notes); the user may come back with lecture 4 exercises (pattern: mock-up first, then the tile).
+- Other formulas still use KaTeX `\color{…}{…}`, which also colours what follows it in the same group: `comparative-statics/app.js`, `marshall-law/app.js` and `index.html`, `slutsky/index.html`, `substitution-scale-effects/index.html`. Check each for a wrongly coloured operator; switch to `\textcolor` where needed.
+- Touch drags tested on only some tiles.
 
 ### 5. Visitor counter (GoatCounter)
 Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct). The footer total ("Lukáš Lafférs · N visits", start page only) appears only after the user ticks **Settings → "Allow adding visitor counts on your website"** in GoatCounter; told the user, not confirmed. The cloud environment's network policy blocks `microvis.goatcounter.com` and `lukaslaffers.github.io`, so it cannot be checked from the container unless those hosts are allowed.
@@ -84,15 +103,17 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 - Commit messages end with the co-author / session trailers of the current account; PR bodies end with the "Generated with Claude Code" line. No model names in commits, PRs or code.
 - Never put the user's contact details (email etc.) on the site. No course code or university name on pages.
 - Design taste: minimal, Helvetica/Arial, square corners, hairlines, black/white plus one blue; no "AI look" (no rounded boxes, coloured stripes, many colours). "Complexity is our enemy."
-- Writing: academic, precise, short; no slogans, no rhetorical questions, no "watch …"/"meet …". Tile = one plain sentence; "How to read this" = idea in 2–3 sentences + a short list of things to try. Do not give closed-form answers to the notes' exercises (show numbers).
-- Two tools are "advanced" and marked only with an asterisk on their tile (no explanation): Concavity and Returns to Scale, The Core Shrinks.
+- Writing: academic, precise, short; no slogans, no rhetorical questions, no "watch …"/"meet …"; never the word "dearer". Tile = one plain sentence; "How to read this" = idea in 2–3 sentences + a short list of things to try. By default do not give closed-form answers to the notes' exercises (show numbers); the user may still want a formula shown (Cross-Price Effects header): ask or follow the user.
+- Notation: as in the notes, with arguments where the notes write them (Dⁱ(w,p), Hⁱ(w,q)).
+- New tiles from the notes or assignments: the user often wants to see a mock-up first. Make a static HTML page in the scratchpad (loading `shared/` by absolute file:// paths), screenshot it with Playwright and send the image; build the tile only when asked. Check the math independently (brute force) before showing numbers.
+- Three tools are "advanced" and marked only with an asterisk on their tile (no explanation): Two Technologies and a Kink, Concavity and Returns to Scale, The Core Shrinks.
 - An old local clone (GitHub Desktop) twice pushed merge commits with conflict markers ("tgf" commits). If that happens: do not force-push over the user's work; commit the correct tree on top.
 
 ## How the site is built
 
 - Plain HTML/CSS/JS, no build step for pages; Plotly 2.35.2 and KaTeX 0.16.9 vendored in `shared/vendor/`; works offline and from `file://`.
 - `tools/catalog.cjs` (tools in lecture order, tile sentence) + `tools/glyphs.cjs` (64 px tile drawings) → `node tools/build-site.cjs` writes `index.html` and, in every tool page: the "Microvis /" header link, previous/next links, the light/dark switch (button + `<head>` line + `shared/theme.js`), and the GoatCounter line. Run it after any catalog/glyph change; it is idempotent.
-- Version tags: our CSS/JS are linked as `?v=N` (now **13**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=13"' index.html */index.html | xargs sed -i 's/?v=13"/?v=14"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise.
+- Version tags: our CSS/JS are linked as `?v=N` (now **15**). Raise N in all pages whenever a shared CSS/JS file changes (`grep -l '?v=15"' index.html */index.html | xargs sed -i 's/?v=15"/?v=16"/g'`, then `node tools/build-site.cjs`). A tag that is not yet merged/deployed does not need another raise. When only a tool's own app.js/style.css changes in a way that breaks an old cached copy (new element ids), raise that page's own tags.
 - Hover previews on tiles: `<tool>/preview.webp` and `preview-dark.webp`, made with `tools/previews.cjs` (Playwright).
 - `style-kit/`: a copy of the look for a new project (README = style guide). Keep `style-kit/shared/{style.css,ui.js,theme.js}` in step with `shared/`.
 - Dark mode: tokens on `:root`, `data-theme` set by the switch; figures redraw on the `microvis-theme` event via `Microvis.watchColorScheme`.
@@ -117,10 +138,13 @@ In Claude's cloud container Playwright is at `/opt/node22/lib/node_modules/playw
 - `requestAnimationFrame`'s first time stamp can be earlier than the click: clamp animation progress at 0 (red banners otherwise).
 - Plotly 3D: switching the camera between perspective and orthographic creates a new WebGL context each time; use `U.react3d`.
 - `U.plot` only moves points when the layout is unchanged: give axes explicit ranges if they must follow the data.
+- KaTeX `\color{c}{x}` is a switch: it colours everything after it in the group, so `\color{blue}{a}+\color{red}{b}` paints the "+" blue. Use `\textcolor{c}{x}` (the dark-mode CSS handles both).
+- Screenshots and scratch files: write them to the scratchpad with absolute paths; a script run from the repo once dropped two PNGs into a commit (`git add -A`).
+- `pkill -f <name>` also matches the shell running it and kills your own command.
 - Cache: a new page with an old cached stylesheet broke the start page once → version tags + inline width/height on tile SVGs + `style="display:none"` on previews.
 
 ## History (merged PRs)
-#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz · #21 Homogeneous and Homothetic: same isoquants, different outputs (another session) · #22 lecture 4–6 review fixes, Check your answer, Giffen good without a function · #23 smooth animations on an SVG overlay (`Microvis.overlay`) · #24 Production Explorer prototype: More settings, drag the point, figures first on phones · #25 the same pattern on all tiles · #26 Two Technologies: drag H along the isoquant, kink band fixed · #27 non-economic drag handles removed · #28 also the isocost handle in Cost Minimisation.
+#2 lectures 3–9 (21 tools) · #4 typo fixes · #5 Concavity and Returns to Scale · #6 asterisks · #7 Building the MRTS · #8 Homogeneous and Homothetic, Two Elasticities · #9 new design, Safari fixes, Engel D/E, tile drawings + previews · #10 cache fix · #11 redesign (one-line tiles, guides, prev/next, new drawings) · #12 style kit, plainer wording · #13 GoatCounter · #14 light/dark switch · #15 two animation buttons, two decimals, error-banner fix · #16 Slutsky and Engel animations, buttons in figure headings, smoother animations (U.plot) · #17 Excess Demand · #18 Two Technologies and a Kink · #19 its tile position · #20 bug hunt: all items of BUGS.md fixed, react3d, fitIncome, check-fuzz · #21 Homogeneous and Homothetic: same isoquants, different outputs (another session) · #22 lecture 4–6 review fixes, Check your answer, Giffen good without a function · #23 smooth animations on an SVG overlay (`Microvis.overlay`) · #24 Production Explorer prototype: More settings, drag the point, figures first on phones · #25 the same pattern on all tiles · #26 Two Technologies: drag H along the isoquant, kink band fixed · #27 non-economic drag handles removed · #28 also the isocost handle in Cost Minimisation · #29 Cross-Price Effects (lecture 4), no "dearer" on any page · #30 Dⁱ(w,p) in the header formulas.
 
 ## Ideas offered, not requested
 Per-tool view counts on each tool page; tighter crops for some hover previews (Production Explorer); keep tile titles visible on hover.
