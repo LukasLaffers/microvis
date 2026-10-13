@@ -149,6 +149,24 @@ for (const e of economies) {
   // a < 3: only p = 1 (E'(1) = a - 3 < 0)
   assert.deepEqual(X.equilibria(quad(2.8, [4, 4], [4, 0])).map(q => Math.round(q.p * 1e6) / 1e6), [1]);
   checks += 3;
+  // The statements on the Edgeworth Box page, for every a on its slider (2 to 4) with R in the corner:
+  for (let a = 2; a <= 4 + 1e-9; a += 0.25) {
+    const ex = quad(a, [4, 4], [4, 0]), h = 1e-6;
+    for (let p = 0.05; p < 20; p *= 1.03) {
+      // Alf, who sells good 1, keeps more of it as its price rises exactly when p > 2/a (and x2 > 0)
+      const x1 = q => X.demands(ex, q).xa[0], d = (x1(p + h) - x1(p - h)) / (2 * h), x2 = X.demands(ex, p).xa[1];
+      if (x2 > 1e-9 && Math.abs(p - 2 / a) > 1e-3) { assert.equal(d > 0, p > 2 / a, `Alf's good 1, a ${a}, p ${p}`); checks++; }
+      // both offer curves pass through R, at different prices: Alf demands R for p <= 1/a, Bill for p >= a
+      const d0 = X.demands(ex, p), atR = Math.hypot(d0.xa[0] - 4, d0.xa[1]) < 1e-9, bAtR = Math.hypot(d0.xb[0], d0.xb[1] - 4) < 1e-9;
+      if (Math.abs(p - 1 / a) > 1e-9) { assert.equal(atR, p < 1 / a, 'Alf at R'); checks++; }
+      if (Math.abs(p - a) > 1e-9) { assert.equal(bAtR, p > a, 'Bill at R'); checks++; }
+    }
+    // E1 rises at p = 1 exactly when a > 3, and then there are three equilibria
+    const s1 = (X.excess(ex, 1 + h)[0] - X.excess(ex, 1 - h)[0]) / (2 * h);
+    close(s1, a - 3, 1e-6, "E1'(1) = a - 3");
+    assert.equal(X.equilibria(ex).length, a > 3 + 1e-9 ? 3 : 1, `number of equilibria, a ${a}`);
+    checks += 2;
+  }
 }
 
 console.log(`All ${checks} exchange-model checks passed.`);
