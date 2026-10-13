@@ -104,4 +104,51 @@ for (const e of economies) {
   checks += 3;
 }
 
+// Bergstrom, Shimomura and Yamato (2009), Example 1: U^a = x1 + a x2 - x2^2/2, U^b = a x1 - x1^2/2 + x2, a = 7/2,
+// R^a = (4, 0), R^b = (0, 4). Equilibria at p = p1/p2 = 1/2, 1, 2 (the paper's p is p2/p1: the same set), bundles as in
+// the paper, the middle one unstable.
+{
+  const quad = (a, O, Ra) => ({ ua: { type: 'quadlinear', lin: 1, a }, ub: { type: 'quadlinear', lin: 2, a }, Omega: O, Ra });
+  const e = quad(3.5, [4, 4], [4, 0]), eqs = X.equilibria(e);
+  assert.deepEqual(eqs.map(q => Math.round(q.p * 1e6) / 1e6), [0.5, 1, 2]);
+  assert.deepEqual(eqs.map(q => q.stable), [true, false, true]);
+  const paper = [[[1, 1.5], [3, 2.5]], [[1.5, 2.5], [2.5, 1.5]], [[2.5, 3], [1.5, 1]]];
+  eqs.forEach((q, i) => { for (const j of [0, 1]) { close(q.xa[j], paper[i][0][j], 1e-7, 'x^a'); close(q.xb[j], paper[i][1][j], 1e-7, 'x^b'); } });
+  checks += 2 + 12;
+  // excess demand for good 1 at interior prices: E1 = a - p - a/p + 1/p^2 = (p - 1)(a - 1 - p - 1/p)/p (the paper's (16))
+  for (let k = 0; k < 50; k++) {
+    const p = 0.3 + 2.9 * rnd(), E = X.excess(e, p);
+    close(E[0], 3.5 - p - 3.5 / p + 1 / (p * p), 1e-9, 'E1 closed form');
+    close(p * E[0] + E[1], 0, 1e-9, 'Walras');
+    close(X.excess(e, 3 * p, 3)[0], E[0], 1e-9, 'homogeneity');
+    checks += 3;
+  }
+  // MRS in closed form against numerical marginal utilities; equilibria on the contract curve and in the core
+  for (let k = 0; k < 50; k++) {
+    const x = [0.2 + 3 * rnd(), 0.2 + 3 * rnd()];
+    close(X.mrs(x, e.ua), CM.mrs21(x, e.ua), 1e-5, 'MRS^a'); close(X.mrs(x, e.ub), CM.mrs21(x, e.ub), 1e-5, 'MRS^b');
+    checks += 2;
+  }
+  const [lo, hi] = X.coreRange(e);
+  for (const q of eqs) {
+    close(X.contractX2(e, q.xa[0]), q.xa[1], 1e-7, 'equilibrium on the contract curve');
+    close(X.mrs(q.xa, e.ua), q.p, 1e-7, 'MRS^a = p'); close(X.mrs(q.xb, e.ub), q.p, 1e-7, 'MRS^b = p');
+    assert.ok(q.xa[0] >= lo - 1e-9 && q.xa[0] <= hi + 1e-9, 'in the core');
+    checks += 4;
+  }
+  // Second welfare theorem along the contract curve
+  for (const x1 of [1.2, 2, 3]) {
+    const w = X.support(e, x1), hit = X.equilibria(e, w.T).find(q => Math.abs(q.p - w.p) < 1e-5 * w.p);
+    assert.ok(hit, 'supporting price after the transfer'); close(hit.xa[0], w.xa[0], 1e-5); close(hit.xa[1], w.xa[1], 1e-5);
+    checks += 3;
+  }
+  // Neutrality (Theorem 2): larger endowments, the same equilibrium prices
+  assert.deepEqual(X.equilibria(quad(3.5, [6, 6], [6, 0])).map(q => Math.round(q.p * 1e6) / 1e6), [0.5, 1, 2]);
+  // Working backwards (Remark 7): a = 1 + 3 + 1/3 puts the equilibria at 1/3, 1, 3 (endowments above 1 + 3)
+  assert.deepEqual(X.equilibria(quad(1 + 3 + 1 / 3, [5, 5], [5, 0])).map(q => Math.round(q.p * 1e6) / 1e6), [0.333333, 1, 3]);
+  // a < 3: only p = 1 (E'(1) = a - 3 < 0)
+  assert.deepEqual(X.equilibria(quad(2.8, [4, 4], [4, 0])).map(q => Math.round(q.p * 1e6) / 1e6), [1]);
+  checks += 3;
+}
+
 console.log(`All ${checks} exchange-model checks passed.`);
