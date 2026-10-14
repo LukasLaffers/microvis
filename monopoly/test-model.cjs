@@ -46,6 +46,44 @@ for (const s of techs) for (const d of demands) {
   checks += 2;
 }
 
+// Constant-elasticity view: C = F + q^2 and demand through the bottom of AC. Checked against brute force; one
+// solution of MR = MC; as demand becomes more elastic p -> MC and profit and deadweight loss fall to 0.
+for (const F of [4, 2.25]) {
+  const s = { profile: 'quadF', F }, qHat = Math.sqrt(F), pHat = 2 * qHat;
+  // AC is lowest at qHat, where AC = MC = pHat (grid)
+  let lo = Infinity, qlo = 0;
+  for (let q = 0.001; q < 3 * qHat; q += 0.001) { const v = M.ACAt(W, q, s); if (v < lo) { lo = v; qlo = q; } }
+  close(qlo, qHat, 2e-3, 'qHat'); close(lo, pHat, 1e-6, 'min AC'); close(M.MCAt(W, qHat, s), pHat, 1e-12, 'MC = AC there');
+  close((M.costAt(W, 1.3 + 1e-6, s) - M.costAt(W, 1.3 - 1e-6, s)) / 2e-6, M.MCAt(W, 1.3, s), 1e-6, 'MC = C\'');
+  checks += 4;
+  let prevProfit = Infinity, prevDwl = Infinity;
+  for (const ae of [1.2, 1.5, 2, 3, 5, 8, 12, 20, 35, 50]) {
+    const e = -ae, d = M.anchoredCE(e, W, s), label = JSON.stringify({ F, e });
+    close(M.price(qHat, d), pHat, 1e-12, 'demand through the bottom of AC ' + label);
+    const o = M.optimum(W, s, d);
+    let best = -Infinity, qb = 0, crossings = 0, prevSign = null;
+    for (let q = 0.0005; q <= M.qLimit(d, s); q += 0.0005) {
+      const v = M.profitAt(q, W, s, d); if (v > best) { best = v; qb = q; }
+      const sign = M.MR(q, d) > M.MCAt(W, q, s); if (prevSign !== null && sign !== prevSign) crossings++; prevSign = sign;
+    }
+    assert.equal(crossings, 1, 'MR = MC once ' + label);
+    close(o.q, qb, 1e-3, 'q* ' + label); close(o.profit, best, 1e-7, 'profit ' + label);
+    close(o.MR, o.MC, 1e-9, 'MR = MC ' + label); close(o.p / o.MC, e / (1 + e), 1e-9, 'markup ' + label);
+    close(o.profit, (o.p - o.AC) * o.q, 1e-9, 'profit rectangle ' + label);
+    const c = M.competitive(W, s, d); close(c.q, qHat, 1e-9, 'price taker q ' + label); close(c.p, pHat, 1e-9, 'price taker p ' + label);
+    // deadweight loss against a fine midpoint sum
+    let dw = 0; const n = 20000, h = (c.q - o.q) / n; for (let k = 0; k < n; k++) { const q = o.q + (k + 0.5) * h; dw += (M.price(q, d) - M.MCAt(W, q, s)) * h; }
+    const dwl = M.deadweightLoss(W, s, d, o.q, c.q); close(dwl, dw, 1e-6, 'deadweight loss ' + label);
+    assert.ok(o.profit > 0 && o.profit < prevProfit && dwl < prevDwl, 'profit and deadweight loss fall ' + label);
+    assert.ok(o.q < qHat && o.p > pHat, 'less output at a higher price ' + label);
+    prevProfit = o.profit; prevDwl = dwl;
+    checks += 14;
+  }
+  const far = M.optimum(W, s, M.anchoredCE(-1e4, W, s));
+  close(far.p, far.MC, 1e-3, 'very elastic demand: p -> MC'); close(far.profit, 0, 1e-6, 'profit -> 0'); close(far.q, qHat, 1e-3, 'q* -> price taker');
+  checks += 3;
+}
+
 // Long run with differentiated products: at A* profit is zero and AR is tangent to AC where MR = MC.
 for (const s of techs) for (const B of [0.5, 1, 2]) {
   const As = M.tangencyIntercept(W, s, B), d = { type: 'linear', A: As, B }, o = M.optimum(W, s, d);

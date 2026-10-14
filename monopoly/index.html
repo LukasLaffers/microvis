@@ -7,8 +7,8 @@
   <meta name="description" content="A monopolist sets marginal revenue equal to marginal cost, p = MC/(1 + 1/η), and earns (AR − AC)q. With differentiated products, entry of substitutes pushes average revenue down until it is tangent to average cost. Lecture 5.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=16">
-  <link rel="stylesheet" href="style.css?v=16">
+  <link rel="stylesheet" href="../shared/style.css?v=18">
+  <link rel="stylesheet" href="style.css?v=18">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -30,6 +30,8 @@
           <summary>How to read this</summary>
           <p data-show="mono">A monopolist faces the whole demand curve, its average revenue <span class="tex" data-tex="AR=p(q)"></span>. Selling one more unit lowers the price on all units, so marginal revenue lies below <span class="tex" data-tex="AR"></span>. The firm produces where <span class="tex" data-tex="MR=MC"></span> and earns the green rectangle <span class="tex" data-tex="(AR-AC)\,q^\ast"></span>; a price taker facing the same demand would produce more at a lower price (open circle). The grey area between them is the deadweight loss.</p>
           <ul data-show="mono"><li>Choose <b>Curved</b> demand: AR and MR bend, and MR is <span class="tex" data-tex="1+\gamma"></span> times as steep as AR at every output (twice as steep only when AR is linear).</li></ul>
+          <p data-show="mono ce">Here only the elasticity changes. Every demand curve passes through the bottom of <span class="tex" data-tex="AC"></span>, where <span class="tex" data-tex="p=MC=AC"></span>: perfect competition in the long run (open circle). The more elastic demand is, the less the firm can raise its price above marginal cost: <span class="tex" data-tex="p=MC/(1+1/\eta)\to MC"></span>, and profit and deadweight loss shrink to zero.</p>
+          <ul data-show="mono ce"><li>Press <b>▶ More elastic demand</b>, or move <span class="tex" data-tex="|\eta|"></span>.</li></ul>
           <p data-show="local">A firm with a product of its own is a local monopolist and earns a profit. Rivals then bring out substitutes that take some of its demand, so its <span class="tex" data-tex="AR"></span> shifts down. Press <b>Substitutes enter</b>: in the long run <span class="tex" data-tex="AR"></span> just touches <span class="tex" data-tex="AC"></span>, zero profit, while average cost is still falling.</p>
         </details>
       </div>
@@ -52,8 +54,8 @@
         <div class="ctrl" data-key="B" data-label="B" data-hint="the demand curve has slope −B" data-min="0.3" data-max="3" data-step="0.05" data-show="linear"></div>
         <div class="ctrl" data-key="Bc" data-label="B" data-hint="scale of the fall in price" data-min="0.3" data-max="6" data-step="0.05" data-show="curved"></div>
         <div class="ctrl" data-key="g" data-label="\gamma" data-hint="γ &lt; 1: AR convex, γ &gt; 1: concave" data-min="0.3" data-max="3" data-step="0.05" data-show="curved"></div>
-        <div class="ctrl" data-key="K" data-label="K" data-hint="demand level" data-min="4" data-max="30" data-step="0.1" data-show="ce"></div>
-        <div class="ctrl" data-key="eta" data-label="\eta" data-hint="price elasticity of demand" data-min="-6" data-max="-1.1" data-step="0.05" data-show="ce"></div>
+        <div class="ctrl" data-key="ae" data-label="|\eta|" data-hint="the price elasticity is η = −|η|" data-min="1.2" data-max="50" data-log="1" data-show="ce"></div>
+        <div class="btn-row" role="group" aria-label="Animation" data-show="ce"><button type="button" id="play-eta">▶ More elastic demand</button></div>
       </div>
       <div class="group" data-show="local">
         <h2>Demand for this firm's product</h2>
@@ -67,7 +69,7 @@
         </div>
       </div>
 
-      <details class="more" id="more">
+      <details class="more" id="more" data-show="ushape">
         <summary>More settings</summary>
         <p class="note">The cost function and the shape of marginal cost.</p>
       <div class="group">
@@ -86,6 +88,11 @@
     </section>
 
     <div class="side">
+      <section class="panel" aria-label="Profit and markup" data-show="mono ce">
+        <h2>As demand becomes more elastic</h2>
+        <div id="plotE" class="plot plot-e"></div>
+        <p class="caption" id="capE"></p>
+      </section>
       <section class="panel readouts" aria-label="Checks" aria-live="polite">
         <h2>At the optimum</h2>
         <ul class="checks" id="checks"></ul>
@@ -106,11 +113,11 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=16"></script>
-  <script src="../shared/firm-model.js?v=16"></script>
-  <script src="model.js?v=17"></script>
-  <script src="app.js?v=17"></script>
-  <script src="../shared/theme.js?v=16"></script>
+  <script src="../shared/ui.js?v=18"></script>
+  <script src="../shared/firm-model.js?v=18"></script>
+  <script src="model.js?v=18"></script>
+  <script src="app.js?v=18"></script>
+  <script src="../shared/theme.js?v=18"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

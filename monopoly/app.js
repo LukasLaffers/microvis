@@ -12,24 +12,30 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { mode: 'mono', dem: 'linear', A: 12, B: 1, Bc: 4, g: 0.5, K: 14, eta: -2, AL: 12, BL: 1, gL: 1, a: 2, m: 1 };
+  // ae = |eta| of the constant-elasticity view; anim: progress of its animation (null when not playing)
+  const state = { mode: 'mono', dem: 'linear', A: 12, B: 1, Bc: 4, g: 0.5, ae: 2, AL: 12, BL: 1, gL: 1, a: 2, m: 1, anim: null };
   const W = [1, 1];
   let ctrls = {}, timer = null;
   const schedule = U.scheduler(render);
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
   const z = x => Math.abs(x) < 1e-9 ? 0 : x;   // print rounding noise as 0
-  const tech = () => ({ tech: 'cobb', delta: 0.5, rho: 0, profile: 'ushape', A: 1, k: 0.6, a: state.a, m: state.m });
+  // Constant elasticity: C(q) = 4 + q^2 and demand through the bottom of AC (q, p) = (2, 4), so that only eta moves
+  // (with the U-shaped cost this demand can have two profit peaks, and the optimum would jump between them).
+  const ceView = () => state.mode === 'mono' && state.dem === 'ce';
+  const CE_COST = { profile: 'quadF', F: 4 }, AE_MIN = 1.2, AE_MAX = 50;
+  const tech = () => ceView() ? CE_COST : { tech: 'cobb', delta: 0.5, rho: 0, profile: 'ushape', A: 1, k: 0.6, a: state.a, m: state.m };
   // AR = A - B q^g with g = 1 is the linear case (and is computed as such).
   const curve = (A, B, g) => (g === 1 ? { type: 'linear', A, B } : { type: 'curved', A, B, g });
   const demand = () => state.mode === 'local' ? curve(state.AL, state.BL, state.gL)
-    : state.dem === 'linear' ? { type: 'linear', A: state.A, B: state.B } : state.dem === 'curved' ? curve(state.A, state.Bc, state.g) : { type: 'ce', K: state.K, eta: state.eta };
+    : state.dem === 'linear' ? { type: 'linear', A: state.A, B: state.B } : state.dem === 'curved' ? curve(state.A, state.Bc, state.g) : MM.anchoredCE(-state.ae, W, CE_COST);
 
   function draw(th) {
     const s = tech(), d = demand(), o = MM.optimum(W, s, d), comp = state.mode === 'mono' ? MM.competitive(W, s, d) : null;
     // With differentiated products keep the short-run axes, so that AR is seen shifting down.
     const local = state.mode === 'local', A0 = local ? Math.max(12, d.A) : d.A;
-    const capped = d.type !== 'ce';   // AR reaches zero at a finite output
-    const qMax = capped ? Math.min(MM.qLimit({ ...d, A: A0 }, s), 8) * 1.02 : 7, yMax = capped ? A0 * 1.05 : Math.max(16, o.p * 1.4);
+    // AR reaches zero at a finite output; constant elasticity: fixed axes, so that only the curves move
+    const capped = d.type !== 'ce';
+    const qMax = capped ? Math.min(MM.qLimit({ ...d, A: A0 }, s), 8) * 1.02 : 4.5, yMax = capped ? A0 * 1.05 : 12;
     const qq = U.linspace(0.02, qMax, 400), clip = v => (v <= yMax * 1.5 && v >= -yMax) ? v : null;
     const traces = [];
     if (!o.shutdown && o.q > 0) {
@@ -38,11 +44,11 @@
     }
     // Monopoly deadweight loss: between AR and MC from q* to the price taker's output.
     if (comp && !o.shutdown && comp.q > o.q) {
-      const qs = U.linspace(o.q, comp.q, 60), top = qs.map(q => [q, MM.price(q, d)]), bot = qs.map(q => [q, FM.MC(W, q, s)]).reverse(), poly = [...top, ...bot, top[0]];
+      const qs = U.linspace(o.q, comp.q, 60), top = qs.map(q => [q, MM.price(q, d)]), bot = qs.map(q => [q, MM.MCAt(W, q, s)]).reverse(), poly = [...top, ...bot, top[0]];
       traces.push({ type: 'scatter', mode: 'lines', x: poly.map(v => v[0]), y: poly.map(v => v[1]), fill: 'toself', fillcolor: 'rgba(155,155,155,0.4)', line: { width: 0 }, hoverinfo: 'skip', name: 'deadweight loss' });
     }
-    traces.push(U.line2(qq.map(q => [q, clip(FM.AC(W, q, s))]), th.ink, 2, 'average cost AC'));
-    traces.push(U.line2(qq.map(q => [q, clip(FM.MC(W, q, s))]), th.red, 2.5, 'marginal cost MC'));
+    traces.push(U.line2(qq.map(q => [q, clip(MM.ACAt(W, q, s))]), th.ink, 2, 'average cost AC'));
+    traces.push(U.line2(qq.map(q => [q, clip(MM.MCAt(W, q, s))]), th.red, 2.5, 'marginal cost MC'));
     if (local && Math.abs(d.A - 12) > 1e-6) traces.push(U.line2(qq.map(q => [q, clip(MM.price(q, { ...d, A: 12 }))]), th.blue, 1.2, 'AR before entry', 'dot', { opacity: 0.6 }));
     traces.push(U.line2(qq.map(q => [q, clip(MM.price(q, d))]), th.blue, 2.5, 'average revenue AR = p(q)'));
     traces.push(U.line2(qq.map(q => [q, clip(MM.MR(q, d))]), th.blue, 2, 'marginal revenue MR', 'dash'));
@@ -61,14 +67,32 @@
     // Curve labels at their right ends.
     // Rising curves get the label above their end, falling ones below it, so that the curve does not run through it.
     const label = (f, text, color, falling) => { for (let i = qq.length - 1; i >= 0; i--) { const v = f(qq[i]); if (v > 0.05 * yMax && v < 0.93 * yMax) { annotations.push({ x: qq[i], y: v, text, showarrow: false, xanchor: 'right', xshift: -6, yanchor: falling ? 'top' : 'bottom', yshift: falling ? -2 : 0, font: { size: 12, color } }); return; } } };
-    label(q => FM.MC(W, q, s), 'MC', th.red, false);
-    label(q => FM.AC(W, q, s), 'AC', th.ink, false);
+    label(q => MM.MCAt(W, q, s), 'MC', th.red, false);
+    label(q => MM.ACAt(W, q, s), 'AC', th.ink, false);
     label(q => MM.price(q, d), 'AR', th.blue, true);
     label(q => MM.MR(q, d), 'MR', th.blue, true);
     if (comp && comp.q > o.q && !o.shutdown) annotations.push({ x: (2 * o.q + comp.q) / 3, y: (o.p + o.MC + comp.p) / 3, text: 'deadweight loss', showarrow: true, arrowhead: 0, arrowwidth: 1, arrowcolor: th.muted, ax: 70, ay: -95, xanchor: 'left', yanchor: 'bottom', font: { size: 11, color: th.muted } });
     Plotly.react('plot', traces, U.base2d(th, { xt: 'q', yt: 'p', x: { range: [0, qMax] }, y: { range: [0, yMax] }, shapes, annotations }), U.PLOT_CONFIG);
     const dwl = comp && !o.shutdown ? MM.deadweightLoss(W, s, d, o.q, comp.q) : null;
     return { s, d, o, comp, dwl };
+  }
+
+  // Constant elasticity: profit and the markup p/MC = eta/(1 + eta) against |eta|, the current value as a dot.
+  const AES = U.logspace(AE_MIN, AE_MAX, 160);
+  function drawElastic(th, o) {
+    const at = ae => MM.optimum(W, CE_COST, MM.anchoredCE(-ae, W, CE_COST));
+    const rows = AES.map(ae => [ae, at(ae).profit]), top = Math.max(...rows.map(r => r[1])) * 1.08;
+    const traces = [
+      U.line2(rows, th.ink, 2.5, 'profit Π'),
+      U.line2(AES.map(ae => [ae, ae / (ae - 1)]), th.red, 2, 'markup p/MC', null, { yaxis: 'y2' }),
+      U.dot2([[state.ae, o.profit]], th.ink, 'now: profit', 10),
+      U.dot2([[state.ae, o.p / o.MC]], th.red, 'now: markup', 9, { yaxis: 'y2' })
+    ];
+    const base = U.base2d(th, { xt: '|η|', yt: 'profit Π', x: { type: 'log', range: [Math.log10(AE_MIN), Math.log10(AE_MAX)], tickvals: [1.2, 2, 5, 10, 20, 50], ticktext: ['1.2', '2', '5', '10', '20', '50'], tickangle: 0 }, y: { range: [0, top] }, margin: { l: 48, r: 48, t: 8, b: 42 } });
+    base.yaxis2 = { ...base.yaxis, overlaying: 'y', side: 'right', range: [1, AE_MIN / (AE_MIN - 1) * 1.05], showgrid: false, title: { ...base.yaxis.title, text: 'markup p/MC', font: { color: th.red } }, tickfont: { color: th.red } };
+    base.yaxis.title.font = { color: th.ink };
+    Plotly.react('plotE', traces, base, { ...U.PLOT_CONFIG, displayModeBar: false });
+    $('capE').innerHTML = `<span class="c-ink"><span class="key"></span>Profit</span> and <span class="c-l2-red"><span class="key"></span>markup ${texStr('p/MC=\\eta/(1+\\eta)')}</span> at the optimum: both fall as demand becomes more elastic, profit towards 0 and the markup towards 1, the price taker's ${texStr('p=MC')}.`;
   }
 
   function renderText({ s, d, o, comp, dwl }) {
@@ -107,30 +131,52 @@
         : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}; the <span class="c-muted">grey area</span> between ${texStr('AR')} and ${texStr('MC')} is the deadweight loss, ${fmt(dwl)}: units that buyers value above their marginal cost but that are not produced` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.` +
           // close to unit elasticity MR is a small fraction of the price: a tiny quantity at a very high price
           (d.type === 'curved' ? ` With curved demand ${texStr('MR')} is ${texStr(`1+\\gamma=${U.num(1 + d.g)}`)} times as steep as ${texStr('AR')} at every output, not twice.` : '') +
+          (ceView() ? ` Every demand curve passes through the open circle, the bottom of ${texStr('AC')}: the more elastic demand is, the closer ${texStr('p^\\ast')} gets to ${texStr('MC')} and the smaller the profit.` : '') +
           (o.eta > -1.5 ? ` So close to ${texStr('\\eta=-1')}, marginal revenue is only ${fmt(1 + 1 / o.eta, 2)} of the price, so the markup is huge: ${texStr(`p^\\ast=${fmt(1 / (1 + 1 / o.eta), 1)}\\cdot MC`)}.` : ''));
   }
 
   function render() {
-    U.applyVisibility({ mono: state.mode === 'mono', local: state.mode === 'local', ab: state.dem !== 'ce', curved: state.dem === 'curved', ce: state.dem === 'ce' });
+    U.applyVisibility({ mono: state.mode === 'mono', local: state.mode === 'local', linear: state.dem === 'linear', ab: state.dem !== 'ce', curved: state.dem === 'curved', ce: state.dem === 'ce', ushape: !ceView() });
     document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
     document.querySelectorAll('[data-dem]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.dem === state.dem)));
     // A - Bq with the numbers (no "1q"); the constant-elasticity exponent 1/eta exactly (a number only when exact).
     const lin = (A, B) => `${U.num(A)}-${B === 1 ? '' : U.num(B) + '\\,'}q`;
-    const inv = 1 / state.eta, invTex = Math.abs(100 * inv - Math.round(100 * inv)) < 1e-7 ? U.num(inv) : `1/(${U.num(state.eta)})`;
     // p(q) with the numbers, and MR(q) = p(q) + q p'(q) in general form
     const pow = (A, B, g) => `${U.num(A)}-${B === 1 ? '' : U.num(B) + '\\,'}q^{${U.num(g)}}`;
     tex($('formula-dem'), state.dem === 'linear' ? `\\begin{gathered}p(q)=A-Bq=${lin(state.A, state.B)}\\\\ MR(q)=A-2Bq\\end{gathered}`
       : state.dem === 'curved' ? `\\begin{gathered}p(q)=A-Bq^{\\gamma}=${pow(state.A, state.Bc, state.g)}\\\\ MR(q)=A-(1+\\gamma)Bq^{\\gamma}\\end{gathered}`
-      : `\\begin{gathered}p(q)=K\\,q^{1/\\eta}=${U.num(state.K)}\\,q^{${invTex}}\\\\ MR(q)=(1+1/\\eta)\\,p(q)\\end{gathered}`, true);
+      : `\\begin{gathered}p(q)=4\\,(q/2)^{1/\\eta},\\ \\eta=${U.num(-state.ae)}\\\\ MR(q)=(1+1/\\eta)\\,p(q)\\\\ C(q)=4+q^2,\\ MC=2q\\end{gathered}`, true);
     tex($('formula-local'), state.gL === 1 ? `\\begin{gathered}AR=p(q)=${lin(state.AL, state.BL)}\\\\ MR=A-2Bq\\end{gathered}` : `\\begin{gathered}AR=p(q)=${pow(state.AL, state.BL, state.gL)}\\\\ MR=A-(1+\\gamma)Bq^{\\gamma}\\end{gathered}`, true);
     tex($('formula-cost'), `\\begin{gathered}C(w,q)=c(w)\\,G(q),\\ c(w)=2\\\\ G(q)=\\tfrac13q^3-${U.num(state.a)}q^2+${U.num(state.a * state.a + state.m)}q\\end{gathered}`, true);
     const th = U.theme();
     let R = null;
     guard('plot', () => { R = draw(th); });
+    if (R && ceView()) guard('plotE', () => drawElastic(th, R.o));
     if (R) guard('numbers', () => renderText(R));
   }
 
-  const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+  // Make demand more elastic smoothly: |eta| from 1.2 to 50, evenly on the log scale.
+  const DURATION = 5000;
+  function playElastic() {
+    if (state.anim !== null) return;
+    stop();
+    const start = performance.now();
+    state.anim = 0; $('play-eta').disabled = true;
+    const step = now => {
+      if (state.anim === null) return;
+      state.anim = Math.min(1, (now - start) / DURATION);
+      state.ae = AE_MIN * Math.pow(AE_MAX / AE_MIN, state.anim); ctrls.ae.sync();
+      guard('animation', render);
+      if (state.anim < 1) requestAnimationFrame(step);
+      else { state.anim = null; $('play-eta').disabled = false; render(); }
+    };
+    requestAnimationFrame(step);
+  }
+
+  const stop = () => {
+    if (timer) { clearInterval(timer); timer = null; }
+    if (state.anim !== null) { state.anim = null; $('play-eta').disabled = false; }
+  };
   function enter() {
     stop();
     const target = MM.tangencyIntercept(W, tech(), state.BL, state.gL), start = state.AL, steps = 30;
@@ -149,6 +195,7 @@
     document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { stop(); state.mode = b.dataset.mode; schedule(); }));
     document.querySelectorAll('[data-dem]').forEach(b => b.addEventListener('click', () => { state.dem = b.dataset.dem; schedule(); }));
     $('enter').addEventListener('click', enter);
+    $('play-eta').addEventListener('click', playElastic);
     $('short').addEventListener('click', () => { stop(); ctrls.AL.set(12); });
     render();
     U.watchColorScheme(schedule);
