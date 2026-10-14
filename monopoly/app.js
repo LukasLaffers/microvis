@@ -12,21 +12,24 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { mode: 'mono', dem: 'linear', A: 12, B: 1, K: 14, eta: -2, AL: 12, BL: 1, a: 2, m: 1 };
+  const state = { mode: 'mono', dem: 'linear', A: 12, B: 1, Bc: 4, g: 0.5, K: 14, eta: -2, AL: 12, BL: 1, gL: 1, a: 2, m: 1 };
   const W = [1, 1];
   let ctrls = {}, timer = null;
   const schedule = U.scheduler(render);
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
   const z = x => Math.abs(x) < 1e-9 ? 0 : x;   // print rounding noise as 0
   const tech = () => ({ tech: 'cobb', delta: 0.5, rho: 0, profile: 'ushape', A: 1, k: 0.6, a: state.a, m: state.m });
-  const demand = () => state.mode === 'local' ? { type: 'linear', A: state.AL, B: state.BL }
-    : state.dem === 'linear' ? { type: 'linear', A: state.A, B: state.B } : { type: 'ce', K: state.K, eta: state.eta };
+  // AR = A - B q^g with g = 1 is the linear case (and is computed as such).
+  const curve = (A, B, g) => (g === 1 ? { type: 'linear', A, B } : { type: 'curved', A, B, g });
+  const demand = () => state.mode === 'local' ? curve(state.AL, state.BL, state.gL)
+    : state.dem === 'linear' ? { type: 'linear', A: state.A, B: state.B } : state.dem === 'curved' ? curve(state.A, state.Bc, state.g) : { type: 'ce', K: state.K, eta: state.eta };
 
   function draw(th) {
     const s = tech(), d = demand(), o = MM.optimum(W, s, d), comp = state.mode === 'mono' ? MM.competitive(W, s, d) : null;
     // With differentiated products keep the short-run axes, so that AR is seen shifting down.
     const local = state.mode === 'local', A0 = local ? Math.max(12, d.A) : d.A;
-    const qMax = d.type === 'linear' ? Math.min(A0 / d.B, 8) * 1.02 : 7, yMax = d.type === 'linear' ? A0 * 1.05 : Math.max(16, o.p * 1.4);
+    const capped = d.type !== 'ce';   // AR reaches zero at a finite output
+    const qMax = capped ? Math.min(MM.qLimit({ ...d, A: A0 }, s), 8) * 1.02 : 7, yMax = capped ? A0 * 1.05 : Math.max(16, o.p * 1.4);
     const qq = U.linspace(0.02, qMax, 400), clip = v => (v <= yMax * 1.5 && v >= -yMax) ? v : null;
     const traces = [];
     if (!o.shutdown && o.q > 0) {
@@ -40,7 +43,7 @@
     }
     traces.push(U.line2(qq.map(q => [q, clip(FM.AC(W, q, s))]), th.ink, 2, 'average cost AC'));
     traces.push(U.line2(qq.map(q => [q, clip(FM.MC(W, q, s))]), th.red, 2.5, 'marginal cost MC'));
-    if (local && Math.abs(d.A - 12) > 1e-6) traces.push(U.line2(qq.map(q => [q, clip(12 - d.B * q)]), th.blue, 1.2, 'AR before entry', 'dot', { opacity: 0.6 }));
+    if (local && Math.abs(d.A - 12) > 1e-6) traces.push(U.line2(qq.map(q => [q, clip(MM.price(q, { ...d, A: 12 }))]), th.blue, 1.2, 'AR before entry', 'dot', { opacity: 0.6 }));
     traces.push(U.line2(qq.map(q => [q, clip(MM.price(q, d))]), th.blue, 2.5, 'average revenue AR = p(q)'));
     traces.push(U.line2(qq.map(q => [q, clip(MM.MR(q, d))]), th.blue, 2, 'marginal revenue MR', 'dash'));
     const shapes = [], annotations = [];
@@ -70,7 +73,7 @@
 
   function renderText({ s, d, o, comp, dwl }) {
     const item = (good, html) => `<li><span class="mark ${good ? 'ok' : 'no'}">${good ? '✓' : '✗'}</span><span>${html}</span></li>`;
-    const local = state.mode === 'local', As = local ? MM.tangencyIntercept(W, s, state.BL) : null;
+    const local = state.mode === 'local', As = local ? MM.tangencyIntercept(W, s, state.BL, state.gL) : null;
     $('head').textContent = !local ? 'Profit optimisation of a monopolist' : Math.abs(state.AL - As) < 0.02 ? 'Local monopolist in the long run' : 'Local monopolist in the short run';
     if (o.shutdown) {
       $('checks').innerHTML = `<li><span class="mark na">–</span><span>Even the best output makes a loss (${texStr(`\\Pi=${fmt(o.profit, 3)}`)}), so the firm produces nothing.${local ? ' Too many substitutes: some rivals would leave.' : ''}</span></li>`;
@@ -78,7 +81,10 @@
       $('cap').innerHTML = 'Average revenue lies below average cost everywhere: no output covers its cost.';
       return;
     }
+    // MR = p + q p'(q): the price of the extra unit, less what the lower price costs on the units already sold
+    const qp = o.q * MM.priceSlope(o.q, d), [mrP, mrL, mrT] = U.fmtSum([o.p, qp]);
     const lines = [
+      item(same(o.MR, o.p + qp), `${texStr(`MR=p(q^\\ast)+q^\\ast p'(q^\\ast)=${mrP}+(${mrL})=${mrT}`)}: the price of one more unit, less the fall in price on the ${fmt(o.q)} units already sold`),
       item(same(o.MR, o.MC), `${texStr(`MR=${fmt(o.MR, 3)}`)} = ${texStr(`MC=${fmt(o.MC, 3)}`)}`),
       item(same(o.p, o.MC / (1 + 1 / o.eta)), `${texStr(`p=\\frac{MC}{1+1/\\eta}=\\frac{${fmt(o.MC, 3)}}{1+1/(${fmt(o.eta, 3)})}=${fmt(o.MC / (1 + 1 / o.eta), 3)}`)}`),
       // AC shown as p minus the rounded margin, so the shown numbers fit together (at the tangency 4.38 − 4.38, not 4.38 − 4.37)
@@ -100,18 +106,23 @@
       (local ? (Math.abs(o.profit) < 0.02 ? 'Entry of substitutes has pushed average revenue down until it just touches average cost: the firm still sets MR = MC, but earns zero profit.' : `The firm earns ${texStr(`\\Pi=${fmt(o.profit, 2)}`)}. Press "Substitutes enter" to let rivals take its demand.`)
         : `Where ${texStr('MR')} crosses ${texStr('MC')} the firm sells ${texStr(`q^\\ast=${fmt(o.q, 2)}`)} at ${texStr(`p^\\ast=${fmt(o.p, 2)}`)}${comp ? `, less than the ${fmt(comp.q, 2)} a price taker would sell at ${fmt(comp.p, 2)}; the <span class="c-muted">grey area</span> between ${texStr('AR')} and ${texStr('MC')} is the deadweight loss, ${fmt(dwl)}: units that buyers value above their marginal cost but that are not produced` : ''}. Demand is elastic there: ${texStr(`\\eta=${fmt(o.eta, 2)}<-1`)}.` +
           // close to unit elasticity MR is a small fraction of the price: a tiny quantity at a very high price
+          (d.type === 'curved' ? ` With curved demand ${texStr('MR')} is ${texStr(`1+\\gamma=${U.num(1 + d.g)}`)} times as steep as ${texStr('AR')} at every output, not twice.` : '') +
           (o.eta > -1.5 ? ` So close to ${texStr('\\eta=-1')}, marginal revenue is only ${fmt(1 + 1 / o.eta, 2)} of the price, so the markup is huge: ${texStr(`p^\\ast=${fmt(1 / (1 + 1 / o.eta), 1)}\\cdot MC`)}.` : ''));
   }
 
   function render() {
-    U.applyVisibility({ mono: state.mode === 'mono', local: state.mode === 'local', linear: state.dem === 'linear', ce: state.dem === 'ce' });
+    U.applyVisibility({ mono: state.mode === 'mono', local: state.mode === 'local', ab: state.dem !== 'ce', curved: state.dem === 'curved', ce: state.dem === 'ce' });
     document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
     document.querySelectorAll('[data-dem]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.dem === state.dem)));
     // A - Bq with the numbers (no "1q"); the constant-elasticity exponent 1/eta exactly (a number only when exact).
     const lin = (A, B) => `${U.num(A)}-${B === 1 ? '' : U.num(B) + '\\,'}q`;
     const inv = 1 / state.eta, invTex = Math.abs(100 * inv - Math.round(100 * inv)) < 1e-7 ? U.num(inv) : `1/(${U.num(state.eta)})`;
-    tex($('formula-dem'), state.dem === 'linear' ? `p(q)=A-Bq=${lin(state.A, state.B)}` : `p(q)=K\\,q^{1/\\eta}=${U.num(state.K)}\\,q^{${invTex}}`, true);
-    tex($('formula-local'), `AR=p(q)=${lin(state.AL, state.BL)}`, true);
+    // p(q) with the numbers, and MR(q) = p(q) + q p'(q) in general form
+    const pow = (A, B, g) => `${U.num(A)}-${B === 1 ? '' : U.num(B) + '\\,'}q^{${U.num(g)}}`;
+    tex($('formula-dem'), state.dem === 'linear' ? `\\begin{gathered}p(q)=A-Bq=${lin(state.A, state.B)}\\\\ MR(q)=A-2Bq\\end{gathered}`
+      : state.dem === 'curved' ? `\\begin{gathered}p(q)=A-Bq^{\\gamma}=${pow(state.A, state.Bc, state.g)}\\\\ MR(q)=A-(1+\\gamma)Bq^{\\gamma}\\end{gathered}`
+      : `\\begin{gathered}p(q)=K\\,q^{1/\\eta}=${U.num(state.K)}\\,q^{${invTex}}\\\\ MR(q)=(1+1/\\eta)\\,p(q)\\end{gathered}`, true);
+    tex($('formula-local'), state.gL === 1 ? `\\begin{gathered}AR=p(q)=${lin(state.AL, state.BL)}\\\\ MR=A-2Bq\\end{gathered}` : `\\begin{gathered}AR=p(q)=${pow(state.AL, state.BL, state.gL)}\\\\ MR=A-(1+\\gamma)Bq^{\\gamma}\\end{gathered}`, true);
     tex($('formula-cost'), `\\begin{gathered}C(w,q)=c(w)\\,G(q),\\ c(w)=2\\\\ G(q)=\\tfrac13q^3-${U.num(state.a)}q^2+${U.num(state.a * state.a + state.m)}q\\end{gathered}`, true);
     const th = U.theme();
     let R = null;
@@ -122,7 +133,7 @@
   const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
   function enter() {
     stop();
-    const target = MM.tangencyIntercept(W, tech(), state.BL), start = state.AL, steps = 30;
+    const target = MM.tangencyIntercept(W, tech(), state.BL, state.gL), start = state.AL, steps = 30;
     let k = 0;
     timer = setInterval(() => {
       k++;

@@ -5,7 +5,9 @@
  * The monopolist solves max_{q >= 0} p(q) q - C(w,q). For q > 0 the first-order condition is MR = MC:
  *   p(q) + p_q(q) q - MC(w,q) = 0   <=>   p(q) = MC(w,q) / (1 + 1/eta(q)),  eta(q) = p(q) / (q p_q(q)) < 0.
  * Profit = [AR(p(q*),q*) - AC(w,q*)] q*.
- * Demand (average revenue): linear p(q) = A - B q, or constant elasticity p(q) = K q^(1/eta).
+ * Demand (average revenue): linear p(q) = A - B q, curved p(q) = A - B q^g (g = 1: linear; g < 1: AR convex, g > 1:
+ * concave; then MR = A - (1 + g) B q^g, curved too and not halfway between AR and the price axis), or constant
+ * elasticity p(q) = K q^(1/eta).
  * Product differentiation: substitutes entering shift the firm's AR down (A falls) until the best profit is zero;
  * then AR is tangent to AC, at the output where MR = MC.
  *
@@ -17,12 +19,20 @@
   const FM = typeof module !== 'undefined' && module.exports ? require('../shared/firm-model.js') : root.FirmModel;
 
   // Inverse demand p(q), its derivative, MR and the elasticity eta.
-  function price(q, d) { return d.type === 'linear' ? d.A - d.B * q : d.K * Math.pow(q, 1 / d.eta); }
-  function priceSlope(q, d) { return d.type === 'linear' ? -d.B : d.K / d.eta * Math.pow(q, 1 / d.eta - 1); }
+  function price(q, d) {
+    if (d.type === 'linear') return d.A - d.B * q;
+    if (d.type === 'curved') return d.A - d.B * Math.pow(q, d.g);
+    return d.K * Math.pow(q, 1 / d.eta);
+  }
+  function priceSlope(q, d) {
+    if (d.type === 'linear') return -d.B;
+    if (d.type === 'curved') return -d.B * d.g * Math.pow(q, d.g - 1);
+    return d.K / d.eta * Math.pow(q, 1 / d.eta - 1);
+  }
   const MR = (q, d) => price(q, d) + priceSlope(q, d) * q;
   const eta = (q, d) => price(q, d) / (q * priceSlope(q, d));
-  // Largest output with a non-negative price (linear demand), or a plotting bound.
-  const qLimit = (d, s) => d.type === 'linear' ? d.A / d.B : 4 * s.a + 4;
+  // Largest output with a non-negative price (linear and curved demand), or a plotting bound.
+  const qLimit = (d, s) => d.type === 'linear' ? d.A / d.B : d.type === 'curved' ? Math.pow(d.A / d.B, 1 / d.g) : 4 * s.a + 4;
 
   const profitAt = (q, w, s, d) => price(q, d) * q - FM.cost(w, q, s);
 
@@ -66,9 +76,9 @@
     return sum * h / 3;
   }
 
-  // Long run with differentiated products: the intercept A* of a linear AR (slope B) at which the best profit is 0.
-  function tangencyIntercept(w, s, B) {
-    const best = A => optimum(w, s, { type: 'linear', A, B }).profit;
+  // Long run with differentiated products: the intercept A* of AR = A - B q^g (g = 1: linear) at which the best profit is 0.
+  function tangencyIntercept(w, s, B, g = 1) {
+    const best = A => optimum(w, s, g === 1 ? { type: 'linear', A, B } : { type: 'curved', A, B, g }).profit;
     let lo = 0, hi = 1;
     while (best(hi) <= 0) hi *= 2;
     for (let it = 0; it < 100; it++) { const m = 0.5 * (lo + hi); if (best(m) > 0) hi = m; else lo = m; }

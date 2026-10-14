@@ -29,6 +29,7 @@
         <details class="howto" open>
           <summary>How to read this</summary>
           <p data-show="mono">A monopolist faces the whole demand curve, its average revenue <span class="tex" data-tex="AR=p(q)"></span>. Selling one more unit lowers the price on all units, so marginal revenue lies below <span class="tex" data-tex="AR"></span>. The firm produces where <span class="tex" data-tex="MR=MC"></span> and earns the green rectangle <span class="tex" data-tex="(AR-AC)\,q^\ast"></span>; a price taker facing the same demand would produce more at a lower price (open circle). The grey area between them is the deadweight loss.</p>
+          <ul data-show="mono"><li>Choose <b>Curved</b> demand: AR and MR bend, and MR is <span class="tex" data-tex="1+\gamma"></span> times as steep as AR at every output (twice as steep only when AR is linear).</li></ul>
           <p data-show="local">A firm with a product of its own is a local monopolist and earns a profit. Rivals then bring out substitutes that take some of its demand, so its <span class="tex" data-tex="AR"></span> shifts down. Press <b>Substitutes enter</b>: in the long run <span class="tex" data-tex="AR"></span> just touches <span class="tex" data-tex="AC"></span>, zero profit, while average cost is still falling.</p>
         </details>
       </div>
@@ -43,11 +44,14 @@
         <h2>Demand</h2>
         <div class="seg" role="group" aria-label="Demand">
           <button type="button" data-dem="linear" aria-pressed="true">Linear</button>
+          <button type="button" data-dem="curved" aria-pressed="false">Curved</button>
           <button type="button" data-dem="ce" aria-pressed="false">Constant elasticity</button>
         </div>
         <div class="formula" id="formula-dem"></div>
-        <div class="ctrl" data-key="A" data-label="A" data-hint="price at q = 0" data-min="4" data-max="20" data-step="0.05" data-show="linear"></div>
+        <div class="ctrl" data-key="A" data-label="A" data-hint="price at q = 0" data-min="4" data-max="20" data-step="0.05" data-show="ab"></div>
         <div class="ctrl" data-key="B" data-label="B" data-hint="the demand curve has slope −B" data-min="0.3" data-max="3" data-step="0.05" data-show="linear"></div>
+        <div class="ctrl" data-key="Bc" data-label="B" data-hint="scale of the fall in price" data-min="0.3" data-max="6" data-step="0.05" data-show="curved"></div>
+        <div class="ctrl" data-key="g" data-label="\gamma" data-hint="γ &lt; 1: AR convex, γ &gt; 1: concave" data-min="0.3" data-max="3" data-step="0.05" data-show="curved"></div>
         <div class="ctrl" data-key="K" data-label="K" data-hint="demand level" data-min="4" data-max="30" data-step="0.1" data-show="ce"></div>
         <div class="ctrl" data-key="eta" data-label="\eta" data-hint="price elasticity of demand" data-min="-6" data-max="-1.1" data-step="0.05" data-show="ce"></div>
       </div>
@@ -55,7 +59,8 @@
         <h2>Demand for this firm's product</h2>
         <div class="formula" id="formula-local"></div>
         <div class="ctrl" data-key="AL" data-label="A" data-hint="falls as substitutes enter" data-min="3" data-max="16" data-step="0.025"></div>
-        <div class="ctrl" data-key="BL" data-label="B" data-hint="the demand curve has slope −B" data-min="0.3" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="BL" data-label="B" data-hint="scale of the fall in price" data-min="0.3" data-max="3" data-step="0.05"></div>
+        <div class="ctrl" data-key="gL" data-label="\gamma" data-hint="curvature of AR (1: linear)" data-min="0.3" data-max="3" data-step="0.05"></div>
         <div class="btn-row" role="group" aria-label="Entry">
           <button type="button" id="enter">Substitutes enter</button>
           <button type="button" id="short">Short run</button>
@@ -103,8 +108,8 @@
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
   <script src="../shared/ui.js?v=16"></script>
   <script src="../shared/firm-model.js?v=16"></script>
-  <script src="model.js?v=16"></script>
-  <script src="app.js?v=16"></script>
+  <script src="model.js?v=17"></script>
+  <script src="app.js?v=17"></script>
   <script src="../shared/theme.js?v=16"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
