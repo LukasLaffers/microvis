@@ -172,4 +172,19 @@ for (const u of prefs) {
   }
 }
 
+// Quasi-linear-quadratic utility ('quadlinear', Bergstrom, Shimomura and Yamato 2009): the closed-form demand equals
+// the numerical UMP (interior and corner solutions), and x2On lies on the indifference curve.
+for (const u of [{ type: 'quadlinear', lin: 1, a: 3.5 }, { type: 'quadlinear', lin: 2, a: 3.5 }, { type: 'quadlinear', lin: 1, a: 5 }]) {
+  for (let k = 0; k < 300; k++) {
+    const p = [Math.exp(-2 + 4 * rnd()), Math.exp(-2 + 4 * rnd())], y = 0.2 + 10 * rnd();
+    const c = M.demandClosed(p, y, u), n = M.demandNumeric(p, y, u);
+    close(M.utility(c, u), M.utility(n, u), 1e-9, 'quadlinear: closed form is optimal');
+    assert.ok(M.utility(c, u) >= M.utility(n, u) - 1e-12, 'quadlinear: not worse than the numerical optimum');
+    close(p[0] * c[0] + p[1] * c[1], y, 1e-9, 'quadlinear: on the budget');
+    const x1 = 6 * rnd(), v = M.utility([0.5 + 4 * rnd(), 3 * rnd()], u), x2 = M.x2On(x1, v, u);
+    if (x2 !== null && x2 > 0) close(M.utility([x1, x2], u), v, 1e-8, 'quadlinear: on the indifference curve');
+    checks += 4;
+  }
+}
+
 console.log(`All ${checks} consumer-model checks passed.`);

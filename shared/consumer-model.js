@@ -14,6 +14,9 @@
  *   'humped'       U = c log x1 + log x2 + x2^2/(2K^2),  0 < c < 8.  MRS21 = h(x2)/x1 with h(x2) = c x2/(1 + x2^2/K^2):
  *                  h rises up to x2 = K and falls after, so good 1 is normal while x2 < K and inferior after (its
  *                  Engel curve rises, then falls). Indifference curves are convex because h' > -1 (min h' = -c/8).
+ *   'quadlinear'   lin = 1: U = x1 + g(x2), lin = 2: U = g(x1) + x2, with g(z) = a z - z^2/2 up to z = a and a^2/2 after
+ *                  (no use for more; footnote 4 of Bergstrom, Shimomura and Yamato 2009). Quasi-linear in good lin:
+ *                  the other good is bought up to MRS = price, D = a - (its price)/(price of good lin), at most income.
  * The UMP is solved in closed form where one is known and otherwise numerically (golden section along the budget
  * line, valid for quasi-concave U); the EMP through duality: C(p,v) solves V(p,C) = v and H(p,v) = D(p,C(p,v)).
  *
@@ -44,9 +47,13 @@
       }
       case 'additive': return x1 < 0 || x2 < 0 ? NEG : Math.pow(x1, u.a) / u.a + Math.pow(x2, u.b) / u.b;
       case 'humped': return x1 <= 0 || x2 <= 0 ? NEG : u.c * Math.log(x1) + Math.log(x2) + x2 * x2 / (2 * u.K * u.K);
+      case 'quadlinear': return x1 < 0 || x2 < 0 ? NEG : u.lin === 1 ? x1 + quadPart(x2, u.a) : quadPart(x1, u.a) + x2;
     }
     throw new Error('unknown utility ' + u.type);
   }
+
+  // The quadratic part of 'quadlinear', flat after its peak at z = a.
+  const quadPart = (z, a) => (z < a ? a * z - z * z / 2 : a * a / 2);
 
   // Marginal utilities by central differences.
   function gradient(x, u) {
@@ -87,6 +94,13 @@
       let lo = -60, hi = 60;
       for (let it = 0; it < 200; it++) { const m = 0.5 * (lo + hi); if (spend(m) > 0) lo = m; else hi = m; }
       return xs(0.5 * (lo + hi));
+    }
+    if (u.type === 'quadlinear') {
+      // MRS = price ratio for the non-linear good, clipped to [0, what the income buys]; the rest buys the linear good
+      const j = u.lin === 1 ? 1 : 0, k = 1 - j, x = [0, 0];
+      x[j] = Math.min(Math.max(0, u.a - p[j] / p[k]), y / p[j]);
+      x[k] = Math.max(0, (y - p[j] * x[j]) / p[k]);   // 0 at the corner (rounding)
+      return x;
     }
     if (u.type === 'humped') {
       // tangency x1 = (p2/p1) h(x2); the budget gives h(x2) + x2 = y/p2, increasing in x2 (h' > -1): bisection.
@@ -137,6 +151,7 @@
       case 'stonegeary': return u.g2 + Math.pow(v / Math.pow(x1 - u.g1, u.a), 1 / (1 - u.a));
       case 'quasilinear': return v - u.kappa * Math.log(1 + x1);
       case 'giffen': return u.s - Math.sqrt(-v * (x1 - u.c));
+      case 'quadlinear': return u.lin === 1 ? u.a - Math.sqrt(u.a * u.a - 2 * (v - x1)) : v - quadPart(x1, u.a);
     }
     return NaN;
   }

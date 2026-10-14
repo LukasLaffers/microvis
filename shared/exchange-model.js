@@ -10,7 +10,9 @@
  *   replicas       an equal-treatment allocation y on the contract curve is blocked in the N-replica by N a-types and
  *                  M < N b-types if a prefers theta y^a + (1 - theta) R^a to y^a for some theta = M/N (the notes'
  *                  construction), and likewise with the roles of a and b swapped.
- * An economy is e = { ua, ub, Omega: [O1, O2], Ra: [R1, R2] }, ua and ub CES utilities { type: 'ces', delta, rho }.
+ * An economy is e = { ua, ub, Omega: [O1, O2], Ra: [R1, R2] }, ua and ub CES utilities { type: 'ces', delta, rho } or
+ * quasi-linear-quadratic ones { type: 'quadlinear', lin, a } (the Shapley-Shubik economies of Bergstrom, Shimomura and
+ * Yamato 2009: a linear in good 1, b in good 2, each endowed with the good it is linear in, gives up to three equilibria).
  *
  * Works in the browser (window.ExchangeModel, needs window.ConsumerModel) and in Node.
  */
@@ -22,8 +24,11 @@
   const Rb = e => [e.Omega[0] - e.Ra[0], e.Omega[1] - e.Ra[1]];
   const toB = (e, xa) => [e.Omega[0] - xa[0], e.Omega[1] - xa[1]];
 
-  // Marginal rate of substitution of a CES utility, in closed form.
-  const mrs = (x, u) => u.delta / (1 - u.delta) * Math.pow(x[0] / x[1], u.rho - 1);
+  // Marginal rate of substitution MRS_21 = U_1/U_2, in closed form (Infinity where U_2 = 0).
+  function mrs(x, u) {
+    if (u.type === 'quadlinear') return u.lin === 1 ? (x[1] < u.a ? 1 / (u.a - x[1]) : Infinity) : Math.max(0, u.a - x[0]);
+    return u.delta / (1 - u.delta) * Math.pow(x[0] / x[1], u.rho - 1);
+  }
 
   // Demands at prices (p1, p2) with the transfer T (in units of good 2, scaled with p2).
   function demands(e, p1, p2 = 1, T = 0) {
