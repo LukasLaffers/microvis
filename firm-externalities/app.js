@@ -11,9 +11,9 @@
   }
   const { $, fmt, texStr, guard } = U;
 
-  const state = { e: 0.5, alpha: 1, c: 1, qa: 0, qb: 8, p: 6, actual: true };
+  const state = { e: 0.5, alpha: 1, c: 1, qa: 1, qb: 5, p: 6, actual: true };
   // P_TOP a little above the price slider's maximum 12, so the dots are never cut at the top; the q axes grow
-  // with the equilibrium output (a strong positive externality, e = −0.8, gives q = 25 each).
+  // with the equilibrium output beyond the default case (a strong positive externality, e = −0.8, gives q = 25 each).
   const P_TOP = 12.6;
   let Q_FIRM = 12, Q_MARKET = 24;
   let ctrls = {};
@@ -26,11 +26,13 @@
 
   function draw(th) {
     const s = model(), eq = EM.equilibrium(s, state.p), traces = [], annotations = [], shapes = [];
-    Q_MARKET = Math.max(24, 1.15 * eq.Q); Q_FIRM = Q_MARKET / 2;
+    // 17 just holds the default negative externality up to p = 12 (q¹ + q² = 14.7), so its axes do not move; zoomed
+    // in this far, the two orange curves stand clearly apart.
+    Q_MARKET = Math.max(17, 1.15 * eq.Q); Q_FIRM = Q_MARKET / 2;
     // One scale for all three q axes: the market panel (range 2 Q_FIRM) is twice as wide as a firm's, same ticks.
-    const GAP = 0.06, W = (1 - 2 * GAP) / 4, dtick = Q_FIRM <= 15 ? 5 : Q_FIRM <= 30 ? 10 : 20;
+    const GAP = 0.05, W = (1 - 2 * GAP) / 4;
     const rect = $('plot').getBoundingClientRect(), pxQ = (rect.width - 54) * W / Q_FIRM, pxP = (rect.height - 82) / P_TOP;
-    const narrow = pxQ * Q_FIRM < 110;
+    const narrow = pxQ * Q_FIRM < 110, dtick = Q_FIRM <= 10 && !narrow ? 2 : Q_FIRM <= 15 ? 5 : Q_FIRM <= 30 ? 10 : 20;
     // The market is on the main axes x, y (its dot can be dragged); firm 1 on x2, firm 2 on x3.
     for (const [xa, other] of [['x2', 'q²'], ['x3', 'q¹']]) {
       const self = xa === 'x2' ? '1' : '2';
@@ -73,10 +75,10 @@
       const upper = s.e * qbar > s.e * (qbar === state.qa ? state.qb : state.qa) || (qbar === state.qa && s.e * state.qa === s.e * state.qb);
       if (!upper && s.e * state.qa === s.e * state.qb) continue;   // the two lines coincide: one label
       const pAt = Q => s.c + Q / (2 * s.alpha) + s.e * qbar, QAt = p => 2 * s.alpha * (p - s.c - s.e * qbar);
-      let ql = (upper ? 0.75 : 0.55) * Q_MARKET, pl = pAt(ql);
+      let ql = (upper ? 0.75 : narrow ? 0.5 : 0.65) * Q_MARKET, pl = pAt(ql);
       if (upper && pl > 0.92 * P_TOP) { pl = 0.92 * P_TOP; ql = QAt(pl); }
       if (!upper && pl < 0.12 * P_TOP) { pl = 0.12 * P_TOP; ql = QAt(pl); }
-      if (pl > 0.3 && pl < P_TOP * 0.97 && ql > 0) annotations.push({ xref: 'x', yref: 'y', x: ql, y: pl, text: 'MC<sub>1</sub> + MC<sub>2</sub>', showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -5 : 5, font: { size: narrow ? 10 : 11, color: th.muted } });
+      if (pl > 0.3 && pl < P_TOP * 0.97 && ql > 0) annotations.push({ xref: 'x', yref: 'y', x: ql, y: pl, text: 'MC<sub>1</sub> + MC<sub>2</sub>', showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -5 : 5, bgcolor: th.panel, borderpad: 1, font: { size: narrow ? 10 : 11, color: th.muted } });
     }
     const pS = Math.min(P_TOP * 0.8, EM.priceFor(s, Q_MARKET * 0.55));
     annotations.push({ xref: 'x', yref: 'y', x: EM.marketSupply(s, pS), y: pS, text: '<b>S</b>', showarrow: false, xanchor: 'right', xshift: -8, font: { size: 13, color: th.ink } });
