@@ -11,7 +11,7 @@
   }
   const { $, fmt, texStr, guard } = U;
 
-  const state = { e: 0.5, alpha: 1, c: 1, qa: 1, qb: 5, p: 6, actual: true };
+  const state = { e: 0.5, alpha: 1, c: 1, qa: 0, qb: 8, p: 6, actual: true };
   // P_TOP a little above the price slider's maximum 12, so the dots are never cut at the top; the q axes grow
   // with the equilibrium output (a strong positive externality, e = −0.8, gives q = 25 each).
   const P_TOP = 12.6;
@@ -45,7 +45,7 @@
         let q = (upper ? 0.75 : 0.3) * Q_FIRM, p = pAt(q);
         if (upper && p > 0.92 * P_TOP) { p = 0.92 * P_TOP; q = qAt(p); }
         if (!upper && p < 0.12 * P_TOP) { p = 0.12 * P_TOP; q = qAt(p); }
-        if (p > 0.3 && p < P_TOP * 0.97 && q > 0) annotations.push({ xref: xa, yref: 'y', x: q, y: p, text: narrow ? `${otherHtml}=${fmt(qbar)}` : `S<sup>${self}</sup>(${otherHtml} = ${fmt(qbar)})`, showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -5 : 5, font: { size: narrow ? 10 : 11, color: th.ink } });
+        if (p > 0.3 && p < P_TOP * 0.97 && q > 0) annotations.push({ xref: xa, yref: 'y', x: q, y: p, text: narrow ? `${otherHtml}=${fmt(qbar)}` : `S<sup>${self}</sup>(${otherHtml} = ${fmt(qbar)})`, showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -5 : 5, bgcolor: th.panel, borderpad: 1, font: { size: narrow ? 10 : 11, color: th.ink } });
       };
       lab(hiQ, true); if (state.qa !== state.qb) lab(hiQ === state.qb ? state.qa : state.qb, false);
       // The supply curve at the other firm's actual output: the dot lies on it.
