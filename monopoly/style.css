@@ -1,5 +1,6 @@
 /* Monopoly and Product Differentiation: tool-specific styles (shared look is in ../shared/style.css). */
 .plot-firm { height: 480px; }
+.plot-e { height: 260px; }
 @media (max-width: 800px) { .plot-firm { height: 360px; } }
 /* On a phone the figures come first (a point in them can be dragged), the controls follow. */
 @media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }
