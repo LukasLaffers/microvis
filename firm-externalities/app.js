@@ -15,7 +15,7 @@
   // P_TOP a little above the price slider's maximum 12, so the dots are never cut at the top; the q axes grow
   // with the equilibrium output beyond the default case (a strong positive externality, e = −0.8, gives q = 25 each).
   const P_TOP = 12.6;
-  let Q_FIRM = 12, Q_MARKET = 24;
+  let Q_FIRM = 12, Q_MARKET = 24, heldQ = null;   // heldQ: the market axis held still while a dot is dragged
   let ctrls = {};
   const schedule = U.scheduler(render);
   const model = () => ({ alpha: state.alpha, c: state.c, e: state.e });
@@ -28,12 +28,12 @@
     const s = model(), eq = EM.equilibrium(s, state.p), traces = [], annotations = [], shapes = [];
     // 17 just holds the default negative externality up to p = 12 (q¹ + q² = 14.7), so its axes do not move; zoomed
     // in this far, the two orange curves stand clearly apart.
-    Q_MARKET = Math.max(17, 1.15 * eq.Q); Q_FIRM = Q_MARKET / 2;
+    Q_MARKET = heldQ !== null ? heldQ : Math.max(17, 1.15 * eq.Q); Q_FIRM = Q_MARKET / 2;
     // One scale for all three q axes: the market panel (range 2 Q_FIRM) is twice as wide as a firm's, same ticks.
     const GAP = 0.05, W = (1 - 2 * GAP) / 4;
     const rect = $('plot').getBoundingClientRect(), pxQ = (rect.width - 54) * W / Q_FIRM, pxP = (rect.height - 82) / P_TOP;
     const narrow = pxQ * Q_FIRM < 110, dtick = Q_FIRM <= 10 && !narrow ? 2 : Q_FIRM <= 15 ? 5 : Q_FIRM <= 30 ? 10 : 20;
-    // The market is on the main axes x, y (its dot can be dragged); firm 1 on x2, firm 2 on x3.
+    // The market is on the main axes x, y; firm 1 on x2, firm 2 on x3. All three black dots can be dragged.
     for (const [xa, other] of [['x2', 'q²'], ['x3', 'q¹']]) {
       const self = xa === 'x2' ? '1' : '2';
       traces.push(curve(p => EM.supplyGiven(s, p, state.qa), xa, th.orange, 2.5, `S${self}(${other} = ${fmt(state.qa)})`));
@@ -93,7 +93,7 @@
     shapes.push({ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: state.p, y1: state.p, line: { color: th.muted, width: 1, dash: 'dot' } });
     const box = (xa, text) => annotations.push({ xref: xa + ' domain', yref: 'paper', x: 0.5, y: -0.2, text, showarrow: false, font: { size: 12, color: th.ink }, bordercolor: th.line, borderwidth: 1, borderpad: 3 });
     box('x2', 'firm 1 alone'); box('x3', 'firm 2 alone'); box('x', 'both firms');
-    traces.push(U.dot2([[eq.Q, state.p]], th.ink, 'market at p (drag it)', 14, { cliponaxis: false }));
+    traces.push(U.dot2([[eq.Q, state.p]], th.ink, 'market at p (drag it up or down)', 14, { cliponaxis: false }));
 
     // the price axis stays at the left edge, next to firm 1
     const base = U.base2d(th, { xt: 'q<sup>1</sup> + q<sup>2</sup>', yt: 'p', x: { domain: [2 * W + 2 * GAP, 1], range: [0, Q_MARKET], dtick }, y: { range: [0, P_TOP], anchor: 'free', position: 0 }, shapes, annotations, margin: { l: 44, r: 10, t: 8, b: 74 } });
@@ -105,7 +105,7 @@
     const kind = state.e > 0 ? `A higher output of the other firm <b>raises</b> marginal cost, so ${texStr(`S^1(q^2=${fmt(state.qb)})`)} lies above ${texStr(`S^1(q^2=${fmt(state.qa)})`)}. Market supply ${texStr('S')} is steeper than ${texStr('MC_1+MC_2')}: it reacts less to the price.`
       : state.e < 0 ? `A higher output of the other firm <b>lowers</b> marginal cost, so ${texStr(`S^1(q^2=${fmt(state.qb)})`)} lies below ${texStr(`S^1(q^2=${fmt(state.qa)})`)}. Market supply ${texStr('S')} is flatter than ${texStr('MC_1+MC_2')}: it reacts more to the price.`
       : `Without an externality the firms' supply curves do not depend on each other and ${texStr('S')} is simply ${texStr('MC_1+MC_2')}.`;
-    $('capMain').innerHTML = `<b>Drag the market dot</b> up or down to change the price. Left and middle: a firm's supply when the other firm produces <span class="c-l2-orange"><span class="key"></span>${fmt(state.qa)}</span> or <span class="c-l2-orange"><span class="key dash"></span>${fmt(state.qb)}</span>${state.actual ? `, and <span class="c-ink"><span class="key"></span>${fmt(eq.q2)}</span>, what it actually produces at this price: the dot lies on that curve` : '; the dot is what the firm produces at this price'}. Right: <span class="c-l2-orange"><span class="key"></span>market supply</span> and <span class="c-l2-grey"><span class="key dash"></span>${texStr('MC_1+MC_2')}</span> for the other firm's output fixed at ${fmt(state.qa)} and ${fmt(state.qb)}. ${kind} ${texStr('S')} meets each dotted line where both firms produce exactly that output.`;
+    $('capMain').innerHTML = `<b>Drag a black dot</b> up or down to change the price. Left and middle: a firm's supply when the other firm produces <span class="c-l2-orange"><span class="key"></span>${fmt(state.qa)}</span> or <span class="c-l2-orange"><span class="key dash"></span>${fmt(state.qb)}</span>${state.actual ? `, and <span class="c-ink"><span class="key"></span>${fmt(eq.q2)}</span>, what it actually produces at this price: the dot lies on that curve` : '; the dot is what the firm produces at this price'}. Right: <span class="c-l2-orange"><span class="key"></span>market supply</span> and <span class="c-l2-grey"><span class="key dash"></span>${texStr('MC_1+MC_2')}</span> for the other firm's output fixed at ${fmt(state.qa)} and ${fmt(state.qb)}. ${kind} ${texStr('S')} meets each dotted line where both firms produce exactly that output.`;
     return { s, eq };
   }
 
@@ -143,11 +143,44 @@
     document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { ctrls.p.set(Number(b.dataset.p)); ctrls.e.set(Number(b.dataset.preset)); }));
     $('actual').addEventListener('change', e => { state.actual = e.target.checked; schedule(); });
     window.addEventListener('resize', schedule);   // the curve labels depend on the panel width
-    // Drag the market dot along S: only the price counts (the q axes follow the output).
-    U.dragPoint('plot', {
-      target: () => [EM.equilibrium(model(), state.p).Q, state.p],
-      move: ([, y]) => ctrls.p.setExact(Math.min(ctrls.p.max, Math.max(ctrls.p.min, y)))
-    });
+    // Drag any of the three black dots up or down: only the price counts. With a mouse a press anywhere in a panel
+    // moves them there; a finger has to start on a dot, so that the page still scrolls. The axes are held still
+    // during the drag (they follow the output otherwise) and rescale when it ends.
+    const gd = $('plot'), GRAB = 24;
+    gd.classList.add('drag-plot');
+    let dragging = null;
+    const rel = ev => { const r = gd.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; };
+    const near = ev => {
+      const fl = gd._fullLayout; if (!fl || !fl.yaxis) return false;
+      const e = EM.equilibrium(model(), state.p), [x, y] = rel(ev), py = fl.yaxis._offset + fl.yaxis.c2p(state.p);
+      return [['xaxis2', e.q1], ['xaxis3', e.q2], ['xaxis', e.Q]].some(([k, q]) => fl[k] && Math.hypot(x - fl[k]._offset - fl[k].c2p(q), y - py) <= GRAB);
+    };
+    const inPanel = ev => {
+      const fl = gd._fullLayout; if (!fl || !fl.yaxis) return false;
+      const [x, y] = rel(ev), ya = fl.yaxis;
+      return y >= ya._offset - 4 && y <= ya._offset + ya._length + 4 &&
+        ['xaxis2', 'xaxis3', 'xaxis'].some(k => fl[k] && x >= fl[k]._offset - 4 && x <= fl[k]._offset + fl[k]._length + 4);
+    };
+    const setPrice = ev => {
+      const ya = gd._fullLayout.yaxis, f = Math.min(1, Math.max(0, (rel(ev)[1] - ya._offset) / ya._length));
+      ctrls.p.setExact(Math.min(ctrls.p.max, Math.max(ctrls.p.min, ya.range[1] - f * (ya.range[1] - ya.range[0]))));
+    };
+    gd.addEventListener('pointerdown', ev => {
+      if (ev.pointerType === 'mouse' ? ev.button !== 0 || !inPanel(ev) : !near(ev)) return;
+      dragging = ev.pointerId; heldQ = Q_MARKET;
+      try { gd.setPointerCapture(ev.pointerId); } catch (err) { /* the drag still works inside the figure */ }
+      ev.preventDefault(); gd.classList.add('dragging');
+      setPrice(ev);
+    }, true);
+    gd.addEventListener('pointermove', ev => {
+      if (dragging === ev.pointerId) { ev.preventDefault(); setPrice(ev); }
+      else if (ev.pointerType === 'mouse') gd.classList.toggle('near', near(ev));
+    }, true);
+    const end = ev => { if (dragging === ev.pointerId) { dragging = null; heldQ = null; gd.classList.remove('dragging'); schedule(); } };
+    gd.addEventListener('pointerup', end, true);
+    gd.addEventListener('pointercancel', end, true);
+    gd.addEventListener('touchstart', ev => { const t = ev.touches[0]; if (t && near(t)) ev.preventDefault(); }, { passive: false, capture: true });
+    gd.addEventListener('touchmove', ev => { if (dragging !== null) ev.preventDefault(); }, { passive: false, capture: true });
     render();
     U.watchColorScheme(schedule);
   }
