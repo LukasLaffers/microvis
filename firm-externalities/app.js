@@ -42,23 +42,29 @@
       // the notes), both inside the panel; a narrow panel (phone) gets the short label q2 = 5.00.
       const hiQ = s.e * state.qb >= s.e * state.qa ? state.qb : state.qa;
       const otherHtml = other.replace('²', '<sup>2</sup>').replace('¹', '<sup>1</sup>');
+      // the black curve: supply at the other firm's actual output (the dot lies on it)
+      const qOther = xa === 'x2' ? eq.q2 : eq.q1, qBlack = p => s.alpha * (p - s.c - s.e * qOther);
       const lab = (qbar, upper) => {
         const pAt = q => s.c + q / s.alpha + s.e * qbar, qAt = p => s.alpha * (p - s.c - s.e * qbar);
         let q = (upper ? 0.75 : 0.3) * Q_FIRM, p = pAt(q);
         if (upper && p > 0.92 * P_TOP) { p = 0.92 * P_TOP; q = qAt(p); }
         if (!upper && p < 0.12 * P_TOP) { p = 0.12 * P_TOP; q = qAt(p); }
+        // the label stays clear of the black curve too: left of both lines (upper), right of both (lower)
+        if (state.actual && s.e !== 0) q = upper ? Math.min(q, qBlack(p)) : Math.max(q, qBlack(p));
         if (p > 0.3 && p < P_TOP * 0.97 && q > 0) annotations.push({ xref: xa, yref: 'y', x: q, y: p, text: narrow ? `${otherHtml}=${fmt(qbar)}` : `S<sup>${self}</sup>(${otherHtml} = ${fmt(qbar)})`, showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -5 : 5, bgcolor: th.panel, borderpad: 1, font: { size: narrow ? 10 : 11, color: th.ink } });
       };
       lab(hiQ, true); if (state.qa !== state.qb) lab(hiQ === state.qb ? state.qa : state.qb, false);
-      // The supply curve at the other firm's actual output: the dot lies on it.
-      const qOther = xa === 'x2' ? eq.q2 : eq.q1;
       if (state.actual) {
         traces.push(curve(p => EM.supplyGiven(s, p, qOther), xa, th.ink, 1.5, `S${self}(${other} = ${fmt(qOther)}), the other firm's actual output`));
-        // its label sits on the line, turned along it, away from the dot (the orange labels are beside their lines)
-        const qAt = p => s.alpha * (p - s.c - s.e * qOther);
-        let pl = state.p >= 0.5 * P_TOP ? 0.3 * P_TOP : 0.72 * P_TOP;
-        pl = Math.min(Math.max(pl, s.c + s.e * qOther + 0.15 * Q_FIRM / s.alpha), s.c + s.e * qOther + 0.85 * Q_FIRM / s.alpha);
-        if (s.e !== 0 && pl > 0.05 * P_TOP && pl < 0.95 * P_TOP) annotations.push({ xref: xa, yref: 'y', x: qAt(pl), y: pl,
+        // its label sits on the line, turned along it: where the line is well inside the panel, as far from the dot
+        // as possible (the orange labels are beside their lines)
+        let pl = null;
+        for (let k = 0; k <= 60; k++) {
+          const pk = P_TOP * (0.12 + 0.76 * k / 60), qk = qBlack(pk);
+          if (qk < 0.25 * Q_FIRM || qk > 0.72 * Q_FIRM) continue;
+          if (pl === null || Math.abs(pk - state.p) > Math.abs(pl - state.p)) pl = pk;
+        }
+        if (s.e !== 0 && pl !== null) annotations.push({ xref: xa, yref: 'y', x: qBlack(pl), y: pl,
           text: narrow ? `${otherHtml}=${fmt(qOther)}` : `S<sup>${self}</sup>(${otherHtml} = ${fmt(qOther)})`, showarrow: false,
           textangle: -Math.atan2(pxP, s.alpha * pxQ) * 180 / Math.PI, bgcolor: th.panel, borderpad: 1, font: { size: narrow ? 9 : 11, color: th.ink } });
       }
@@ -75,13 +81,15 @@
       const upper = s.e * qbar > s.e * (qbar === state.qa ? state.qb : state.qa) || (qbar === state.qa && s.e * state.qa === s.e * state.qb);
       if (!upper && s.e * state.qa === s.e * state.qb) continue;   // the two lines coincide: one label
       const pAt = Q => s.c + Q / (2 * s.alpha) + s.e * qbar, QAt = p => 2 * s.alpha * (p - s.c - s.e * qbar);
-      let ql = (upper ? 0.75 : narrow ? 0.5 : 0.65) * Q_MARKET, pl = pAt(ql);
+      // with a positive externality S is flat and runs through the middle: the lower label goes low down, below it
+      let ql = (upper ? 0.75 : s.e < 0 ? 0 : narrow ? 0.5 : 0.65) * Q_MARKET, pl = pAt(ql);
       if (upper && pl > 0.92 * P_TOP) { pl = 0.92 * P_TOP; ql = QAt(pl); }
       if (!upper && pl < 0.12 * P_TOP) { pl = 0.12 * P_TOP; ql = QAt(pl); }
       if (pl > 0.3 && pl < P_TOP * 0.97 && ql > 0) annotations.push({ xref: 'x', yref: 'y', x: ql, y: pl, text: 'MC<sub>1</sub> + MC<sub>2</sub>', showarrow: false, xanchor: upper ? 'right' : 'left', xshift: upper ? -5 : 5, bgcolor: th.panel, borderpad: 1, font: { size: narrow ? 10 : 11, color: th.muted } });
     }
-    const pS = Math.min(P_TOP * 0.8, EM.priceFor(s, Q_MARKET * 0.55));
-    annotations.push({ xref: 'x', yref: 'y', x: EM.marketSupply(s, pS), y: pS, text: '<b>S</b>', showarrow: false, xanchor: 'right', xshift: -8, font: { size: 13, color: th.ink } });
+    // S labelled left of the line, high up; a flat S (positive externality) below its right end, away from the dot
+    if (s.e < 0) { const QS = 0.9 * Q_MARKET; annotations.push({ xref: 'x', yref: 'y', x: QS, y: EM.priceFor(s, QS), text: '<b>S</b>', showarrow: false, yanchor: 'top', yshift: -6, font: { size: 13, color: th.ink } }); }
+    else { const pS = Math.min(P_TOP * 0.8, EM.priceFor(s, Q_MARKET * 0.55)); annotations.push({ xref: 'x', yref: 'y', x: EM.marketSupply(s, pS), y: pS, text: '<b>S</b>', showarrow: false, xanchor: 'right', xshift: -8, font: { size: 13, color: th.ink } }); }
     shapes.push({ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: state.p, y1: state.p, line: { color: th.muted, width: 1, dash: 'dot' } });
     const box = (xa, text) => annotations.push({ xref: xa + ' domain', yref: 'paper', x: 0.5, y: -0.2, text, showarrow: false, font: { size: 12, color: th.ink }, bordercolor: th.line, borderwidth: 1, borderpad: 3 });
     box('x2', 'firm 1 alone'); box('x3', 'firm 2 alone'); box('x', 'both firms');
@@ -130,7 +138,9 @@
     U.renderStaticTex();
     // Keep |alpha e| < 1 so that the outputs settle down (the slider ranges already ensure it).
     ctrls = U.controls(document, state, { onChange: schedule });
-    document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => ctrls.e.set(Number(b.dataset.preset))));
+    // Each preset also sets a price at which both firms produce well inside the panels (positive externality: p = 3,
+    // output 4 each, the black curve between the two orange ones as with the negative one at p = 6).
+    document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { ctrls.p.set(Number(b.dataset.p)); ctrls.e.set(Number(b.dataset.preset)); }));
     $('actual').addEventListener('change', e => { state.actual = e.target.checked; schedule(); });
     window.addEventListener('resize', schedule);   // the curve labels depend on the panel width
     // Drag the market dot along S: only the price counts (the q axes follow the output).
