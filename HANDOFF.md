@@ -1,4 +1,4 @@
-# Handoff: Microvis (state on 12 October 2026)
+# Handoff: Microvis (state on 15 October 2026)
 
 Read this first, then `CLAUDE.md` (conventions, notation) and `style-kit/README.md` (the design and writing style).
 
@@ -13,7 +13,8 @@ Repo `LukasLaffers/microvis`, live at https://lukaslaffers.github.io/microvis/ (
 2. Work on the branch the new session is given (this session used `claude/vigilant-carson-p2wfrl`; in the commands below, use your own branch name). Start it from `origin/main`.
 3. Use the new account's commit and PR trailers; no model names anywhere.
 4. Run the checks below before every preview; previews are raw.githack links with the full commit SHA; merge only on "merge it".
-5. Main is at #30 (12 October); nothing is unmerged.
+5. Main is at #34 (15 October) plus this handoff; nothing else is unmerged. Two sessions (two accounts) have been working on the repo in turns: always `git fetch` and start from `origin/main`, and read the newest sections below first.
+6. Teaching plans (how to use the tiles in a lecture) are **never committed**: the repo is published, and the user does not want them on the internet. Give them in the chat or as a file outside the repository.
 
 ## Start here: what is open
 
@@ -103,9 +104,12 @@ User wanted to show that the more elastic demand is, the closer the firm is to p
 ### 4m. Merged on 15 October (#34): Firms That Affect Each Other, positive externality and dragging
 User: the positive externality should look as "nice and crispy" as the negative one. At p = 6 each firm produced 10 (market 20), so dots and the black curve sat at the right edges and the axes zoomed out. Now each preset also sets the price (`data-p` on the buttons): Negative and None p = 6, Positive p = 3 (output 4 each, market 8: the same axes as the negative case, the black curve between the two orange ones). Labels: the orange ones stay clear of the black curve (left of both lines, or right of both); the black curve's label goes where its line is well inside the panel, as far from the dot as possible; with a positive externality the lower MC₁ + MC₂ label goes low down and "S" below the right end of the flat S. Then the user: dragging the black point "does not work as intended": only the market dot could be grabbed (not the two firm dots), and the market axis rescaled during the drag (positive case: 17 → 40), so the dot ran away from the pointer. Now a local drag handler (not `U.dragPoint`, which knows only the main x axis): any of the three black dots, mouse anywhere in a panel, finger only on a dot; only the price moves; the axes are held during the drag (`heldQ`) and rescale on release. Version tag **19**.
 
+### 4n. 15 October: teaching plan for lecture 5 (no code change)
+The user asked, on the day of lecture 5 ("The firm and the market / Consumer preferences", notes dated 15 October), for a walk-through of the lecture: at which point to show which tile and exactly what to click. (It was first committed as `plans/teaching-lecture-5.md`; on 16 October the user asked to remove it, it must not be on the internet: removed, and the branch rewritten without that commit.) Also answered that day, no change needed: the monopoly first-order condition p + p′q = MC and p = MC/(1 + 1/η) with η = p/(q p_q) is covered by the Monopoly tile (header, the first three check lines, η and the markup in the readouts). Offered, not requested: shade the inelastic part of AR on the Monopoly tile (−1 < η < 0, MR < 0, never chosen); a one-page cheat sheet of the plan.
+
 ### Next
 Nothing requested. Open, small:
-- Lecture 4 is taught on 13 October (date on the notes); the user may come back with lecture 4 exercises (pattern: mock-up first, then the tile).
+- Lecture 6 (demand theory) comes next; a teaching plan may be requested (in the chat, not in the repo), and possibly new tiles from its exercises (pattern: mock-up first, then the tile).
 - Other formulas still use KaTeX `\color{…}{…}`, which also colours what follows it in the same group: `comparative-statics/app.js`, `marshall-law/app.js` and `index.html`, `slutsky/index.html`, `substitution-scale-effects/index.html`. Check each for a wrongly coloured operator; switch to `\textcolor` where needed.
 - Touch drags tested on only some tiles.
 
@@ -122,6 +126,7 @@ Counting works (dashboard https://microvis.goatcounter.com, 19 visits on 7 Oct).
 - Design taste: minimal, Helvetica/Arial, square corners, hairlines, black/white plus one blue; no "AI look" (no rounded boxes, coloured stripes, many colours). "Complexity is our enemy."
 - Writing: academic, precise, short; no slogans, no rhetorical questions, no "watch …"/"meet …"; never the word "dearer". Tile = one plain sentence; "How to read this" = idea in 2–3 sentences + a short list of things to try. By default do not give closed-form answers to the notes' exercises (show numbers); the user may still want a formula shown (Cross-Price Effects header): ask or follow the user.
 - Notation: as in the notes, with arguments where the notes write them (Dⁱ(w,p), Hⁱ(w,q)).
+- Before a lecture the user may upload the notes and ask how to use the tiles in it: answer with a concrete plan (page by page: which tile, which button or slider, which numbers appear, what to say, where to ask for a prediction, which "Check your answer" would give an exercise away) and give it in the chat or as a file outside the repository, never committed (the repo is public). Check the tiles' current controls first: other sessions change them (#33 rebuilt a view the day before lecture 5).
 - New tiles from the notes or assignments: the user often wants to see a mock-up first. Make a static HTML page in the scratchpad (loading `shared/` by absolute file:// paths), screenshot it with Playwright and send the image; build the tile only when asked. Check the math independently (brute force) before showing numbers.
 - Three tools are "advanced" and marked only with an asterisk on their tile (no explanation): Two Technologies and a Kink, Concavity and Returns to Scale, The Core Shrinks.
 - An old local clone (GitHub Desktop) twice pushed merge commits with conflict markers ("tgf" commits). If that happens: do not force-push over the user's work; commit the correct tree on top.
