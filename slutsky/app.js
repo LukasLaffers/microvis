@@ -11,11 +11,15 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
+  // Necessity and luxury start from almost the same bundle (2.55, 4.90) and (2.45, 5.10), so that only eta differs;
+  // the inferior good and the Giffen good use preferences that are not shown (no function to learn).
   const PRESETS = {
-    normal: { type: 'ces', delta: 0.5, rho: -1, p1: 2, p1n: 1, p2: 1, y: 10 },
+    necessity: { type: 'stonegeary', a: 0.3, g1: 1.5, g2: 0, p1: 2, p1n: 1, p2: 1, y: 10 },
+    luxury: { type: 'stonegeary', a: 0.7, g1: 0, g2: 3, p1: 2, p1n: 1, p2: 1, y: 10 },
+    inferior: { type: 'humped', p1: 2, p1n: 1, p2: 1, y: 8 },
     giffen: { type: 'giffen', p1: 2.5, p1n: 2, p2: 1, y: 5 }
   };
-  const state = { a: 0.4, g1: 1, g2: 1, ...PRESETS.normal, t: 1,
+  const state = { delta: 0.5, rho: -1, ...PRESETS.necessity, t: 1,
     mode: 'steps', anim: null, playing: false };   // mode: 'steps' (E1 -> E2 -> E3) or 'smooth' (p1 changes gradually)
   let ctrls = {};
   const schedule = U.scheduler(render);
@@ -25,7 +29,8 @@
   const f3 = x => fmt(Math.abs(x) < 5e-10 ? 0 : x, 3);
   const same = (a, b) => Math.abs(a - b) <= 1e-4 * Math.max(1, Math.abs(a), Math.abs(b));
   const pref = () => state.type === 'ces' ? { type: 'ces', delta: state.delta, rho: CU.rhoAway(state.rho) }
-    : state.type === 'stonegeary' ? { type: 'stonegeary', a: state.a, g1: state.g1, g2: state.g2 } : { type: 'giffen', c: 1, s: 4 };
+    : state.type === 'stonegeary' ? { type: 'stonegeary', a: state.a, g1: state.g1, g2: state.g2 }
+    : state.type === 'humped' ? { type: 'humped', c: 4, K: 2 } : { type: 'giffen', c: 1, s: 4 };
 
   const N = 160;   // steps along the smooth change
 
@@ -69,7 +74,18 @@
   // Two pictures: the two-step split E1 -> E2 -> E3 (on load), and the smooth change with slider t.
   const draw = (th, S) => (state.mode === 'smooth' ? drawSmooth : drawSteps)(th, S);
 
-  const headText = S => S.cls.kind === 'giffen' ? 'A Giffen good: the income effect wins' : S.cls.kind === 'inferior' ? 'An inferior good' : 'A normal good';
+  const headText = S => S.cls.kind === 'giffen' ? 'A Giffen good: the income effect wins'
+    : S.cls.kind === 'inferior' ? 'An inferior good: the income effect works against substitution'
+    : S.cls.normal === 'luxury' ? 'A luxury: a large income effect' : S.cls.normal === 'necessity' ? 'A necessity: a smaller income effect' : 'A normal good';
+  // What kind of good 1 is, in one sentence of the caption (the effects on good 1 of the step E1 -> E3).
+  function kindSentence(S, fall) {
+    const { d, cls } = S, inc = f3(d.income[0]), sub = f3(d.substitution[0]), eta = texStr(`\\eta_1=${f3(cls.eta)}`);
+    if (cls.kind === 'giffen') return ` Good 1 is a Giffen good: the income effect on good 1 (${inc}) outweighs the substitution effect (${sub}), so she buys ${fall ? 'less' : 'more'} of good 1 although its price ${fall ? 'fell' : 'rose'}.`;
+    if (cls.kind === 'inferior') return ` Good 1 is inferior (${eta}<0): the income effect on good 1 (${inc}) works against the substitution effect (${sub}) but is smaller, so she still buys ${fall ? 'more' : 'less'} of it.`;
+    if (cls.normal === 'luxury') return ` Good 1 is a luxury (${eta}>1): as real income rises, the share of it spent on good 1 rises, and the income effect (${inc}) adds a lot to the substitution effect (${sub}).`;
+    if (cls.normal === 'necessity') return ` Good 1 is a necessity (${eta}<1): as real income rises, the share of it spent on good 1 falls, and the income effect (${inc}) adds less to the substitution effect (${sub}) than for a luxury bought in about the same amount.`;
+    return ` Good 1 is normal (${eta}): the income effect (${inc}) adds to the substitution effect (${sub}).`;
+  }
 
   // ---------- the two-step split ----------
 
@@ -124,7 +140,7 @@
     const fall = pn[0] < p[0];
     $('head').textContent = headText(S);
     $('cap').innerHTML = `The price of good 1 ${fall ? 'falls' : 'rises'} from ${fmt(p[0])} to ${fmt(pn[0])}. ${texStr('E_1\\to E_2')}: <span class="c-l2-blue">substitution</span> along the indifference curve ${texStr('v^0')}, to where its slope equals the new price ratio (the dotted blue line is the budget line that would just let her stay on ${texStr('v^0')}, with income ${texStr(`C(p',v^0)=${f3(d.yc)}`)}). ${texStr('E_2\\to E_3')}: <span class="c-l2-red">income effect</span>, a parallel shift to the actual new budget line.` +
-      (S.cls.kind === 'giffen' ? ` Here the income effect on good 1 (${f3(d.income[0])}) outweighs the substitution effect (${f3(d.substitution[0])}): she buys ${fall ? 'less' : 'more'} of good 1 although its price ${fall ? 'fell' : 'rose'}.` : '');
+      kindSentence(S, fall);
   }
 
   // ---------- the smooth change ----------
@@ -195,7 +211,7 @@
     U.overlay('plot', moving, th.font);
     $('plot').classList.add('drag-plot');
     $('head').textContent = headText(S);
-    if (writeText) $('cap').innerHTML = `<b>Drag the consumer</b> along her path to move ${texStr('t')}. ${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars at the bottom (changes in ${texStr('x_1')}) grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.`;
+    if (writeText) $('cap').innerHTML = `<b>Drag the consumer</b> along her path to move ${texStr('t')}. ${texStr(`p_1=${fmt(now.p1)}`)}. She moves along the black path from ${texStr('E_1')} to ${texStr('E_3')}. At every moment she substitutes (blue arrow, along the current indifference curve) and her real income changes (red arrow, to the next indifference curve) at the same time; the two arrows add up to the black one, the direction of the path. The bars at the bottom (changes in ${texStr('x_1')}) grow together: <span class="c-l2-blue">substitution</span> + <span class="c-l2-red">income</span> = total, accumulated so far.` + kindSentence(S, state.p1n < p[0]);
   }
 
   // ---------- demand curves ----------
@@ -252,7 +268,7 @@
     // the elasticity as computed from the rounded numbers on the right, so the line adds up
     const shown = x => { const t = f3(x); return t.includes('×') ? x : Number(t.replace('−', '-')); };
     const euShown = shown(e.ec[0][0]) - shown(e.eta[0]) * shown(e.b[0]);
-    const kindTxt = { normal: '<span class="badge-kind c-inc">normal</span>', inferior: '<span class="badge-kind c-l2-orange">inferior</span>', giffen: '<span class="badge-kind c-l2-red">Giffen</span>' }[cls.kind];
+    const kindTxt = { necessity: '<span class="badge-kind c-inc">a necessity</span>', luxury: '<span class="badge-kind c-inc">a luxury</span>', unit: '<span class="badge-kind c-inc">normal</span>', inferior: '<span class="badge-kind c-l2-orange">inferior</span>', giffen: '<span class="badge-kind c-l2-red">Giffen</span>' }[cls.normal || cls.kind];
     $('checks').innerHTML = [
       item(same(s.total, s.substitution + s.income), `${now ? 'At' : 'Slopes at the starting price'} ${texStr(`p_1=${fmt(p[0])}`)}${now ? '' : ' (the table is the whole step to ' + texStr(`p_1'=${fmt(state.p1n)}`) + ')'}: ${(() => { const [a, b, t] = U.fmtSum([s.substitution, s.income]); return texStr(`\\frac{\\partial D^1}{\\partial p_1}=${t}=\\color{${TH.blue}}{${a}}\\color{${TH.red}}{${b.startsWith('−') ? '' : '+'}${b}}`); })()}`),
       item(same(e.eu[0][0], e.ec[0][0] - e.eta[0] * e.b[0]), `${texStr(`\\varepsilon^u_{11}=${f3(euShown)}=\\varepsilon^c_{11}-\\eta_1b_1=${f3(e.ec[0][0])}-(${f3(e.eta[0])})(${f3(e.b[0])})`)}`),
@@ -262,7 +278,7 @@
 
   function render() {
     writeText = textDue();
-    U.applyVisibility({ ces: state.type === 'ces', stonegeary: state.type === 'stonegeary', giffen: state.type === 'giffen', steps: state.mode === 'steps', smooth: state.mode === 'smooth' });
+    U.applyVisibility({ ces: state.type === 'ces', stonegeary: state.type === 'stonegeary', giffen: state.type === 'giffen', humped: state.type === 'humped', steps: state.mode === 'steps', smooth: state.mode === 'smooth' });
     $('play-steps').setAttribute('aria-pressed', String(state.mode === 'steps'));
     $('play-smooth').setAttribute('aria-pressed', String(state.mode === 'smooth'));
     $('play-smooth').textContent = `▶ ${state.p1n < state.p1 ? 'Lower' : 'Raise'} p₁ smoothly`;
@@ -274,7 +290,7 @@
     const S = solve(), th = U.theme();
     lastS = S;
     tex($('formula'), CU.formula(S.u), true);
-    $('formula').hidden = S.u.type === 'giffen';
+    $('formula').hidden = S.u.type === 'giffen' || S.u.type === 'humped';
     guard('plot', () => draw(th, S));
     guard('demand plot', () => drawDemand(th, S));
     if (writeText) guard('numbers', () => renderNumbers(S));

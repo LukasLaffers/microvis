@@ -75,4 +75,33 @@ for (const [u, p, y, p1n] of cases) {
   checks += 4 + 2 * (n + 1) + 6;
 }
 
+// The four examples of the page: necessity, luxury (from almost the same bundle), inferior but not Giffen, Giffen.
+{
+  const ex = {
+    necessity: [{ type: 'stonegeary', a: 0.3, g1: 1.5, g2: 0 }, [2, 1], 10, 1],
+    luxury: [{ type: 'stonegeary', a: 0.7, g1: 0, g2: 3 }, [2, 1], 10, 1],
+    inferior: [{ type: 'humped', c: 4, K: 2 }, [2, 1], 8, 1],
+    giffen: [{ type: 'giffen', c: 1, s: 4 }, [2.5, 1], 5, 2]
+  };
+  const r = {};
+  for (const [name, [u, p, y, p1n]] of Object.entries(ex)) {
+    const c = M.classify(p, y, u), d = M.decompose(p, y, u, p1n);
+    // income elasticity against an independent difference of demand in income (step 1e-3)
+    const h = 1e-3, eta = (CM.demand(p, y + h, u)[0] - CM.demand(p, y - h, u)[0]) / (2 * h) * y / CM.demand(p, y, u)[0];
+    assert.ok(Math.abs(c.eta - eta) < 1e-4, name + ' eta');
+    // the effects add up, and substitution raises x1 when its price falls
+    assert.ok(Math.abs(d.substitution[0] + d.income[0] - d.total[0]) < 1e-9 && d.substitution[0] > 0, name + ' substitution');
+    r[name] = { c, d };
+    checks += 2;
+  }
+  assert.equal(r.necessity.c.normal, 'necessity'); assert.ok(r.necessity.c.eta > 0 && r.necessity.c.eta < 1);
+  assert.equal(r.luxury.c.normal, 'luxury'); assert.ok(r.luxury.c.eta > 1);
+  assert.ok(Math.abs(r.necessity.d.E1[0] - r.luxury.d.E1[0]) < 0.15, 'almost the same bundle');
+  assert.ok(r.necessity.d.income[0] > 0 && r.luxury.d.income[0] > 2 * r.necessity.d.income[0], 'the luxury income effect is more than twice as large');
+  assert.equal(r.inferior.c.kind, 'inferior'); assert.ok(r.inferior.d.income[0] < 0 && r.inferior.d.total[0] > 0, 'inferior, not Giffen');
+  assert.equal(r.giffen.c.kind, 'giffen'); assert.ok(r.giffen.d.total[0] < 0, 'Giffen: less of good 1 when it gets cheaper');
+  assert.equal(M.classify([2, 1], 10, { type: 'ces', delta: 0.5, rho: -1 }).normal, 'unit');
+  checks += 10;
+}
+
 console.log(`All ${checks} Slutsky checks passed.`);

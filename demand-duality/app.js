@@ -11,7 +11,12 @@
   }
   const { $, fmt, tex, texStr, guard } = U;
 
-  const state = { reveal: false, view: 'ump', type: 'ces', delta: 0.4, rho: -1, a: 0.4, g1: 1, g2: 0.5, kappa: 5, p1: 1, p2: 1, y: 10, v: 4 };
+  // kU: the indifference curve being tried in UMP, as the share of y needed to reach it (1: the best affordable one);
+  // kE: the budget line being tried in EMP, as a share of C(p,v) (1: the cheapest that reaches v). Both start off the optimum.
+  const state = { reveal: false, view: 'ump', type: 'ces', delta: 0.4, rho: -1, a: 0.4, g1: 1, g2: 0.5, kappa: 5, p1: 1, p2: 1, y: 10, v: 4, kU: 0.6, kE: 1.4 };
+  const SNAP = 0.03;   // within 3% of the optimum the curve or the line snaps onto it
+  const FAINT = [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7];   // the faint curves (UMP) and lines (EMP), none at the optimum
+  let trialPts = [];   // the curve or line being dragged, in data coordinates (to grab it with a finger)
   let ctrls = {};
   const schedule = U.scheduler(render);
   const f3 = x => fmt(x, 3);
@@ -31,31 +36,50 @@
   const plotMax = S => 1.15 * Math.max(S.y / S.p[0], S.y / S.p[1]);
 
   function draw(th, S) {
-    // the axes stay fixed while the budget line is dragged, so they do not move under the pointer
+    // the axes depend only on prices and income, so they do not move while the curve or the line is dragged
     const { u, p, y, v, x } = S, L = plotMax(S);
     const x1s = U.linspace(L / 400, L, 300), ic = lev => CM.indifferenceCurve(lev, u, x1s).map(([a, b]) => [a, b !== null && b <= L * 1.05 ? b : null]);
     const traces = [], annotations = [];
     const line = (m, color, width, name, dash) => U.line2([[m / p[0], 0], [0, m / p[1]]], color, width, name, dash);
+    const faint = { opacity: 0.35, hoverinfo: 'skip' };
     if (state.view === 'ump') {
+      // fixed: the budget set and line; dragged: an indifference curve, the one that income kU·y would just reach
+      const k = state.kU, best = k === 1, w = best ? v : CM.indirect(p, k * y, u);
       traces.push({ type: 'scatter', mode: 'lines', x: [0, y / p[0], 0, 0], y: [0, 0, y / p[1], 0], fill: 'toself', fillcolor: 'rgba(155,155,155,0.25)', line: { width: 0 }, hoverinfo: 'skip', name: 'budget set' });
+      // (a level below the subsistence bundle, Stone–Geary, has no indifference curve)
+      const ok = lev => Number.isFinite(lev) && lev > -1e299;
+      for (const f of FAINT) { const lev = CM.indirect(p, f * y, u); if (ok(lev)) traces.push(U.line2(ic(lev), th.muted, 1, '', null, faint)); }
       traces.push(line(y, th.ink, 2.5, 'budget line p·x = y'));
-      for (const [k, lab] of [[0.75, 'lower: affordable, not best'], [1.3, 'higher: not affordable']]) {
-        const lv = state.type === 'quasilinear' ? v + (k - 1) * Math.abs(v) : v * k;
-        traces.push(U.line2(ic(lv), th.muted, 1.2, lab, 'dot'));
-      }
-      traces.push(U.line2(ic(v), th.blue, 3, `indifference curve V(p,y) = ${f3(v)}`));
+      const curve = ok(w) ? ic(w) : [];
+      trialPts = curve.filter(q => q[1] !== null);
+      traces.push(U.line2(curve, th.blue, 3, `indifference curve U = ${f3(w)} (drag it)`));
+      $('head').textContent = best ? 'The best affordable bundle (UMP)' : k < 1 ? 'Affordable, but not the best' : 'Not affordable';
+      $('cap').innerHTML = `<b>Drag the indifference curve.</b> The <span class="c-muted">faint curves</span> are other indifference curves. ` + (best
+        ? `It just touches the budget line: with income ${texStr(`y=${f3(y)}`)} the best affordable bundle is ${texStr(`D(p,y)=(${f3(x[0])},${f3(x[1])})`)}, on the indifference curve ${texStr(`V(p,y)=${f3(v)}`)}. Switch to EMP: asked to reach ${texStr(`v=${f3(v)}`)} at least cost, the consumer picks the same bundle and spends exactly ${texStr('y')}.`
+        : k < 1 ? `It crosses the budget line, so its bundles there are affordable; but the bundles between the crossings, in the <span class="c-muted">grey budget set</span>, lie on higher curves. Move it up.`
+        : `It lies above the budget line everywhere: no bundle on it can be bought with ${texStr(`y=${f3(y)}`)}. Move it down.`);
+      if (best) traces.push(U.dot2([x], th.red, 'D(p,y)', 12));
+      if (best) annotations.push({ x: x[0], y: x[1], text: 'x* = D(p, y)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { size: 13, color: th.red } });
     } else {
-      for (const k of [0.75, 1.25]) traces.push(line(y * k, th.grey, 1.2, k < 1 ? 'cheaper: cannot reach v' : 'more expensive: not the cheapest', 'dash'));
-      traces.push(line(y, th.ink, 2.5, `cheapest expenditure line p·x = C(p,v) = ${f3(y)}`));
-      traces.push(U.line2(ic(v), th.blue, 3, `indifference curve U = v = ${f3(v)}`));
+      // fixed: the indifference curve U = v and the bundles above it; dragged: a budget line with cost kE·C(p,v)
+      const k = state.kE, best = k === 1, m = k * y, curve = ic(v), pts = curve.filter(q => q[1] !== null);
+      if (pts.length > 1) {
+        const up = [...pts, [pts[pts.length - 1][0], L * 1.2], [pts[0][0], L * 1.2]];
+        traces.push({ type: 'scatter', mode: 'lines', x: up.map(q => q[0]), y: up.map(q => q[1]), fill: 'toself', fillcolor: 'rgba(74,144,226,0.15)', line: { width: 0 }, hoverinfo: 'skip', name: 'bundles with U ≥ v' });
+      }
+      for (const f of FAINT) traces.push(line(f * y, th.muted, 1, '', null, { ...faint, opacity: 0.25 }));
+      traces.push(U.line2(curve, th.blue, 3, `indifference curve U = v = ${f3(v)}`));
+      trialPts = [[m / p[0], 0], [0, m / p[1]]];
+      traces.push(line(m, th.ink, 2.5, `budget line p·x = ${f3(m)} (drag it)`));
+      $('head').textContent = best ? 'The cheapest way to reach v (EMP)' : k < 1 ? 'Too cheap: v cannot be reached' : 'Reaches v, but not at the lowest cost';
+      $('cap').innerHTML = `<b>Drag the budget line</b> to change what is spent. The <span class="c-l2-blue">shaded bundles</span> give at least ${texStr(`v=${f3(v)}`)}; the <span class="c-muted">faint lines</span> are other levels of spending. ` + (best
+        ? `It just touches the indifference curve: the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`
+        : k < 1 ? `With ${texStr(`p^tx=${f3(m)}`)} no shaded bundle can be bought. Move it out.`
+        : `With ${texStr(`p^tx=${f3(m)}`)} some shaded bundles can be bought, but a lower line would still reach them. Move it in.`);
+      if (best) traces.push(U.dot2([x], th.red, 'H(p,v)', 12));
+      if (best) annotations.push({ x: x[0], y: x[1], text: 'x* = H(p, v)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { size: 13, color: th.red } });
     }
-    traces.push(U.dot2([x], th.red, state.view === 'ump' ? 'D(p,y)' : 'H(p,v)', 12));
-    annotations.push({ x: x[0], y: x[1], text: state.view === 'ump' ? 'x* = D(p, y)' : 'x* = H(p, v)', showarrow: false, xanchor: 'left', yanchor: 'bottom', xshift: 8, font: { size: 13, color: th.red } });
     Plotly.react('plot', traces, U.base2d(th, { xt: 'x<sub>1</sub>', yt: 'x<sub>2</sub>', x: { range: [0, L], constrain: 'domain' }, y: { range: [0, L], scaleanchor: 'x', constrain: 'domain' }, annotations, margin: { l: 48, r: 12, t: 8, b: 44 } }), { ...U.PLOT_CONFIG, displayModeBar: false });
-    $('head').textContent = state.view === 'ump' ? 'Reach the highest indifference curve (UMP)' : 'Reach v at the lowest cost (EMP)';
-    $('cap').innerHTML = (state.view === 'ump'
-      ? `<span class="c-muted"><span class="key dotted"></span>Dotted</span>: a lower indifference curve (affordable, not the best) and a higher one (not affordable). With income ${texStr(`y=${f3(y)}`)} the best affordable bundle is ${texStr(`D(p,y)=(${f3(x[0])},${f3(x[1])})`)} on the indifference curve ${texStr(`V(p,y)=${f3(v)}`)}. Switch to EMP: asked to reach ${texStr(`v=${f3(v)}`)} at least cost, the consumer picks the same bundle and spends exactly ${texStr('y')}.`
-      : `<span class="c-muted"><span class="key dash"></span>Dashed</span>: a cheaper line that cannot reach ${texStr('v')} and a more expensive one that is not the cheapest. To reach ${texStr(`v=${f3(v)}`)} the cheapest bundle is ${texStr(`H(p,v)=(${f3(x[0])},${f3(x[1])})`)}, costing ${texStr(`C(p,v)=${f3(y)}`)}. A consumer with that income maximising utility would choose the same bundle.`);
   }
 
   function renderChecks(S) {
@@ -132,6 +156,49 @@
       target: () => { const S = solve(); return [S.p[0], id === 'plotV' ? S.v : CM.expenditure(S.p, S.v, S.u)]; },
       move: ([x]) => ctrls.p1.setExact(r2(lim(x)))
     });
+    // The main figure: drag the indifference curve (UMP) or the budget line (EMP). With a mouse a press anywhere on the
+    // axes moves it through the pointer; a finger has to start on it, so that the page still scrolls.
+    const gd = $('plot'), GRAB = 24;
+    gd.classList.add('drag-plot');
+    let dragging = null;
+    const nearTrial = ev => {
+      const fl = gd._fullLayout; if (!fl || !fl.xaxis || trialPts.length < 2) return false;
+      const r = gd.getBoundingClientRect(), px = ev.clientX - r.left, py = ev.clientY - r.top;
+      const P = trialPts.map(([a, b]) => [fl.xaxis._offset + fl.xaxis.c2p(a), fl.yaxis._offset + fl.yaxis.c2p(b)]);
+      for (let i = 1; i < P.length; i++) {   // distance to each piece of the polyline
+        const [ax, ay] = P[i - 1], [bx, by] = P[i], dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+        const t = l2 > 0 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l2)) : 0;
+        if (Math.hypot(px - ax - t * dx, py - ay - t * dy) <= GRAB) return true;
+      }
+      return false;
+    };
+    const moveTo = ev => {
+      const fl = gd._fullLayout, r = gd.getBoundingClientRect(), xa = fl.xaxis, ya = fl.yaxis, c = q => Math.min(1, Math.max(0.005, q));
+      const z = [xa.range[0] + c((ev.clientX - r.left - xa._offset) / xa._length) * (xa.range[1] - xa.range[0]), ya.range[0] + c(1 - (ev.clientY - r.top - ya._offset) / ya._length) * (ya.range[1] - ya.range[0])];
+      const S = solve(), snap = k => (Math.abs(k - 1) < SNAP ? 1 : k);
+      if (state.view === 'ump') {
+        // the curve through the pointer: U(z), expressed as the share of y needed to reach it
+        const w = CM.utility(z, S.u);
+        if (w <= -1e299) return;   // outside the domain (below a subsistence level)
+        state.kU = snap(Math.min(3, CM.expenditure(S.p, w, S.u) / S.y));
+      } else state.kE = snap(Math.min(3, Math.max(0.05, (S.p[0] * z[0] + S.p[1] * z[1]) / S.y)));
+      schedule();
+    };
+    gd.addEventListener('pointerdown', ev => {
+      if (ev.pointerType === 'mouse' ? ev.button !== 0 || !U.eventToData(gd, ev) : !nearTrial(ev)) return;
+      dragging = ev.pointerId;
+      try { gd.setPointerCapture(ev.pointerId); } catch (err) { /* the drag still works inside the figure */ }
+      ev.preventDefault(); gd.classList.add('dragging'); moveTo(ev);
+    }, true);
+    gd.addEventListener('pointermove', ev => {
+      if (dragging === ev.pointerId) { ev.preventDefault(); moveTo(ev); }
+      else if (ev.pointerType === 'mouse') gd.classList.toggle('near', nearTrial(ev));
+    }, true);
+    const end = ev => { if (dragging === ev.pointerId) { dragging = null; gd.classList.remove('dragging'); } };
+    gd.addEventListener('pointerup', end, true);
+    gd.addEventListener('pointercancel', end, true);
+    gd.addEventListener('touchstart', ev => { const t = ev.touches[0]; if (t && nearTrial(t)) ev.preventDefault(); }, { passive: false, capture: true });
+    gd.addEventListener('touchmove', ev => { if (dragging !== null) ev.preventDefault(); }, { passive: false, capture: true });
     render();
     U.watchColorScheme(schedule);
   }

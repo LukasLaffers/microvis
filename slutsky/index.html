@@ -7,8 +7,8 @@
   <meta name="description" content="The Slutsky equation: a price change splits into a substitution effect along the indifference curve and an income effect; Marshallian versus Hicksian demand; inferior and Giffen goods. Lecture 6.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="../shared/style.css?v=19">
-  <link rel="stylesheet" href="style.css?v=19">
+  <link rel="stylesheet" href="../shared/style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=20">
   <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -32,15 +32,18 @@
           <ul>
           <li>Press <b>▶ Step by step</b>: first <span class="tex" data-tex="E_1\to E_2"></span>, then <span class="tex" data-tex="E_2\to E_3"></span>.</li>
           <li>Press <b>▶ Lower p₁ smoothly</b>, then drag <span class="tex" data-tex="t"></span> or the consumer’s point: at every point the blue and red arrows add up to the black one, the direction of the path.</li>
-          <li>Press <b>Giffen good</b>: good 1 is so inferior that the income effect wins, and she buys <em>less</em> of it when it gets cheaper.</li>
+          <li>Press <b>Necessity</b>, then <b>Luxury</b>: both are normal goods, so the income effect adds to the substitution effect; from almost the same bundle it is more than twice as large for the luxury.</li>
+          <li>Press <b>Inferior</b>: the income effect works against the substitution effect, but is smaller. <b>Giffen</b>: it wins, and she buys <em>less</em> of good 1 when it gets cheaper.</li>
           </ul>
         </details>
       </div>
       <div class="group">
         <h2>Examples</h2>
         <div class="btn-row" role="group" aria-label="Examples">
-          <button type="button" data-preset="normal">Normal good</button>
-          <button type="button" data-preset="giffen">Giffen good</button>
+          <button type="button" data-preset="necessity">Necessity</button>
+          <button type="button" data-preset="luxury">Luxury</button>
+          <button type="button" data-preset="inferior">Inferior</button>
+          <button type="button" data-preset="giffen">Giffen</button>
         </div>
       </div>
       <div class="group">
@@ -48,6 +51,7 @@
         <select id="type" aria-label="Utility function">
           <option value="ces">CES</option>
           <option value="stonegeary">Stone–Geary (subsistence)</option>
+          <option value="humped">Inferior good</option>
           <option value="giffen">Giffen good</option>
         </select>
         <div class="formula" id="formula"></div>
@@ -117,12 +121,12 @@
 
   <script src="../shared/vendor/katex/katex.min.js"></script>
   <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
-  <script src="../shared/ui.js?v=19"></script>
-  <script src="../shared/consumer-model.js?v=19"></script>
-  <script src="../shared/consumer-ui.js?v=19"></script>
-  <script src="model.js?v=19"></script>
-  <script src="app.js?v=19"></script>
-  <script src="../shared/theme.js?v=19"></script>
+  <script src="../shared/ui.js?v=20"></script>
+  <script src="../shared/consumer-model.js?v=20"></script>
+  <script src="../shared/consumer-ui.js?v=20"></script>
+  <script src="model.js?v=20"></script>
+  <script src="app.js?v=20"></script>
+  <script src="../shared/theme.js?v=20"></script>
   <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
 </body>
 </html>

@@ -25,10 +25,13 @@
     };
   }
 
-  // Normal, inferior or Giffen (for good 1 at (p, y)).
+  // Normal, inferior or Giffen (for good 1 at (p, y)); a normal good is a necessity (0 <= eta < 1), a luxury (eta > 1)
+  // or neither (eta = 1, to rounding: 'unit'). eta = (dD1/dy) y / D1, the income elasticity.
   function classify(p, y, u) {
-    const dy = CM.dDdy(p, y, u, 0), dp = CM.dDdp(p, y, u, 0, 0);
-    return { dy, dp, kind: dp > 0 ? 'giffen' : dy < 0 ? 'inferior' : 'normal' };
+    const dy = CM.dDdy(p, y, u, 0), dp = CM.dDdp(p, y, u, 0, 0), eta = dy * y / CM.demand(p, y, u)[0];
+    const kind = dp > 0 ? 'giffen' : dy < 0 ? 'inferior' : 'normal';
+    const normal = kind !== 'normal' ? null : Math.abs(eta - 1) < 5e-3 ? 'unit' : eta < 1 ? 'necessity' : 'luxury';
+    return { dy, dp, eta, kind, normal };
   }
 
   // Marshallian D1(p1) at income y and Hicksian H1(p1) at utility v, for p1 in a range: points [x1, p1].
