@@ -4,7 +4,7 @@
  *
  * Examples (key: U(x)):
  *   leontief  min{x1, x2}            sqrt      sqrt(x1 x2)          cd        x1^a x2^(1-a), 0 < a < 1
- *   subst     x1 + x2                additive  sqrt(x1) + sqrt(x2)  quasilin  ln x1 + x2
+ *   subst     x1 + x2                additive  sqrt(x1) + sqrt(x2)  quasilin  log x1 + x2
  * p = [p1, p2] > 0, income y > 0, utility level v (in the range of U). Demands are returned as sets: [lo, hi], two
  * bundles that are equal when the optimum is unique; for x1 + x2 at p1 = p2 every bundle on the segment between them is
  * optimal. Derivatives are null where they do not exist (x1 + x2 at p1 = p2, where V and C have a kink in p).
@@ -34,13 +34,13 @@
     throw new Error('unknown example ' + ex);
   }
 
-  // Which case applies: x1 + x2 buys the cheaper good ('1', '2' or 'tie'); ln x1 + x2 is interior when y >= p2.
+  // Which case applies: x1 + x2 buys the cheaper good ('1', '2' or 'tie'); log x1 + x2 is interior when y >= p2.
   function regime(ex, p, y) {
     if (ex === 'subst') return p[0] < p[1] ? '1' : p[0] > p[1] ? '2' : 'tie';
     if (ex === 'quasilin') return y >= p[1] ? 'interior' : 'corner';
     return 'interior';
   }
-  // The same for (EMP) at utility v: ln x1 + x2 is interior when v >= ln(p2/p1), i.e. when C(p,v) >= p2.
+  // The same for (EMP) at utility v: log x1 + x2 is interior when v >= log(p2/p1), i.e. when C(p,v) >= p2.
   const regimeV = (ex, p, v) => ex === 'quasilin' ? (v >= Math.log(p[1] / p[0]) ? 'interior' : 'corner') : regime(ex, p, 0);
 
   // Marshallian demand D(p,y), as a set.

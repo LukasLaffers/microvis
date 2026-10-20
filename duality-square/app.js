@@ -35,8 +35,8 @@
 
   // ---------- the example's formulas ----------
 
-  const L21 = '\\ln\\dfrac{p_2}{p_1}';
-  // The step of each arrow for this example, in the current case (x1 + x2: which good is cheaper; ln x1 + x2: corner or not).
+  const L21 = '\\log\\dfrac{p_2}{p_1}';
+  // The step of each arrow for this example, in the current case (x1 + x2: which good is cheaper; log x1 + x2: corner or not).
   function cells(ex, reg) {
     if (ex === 'leontief') return {
       DV: 'V=\\min\\{D^1,D^2\\}=\\dfrac{y}{p_1+p_2}',
@@ -102,23 +102,23 @@
       DH: '\\dfrac{C\\,p_2}{p_1(p_1+p_2)}=\\dfrac{v^2p_2^2}{(p_1+p_2)^2}'
     };
     if (reg === 'corner') return {
-      DV: 'V=\\ln D^1+D^2=\\ln\\dfrac{y}{p_1}',
-      VC: '\\ln\\dfrac{C}{p_1}=v\\Rightarrow C=p_1e^v',
+      DV: 'V=\\log D^1+D^2=\\log\\dfrac{y}{p_1}',
+      VC: '\\log\\dfrac{C}{p_1}=v\\Rightarrow C=p_1e^v',
       CH: 'H^1=e^v,\\ H^2=0',
       HD: 'D^1=e^V=\\dfrac{y}{p_1},\\ D^2=0',
       VD: '\\dfrac{1/p_1}{1/y}=\\dfrac{y}{p_1},\\ D^2=0',
-      CV: 'p_1e^V=y\\Rightarrow V=\\ln\\dfrac{y}{p_1}',
+      CV: 'p_1e^V=y\\Rightarrow V=\\log\\dfrac{y}{p_1}',
       HC: 'p_1e^v+p_2\\cdot0=p_1e^v',
       DH: '\\dfrac{p_1e^v}{p_1}=e^v,\\ H^2=0'
     };
     return {
-      DV: `V=\\ln D^1+D^2=${L21}+\\dfrac{y}{p_2}-1`,
-      VC: `${L21}+\\dfrac{C}{p_2}-1=v\\Rightarrow C=p_2\\Big(v+1-${L21}\\Big)`,
+      DV: `V=\\log D^1+D^2=${L21}+\\dfrac{y}{p_2}-1`,
+      VC: `\\begin{gathered}${L21}+\\dfrac{C}{p_2}-1=v\\\\\\Rightarrow C=p_2\\Big(v+1-${L21}\\Big)\\end{gathered}`,
       CH: `H^1=\\dfrac{p_2}{p_1},\\ H^2=v-${L21}`,
       HD: `D^1=\\dfrac{p_2}{p_1},\\ D^2=V-${L21}=\\dfrac{y}{p_2}-1`,
       VD: '\\dfrac{1/p_1}{1/p_2}=\\dfrac{p_2}{p_1}',
-      CV: `p_2\\Big(V+1-${L21}\\Big)=y\\Rightarrow V=${L21}+\\dfrac{y}{p_2}-1`,
-      HC: `p_1\\dfrac{p_2}{p_1}+p_2\\Big(v-${L21}\\Big)=p_2\\Big(v+1-${L21}\\Big)`,
+      CV: `\\begin{gathered}p_2\\Big(V+1-${L21}\\Big)=y\\\\\\Rightarrow V=${L21}+\\dfrac{y}{p_2}-1\\end{gathered}`,
+      HC: `\\begin{gathered}p_1\\dfrac{p_2}{p_1}+p_2\\Big(v-${L21}\\Big)\\\\=p_2\\Big(v+1-${L21}\\Big)\\end{gathered}`,
       DH: `H^1=\\dfrac{p_2}{p_1},\\ H^2=\\dfrac{C}{p_2}-1=v-${L21}`
     };
   }
@@ -131,7 +131,7 @@
       case 'cd': return '\\begin{gathered}U=x_1^{\\alpha}x_2^{1-\\alpha}\\\\[2pt]\\text{tangency: }\\dfrac{\\alpha}{1-\\alpha}\\dfrac{x_2}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]\\Rightarrow D^1=\\dfrac{\\alpha y}{p_1},\\ D^2=\\dfrac{(1-\\alpha)y}{p_2}\\\\[6pt]\\text{a price index:}\\\\[2pt]P(p)=\\Big(\\dfrac{p_1}{\\alpha}\\Big)^{\\alpha}\\Big(\\dfrac{p_2}{1-\\alpha}\\Big)^{1-\\alpha}\\end{gathered}';
       case 'subst': return '\\begin{gathered}U=x_1+x_2\\\\[2pt]\\text{only the cheaper good is bought}\\\\[2pt]D(p,y)=\\begin{cases}(y/p_1,\\,0)&p_1<p_2\\\\(0,\\,y/p_2)&p_1>p_2\\\\\\text{the budget line}&p_1=p_2\\end{cases}\\end{gathered}';
       case 'additive': return '\\begin{gathered}U=\\sqrt{x_1}+\\sqrt{x_2}\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\sqrt{\\dfrac{x_2}{x_1}}=\\dfrac{p_1}{p_2}\\\\[2pt]\\Rightarrow D^1=\\dfrac{yp_2}{p_1(p_1+p_2)}\\\\[2pt]D^2=\\dfrac{yp_1}{p_2(p_1+p_2)}\\end{gathered}';
-      case 'quasilin': return '\\begin{gathered}U=\\ln x_1+x_2\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\dfrac{1}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]\\text{if }y\\ge p_2:\\ D^1=\\dfrac{p_2}{p_1},\\ D^2=\\dfrac{y}{p_2}-1\\\\[2pt]\\text{if }y<p_2:\\ D=(y/p_1,\\,0)\\end{gathered}';
+      case 'quasilin': return '\\begin{gathered}U=\\log x_1+x_2\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\dfrac{1}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]\\text{if }y\\ge p_2:\\ D^1=\\dfrac{p_2}{p_1},\\ D^2=\\dfrac{y}{p_2}-1\\\\[2pt]\\text{if }y<p_2:\\ D=(y/p_1,\\,0)\\end{gathered}';
     }
     return '';
   }
@@ -376,8 +376,13 @@
   // A formula wider than its box is drawn smaller (down to 60%), so that no box needs a scroll bar.
   function fit(el) {
     el.style.fontSize = '';
-    const w = el.clientWidth, sw = el.scrollWidth;
-    if (w > 0 && sw > w + 1) el.style.fontSize = `${parseFloat(getComputedStyle(el).fontSize) * Math.max(0.6, (w - 2) / sw)}px`;
+    const base = parseFloat(getComputedStyle(el).fontSize);
+    // a few passes: KaTeX does not shrink exactly in proportion
+    for (let k = 0; k < 4; k++) {
+      const w = el.clientWidth, sw = el.scrollWidth, fs = parseFloat(getComputedStyle(el).fontSize);
+      if (!(w > 0 && sw > w + 1) || fs <= 0.6 * base) break;
+      el.style.fontSize = `${Math.max(0.6 * base, fs * (w - 2) / sw)}px`;
+    }
   }
   const fitAll = () => document.querySelectorAll('#formula, #card-step, .cell-tex').forEach(fit);
 

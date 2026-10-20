@@ -48,7 +48,7 @@ for (const [ex, a] of examples) for (const p of prices) for (const y of [1.2, 8,
   assert.equal(gV === null, tie, 'V kinked only at a tie ' + label); assert.equal(gC === null, tie); checks += 2;
   if (!tie) {
     const fd = (f, k) => { const q = p.slice(), r = p.slice(); q[k] += h; r[k] -= h; return (f(q) - f(r)) / (2 * h); };
-    // (no finite difference across a kink: ln x1 + x2 at y = p2 is smooth, x1 + x2 has no tie here)
+    // (no finite difference across a kink: log x1 + x2 at y = p2 is smooth, x1 + x2 has no tie here)
     for (let k = 0; k < 2; k++) {
       close(gV.p[k], fd(q => M.indirect(ex, q, y, a), k), 1e-5, 'V_p ' + label);
       close(gC[k], fd(q => M.expenditure(ex, q, V, a), k), 1e-5, 'C_p ' + label);
@@ -72,7 +72,7 @@ for (const [ex, a] of examples) for (const p of prices) for (const y of [1.2, 8,
   for (const q of M.curve(ex, V, a, 3 * Math.max(y / p[0], y / p[1]))) if (q[1] !== null && q[1] > 0 && q[0] > 0) { close(M.utility(ex, q, a), V, 1e-9, 'curve ' + label); checks++; }
 }
 
-// ln x1 + x2 switches regime at y = p2 without a jump in D, V, C or their derivatives.
+// log x1 + x2 switches regime at y = p2 without a jump in D, V, C or their derivatives.
 {
   const p = [1, 2], e = 1e-9;
   for (const f of [(y) => M.demandSet('quasilin', p, y)[0][0], (y) => M.indirect('quasilin', p, y), (y) => M.indirectGrad('quasilin', p, y).p[0], (y) => M.indirectGrad('quasilin', p, y).y]) {

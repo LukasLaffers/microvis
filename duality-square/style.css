@@ -2,10 +2,10 @@
 /* Two columns: the controls, then the figure with the square and, under it, the table of all arrows. */
 .layout { grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "controls main" "controls arrows"; }
 .layout > .arrows-panel { grid-area: arrows; }
-.seg-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; }
-.seg-3 button { padding: 8px 2px; font-weight: 400; font-size: 13px; white-space: nowrap; }
-.seg-3 button:nth-child(4) { border-left: 0; }
-.seg-3 button:nth-child(n+4) { border-top: 1px solid var(--ink); }
+/* six buttons on a grid; the 1px gaps show the ink colour as separators */
+.seg-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--ink); }
+.seg-3 button { padding: 8px 2px; background: var(--panel); font-weight: 400; font-size: 13px; white-space: nowrap; overflow: hidden; }
+.seg-3 button + button { border-left: 0; }
 
 .trip button { font-size: 13px; }
 .trip-status { min-height: 1.5em; margin: 0 0 4px; font-size: 14px; }
@@ -33,6 +33,7 @@
 
 /* formulas are drawn smaller when too wide (app.js), so they never need a scroll bar */
 #formula, #card-step, .arrow-grid .cell .cell-tex { overflow: hidden; }
+.arrow-grid .cell-tex .katex { white-space: nowrap; }   /* one line, never broken at an operator */
 .step-card { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 .card-rule { margin: 0; font-size: 15px; }
 .card-step { font-size: 16px; }
@@ -58,6 +59,7 @@
   .layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "main" "controls" "arrows"; }
 }
 @media (max-width: 480px) {
+  .seg-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .arrow-grid { grid-template-columns: minmax(0, 1fr); }
   #square .alab { font-size: 18px; }
   #square .side-lab { font-size: 15px; }
