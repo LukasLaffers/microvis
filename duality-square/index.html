@@ -66,6 +66,7 @@
         <div class="btn-row trip">
           <button type="button" id="trip-fwd" aria-pressed="false">▶ Round the square</button>
           <button type="button" id="trip-back" aria-pressed="false">▶ The other way</button>
+          <button type="button" id="trip-stop" hidden>■ Stop</button>
         </div>
       </div>
       <p class="trip-status" id="trip-status" aria-live="polite"></p>
@@ -85,7 +86,7 @@
       </div>
     </section>
 
-    <section class="panel wide" aria-label="All eight arrows">
+    <section class="panel arrows-panel" aria-label="All eight arrows">
       <h2>All eight arrows for this example</h2>
       <p class="caption">Top row: round the square, <span class="tex" data-tex="D\to V\to C\to H\to D"></span>. Bottom row: the reverse of each arrow above it. Click a box to see that arrow.</p>
       <div class="arrow-grid" id="grid"></div>

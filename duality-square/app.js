@@ -128,10 +128,10 @@
     switch (ex) {
       case 'leontief': return '\\begin{gathered}U=\\min\\{x_1,x_2\\}\\\\[2pt]\\text{optimum at the kink: }x_1=x_2\\\\[2pt]\\text{budget: }(p_1+p_2)x_1=y\\\\[2pt]\\Rightarrow D^1=D^2=\\dfrac{y}{p_1+p_2}\\end{gathered}';
       case 'sqrt': return '\\begin{gathered}U=\\sqrt{x_1x_2}\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\dfrac{x_2}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]\\Rightarrow D^1=\\dfrac{y}{2p_1},\\ D^2=\\dfrac{y}{2p_2}\\end{gathered}';
-      case 'cd': return '\\begin{gathered}U=x_1^{\\alpha}x_2^{1-\\alpha}\\\\[2pt]\\text{tangency: }\\dfrac{\\alpha}{1-\\alpha}\\dfrac{x_2}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]\\Rightarrow D^1=\\dfrac{\\alpha y}{p_1},\\ D^2=\\dfrac{(1-\\alpha)y}{p_2}\\\\[6pt]\\text{a price index: }P(p)=\\Big(\\dfrac{p_1}{\\alpha}\\Big)^{\\alpha}\\Big(\\dfrac{p_2}{1-\\alpha}\\Big)^{1-\\alpha}\\end{gathered}';
+      case 'cd': return '\\begin{gathered}U=x_1^{\\alpha}x_2^{1-\\alpha}\\\\[2pt]\\text{tangency: }\\dfrac{\\alpha}{1-\\alpha}\\dfrac{x_2}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]\\Rightarrow D^1=\\dfrac{\\alpha y}{p_1},\\ D^2=\\dfrac{(1-\\alpha)y}{p_2}\\\\[6pt]\\text{a price index:}\\\\[2pt]P(p)=\\Big(\\dfrac{p_1}{\\alpha}\\Big)^{\\alpha}\\Big(\\dfrac{p_2}{1-\\alpha}\\Big)^{1-\\alpha}\\end{gathered}';
       case 'subst': return '\\begin{gathered}U=x_1+x_2\\\\[2pt]\\text{only the cheaper good is bought}\\\\[2pt]D(p,y)=\\begin{cases}(y/p_1,\\,0)&p_1<p_2\\\\(0,\\,y/p_2)&p_1>p_2\\\\\\text{the budget line}&p_1=p_2\\end{cases}\\end{gathered}';
-      case 'additive': return '\\begin{gathered}U=\\sqrt{x_1}+\\sqrt{x_2}\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\sqrt{\\dfrac{x_2}{x_1}}=\\dfrac{p_1}{p_2}\\\\[2pt]\\Rightarrow D^1=\\dfrac{yp_2}{p_1(p_1+p_2)},\\ D^2=\\dfrac{yp_1}{p_2(p_1+p_2)}\\end{gathered}';
-      case 'quasilin': return '\\begin{gathered}U=\\ln x_1+x_2\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\dfrac{1}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]y\\ge p_2:\\ D^1=\\dfrac{p_2}{p_1},\\ D^2=\\dfrac{y}{p_2}-1\\\\[2pt]y<p_2:\\ D=(y/p_1,\\,0)\\end{gathered}';
+      case 'additive': return '\\begin{gathered}U=\\sqrt{x_1}+\\sqrt{x_2}\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\sqrt{\\dfrac{x_2}{x_1}}=\\dfrac{p_1}{p_2}\\\\[2pt]\\Rightarrow D^1=\\dfrac{yp_2}{p_1(p_1+p_2)}\\\\[2pt]D^2=\\dfrac{yp_1}{p_2(p_1+p_2)}\\end{gathered}';
+      case 'quasilin': return '\\begin{gathered}U=\\ln x_1+x_2\\\\[2pt]\\text{tangency: }\\dfrac{U_1}{U_2}=\\dfrac{1}{x_1}=\\dfrac{p_1}{p_2}\\\\[2pt]\\text{if }y\\ge p_2:\\ D^1=\\dfrac{p_2}{p_1},\\ D^2=\\dfrac{y}{p_2}-1\\\\[2pt]\\text{if }y<p_2:\\ D=(y/p_1,\\,0)\\end{gathered}';
     }
     return '';
   }
@@ -224,7 +224,7 @@
     h += `<text class="side-lab" x="${NODE.V[0]}" y="318" text-anchor="middle">UMP</text><text class="side-lab" x="${NODE.C[0]}" y="318" text-anchor="middle">EMP</text>`;
     sq.innerHTML = h;
     sq.querySelectorAll('.arrow').forEach(g => {
-      const go = () => { stopTrip(); select(g.dataset.id, true); };
+      const go = () => select(g.dataset.id);
       g.addEventListener('click', go);
       g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); go(); } });
     });
@@ -276,8 +276,9 @@
     const mOf = () => y * (START + (1 - START) * s);   // the income of a slide
     const label = (pt, text, color) => U.text2(pt, text ? '\u2002\u2002\u2002' + text : '', color, 'top right', 13);   // the spaces clear the ring of H
     const at = D[tie ? 1 : 0];   // where the labels go
-    // a label just above the budget line p.x = m, near its left end (hidden labels have no text, so that they can move)
-    const lineLabel = (m, text) => U.text2([0.1 * m / p[0], 0.9 * m / p[1]], text, th.blue, 'top right', 13);
+    // a label just below the budget line p.x = m, near its left end, away from the curve above it
+    // (hidden labels have no text, so that they can move)
+    const lineLabel = (m, text) => U.text2([0.06 * m / p[0], 0.94 * m / p[1]], text, th.blue, 'bottom right', 13);
 
     switch (id) {
       case 'DV': {   // the indifference curve grows out of D
@@ -372,6 +373,14 @@
 
   // ---------- drawing ----------
 
+  // A formula wider than its box is drawn smaller (down to 60%), so that no box needs a scroll bar.
+  function fit(el) {
+    el.style.fontSize = '';
+    const w = el.clientWidth, sw = el.scrollWidth;
+    if (w > 0 && sw > w + 1) el.style.fontSize = `${parseFloat(getComputedStyle(el).fontSize) * Math.max(0.6, (w - 2) / sw)}px`;
+  }
+  const fitAll = () => document.querySelectorAll('#formula, #card-step, .cell-tex').forEach(fit);
+
   function drawFigure() {
     const S = solve(), th = U.theme();
     guard('figure', () => figure(th, S, state.sel, state.t));
@@ -398,6 +407,7 @@
           `<div class="cell-val">${value(id, S)}</div></div>`;
       }).join('');
     });
+    fitAll();
     drawFigure();
   }
   const schedule = U.scheduler(render);
@@ -405,64 +415,84 @@
   // ---------- animation and the round trips ----------
 
   const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let anim = null, trip = null;
-  // Choose an arrow; play its step in the figure (dur in ms; none with reduced motion).
-  function select(id, play, dur = 1800, then) {
-    state.sel = id;
-    if (anim) cancelAnimationFrame(anim.frame);
-    anim = null;
-    state.t = play && !reduced() ? 0 : 1;
-    render();
-    if (!play || reduced()) { state.t = 1; drawFigure(); if (then) then(); return; }
-    const t0 = performance.now();
-    const step = now => {
-      state.t = Math.min(1, (now - t0) / dur);
+  // One player for both a single arrow and a trip round the square: each arrow plays its step in the figure (ANIM ms),
+  // then holds the result (HOLD ms, on a trip) before the next. Time runs only while not paused.
+  const ANIM = 2400, TRIP_ANIM = 3400, HOLD = 3000;
+  let player = null;
+  function frame(now) {
+    const P = player;
+    if (!P || P.paused) return;
+    P.elapsed += now - P.last; P.last = now;
+    if (P.phase === 'anim') {
+      state.t = P.dur > 0 ? Math.min(1, P.elapsed / P.dur) : 1;
       drawFigure();
-      if (state.t < 1) anim.frame = requestAnimationFrame(step);
-      else { anim = null; if (then) then(); }
-    };
-    state.t = 0; drawFigure();
-    anim = { frame: requestAnimationFrame(step) };
+      if (state.t >= 1) { P.phase = 'hold'; P.elapsed = 0; }
+    } else if (P.elapsed >= P.hold) {
+      if (P.i + 1 < P.seq.length) { P.i++; startStep(); }
+      else { finish(); return; }
+    }
+    P.frame = requestAnimationFrame(frame);
   }
-  function tripButtons() {
-    for (const dir of ['fwd', 'back']) {
-      const b = $(`trip-${dir}`), on = trip && trip.dir === dir;
-      b.textContent = on ? '■ Stop' : `▶ ${NAMES[dir]}`;
-      b.setAttribute('aria-pressed', String(!!on));
+  function startStep() {
+    const P = player;
+    P.phase = 'anim'; P.elapsed = 0;
+    state.sel = P.seq[P.i]; state.t = P.dur > 0 ? 0 : 1;
+    render();
+    tripStatus();
+  }
+  function play(seq, dir) {
+    stop();
+    const still = reduced();
+    player = { seq, dir, i: 0, dur: still ? 0 : dir ? TRIP_ANIM : ANIM, hold: dir ? (still ? 5000 : HOLD) : 0, paused: false, last: performance.now(), elapsed: 0, phase: 'anim', frame: 0 };
+    startStep();
+    tripButtons();
+    player.frame = requestAnimationFrame(frame);
+  }
+  function stop() {
+    if (!player) return;
+    cancelAnimationFrame(player.frame);
+    const wasTrip = !!player.dir;
+    player = null;
+    if (state.t < 1) { state.t = 1; drawFigure(); }
+    if (wasTrip) { tripButtons(); $('trip-status').innerHTML = ''; }
+  }
+  function finish() {
+    const dir = player.dir;
+    player = null;
+    tripButtons();
+    if (dir) {
+      const S = solve();
+      $('trip-status').innerHTML = `Back at ${texStr('D')}: ${texStr(`D(p,y)=${setTex(S, S.D, S.y / S.p[0])}`)}, the bundle we started from.`;
     }
   }
-  function stopTrip() {
-    if (!trip) return;
-    clearTimeout(trip.timer);
-    trip = null;
-    tripButtons();
+  function pause(on) {
+    const P = player;
+    if (!P) return;
+    P.paused = on;
+    if (on) cancelAnimationFrame(P.frame);
+    else { P.last = performance.now(); P.frame = requestAnimationFrame(frame); }
+    tripButtons(); tripStatus();
   }
-  function tripStatus(text) { $('trip-status').innerHTML = text; }
-  function startTrip(dir) {
-    if (trip && trip.dir === dir) { stopTrip(); tripStatus(''); return; }
-    stopTrip();
-    trip = { dir, i: 0, timer: 0 };
-    tripButtons();
-    const seq = TRIPS[dir], hold = reduced() ? 2600 : 1300;
-    const next = () => {
-      if (!trip) return;
-      const id = seq[trip.i], A = ARROWS[id];
-      tripStatus(`Step ${trip.i + 1} of 4: ${texStr(`${A.from}\\to ${A.to}`)}, ${A.name}`);
-      select(id, true, 2200, () => {
-        if (!trip) return;
-        trip.timer = setTimeout(() => {
-          if (!trip) return;
-          trip.i++;
-          if (trip.i < seq.length) next();
-          else {
-            const S = solve();
-            tripStatus(`Back at ${texStr('D')}: ${texStr(`D(p,y)=${setTex(S, S.D, S.y / S.p[0])}`)}, the bundle we started from.`);
-            stopTrip();
-          }
-        }, hold);
-      });
-    };
-    next();
+  // Choose an arrow and play its step once.
+  const select = id => play([id], null);
+  function tripButtons() {
+    for (const dir of ['fwd', 'back']) {
+      const b = $(`trip-${dir}`), on = player && player.dir === dir;
+      b.textContent = !on ? `▶ ${NAMES[dir]}` : player.paused ? '▶ Resume' : '❚❚ Pause';
+      b.setAttribute('aria-pressed', String(!!on));
+    }
+    $('trip-stop').hidden = !(player && player.dir);
+  }
+  function tripStatus() {
+    const P = player;
+    if (!P || !P.dir) return;
+    const A = ARROWS[P.seq[P.i]];
+    $('trip-status').innerHTML = `Step ${P.i + 1} of 4: ${texStr(`${A.from}\\to ${A.to}`)}, ${A.name}${P.paused ? ' <span class="c-muted">(paused)</span>' : ''}`;
+  }
+  // A trip button starts its trip; while that trip runs it pauses it, and then resumes it.
+  function tripButton(dir) {
+    if (player && player.dir === dir) pause(!player.paused);
+    else play(TRIPS[dir], dir);
   }
 
   function init() {
@@ -470,22 +500,23 @@
     buildSquare();
     ctrls = U.controls(document, state, { onChange: schedule });
     document.querySelectorAll('[data-ex]').forEach(b => b.addEventListener('click', () => {
-      stopTrip(); tripStatus('');
-      state.ex = b.dataset.ex; select(state.sel, true);
+      state.ex = b.dataset.ex; select(state.sel);
     }));
-    $('grid').addEventListener('click', ev => { const c = ev.target.closest('.cell'); if (c) { stopTrip(); tripStatus(''); select(c.dataset.id, true); } });
+    $('grid').addEventListener('click', ev => { const c = ev.target.closest('.cell'); if (c) select(c.dataset.id); });
     $('grid').addEventListener('keydown', ev => {
       const c = ev.target.closest('.cell');
-      if (c && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); stopTrip(); tripStatus(''); select(c.dataset.id, true); }
+      if (c && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); select(c.dataset.id); }
     });
-    $('trip-fwd').addEventListener('click', () => startTrip('fwd'));
-    $('trip-back').addEventListener('click', () => startTrip('back'));
+    $('trip-fwd').addEventListener('click', () => tripButton('fwd'));
+    $('trip-back').addEventListener('click', () => tripButton('back'));
+    $('trip-stop').addEventListener('click', stop);
     $('reset').addEventListener('click', () => {
-      stopTrip(); tripStatus('');
+      stop();
       for (const k of ['p1', 'p2', 'y', 'alpha']) ctrls[k].setExact(DEF[k]);
       state.ex = DEF.ex; schedule();
     });
     render();
+    window.addEventListener('resize', schedule);
     U.watchColorScheme(schedule);
   }
 

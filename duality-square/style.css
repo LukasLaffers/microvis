@@ -1,7 +1,7 @@
 /* The Duality Square: tool-specific styles (shared look is in ../shared/style.css). */
-/* Two columns: the controls, then the figure with the square; the table of all arrows below, across the page. */
-.layout { grid-template-columns: 300px minmax(0, 1fr); grid-template-areas: "controls main"; }
-.layout > .wide { grid-column: 1 / -1; }
+/* Two columns: the controls, then the figure with the square and, under it, the table of all arrows. */
+.layout { grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "controls main" "controls arrows"; }
+.layout > .arrows-panel { grid-area: arrows; }
 .seg-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; }
 .seg-3 button { padding: 8px 2px; font-weight: 400; font-size: 13px; white-space: nowrap; }
 .seg-3 button:nth-child(4) { border-left: 0; }
@@ -31,6 +31,8 @@
 #square .arrow.sel .stem { stroke: var(--ink); stroke-width: 3; }
 #square .arrow.sel .alab { fill: var(--ink); font-weight: 700; }
 
+/* formulas are drawn smaller when too wide (app.js), so they never need a scroll bar */
+#formula, #card-step, .arrow-grid .cell .cell-tex { overflow: hidden; }
 .step-card { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 .card-rule { margin: 0; font-size: 15px; }
 .card-step { font-size: 16px; }
@@ -53,7 +55,7 @@
 }
 /* On a phone the figure and the square come first, the controls follow. */
 @media (max-width: 800px) {
-  .layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "controls"; }
+  .layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "main" "controls" "arrows"; }
 }
 @media (max-width: 480px) {
   .arrow-grid { grid-template-columns: minmax(0, 1fr); }
