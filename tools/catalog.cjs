@@ -40,6 +40,7 @@ module.exports = [
   ] },
   { id: 'l6', lecture: 6, nav: 'Demand', title: 'Demand theory', tools: [
     ['demand-duality', 'UMP and EMP: Two Sides of One Tangency', 'Maximise utility on a budget, or minimise spending for a utility level: the same bundle.'],
+    ['duality-square', 'The Duality Square', 'Demand, indirect utility, expenditure and Hicksian demand: from any one to the other three.'],
     ['slutsky', 'Substitution and Income Effects', 'A price change split into a substitution and an income effect, including a Giffen good.'],
     ['engel-curves', 'Income Expansion Paths and Engel Curves', 'Necessities, luxuries and inferior goods: how demand moves with income.']
   ] },

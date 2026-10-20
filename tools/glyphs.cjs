@@ -95,6 +95,17 @@ G['ordinal-utility'] = svg(AX + S(iso(140)) + A(iso(380), 2.4) + S(iso(760)));
 
 // Lecture 6
 G['demand-duality'] = svg(AX + F([[9, 55], [9, 15], [49, 55]], 0.12) + A([[9, 15], [49, 55]], 2) + L(iso(400)) + D(29, 35));
+{ // the duality square: D, H (top), V, C (bottom); one way round in the accent colour, the other way faint
+  const N = { D: [17, 15], H: [51, 15], V: [17, 49], C: [51, 49] }, gap = 6, k = 5;
+  const arc = (a, b) => {   // a curve from a to b that bends to its left, ending short of both corners
+    const [x1, y1] = N[a], [x2, y2] = N[b], dx = x2 - x1, dy = y2 - y1, n = Math.hypot(dx, dy), ux = dx / n, uy = dy / n;
+    const s = [x1 + gap * ux, y1 + gap * uy], e = [x2 - gap * ux, y2 - gap * uy], c = [(s[0] + e[0]) / 2 + k * uy, (s[1] + e[1]) / 2 - k * ux];
+    return fn(t => 0, 0, 1, 16).map(([t]) => [(1 - t) ** 2 * s[0] + 2 * t * (1 - t) * c[0] + t * t * e[0], (1 - t) ** 2 * s[1] + 2 * t * (1 - t) * c[1] + t * t * e[1]]);
+  };
+  const way = (pairs, draw, acc) => pairs.map(([a, b]) => { const q = arc(a, b); return draw(q) + head(q[q.length - 2], q[q.length - 1], acc); }).join('');
+  G['duality-square'] = svg('<g opacity="0.45">' + way([['D', 'H'], ['H', 'C'], ['C', 'V'], ['V', 'D']], q => L(q, 1.3), false) + '</g>' +
+    way([['D', 'V'], ['V', 'C'], ['C', 'H'], ['H', 'D']], q => A(q, 2), true) + Object.values(N).map(([x, y]) => D(x, y, false, 3.2)).join(''));
+}
 G['slutsky'] = svg(AX + A([[9, 15], [49, 55]], 1.8) + S([[9, 15], [33, 55]]) + L(iso(400)) + S(iso(150)) + D(29, 35));
 G['engel-curves'] = svg(AX + S(fn(x => 53 - 0.5 * (x - 9) - 0.004 * (x - 9) ** 2, 9, 57)) + A(fn(x => 55 - 34 * ((x - 9) / 18) * Math.exp(1 - (x - 9) / 18), 9, 59)));
 

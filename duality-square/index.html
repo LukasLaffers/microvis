@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Duality Square · Microvis</title>
+  <meta name="description" content="Marshallian demand, indirect utility, the expenditure function and Hicksian demand: from any one of them to the others, for six simple utility functions. Lecture 6.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=20">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div>
+      <p class="eyebrow"><a href="../index.html#l6">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 6 · Demand theory</p>
+      <h1>The Duality Square</h1>
+      <p class="subtitle"><span class="tex" data-tex="D(p,y)\qquad V(p,y)\qquad C(p,v)\qquad H(p,v)"></span></p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>Utility maximisation gives Marshallian demand <span class="tex" data-tex="D"></span> and indirect utility <span class="tex" data-tex="V"></span> (<span class="c-l2-red">red</span>), expenditure minimisation gives Hicksian demand <span class="tex" data-tex="H"></span> and the expenditure function <span class="tex" data-tex="C"></span> (<span class="c-l2-blue">blue</span>). Know one of the four, and the arrows give the other three.</p>
+          <ul>
+          <li>Click an arrow: its rule, the step for this example, the numbers, and in the figure what the step does.</li>
+          <li>Go round the square: from <span class="tex" data-tex="D"></span> through <span class="tex" data-tex="V"></span>, <span class="tex" data-tex="C"></span> and <span class="tex" data-tex="H"></span> back to <span class="tex" data-tex="D"></span>; then the other way.</li>
+          <li><span class="tex" data-tex="x_1+x_2"></span> with <span class="tex" data-tex="p_1=p_2"></span>, or <span class="tex" data-tex="\log x_1+x_2"></span> with <span class="tex" data-tex="y<p_2"></span>: which arrows change?</li>
+          </ul>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Utility function</h2>
+        <div class="seg seg-3" role="group" aria-label="Utility function">
+          <button type="button" data-ex="leontief" aria-pressed="false"><span class="tex" data-tex="\min\{x_1,x_2\}"></span></button>
+          <button type="button" data-ex="sqrt" aria-pressed="true"><span class="tex" data-tex="\sqrt{x_1x_2}"></span></button>
+          <button type="button" data-ex="cd" aria-pressed="false"><span class="tex" data-tex="x_1^{\alpha}x_2^{1-\alpha}"></span></button>
+          <button type="button" data-ex="subst" aria-pressed="false"><span class="tex" data-tex="x_1+x_2"></span></button>
+          <button type="button" data-ex="additive" aria-pressed="false"><span class="tex" data-tex="\sqrt{x_1}+\sqrt{x_2}"></span></button>
+          <button type="button" data-ex="quasilin" aria-pressed="false"><span class="tex" data-tex="\log x_1+x_2"></span></button>
+        </div>
+        <div class="formula" id="formula"></div>
+        <p class="note" id="ex-note"></p>
+      </div>
+      <div class="group">
+        <h2>Prices and income</h2>
+        <div class="ctrl" data-key="p1" data-label="p_1" data-hint="" data-min="0.5" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="p2" data-label="p_2" data-hint="" data-min="0.5" data-max="4" data-step="0.05"></div>
+        <div class="ctrl" data-key="y" data-label="y" data-hint="income" data-min="1" data-max="20" data-step="0.1"></div>
+        <div class="ctrl" data-key="alpha" data-label="\alpha" data-hint="weight on good 1" data-min="0.1" data-max="0.9" data-step="0.01" data-show="cd"></div>
+        <p class="note">The square uses <span class="tex" data-tex="v=V(p,y)"></span>, so (UMP) and (EMP) pick the same bundle.</p>
+        <div class="btn-row"><button type="button" id="reset">Default values</button></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="The duality square">
+      <div class="panel-head">
+        <h2>Four functions, eight arrows</h2>
+        <div class="btn-row trip">
+          <button type="button" id="trip-fwd" aria-pressed="false">▶ Round the square</button>
+          <button type="button" id="trip-back" aria-pressed="false">▶ The other way</button>
+          <button type="button" id="trip-stop" hidden>■ Stop</button>
+        </div>
+      </div>
+      <p class="trip-status" id="trip-status" aria-live="polite"></p>
+      <div class="duo">
+        <figure class="fig">
+          <div id="plot" class="plot plot-fig"></div>
+          <figcaption class="caption" id="figcap"></figcaption>
+        </figure>
+        <div class="sq-wrap">
+          <svg id="square" viewBox="-5 0 500 330" role="group" aria-label="The duality square: click an arrow"></svg>
+        </div>
+      </div>
+      <div class="step-card" id="card" aria-live="polite">
+        <p class="card-rule" id="card-rule"></p>
+        <div class="card-step formula" id="card-step"></div>
+        <p class="card-num" id="card-num"></p>
+      </div>
+    </section>
+
+    <section class="panel arrows-panel" aria-label="All eight arrows">
+      <h2>All eight arrows for this example</h2>
+      <p class="caption">Top row: round the square, <span class="tex" data-tex="D\to V\to C\to H\to D"></span>. Bottom row: the reverse of each arrow above it. Click a box to see that arrow.</p>
+      <div class="arrow-grid" id="grid"></div>
+    </section>
+  </main>
+
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../demand-duality/index.html"><span>Previous</span>UMP and EMP: Two Sides of One Tangency</a>
+    <a class="all" href="../index.html#l6">All tools</a>
+    <a class="next" href="../slutsky/index.html"><span>Next</span>Substitution and Income Effects</a>
+  </nav>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js?v=20"></script>
+  <script src="model.js?v=20"></script>
+  <script src="app.js?v=20"></script>
+  <script src="../shared/theme.js?v=20"></script>
+  <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
+</body>
+</html>
