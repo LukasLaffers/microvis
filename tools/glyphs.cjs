@@ -115,6 +115,12 @@ G['cv-ev'] = svg(AX + F([[9, 29], ...fn(y => 400 / (55 - y) - 1, 29, 41, 20).map
 G['deadweight-loss'] = svg(AX + L([[9, 13], [57, 53]]) + A([[9, 25], [59, 25]], 1.6) + S([[9, 39], [59, 39]]) + F([[23.4, 25], [40.2, 39], [23.4, 39]], 0.35) + S([[23.4, 25], [23.4, 55]], DASH));
 
 // Lecture 8
+{ // a town of three firms with arrows between them, inside a dashed circle
+  const c = (x, y, r, acc) => `<circle cx="${x}" cy="${y}" r="${r}" ${acc ? `class="af" fill="${BRAND}"` : 'fill="currentColor"'}/>`;
+  G['netput-aggregation'] = svg('<circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.55"/>' +
+    A([[20, 24], [39, 24]], 1.8) + head([20, 24], [42, 24]) + A([[44, 28], [36, 41]], 1.8) + head([44, 28], [34.6, 43.4]) +
+    c(17, 24, 3.4) + c(46, 24, 3.4) + c(32, 46, 3.4));
+}
 { // production possibility frontier and the indifference curve that touches it
   const T = [33, 55 - 44 * Math.sqrt(1 - (24 / 46) ** 2)];
   G['robinson-crusoe'] = svg(AX + L(fn(x => 55 - 44 * Math.sqrt(Math.max(0, 1 - ((x - 9) / 46) ** 2)), 9, 55, 60)) +

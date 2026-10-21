@@ -522,6 +522,12 @@
     });
     render();
     window.addEventListener('resize', schedule);
+    // fit again once the fonts have loaded and whenever the boxes change size (layout settling, a panel opening)
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+    if (window.ResizeObserver) {
+      let frame = 0;
+      new ResizeObserver(() => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; fitAll(); }); }).observe($('grid'));
+    }
     U.watchColorScheme(schedule);
   }
 
