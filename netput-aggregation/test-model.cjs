@@ -10,18 +10,19 @@ let checks = 0;
 const riv = M.TOWNS[0];
 assert.deepEqual(M.townNet(riv, {}), [1000, 900, 0, -30, -2]); checks++;
 assert.deepEqual(M.townNet(M.TOWNS[1], {}), [0, 810, 40, -30, -3]); checks++;
-assert.deepEqual(M.townNet(M.TOWNS[2], {}), [2000, 0, -40, -20, 0]); checks++;
-assert.deepEqual(M.townNet(M.TOWNS[3], {}), [0, -270, 60, -30, -3]); checks++;
+assert.deepEqual(M.townNet(M.TOWNS[2], {}), [3000, 0, -60, -30, 0]); checks++;
+assert.deepEqual(M.townNet(M.TOWNS[3], {}), [0, -360, 80, -40, -4]); checks++;
 assert.deepEqual(M.townNet(M.TOWNS[4], {}), [3000, 0, -60, -30, 0]); checks++;
-assert.deepEqual(M.countryNet(M.COUNTRIES[0], {}), [3000, 1710, 0, -80, -5]); checks++;
-assert.deepEqual(M.countryNet(M.COUNTRIES[1], {}), [3000, -270, 0, -60, -3]); checks++;
-assert.deepEqual(M.economyNet({}), [6000, 1440, 0, -140, -8]); checks++;
+assert.deepEqual(M.countryNet(M.COUNTRIES[0], {}), [4000, 1710, -20, -90, -5]); checks++;
+assert.deepEqual(M.countryNet(M.COUNTRIES[1], {}), [3000, -360, 20, -70, -4]); checks++;
+assert.deepEqual(M.economyNet({}), [7000, 1350, 0, -160, -9]); checks++;
 // Inside Riverton 90 potatoes go to the pig farm and 20 pigs to the sausage factory; in Northland, 40 pigs go from
-// Hillside to Millbrook, in Southland 60 from Oakford to Bayport; between the countries, 270 potatoes go south.
+// Hillside to Millbrook, in Southland 60 from Oakford to Bayport; between the countries 360 potatoes go south and
+// 20 pigs north: two goods in opposite directions.
 assert.deepEqual(M.flows(M.firmActors(riv, {})).map(f => [f.from, f.to, f.good, f.amount]), [['riv-pot', 'riv-pig', 1, 90], ['riv-pig', 'riv-sf', 2, 20]]); checks++;
 assert.deepEqual(M.flows(M.townActors(M.COUNTRIES[0], {})).map(f => [f.from, f.to, f.good, f.amount]), [['hil', 'mil', 2, 40]]); checks++;
 assert.deepEqual(M.flows(M.townActors(M.COUNTRIES[1], {})).map(f => [f.from, f.to, f.good, f.amount]), [['oak', 'bay', 2, 60]]); checks++;
-assert.deepEqual(M.flows(M.countryActors({})).map(f => [f.from, f.to, f.good, f.amount]), [['north', 'south', 1, 270]]); checks++;
+assert.deepEqual(M.flows(M.countryActors({})).map(f => [f.from, f.to, f.good, f.amount]), [['north', 'south', 1, 360], ['south', 'north', 2, 20]]); checks++;
 
 // Random scales: sums, linearity in t, and the flows, checked good by good and actor by actor.
 let seed = 7;
