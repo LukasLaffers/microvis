@@ -50,6 +50,7 @@ module.exports = [
   ] },
   { id: 'l8', lecture: 8, nav: 'Decentralisation', title: 'Decentralisation in a simple economy', tools: [
     ['netput-aggregation', 'Zoom Out: Netputs Add Up', 'Firms, towns, countries and the economy: netput vectors add up, and goods passed between actors cancel.'],
+    ['transformation-function', 'One Frontier, Four Names', 'The transformation function: substitution, transformation, productivity and input requirement are one slope.'],
     ['robinson-crusoe', "Robinson Crusoe's Economy", 'Prices that let a profit-maximising firm and a utility-maximising consumer reach the planner’s optimum.']
   ] },
   { id: 'l9', lecture: 9, nav: 'General equilibrium', title: 'General equilibrium', tools: [

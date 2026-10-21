@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Frontier, Four Names · Microvis</title>
+  <meta name="description" content="The transformation function: technical rate of substitution, marginal rate of transformation, marginal productivity and marginal input requirement are one slope of one frontier. Lecture 8.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=20">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div>
+      <p class="eyebrow"><a href="../index.html#l8">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 8 · Decentralisation in a simple economy</p>
+      <h1>One Frontier, Four Names</h1>
+      <p class="subtitle"><span class="tex" data-tex="\displaystyle-\left.\frac{dq_j}{dq_i}\right|_{d\Phi=0}=\frac{\Phi_i(q)}{\Phi_j(q)}"></span></p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>One technology <span class="tex" data-tex="\Phi(q)\le0"></span> with two inputs (labour, land) and two outputs (sausages, potatoes). Cut its frontier <span class="tex" data-tex="\Phi(q)=0"></span> through the plan <span class="tex" data-tex="q"></span> in the plane of two goods, holding the other two fixed: the slope is always <span class="tex" data-tex="\Phi_i/\Phi_j"></span>. Its name depends only on which goods are inputs and which are outputs.</p>
+          <ul>
+          <li>Drag the red point along a curve. On the isoquant (top left) the outputs stay the same; on the frontier of outputs (bottom left) the inputs do.</li>
+          <li>The bottom right is always 1 over the top right.</li>
+          <li>Switch on "inputs as z = −q": the top right becomes a production function, as in lecture 1.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="group">
+        <h2>The plan q</h2>
+        <div class="ctrl" data-key="L" data-label="z_L=-q_L" data-hint="labour hours" data-min="2" data-max="40" data-step="0.5"></div>
+        <div class="ctrl" data-key="A" data-label="z_A=-q_A" data-hint="acres of land" data-min="1" data-max="10" data-step="0.1"></div>
+        <div class="ctrl" data-key="deg" data-label="\theta" data-hint="output mix: 0° only sausages, 90° only potatoes" data-min="5" data-max="85" data-step="1"></div>
+        <div class="btn-row"><button type="button" id="reset">Default values</button></div>
+      </div>
+      <div class="group">
+        <h2>Show</h2>
+        <label class="check"><input type="checkbox" id="zview"> inputs as <span class="tex" data-tex="z=-q"></span> (lecture 1)</label>
+        <label class="check"><input type="checkbox" id="low" checked> frontier of outputs with less input</label>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="Four slices of the frontier">
+      <div class="panel-head"><h2>Four slices of one frontier through the same plan</h2></div>
+      <div class="grid4">
+        <div class="cell"><h3>Two inputs: technical rate of substitution</h3><p class="slope" id="s-trs"></p><div id="p-trs" class="plot plot-cell"></div></div>
+        <div class="cell"><h3>Input → output: marginal productivity</h3><p class="slope" id="s-mp"></p><div id="p-mp" class="plot plot-cell"></div></div>
+        <div class="cell"><h3>Two outputs: marginal rate of transformation</h3><p class="slope" id="s-mrt"></p><div id="p-mrt" class="plot plot-cell"></div></div>
+        <div class="cell"><h3>Output → input: marginal input requirement</h3><p class="slope" id="s-mir"></p><div id="p-mir" class="plot plot-cell"></div></div>
+      </div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="The technology" aria-live="polite">
+        <h2>The technology</h2>
+        <div class="formula" id="tech"></div>
+        <ul class="checks" id="nums"></ul>
+        <p class="caption" id="side-cap"></p>
+      </section>
+    </div>
+  </main>
+
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../netput-aggregation/index.html"><span>Previous</span>Zoom Out: Netputs Add Up</a>
+    <a class="all" href="../index.html#l8">All tools</a>
+    <a class="next" href="../robinson-crusoe/index.html"><span>Next</span>Robinson Crusoe's Economy</a>
+  </nav>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a>
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js?v=20"></script>
+  <script src="model.js?v=20"></script>
+  <script src="app.js?v=20"></script>
+  <script src="../shared/theme.js?v=20"></script>
+  <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
+</body>
+</html>
