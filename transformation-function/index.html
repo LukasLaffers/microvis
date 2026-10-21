@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>One Frontier, Four Names · Microvis</title>
-  <meta name="description" content="The transformation function: technical rate of substitution, marginal rate of transformation, marginal productivity and marginal input requirement are one slope of one frontier. Lecture 8.">
+  <title>The Transformation Function · Microvis</title>
+  <meta name="description" content="The transformation function Φ with two inputs and two outputs: technical rate of substitution, marginal rate of transformation, marginal productivity and marginal input requirement as slopes of Φ(q) = 0. Lecture 8.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../shared/style.css?v=20">
@@ -16,7 +16,7 @@
     <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
     <div>
       <p class="eyebrow"><a href="../index.html#l8">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 8 · Decentralisation in a simple economy</p>
-      <h1>One Frontier, Four Names</h1>
+      <h1>The Transformation Function</h1>
       <p class="subtitle"><span class="tex" data-tex="\displaystyle-\left.\frac{dq_j}{dq_i}\right|_{d\Phi=0}=\frac{\Phi_i(q)}{\Phi_j(q)}"></span></p>
     </div>
   </header>
@@ -28,7 +28,7 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>One technology <span class="tex" data-tex="\Phi(q)\le0"></span> with two inputs (labour, land) and two outputs (sausages, potatoes). Cut its frontier <span class="tex" data-tex="\Phi(q)=0"></span> through the plan <span class="tex" data-tex="q"></span> in the plane of two goods, holding the other two fixed: the slope is always <span class="tex" data-tex="\Phi_i/\Phi_j"></span>. Its name depends only on which goods are inputs and which are outputs.</p>
+          <p>One technology <span class="tex" data-tex="\Phi(q)\le0"></span> with two inputs (labour, land) and two outputs (sausages, potatoes). Each figure shows the frontier <span class="tex" data-tex="\Phi(q)=0"></span> for one pair of goods, with the other two held fixed at the plan <span class="tex" data-tex="q"></span>. In every figure the slope is <span class="tex" data-tex="\Phi_i/\Phi_j"></span>; whether <span class="tex" data-tex="i"></span> and <span class="tex" data-tex="j"></span> are inputs or outputs decides what it is called.</p>
           <ul>
           <li>Drag the red point along a curve. On the isoquant (top left) the outputs stay the same; on the frontier of outputs (bottom left) the inputs do.</li>
           <li>The bottom right is always 1 over the top right.</li>
@@ -50,8 +50,8 @@
       </div>
     </section>
 
-    <section class="panel main-panel" aria-label="Four slices of the frontier">
-      <div class="panel-head"><h2>Four slices of one frontier through the same plan</h2></div>
+    <section class="panel main-panel" aria-label="The frontier for each pair of goods">
+      <div class="panel-head"><h2>The frontier <span class="tex" data-tex="\Phi(q)=0"></span> for each pair of goods</h2></div>
       <div class="grid4">
         <div class="cell"><h3>Two inputs: technical rate of substitution</h3><p class="slope" id="s-trs"></p><div id="p-trs" class="plot plot-cell"></div></div>
         <div class="cell"><h3>Input → output: marginal productivity</h3><p class="slope" id="s-mp"></p><div id="p-mp" class="plot plot-cell"></div></div>

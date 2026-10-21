@@ -1,7 +1,7 @@
 /*
- * One Frontier, Four Names: interface and plotting (lecture 8).
- * Four slices of the frontier Phi(q) = 0 through one plan q, each in the plane of two goods with the other two fixed.
- * The red point can be dragged along each slice; that moves the plan, and all four slices follow.
+ * The Transformation Function: interface and plotting (lecture 8).
+ * The frontier Phi(q) = 0 for four pairs of goods, each with the other two goods fixed at the plan q (a "slice").
+ * The red point can be dragged along each slice; that moves the plan, and the other figures follow.
  */
 (function () {
   'use strict';
@@ -116,7 +116,7 @@
       item(`Technical rate of substitution ${texStr(`\\Phi_L/\\Phi_A=\\phi_L/\\phi_A=z_A/z_L=${fmt(state.A / state.L)}`)}`),
       item(`Marginal productivity × marginal input requirement: ${texStr(`\\frac{\\Phi_L}{\\Phi_s}\\cdot\\frac{\\Phi_s}{\\Phi_L}=${fmt(mp)}\\cdot${fmt(mir)}=1`)}`)
     ].join('');
-    $('side-cap').innerHTML = `More of any netput is harder to reach, so all four partial derivatives are positive and every slice slopes down: one formula serves all four. With only sausages (${texStr('q_p=0')}), ${texStr('\\Phi(q)=q_s-\\phi(z)')} with ${texStr('z=-q')}: the production function of lecture 1, and ${texStr('\\Phi_L/\\Phi_s=\\phi_L')}.`;
+    $('side-cap').innerHTML = `More of any netput is harder to reach, so all four partial derivatives are positive and every curve slopes down: the same formula gives all four slopes. With only sausages (${texStr('q_p=0')}), ${texStr('\\Phi(q)=q_s-\\phi(z)')} with ${texStr('z=-q')}: the production function of lecture 1, and ${texStr('\\Phi_L/\\Phi_s=\\phi_L')}.`;
     $('cap').innerHTML = `<b>Drag the red point</b> along a curve: the other two netputs stay fixed, and the other three figures follow. The <span class="c-accent-2">dotted line</span> is the tangent; its slope is the number above the figure.` +
       (state.low ? ' Dashed, bottom left: the frontier of outputs with 60% of both inputs, as in the notes (low and high input).' : '');
   }

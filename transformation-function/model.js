@@ -1,5 +1,5 @@
 /*
- * One Frontier, Four Names (lecture 8): a technology with two inputs and two outputs described by its transformation
+ * The Transformation Function (lecture 8): a technology with two inputs and two outputs described by its transformation
  * function Phi, and the slopes of the frontier Phi(q) = 0 in the plane of any two goods. Pure math, no DOM; UMD so that
  * test-model.cjs can require it.
  *
