@@ -1,0 +1,51 @@
+/* Zoom Out: Netputs Add Up: tool-specific styles (shared look is in ../shared/style.css). */
+#map { display: block; width: 100%; background: var(--panel); border: 1px solid var(--line); touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+#map:active { cursor: grabbing; }
+#map .town { fill: var(--accent-soft); stroke: var(--l2-grey); stroke-width: 1.2; stroke-dasharray: 5 4; cursor: pointer; }
+#map .tname { font: 600 15px var(--font); fill: var(--ink); pointer-events: none; paint-order: stroke; stroke: var(--panel); stroke-width: 4px; }
+#map .icon { fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linejoin: round; }
+#map .firm { cursor: pointer; }
+#map .firm.idle .icon { stroke: var(--muted); stroke-dasharray: 3 2; }
+#map .firm .hit { fill: transparent; }
+#map .sel-ring { fill: none; stroke: var(--brand); stroke-width: 2.5; }
+#map .flow { stroke: var(--accent-2); stroke-width: 2; fill: none; }
+#map marker path { fill: var(--accent-2); }
+#map .flab { font: 13px var(--font); fill: var(--accent-2); paint-order: stroke; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+#map .card rect { fill: var(--panel); stroke: var(--line); }
+#map .card.sel rect { stroke: var(--brand); stroke-width: 1.5; }
+#map .card text { font-size: 12.5px; font-family: var(--font); }
+#map .card .h { font-weight: 700; fill: var(--ink); }
+#map .card .g { fill: var(--muted); }
+#map .card .pos { font-weight: 600; fill: var(--inc); }
+#map .card .neg { font-weight: 600; fill: var(--dec); }
+#map .card .zero { fill: var(--muted); }
+.c-flow { color: var(--accent-2); }
+
+.crumbs { margin: 0; font-size: 14px; }
+.crumbs a { color: var(--ink); }
+.crumbs .sep { color: var(--muted); }
+.zoom-btns button { min-width: 32px; font-size: 16px; padding: 2px 10px; }
+.sel-name { margin: 0 0 6px; font-size: 14px; }
+
+table.nv { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; margin-top: 6px; }
+table.nv th, table.nv td { padding: 5px 6px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.nv th { font-weight: 600; }
+table.nv th:first-child, table.nv td:first-child { text-align: left; color: var(--muted); }
+table.nv th.pick { cursor: pointer; }
+table.nv th.pick.sel { color: var(--brand); }
+table.nv .t-row td { color: var(--muted); font-size: 12px; }
+table.nv .pos { color: var(--inc); font-weight: 600; }
+table.nv .neg { color: var(--dec); font-weight: 600; }
+table.nv .zero { color: var(--muted); }
+table.nv .sum { border-left: 2px solid var(--ink); }
+.table-scroll { overflow-x: auto; position: relative; }
+
+table.nv .short { display: none; }
+@media (max-width: 480px) {
+  table.nv { font-size: 12px; }
+  table.nv th, table.nv td { padding: 5px 3px; }
+  table.nv .long { display: none; }
+  table.nv .short { display: inline; }
+}
+/* On a phone the map comes first, the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

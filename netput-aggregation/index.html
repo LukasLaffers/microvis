@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zoom Out: Netputs Add Up · Microvis</title>
+  <meta name="description" content="Netput vectors of firms, towns and the economy: zoom out and they add up, and the goods passed between actors cancel. Lecture 8.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=20">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div>
+      <p class="eyebrow"><a href="../index.html#l8">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 8 · Decentralisation in a simple economy</p>
+      <h1>Zoom Out: Netputs Add Up</h1>
+      <p class="subtitle"><span class="tex" data-tex="q^{\text{town}}=\displaystyle\sum_{\text{firms }f}t_f\,q^f\qquad q^{ec}=\displaystyle\sum_{\text{towns}}q^{\text{town}}"></span></p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>A production plan is a netput vector: outputs count positive, inputs negative. Zoom out and the plans add up, firm by firm and town by town. A good that one actor makes and another uses appears once with + and once with −, so it cancels in the sum.</p>
+          <ul>
+          <li>Zoom into a town: its firms and the goods they pass to each other.</li>
+          <li>Zoom out: each town is one actor, with one netput vector.</li>
+          <li>Pigs: where do they show up, and where do they cancel?</li>
+          <li>Scale the pig farm in Riverton to 0.5: what does Riverton now need from outside?</li>
+          </ul>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Zoom</h2>
+        <div class="seg" role="group" aria-label="Zoom level">
+          <button type="button" data-level="economy" aria-pressed="false">Economy</button>
+          <button type="button" data-level="town" aria-pressed="true">Town</button>
+          <button type="button" data-level="firm" aria-pressed="false">Firm</button>
+        </div>
+        <p class="note">Or scroll or pinch on the map, and drag to move. Click a town to zoom in, a firm to choose it.</p>
+      </div>
+      <div class="group">
+        <h2>Scale of a firm</h2>
+        <p class="sel-name" id="sel-name"></p>
+        <div class="ctrl" data-key="t" data-label="t" data-hint="its plan becomes t·q" data-min="0" data-max="3" data-step="0.1"></div>
+        <div class="btn-row"><button type="button" id="reset">All scales back to 1</button></div>
+      </div>
+      <div class="group">
+        <h2>Show</h2>
+        <label class="check"><input type="checkbox" id="show-flows" checked> goods passed between actors</label>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="The map">
+      <div class="panel-head">
+        <p class="crumbs" id="crumbs"></p>
+        <div class="btn-row zoom-btns">
+          <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+          <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+      <svg id="map" role="img" aria-label="Map of the economy: towns and firms with their netput vectors"></svg>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-label="Netputs at this level" aria-live="polite">
+        <h2 id="table-head"></h2>
+        <div class="formula" id="table-formula"></div>
+        <div class="table-scroll"><table class="nv" id="nv"></table></div>
+        <p class="caption" id="table-cap"></p>
+      </section>
+    </div>
+  </main>
+
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../deadweight-loss/index.html"><span>Previous</span>The Deadweight Loss of a Tax</a>
+    <a class="all" href="../index.html#l8">All tools</a>
+    <a class="next" href="../robinson-crusoe/index.html"><span>Next</span>Robinson Crusoe's Economy</a>
+  </nav>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · The three firms are those of the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/ui.js?v=20"></script>
+  <script src="model.js?v=20"></script>
+  <script src="app.js?v=20"></script>
+  <script src="../shared/theme.js?v=20"></script>
+  <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
+</body>
+</html>
