@@ -347,6 +347,22 @@
     ctrls.t.setExact(tOf(id));
     schedule();
   }
+  // Zooming goes level by level, onto the actor nearest the given point of the map, so the map always shows something:
+  // in, to the country, town or firm there; out, to what holds the current view.
+  function actorNear(level, p) {
+    if (level === 'country') return nearest(Object.entries(COUNTRY_AT).map(([id, C]) => [id, boxCentre(C.box)]), p)[0];
+    if (level === 'town') return nearest(Object.entries(TOWN_AT).map(([id, T]) => [id, T.c]), p)[0];
+    if (level === 'firm') return nearest(Object.entries(FIRM_AT), p)[0];
+    return null;
+  }
+  function stepLevel(dir, p) {
+    const i = LEVELS.indexOf(levelOf(view.k)), j = Math.max(0, Math.min(LEVELS.length - 1, i + dir));
+    if (j === i) { settle(); return; }
+    // going out keeps to what is in view; going in picks what is under the pointer
+    flyTo(target(LEVELS[j], actorNear(LEVELS[j], dir < 0 ? [view.cx, view.cy] : p)));
+  }
+  // After a drag or a pinch: the view of the nearest actor at the level of the current zoom.
+  const settle = () => { const lvl = levelOf(view.k); flyTo(target(lvl, actorNear(lvl, [view.cx, view.cy]))); };
   function zoomAt(f, [sx, sy]) {
     stopFlight();
     const w = toWorld([sx, sy]);
@@ -358,7 +374,17 @@
     const svg = $('map'), pts = new Map();
     let moved = false, pinch = null, lastTap = 0;
     const local = ev => { const r = svg.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; };
-    svg.addEventListener('wheel', ev => { ev.preventDefault(); zoomAt(Math.exp(-ev.deltaY * 0.0015), local(ev)); }, { passive: false });
+    // the wheel: one level per notch (a trackpad's small steps add up to one), then a short pause while the map flies
+    let wheelSum = 0, wheelQuiet = 0;
+    svg.addEventListener('wheel', ev => {
+      ev.preventDefault();
+      const now = performance.now();
+      if (now < wheelQuiet) { wheelSum = 0; return; }
+      wheelSum += ev.deltaY * (ev.deltaMode === 1 ? 33 : ev.deltaMode === 2 ? 400 : 1);
+      if (Math.abs(wheelSum) < 50) return;
+      stepLevel(wheelSum < 0 ? 1 : -1, toWorld(local(ev)));
+      wheelSum = 0; wheelQuiet = now + 450;
+    }, { passive: false });
     svg.addEventListener('pointerdown', ev => {
       stopFlight();
       pts.set(ev.pointerId, local(ev));
@@ -383,7 +409,7 @@
       if (!pts.has(ev.pointerId)) return;
       pts.delete(ev.pointerId);
       if (pts.size < 2) pinch = null;
-      if (moved || ev.type === 'pointercancel') return;
+      if (moved || ev.type === 'pointercancel') { if (pts.size === 0) settle(); return; }
       // a click: a firm is chosen (a second click on it zooms in); a town, seen from afar, is zoomed into
       // (a country, seen from afar, is zoomed into too)
       const el = document.elementFromPoint(ev.clientX, ev.clientY), f = el && el.closest('[data-firm]'), tw = el && el.closest('[data-town]'), co = el && el.closest('[data-country]');
@@ -419,8 +445,8 @@
       flyTo(target(a.dataset.go, a.dataset.id));
     });
     $('nv').addEventListener('click', ev => { const th = ev.target.closest('[data-firm]'); if (th) select(th.dataset.firm); });
-    $('zoom-in').addEventListener('click', () => zoomAt(1.6, [W / 2, H / 2]));
-    $('zoom-out').addEventListener('click', () => zoomAt(1 / 1.6, [W / 2, H / 2]));
+    $('zoom-in').addEventListener('click', () => stepLevel(1, [view.cx, view.cy]));
+    $('zoom-out').addEventListener('click', () => stepLevel(-1, [view.cx, view.cy]));
     $('show-flows').addEventListener('change', e => { state.flows = e.target.checked; schedule(); });
     $('reset').addEventListener('click', () => { state.scales = {}; ctrls.t.setExact(1); });
     const ro = window.ResizeObserver ? new ResizeObserver(() => { measure(); schedule(); }) : null;
