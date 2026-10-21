@@ -5,6 +5,11 @@
 .cell .slope { margin: 3px 0 0; min-height: 2.6em; font-size: 14px; }
 .cell .slope .what { color: var(--muted); font-size: 12.5px; }
 .plot-cell { height: 290px; touch-action: auto; }
+.seg-dim button, .seg-small button { flex: none; padding: 4px 12px; font-size: 13px; }
+.row3d { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 0 0 8px; }
+.row3d .check { margin: 0; }
+.plot-3d { height: 600px; touch-action: auto; }
+@media (max-width: 800px) { .plot-3d { height: 420px; } }
 @media (max-width: 1100px) { .grid4 { grid-template-columns: minmax(0, 1fr); } }
 /* On a phone the figures come first (their points can be dragged), the controls follow. */
 @media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }

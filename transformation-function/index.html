@@ -33,6 +33,7 @@
           <li>Drag the red point along a curve. On the isoquant (top left) the outputs stay the same; on the frontier of outputs (bottom left) the inputs do.</li>
           <li>The bottom right is always 1 over the top right.</li>
           <li>Switch on "inputs as z = −q": the top right becomes a production function, as in lecture 1.</li>
+          <li>3D: the frontier with one good fixed. Look at it from above or from the side to find the 2D figures.</li>
           </ul>
         </details>
       </div>
@@ -51,8 +52,30 @@
     </section>
 
     <section class="panel main-panel" aria-label="The frontier for each pair of goods">
-      <div class="panel-head"><h2>The frontier <span class="tex" data-tex="\Phi(q)=0"></span> for each pair of goods</h2></div>
-      <div class="grid4">
+      <div class="panel-head">
+        <h2 id="main-head"></h2>
+        <div class="seg seg-dim" role="group" aria-label="Figures">
+          <button type="button" data-dim="2d" aria-pressed="true">2D</button>
+          <button type="button" data-dim="3d" aria-pressed="false">3D</button>
+        </div>
+      </div>
+      <div class="view3d" id="view3d" hidden>
+        <div class="row3d">
+          <div class="seg seg-small" role="group" aria-label="Held fixed">
+            <button type="button" data-fix="land" aria-pressed="true">Land fixed</button>
+            <button type="button" data-fix="potatoes" aria-pressed="false">Potatoes fixed</button>
+          </div>
+          <div class="btn-row" role="group" aria-label="Camera">
+            <button type="button" data-cam="3d" aria-pressed="true">3D</button>
+            <button type="button" data-cam="top" aria-pressed="false">From above</button>
+            <button type="button" data-cam="side" aria-pressed="false">From the side</button>
+          </div>
+          <label class="check"><input type="checkbox" id="planes" checked> cutting planes</label>
+        </div>
+        <div id="plot3d" class="plot plot-3d"></div>
+        <p class="caption" id="cap3d"></p>
+      </div>
+      <div class="grid4" id="grid4">
         <div class="cell"><h3>Two inputs: technical rate of substitution</h3><p class="slope" id="s-trs"></p><div id="p-trs" class="plot plot-cell"></div></div>
         <div class="cell"><h3>Input → output: marginal productivity</h3><p class="slope" id="s-mp"></p><div id="p-mp" class="plot plot-cell"></div></div>
         <div class="cell"><h3>Two outputs: marginal rate of transformation</h3><p class="slope" id="s-mrt"></p><div id="p-mrt" class="plot plot-cell"></div></div>
