@@ -1,6 +1,8 @@
 /* Zoom Out: Netputs Add Up: tool-specific styles (shared look is in ../shared/style.css). */
 #map { display: block; width: 100%; background: var(--panel); border: 1px solid var(--line); touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 #map:active { cursor: grabbing; }
+#map .country { fill: none; stroke: var(--muted); stroke-width: 1.3; stroke-dasharray: 2 4; cursor: pointer; pointer-events: all; }
+#map .cname { font: 700 13px var(--font); fill: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none; }
 #map .town { fill: var(--accent-soft); stroke: var(--l2-grey); stroke-width: 1.2; stroke-dasharray: 5 4; cursor: pointer; }
 #map .tname { font: 600 15px var(--font); fill: var(--ink); pointer-events: none; paint-order: stroke; stroke: var(--panel); stroke-width: 4px; }
 #map .icon { fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linejoin: round; }

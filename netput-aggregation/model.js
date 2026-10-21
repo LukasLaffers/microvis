@@ -3,8 +3,8 @@
  * that test-model.cjs can require it.
  *
  * A production plan is a netput vector q: outputs positive, inputs negative. Each firm runs its plan at a scale t >= 0
- * (with additivity and divisibility, tq is feasible whenever q is). A town's netput is the sum of its firms', the
- * economy's the sum of its towns'. Within a level, what net producers of a good make and net users of it use is passed
+ * (with additivity and divisibility, tq is feasible whenever q is). A town's netput is the sum of its firms', a
+ * country's the sum of its towns', the economy's the sum of its countries'. Within a level, what net producers of a good make and net users of it use is passed
  * between them; only the rest leaves (or enters) the level, and that rest is its netput.
  */
 (function (root, factory) {
@@ -20,12 +20,20 @@
     pig: { name: 'pig farm', short: 'pig f.', sup: 'pig\\text{-}f', q: [0, -90, 20, -10, -1] },
     sf: { name: 'sausage factory', short: 'sausage f.', sup: 's\\text{-}fact', q: [1000, 0, -20, -10, 0] }
   };
-  // Riverton is the economy of the notes; Hillside has pigs to spare, Millbrook needs them.
+  // Riverton is the economy of the notes; Hillside has pigs to spare, Millbrook needs them. Northland grows more
+  // potatoes than it uses; Southland grows none, but its pig farms need them.
+  const COUNTRIES = [
+    { id: 'north', name: 'Northland', towns: ['riv', 'hil', 'mil'] },
+    { id: 'south', name: 'Southland', towns: ['oak', 'bay'] }
+  ];
   const TOWNS = [
     { id: 'riv', name: 'Riverton', firms: [{ id: 'riv-pot', type: 'pot' }, { id: 'riv-pig', type: 'pig' }, { id: 'riv-sf', type: 'sf' }] },
     { id: 'hil', name: 'Hillside', firms: [{ id: 'hil-pot', type: 'pot' }, { id: 'hil-pig1', type: 'pig', n: 1 }, { id: 'hil-pig2', type: 'pig', n: 2 }] },
-    { id: 'mil', name: 'Millbrook', firms: [{ id: 'mil-sf1', type: 'sf', n: 1 }, { id: 'mil-sf2', type: 'sf', n: 2 }] }
+    { id: 'mil', name: 'Millbrook', firms: [{ id: 'mil-sf1', type: 'sf', n: 1 }, { id: 'mil-sf2', type: 'sf', n: 2 }] },
+    { id: 'oak', name: 'Oakford', firms: [{ id: 'oak-pig1', type: 'pig', n: 1 }, { id: 'oak-pig2', type: 'pig', n: 2 }, { id: 'oak-pig3', type: 'pig', n: 3 }] },
+    { id: 'bay', name: 'Bayport', firms: [{ id: 'bay-sf1', type: 'sf', n: 1 }, { id: 'bay-sf2', type: 'sf', n: 2 }, { id: 'bay-sf3', type: 'sf', n: 3 }] }
   ];
+  for (const C of COUNTRIES) for (const id of C.towns) TOWNS.find(T => T.id === id).country = C.id;
   const FIRMS = {};
   for (const T of TOWNS) for (const f of T.firms) {
     f.town = T.id;
@@ -41,7 +49,9 @@
   const scaleOf = (scales, id) => (scales && scales[id] !== undefined ? scales[id] : 1);
   const firmNet = (id, scales) => TYPES[FIRMS[id].type].q.map(x => scaleOf(scales, id) * x);
   const townNet = (T, scales) => sum(T.firms.map(f => firmNet(f.id, scales)));
-  const economyNet = scales => sum(TOWNS.map(T => townNet(T, scales)));
+  const countryTowns = C => C.towns.map(id => TOWNS.find(T => T.id === id));
+  const countryNet = (C, scales) => sum(countryTowns(C).map(T => townNet(T, scales)));
+  const economyNet = scales => sum(COUNTRIES.map(C => countryNet(C, scales)));
 
   /*
    * Goods passed between the actors of one level. actors: [{id, q}]. For each good, the net producers (q > 0) supply the
@@ -59,7 +69,8 @@
     return out;
   }
   const firmActors = (T, scales) => T.firms.map(f => ({ id: f.id, q: firmNet(f.id, scales) }));
-  const townActors = scales => TOWNS.map(T => ({ id: T.id, q: townNet(T, scales) }));
+  const townActors = (C, scales) => countryTowns(C).map(T => ({ id: T.id, q: townNet(T, scales) }));
+  const countryActors = scales => COUNTRIES.map(C => ({ id: C.id, q: countryNet(C, scales) }));
 
-  return { GOODS, TYPES, TOWNS, FIRMS, add, sum, scaleOf, firmNet, townNet, economyNet, flows, firmActors, townActors };
+  return { GOODS, TYPES, COUNTRIES, TOWNS, FIRMS, add, sum, scaleOf, firmNet, townNet, countryNet, economyNet, flows, firmActors, townActors, countryActors };
 });

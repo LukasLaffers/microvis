@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Zoom Out: Netputs Add Up · Microvis</title>
-  <meta name="description" content="Netput vectors of firms, towns and the economy: zoom out and they add up, and the goods passed between actors cancel. Lecture 8.">
+  <meta name="description" content="Netput vectors of firms, towns, countries and the economy: zoom out and they add up, and the goods passed between actors cancel. Lecture 8.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../shared/style.css?v=20">
@@ -17,7 +17,7 @@
     <div>
       <p class="eyebrow"><a href="../index.html#l8">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 8 · Decentralisation in a simple economy</p>
       <h1>Zoom Out: Netputs Add Up</h1>
-      <p class="subtitle"><span class="tex" data-tex="q^{\text{town}}=\displaystyle\sum_{\text{firms }f}t_f\,q^f\qquad q^{ec}=\displaystyle\sum_{\text{towns}}q^{\text{town}}"></span></p>
+      <p class="subtitle"><span class="tex" data-tex="q^{\text{town}}=\displaystyle\sum_{\text{firms }f}t_f\,q^f\qquad q^{\text{country}}=\displaystyle\sum_{\text{towns}}q^{\text{town}}\qquad q^{ec}=\displaystyle\sum_{\text{countries}}q^{\text{country}}"></span></p>
     </div>
   </header>
 
@@ -28,11 +28,11 @@
       <div class="group">
         <details class="howto" open>
           <summary>How to read this</summary>
-          <p>A production plan is a netput vector: outputs count positive, inputs negative. Zoom out and the plans add up, firm by firm and town by town. A good that one actor makes and another uses appears once with + and once with −, so it cancels in the sum.</p>
+          <p>A production plan is a netput vector: outputs count positive, inputs negative. Zoom out and the plans add up: firms to a town, towns to a country, countries to the economy. A good that one actor makes and another uses appears once with + and once with −, so it cancels in the sum.</p>
           <ul>
           <li>Zoom into a town: its firms and the goods they pass to each other.</li>
-          <li>Zoom out: each town is one actor, with one netput vector.</li>
-          <li>Pigs: where do they show up, and where do they cancel?</li>
+          <li>Zoom out: each town, then each country, is one actor with one netput vector.</li>
+          <li>Pigs cancel inside each country. Potatoes cross the border: where do they cancel, and what is left?</li>
           <li>Scale the pig farm in Riverton to 0.5: what does Riverton now need from outside?</li>
           </ul>
         </details>
@@ -41,10 +41,11 @@
         <h2>Zoom</h2>
         <div class="seg" role="group" aria-label="Zoom level">
           <button type="button" data-level="economy" aria-pressed="false">Economy</button>
+          <button type="button" data-level="country" aria-pressed="false">Country</button>
           <button type="button" data-level="town" aria-pressed="true">Town</button>
           <button type="button" data-level="firm" aria-pressed="false">Firm</button>
         </div>
-        <p class="note">Or scroll or pinch on the map, and drag to move. Click a town to zoom in, a firm to choose it.</p>
+        <p class="note">Or scroll or pinch on the map, and drag to move. Click a country or a town to zoom in, a firm to choose it.</p>
       </div>
       <div class="group">
         <h2>Scale of a firm</h2>

@@ -15,16 +15,24 @@
 
   // ---------- the world: where towns and firms are (map units) ----------
 
-  const TOWN_AT = { riv: { c: [115, 190], r: 88 }, hil: { c: [320, 150], r: 80 }, mil: { c: [525, 205], r: 70 } };
+  // countries: rectangles [x0, y0, x1, y1], with the zoom that shows the whole country
+  const COUNTRY_AT = { north: { box: [10, 45, 630, 325], k: 1 }, south: { box: [690, 45, 1110, 325], k: 1.3 } };
+  const TOWN_AT = {
+    riv: { c: [115, 190], r: 88 }, hil: { c: [320, 150], r: 80 }, mil: { c: [525, 205], r: 70 },
+    oak: { c: [800, 170], r: 85 }, bay: { c: [1005, 195], r: 80 }
+  };
   const FIRM_AT = {
     'riv-pot': [75, 165], 'riv-pig': [155, 165], 'riv-sf': [115, 235],
     'hil-pot': [285, 125], 'hil-pig1': [355, 125], 'hil-pig2': [320, 195],
-    'mil-sf1': [495, 210], 'mil-sf2': [555, 210]
+    'mil-sf1': [495, 210], 'mil-sf2': [555, 210],
+    'oak-pig1': [760, 140], 'oak-pig2': [840, 140], 'oak-pig3': [800, 210],
+    'bay-sf1': [965, 175], 'bay-sf2': [1045, 175], 'bay-sf3': [1005, 240]
   };
-  const WORLD_W = 640;
-  const LEVEL_K = { economy: 1, town: 2.55, firm: 6 };   // the zoom of each level's view
-  const K_MIN = 0.8, K_MAX = 9;
-  const levelOf = k => (k < 1.7 ? 'economy' : k < 4.5 ? 'town' : 'firm');
+  const WORLD_W = 1120, VIEW_W = 640;   // the world's width; the width a view at zoom 1 shows
+  const LEVEL_K = { economy: 0.55, town: 2.55, firm: 6 };   // the zoom of each level's view (countries: COUNTRY_AT)
+  const K_MIN = 0.45, K_MAX = 9;
+  const levelOf = k => (k < 0.8 ? 'economy' : k < 1.7 ? 'country' : k < 4.5 ? 'town' : 'firm');
+  const LEVELS = ['economy', 'country', 'town', 'firm'];
 
   const state = { sel: 'riv-pig', t: 1, scales: {}, flows: true };
   const view = { cx: 115, cy: 195, k: LEVEL_K.town };
@@ -44,6 +52,10 @@
   const tOf = id => M.scaleOf(state.scales, id);
   const firmLabel = id => M.FIRMS[id].name + (Math.abs(tOf(id) - 1) > 1e-9 ? ` ×${amt(tOf(id))}` : '');
   const townName = id => M.TOWNS.find(T => T.id === id).name;
+  const countryName = id => M.COUNTRIES.find(C => C.id === id).name;
+  const townCountry = id => M.TOWNS.find(T => T.id === id).country;
+  const firmCountry = id => townCountry(M.FIRMS[id].town);
+  const abbr = name => (name.length > 6 ? name.slice(0, 5) + '.' : name);   // names on the cards of a narrow map
   const supTex = id => M.TYPES[M.FIRMS[id].type].sup + (M.FIRMS[id].n ? ',' + M.FIRMS[id].n : '');
 
   // ---------- view ----------
@@ -56,10 +68,13 @@
     view.cy = Math.min(360, Math.max(40, view.cy));
   };
   const nearest = (pts, p) => pts.reduce((b, q) => (Math.hypot(q[1][0] - p[0], q[1][1] - p[1]) < Math.hypot(b[1][0] - p[0], b[1][1] - p[1]) ? q : b));
+  const boxCentre = b => [(b[0] + b[2]) / 2, (b[1] + b[3]) / 2];
+  const currentCountry = () => nearest(Object.entries(COUNTRY_AT).map(([id, C]) => [id, boxCentre(C.box)]), [view.cx, view.cy])[0];
   const currentTown = () => nearest(Object.entries(TOWN_AT).map(([id, T]) => [id, T.c]), [view.cx, view.cy])[0];
   const currentFirm = () => nearest(Object.entries(FIRM_AT), [view.cx, view.cy])[0];
   const target = (level, id) => {
-    if (level === 'economy') return { cx: 320, cy: 215, k: LEVEL_K.economy };
+    if (level === 'economy') return { cx: 560, cy: 280, k: LEVEL_K.economy };
+    if (level === 'country') { const C = COUNTRY_AT[id], c = boxCentre(C.box); return { cx: c[0], cy: c[1] + 55, k: C.k }; }
     if (level === 'town') { const T = TOWN_AT[id]; return { cx: T.c[0], cy: T.c[1] + 5, k: LEVEL_K.town }; }
     const p = FIRM_AT[id]; return { cx: p[0], cy: p[1] + 12, k: LEVEL_K.firm };
   };
@@ -113,7 +128,7 @@
     for (const fs of pairs.values()) {
       const a = posOf(fs[0].from), b = posOf(fs[0].to), dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
       if (L < 1) continue;
-      const ux = dx / L, uy = dy / L, nx = -uy, ny = ux, off = 5, ga = gapOf(fs[0].from), gb = gapOf(fs[0].to);
+      const ux = dx / L, uy = dy / L, nx = -uy, ny = ux, off = 5, ga = gapOf(fs[0].from, [ux, uy]), gb = gapOf(fs[0].to, [ux, uy]);
       const s = [a[0] + ux * ga + nx * off, a[1] + uy * ga + ny * off], e = [b[0] - ux * gb + nx * off, b[1] - uy * gb + ny * off];
       if (Math.hypot(e[0] - s[0], e[1] - s[1]) < 12) continue;
       paths += `<path class="flow" d="M${s[0].toFixed(1)},${s[1].toFixed(1)} L${e[0].toFixed(1)},${e[1].toFixed(1)}" marker-end="url(#flow-head)"/>`;
@@ -127,26 +142,49 @@
   function drawMap() {
     const svg = $('map'), level = levelOf(view.k), sc = narrow() ? 0.8 : 1;
     let back = '', mid = '', front = '';
-    // towns
-    for (const T of M.TOWNS) {
-      const at = TOWN_AT[T.id], c = toScreen(at.c), r = at.r * view.k * B;
-      back += `<circle class="town" data-town="${T.id}" cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="${r.toFixed(1)}"/>`;
-      front += `<text class="tname" x="${c[0].toFixed(1)}" y="${(c[1] - r - 7).toFixed(1)}" text-anchor="middle">${T.name}</text>`;
+    const px = v => (v * view.k * B);
+    // countries
+    for (const C of M.COUNTRIES) {
+      const b = COUNTRY_AT[C.id].box, a = toScreen([b[0], b[1]]), z = toScreen([b[2], b[3]]);
+      back += `<rect class="country" data-country="${C.id}" x="${a[0].toFixed(1)}" y="${a[1].toFixed(1)}" width="${(z[0] - a[0]).toFixed(1)}" height="${(z[1] - a[1]).toFixed(1)}" rx="10"/>`;
+      front += `<text class="cname" x="${(a[0] + 4).toFixed(1)}" y="${(a[1] - 7).toFixed(1)}">${C.name}</text>`;   // above its frame, clear of the towns' names
     }
-    // firms
-    for (const id of Object.keys(FIRM_AT)) {
+    // towns (on the economy level without names, the countries' cards speak for them)
+    for (const T of M.TOWNS) {
+      const at = TOWN_AT[T.id], c = toScreen(at.c), r = px(at.r);
+      back += `<circle class="town" data-town="${T.id}" cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="${r.toFixed(1)}"/>`;
+      if (level !== 'economy') front += `<text class="tname" x="${c[0].toFixed(1)}" y="${(c[1] - r - 7).toFixed(1)}" text-anchor="middle">${T.name}</text>`;
+    }
+    // firms (not on the economy level, where they would be specks)
+    if (level !== 'economy') for (const id of Object.keys(FIRM_AT)) {
       const p = toScreen(FIRM_AT[id]);
       if (p[0] < -40 || p[0] > W + 40 || p[1] < -40 || p[1] > H + 40) continue;
-      const s = (level === 'economy' ? 0.7 : 1) * sc * (tOf(id) === 0 ? 1 : 1);
+      const s = (level === 'country' ? 0.7 : 1) * sc;
       mid += `<g class="firm${tOf(id) === 0 ? ' idle' : ''}" data-firm="${id}">${icon(M.FIRMS[id].type, p, s, id === state.sel)}<circle class="hit" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="20"/></g>`;
     }
     let cards = '', fl = { paths: '', labels: '' };
     const { w, h } = cardSize();
+    const onScreen = p => p[0] >= 0 && p[0] <= W && p[1] >= 0 && p[1] <= H;
     if (level === 'economy') {
-      if (state.flows) fl = flowArrows(M.flows(M.townActors(state.scales)), id => toScreen(TOWN_AT[id].c), id => TOWN_AT[id].r * view.k * B + 4);
+      // from the centre of a country to the edge of its rectangle, in the direction of the arrow
+      const centre = id => toScreen(boxCentre(COUNTRY_AT[id].box));
+      if (state.flows) {
+        const F = M.flows(M.countryActors(state.scales));
+        fl = flowArrows(F, centre, (id, u) => { const b = COUNTRY_AT[id].box, hw = px(b[2] - b[0]) / 2, hh = px(b[3] - b[1]) / 2; return Math.min(Math.abs(u[0]) > 1e-9 ? hw / Math.abs(u[0]) : 1e9, Math.abs(u[1]) > 1e-9 ? hh / Math.abs(u[1]) : 1e9) + 3; });
+      }
+      for (const C of M.COUNTRIES) {
+        const b = COUNTRY_AT[C.id].box, c = toScreen([(b[0] + b[2]) / 2, b[3]]);
+        cards += card(c[0] - w / 2, c[1] + 12, narrow() ? abbr(C.name) : C.name, M.countryNet(C, state.scales));
+      }
+    } else if (level === 'country') {
+      if (state.flows) for (const C of M.COUNTRIES) {
+        const f = flowArrows(M.flows(M.townActors(C, state.scales)), id => toScreen(TOWN_AT[id].c), id => px(TOWN_AT[id].r) + 4);
+        fl.paths += f.paths; fl.labels += f.labels;
+      }
       for (const T of M.TOWNS) {
         const at = TOWN_AT[T.id], c = toScreen(at.c);
-        cards += card(c[0] - w / 2, c[1] + at.r * view.k * B + 12, narrow() ? T.name.slice(0, 5) + '.' : T.name, M.townNet(T, state.scales));
+        if (!onScreen(c)) continue;
+        cards += card(c[0] - w / 2, c[1] + px(at.r) + 12, narrow() ? abbr(T.name) : T.name, M.townNet(T, state.scales));
       }
     } else if (level === 'town') {
       if (state.flows) for (const T of M.TOWNS) {
@@ -155,7 +193,7 @@
       }
       for (const T of M.TOWNS) for (const f of T.firms) {
         const p = toScreen(FIRM_AT[f.id]);
-        if (p[0] < 0 || p[0] > W || p[1] < 0 || p[1] > H) continue;
+        if (!onScreen(p)) continue;
         const d = [FIRM_AT[f.id][0] - TOWN_AT[T.id].c[0], FIRM_AT[f.id][1] - TOWN_AT[T.id].c[1]];
         const left = d[0] < -1, above = d[1] < -1;
         const x0 = above ? (left ? p[0] + 20 - w : p[0] - 20) : (left ? p[0] - 28 - w : p[0] + 28);
@@ -189,23 +227,31 @@
 
   let tableKey = '';
   function drawTable() {
-    const level = levelOf(view.k), town = currentTown(), firm = currentFirm();
-    const key = JSON.stringify([level, town, firm, state.scales, state.sel]);
+    const level = levelOf(view.k), country = currentCountry(), town = currentTown(), firm = currentFirm();
+    const key = JSON.stringify([level, country, town, firm, state.scales, state.sel]);
     if (key === tableKey) return;
     tableKey = key;
     let cols, sumCol = null, tRow = false, head, formula, cap;
+    const words = ['', 'One', 'Two', 'Three'];
     if (level === 'economy') {
-      cols = M.TOWNS.map(T => ({ name: T.name, q: M.townNet(T, state.scales) }));
+      cols = M.COUNTRIES.map(C => ({ name: C.name, q: M.countryNet(C, state.scales) }));
       sumCol = { name: 'economy', q: M.economyNet(state.scales) };
-      head = 'Three towns add up to the economy';
-      formula = 'q^{ec}=q^{\\text{Riverton}}+q^{\\text{Hillside}}+q^{\\text{Millbrook}}';
+      head = 'Two countries add up to the economy';
+      formula = 'q^{ec}=' + M.COUNTRIES.map(C => `q^{\\text{${C.name}}}`).join('+');
       cap = economyText();
+    } else if (level === 'country') {
+      const C = M.COUNTRIES.find(x => x.id === country), Ts = C.towns.map(id => M.TOWNS.find(T => T.id === id));
+      cols = Ts.map(T => ({ name: T.name, q: M.townNet(T, state.scales) }));
+      sumCol = { name: C.name, q: M.countryNet(C, state.scales) };
+      head = `${words[Ts.length]} towns add up to ${C.name}`;
+      formula = `q^{\\text{${C.name}}}=` + Ts.map(T => `q^{\\text{${T.name}}}`).join('+');
+      cap = countryText(C);
     } else if (level === 'town') {
       const T = M.TOWNS.find(x => x.id === town);
       cols = T.firms.map(f => ({ name: f.short, q: M.firmNet(f.id, state.scales), id: f.id, t: tOf(f.id) }));
       sumCol = { name: T.name, q: M.townNet(T, state.scales) };
       tRow = true;
-      head = `${T.firms.length === 2 ? 'Two' : 'Three'} firms add up to ${T.name}`;
+      head = `${words[T.firms.length]} firms add up to ${T.name}`;
       formula = `q^{\\text{${T.name}}}=` + T.firms.map(f => `${tOf(f.id) === 1 ? '' : amt(tOf(f.id)) + '\\,'}q^{${supTex(f.id)}}`).join('+');
       cap = townText(T);
     } else {
@@ -238,12 +284,23 @@
     if (T.id === 'riv' && T.firms.every(f => tOf(f.id) === 1)) parts.push(`This is the notes' example: ${texStr('q^{ec}=q^{pot\\text{-}f}+q^{pig\\text{-}f}+q^{s\\text{-}fact}')}.`);
     return parts.join(' ');
   }
-  function economyText() {
-    const F = M.flows(M.townActors(state.scales)), q = M.economyNet(state.scales), parts = [];
+  // What passes between the towns of a country, what cancels, and what the country needs from outside.
+  function countryText(C) {
+    const F = M.flows(M.townActors(C, state.scales)), q = M.countryNet(C, state.scales), parts = [];
     const pairs = F.map(f => `${townName(f.from)} sends ${qty(f.good, f.amount)} to ${townName(f.to)}`);
     if (pairs.length) parts.push(pairs.join('; ') + '.');
     for (const i of [1, 2]) {
-      if (Math.abs(q[i]) < 1e-9 && F.some(f => f.good === i)) parts.push(`In the economy's total, ${M.GOODS[i]} net out to 0.`);
+      if (Math.abs(q[i]) < 1e-9 && F.some(f => f.good === i)) parts.push(`In ${C.name}'s total, ${M.GOODS[i]} net out to 0.`);
+      else if (q[i] < -1e-9) parts.push(`${C.name} uses ${qty(i, -q[i])} more than its towns make: they must come from outside the country.`);
+    }
+    return parts.join(' ');
+  }
+  function economyText() {
+    const F = M.flows(M.countryActors(state.scales)), q = M.economyNet(state.scales), parts = [];
+    const pairs = F.map(f => `${countryName(f.from)} sends ${qty(f.good, f.amount)} to ${countryName(f.to)}`);
+    if (pairs.length) parts.push(pairs.join('; ') + ": in the economy's total they cancel.");
+    for (const i of [1, 2]) {
+      if (q[i] > 1e-9 && F.some(f => f.good === i)) parts.push(`What is left, ${qty(i, q[i])}, is the economy's net output.`);
       else if (q[i] < -1e-9) parts.push(`The economy as a whole uses ${qty(i, -q[i])} more than it makes: they must come from its endowment ${texStr('R')}.`);
     }
     parts.push(`Labour and land are only used: they come from the households, ${texStr('x\\le q+R')}.`);
@@ -251,13 +308,17 @@
   }
 
   function drawTexts() {
-    const level = levelOf(view.k), town = currentTown(), firm = currentFirm();
+    const level = levelOf(view.k), firm = currentFirm();
+    const town = level === 'firm' ? M.FIRMS[firm].town : currentTown(), country = level === 'country' ? currentCountry() : townCountry(town);
     document.querySelectorAll('[data-level]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.level === level)));
     const crumb = (lvl, id, text, last) => last ? `<b>${text}</b>` : `<a href="#" data-go="${lvl}" data-id="${id || ''}">${text}</a>`;
-    $('crumbs').innerHTML = [crumb('economy', null, 'Economy', level === 'economy'),
-      level !== 'economy' ? crumb('town', level === 'firm' ? M.FIRMS[firm].town : town, townName(level === 'firm' ? M.FIRMS[firm].town : town), level === 'town') : '',
-      level === 'firm' ? crumb('firm', firm, M.FIRMS[firm].name, true) : ''].filter(Boolean).join(' <span class="sep">›</span> ');
-    $('cap').innerHTML = level === 'economy' ? 'Zoomed out: each town is one actor, and its netput is the sum of its firms\'. <span class="c-flow">Orange arrows</span>: goods one town makes and another uses. Click a town to zoom in.'
+    const depth = LEVELS.indexOf(level);
+    $('crumbs').innerHTML = [crumb('economy', null, 'Economy', depth === 0),
+      depth >= 1 ? crumb('country', country, countryName(country), depth === 1) : '',
+      depth >= 2 ? crumb('town', town, townName(town), depth === 2) : '',
+      depth >= 3 ? crumb('firm', firm, M.FIRMS[firm].name, true) : ''].filter(Boolean).join(' <span class="sep">›</span> ');
+    $('cap').innerHTML = level === 'economy' ? 'Zoomed all the way out: each country is one actor, and its netput is the sum of its towns\'. <span class="c-flow">Orange arrows</span>: goods one country makes and the other uses. Click a country to zoom in.'
+      : level === 'country' ? 'Zoomed in on a country: each town is one actor, and its netput is the sum of its firms\'. <span class="c-flow">Orange arrows</span>: goods one town makes and another uses. Click a town to zoom in.'
       : level === 'town' ? 'Zoomed in on a town: its firms with their netputs. <span class="c-flow">Orange arrows</span>: goods one firm makes and another uses. Click a firm to choose it, then scale it.'
         : 'Zoomed in on one firm: its inputs come in, its outputs go out. Inputs count negative, outputs positive.';
     $('sel-name').innerHTML = `<b>${M.FIRMS[state.sel].name}</b> in ${townName(M.FIRMS[state.sel].town)}`;
@@ -276,7 +337,7 @@
     const svg = $('map');
     W = Math.max(280, Math.round(svg.parentElement.clientWidth));
     H = Math.round(Math.min(560, Math.max(300, W * 0.8)));
-    B = Math.min(W / WORLD_W, H / 400);
+    B = Math.min(W / VIEW_W, H / 400);
   }
 
   // ---------- interaction ----------
@@ -324,13 +385,16 @@
       if (pts.size < 2) pinch = null;
       if (moved || ev.type === 'pointercancel') return;
       // a click: a firm is chosen (a second click on it zooms in); a town, seen from afar, is zoomed into
-      const el = document.elementFromPoint(ev.clientX, ev.clientY), f = el && el.closest('[data-firm]'), tw = el && el.closest('[data-town]');
+      // (a country, seen from afar, is zoomed into too)
+      const el = document.elementFromPoint(ev.clientX, ev.clientY), f = el && el.closest('[data-firm]'), tw = el && el.closest('[data-town]'), co = el && el.closest('[data-country]');
       const level = levelOf(view.k), now = performance.now();
-      if (f && level !== 'economy') {
+      if (level === 'economy' && (tw || co)) flyTo(target('country', tw ? townCountry(tw.dataset.town) : co.dataset.country));
+      else if (level === 'country' && (f || tw)) flyTo(target('town', f ? M.FIRMS[f.dataset.firm].town : tw.dataset.town));
+      else if (f && level !== 'economy') {
         if (f.dataset.firm === state.sel && now - lastTap < 450) flyTo(target('firm', f.dataset.firm));
         lastTap = now;
         select(f.dataset.firm);
-      } else if ((f || tw) && level === 'economy') flyTo(target('town', f ? M.FIRMS[f.dataset.firm].town : tw.dataset.town));
+      }
     };
     svg.addEventListener('pointerup', up);
     svg.addEventListener('pointercancel', up);
@@ -341,9 +405,12 @@
     ctrls = U.controls(document, state, { onChange: () => { state.scales[state.sel] = state.t; schedule(); } });
     measure();
     bindMap();
+    // a level button keeps to where the view is: the town (or country) in view, else that of the chosen firm
     document.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => {
-      const lvl = b.dataset.level;
-      flyTo(target(lvl, lvl === 'town' ? (levelOf(view.k) === 'economy' ? M.FIRMS[state.sel].town : levelOf(view.k) === 'firm' ? M.FIRMS[currentFirm()].town : currentTown()) : state.sel));
+      const lvl = b.dataset.level, now = levelOf(view.k);
+      const town = now === 'town' ? currentTown() : now === 'firm' ? M.FIRMS[currentFirm()].town : M.FIRMS[state.sel].town;
+      const country = now === 'country' ? currentCountry() : now === 'economy' ? firmCountry(state.sel) : townCountry(town);
+      flyTo(target(lvl, lvl === 'country' ? country : lvl === 'town' ? (now === 'country' && townCountry(M.FIRMS[state.sel].town) !== country ? M.TOWNS.find(T => T.country === country).id : town) : state.sel));
     }));
     $('crumbs').addEventListener('click', ev => {
       const a = ev.target.closest('[data-go]');
