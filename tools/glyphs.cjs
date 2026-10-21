@@ -115,6 +115,12 @@ G['cv-ev'] = svg(AX + F([[9, 29], ...fn(y => 400 / (55 - y) - 1, 29, 41, 20).map
 G['deadweight-loss'] = svg(AX + L([[9, 13], [57, 53]]) + A([[9, 25], [59, 25]], 1.6) + S([[9, 39], [59, 39]]) + F([[23.4, 25], [40.2, 39], [23.4, 39]], 0.35) + S([[23.4, 25], [23.4, 55]], DASH));
 
 // Lecture 8
+{ // axes crossing in the middle: the frontier of outputs (top right), the mirrored isoquant (bottom left), one tangent
+  const ell = fn(t => 0, 0, Math.PI / 2, 30).map(([t]) => [32 + 22 * Math.cos(t), 32 - 22 * Math.sin(t)]);
+  const iso = fn(x => 32 + 90 / (32 - x), 8, 27.9, 30).filter(p => p[1] <= 58);
+  G['transformation-function'] = svg('<path d="M6 32H58M32 6V58" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>' +
+    L(ell) + S(iso) + A([[38.6, 9.6], [56.4, 26.8]], 1.8) + D(47.6, 18.2));
+}
 { // a town of three firms with arrows between them, inside a dashed circle
   const c = (x, y, r, acc) => `<circle cx="${x}" cy="${y}" r="${r}" ${acc ? `class="af" fill="${BRAND}"` : 'fill="currentColor"'}/>`;
   G['netput-aggregation'] = svg('<circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.55"/>' +

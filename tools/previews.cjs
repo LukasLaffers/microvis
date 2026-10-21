@@ -1,14 +1,15 @@
 // Screenshot the main figure of each tool (light and dark) and save it as WebP next to the tool: preview.webp, preview-dark.webp.
-// node previews.cjs tool:selector ...
+// node previews.cjs tool:selector[:hide] ...   (hide: a selector of elements to leave out, e.g. a caption)
 const { chromium } = require(process.env.PLAYWRIGHT || '/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
 (async () => {
   const b = await chromium.launch();
   for (const spec of process.argv.slice(2)) {
-    const [tool, sel] = spec.split(':');
+    const [tool, sel, hide] = spec.split(':');
     for (const dark of [false, true]) {
       const p = await b.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1, colorScheme: dark ? 'dark' : 'light' });
       await p.goto(`file:///home/user/Microvis/${tool}/index.html`); await p.waitForTimeout(1800);
+      if (hide) await p.addStyleTag({ content: `${hide} { display: none !important; }` });
       const png = await p.locator(sel).first().screenshot();
       // PNG -> WebP, 640 px wide, in the browser
       const webp = await p.evaluate(async b64 => {

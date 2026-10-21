@@ -1,0 +1,10 @@
+/* One Frontier, Four Names: tool-specific styles (shared look is in ../shared/style.css). */
+.grid4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cell { min-width: 0; padding: 8px 8px 2px; border: 1px solid var(--line); }
+.cell h3 { margin: 0; font-size: 14px; font-weight: 700; }
+.cell .slope { margin: 3px 0 0; min-height: 2.6em; font-size: 14px; }
+.cell .slope .what { color: var(--muted); font-size: 12.5px; }
+.plot-cell { height: 290px; touch-action: auto; }
+@media (max-width: 1100px) { .grid4 { grid-template-columns: minmax(0, 1fr); } }
+/* On a phone the figures come first (their points can be dragged), the controls follow. */
+@media (max-width: 800px) { .layout { grid-template-areas: "main" "controls" "side"; } }
