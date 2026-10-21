@@ -50,6 +50,7 @@ module.exports = [
   ] },
   { id: 'l8', lecture: 8, nav: 'Decentralisation', title: 'Decentralisation in a simple economy', tools: [
     ['netput-aggregation', 'Zoom Out: Netputs Add Up', 'Firms, towns, countries and the economy: netput vectors add up, and goods passed between actors cancel.'],
+    ['production-set', 'The Production Set Q', 'Inaction, no free lunch, irreversibility, free disposal, additivity and divisibility, for seven technologies.'],
     ['transformation-function', 'The Transformation Function', 'Rate of substitution, rate of transformation, marginal productivity and input requirement as slopes of Φ(q) = 0.'],
     ['robinson-crusoe', "Robinson Crusoe's Economy", 'Prices that let a profit-maximising firm and a utility-maximising consumer reach the planner’s optimum.']
   ] },

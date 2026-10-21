@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Production Set Q · Microvis</title>
+  <meta name="description" content="The six properties of the set of feasible production plans Q: inaction, no free lunch, irreversibility, free disposal, additivity and divisibility, for seven technologies, in 2D and 3D. Lecture 8.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=20">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div>
+      <p class="eyebrow"><a href="../index.html#l8">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 8 · Decentralisation in a simple economy</p>
+      <h1>The Production Set Q</h1>
+      <p class="subtitle"><span class="tex" data-tex="Q=\{q:\ q\text{ is a feasible production plan}\},\qquad q\in Q\iff\Phi(q)\le0"></span></p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>A production plan is a netput vector: outputs positive, inputs negative. <span class="tex" data-tex="Q"></span> holds every feasible plan. Move the plans <span class="tex" data-tex="q'"></span> and <span class="tex" data-tex="q''"></span>: the figure builds the plans the six properties talk about. A cross marks a plan that is not in <span class="tex" data-tex="Q"></span>; red marks a plan that breaks its property.</p>
+          <ul>
+          <li>Which technology fails additivity, and which divisibility?</li>
+          <li>Only constant returns passes all six: then <span class="tex" data-tex="Q"></span> is a cone.</li>
+          <li>3D: the figure of the notes, with sausages, pigs and labour.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Technology</h2>
+        <div class="techs" id="techs" role="group" aria-label="Technology"></div>
+      </div>
+      <div class="group">
+        <h2>Move</h2>
+        <div class="seg" role="group" aria-label="Plan to move">
+          <button type="button" data-plan="a" aria-pressed="true">q′</button>
+          <button type="button" data-plan="b" aria-pressed="false">q″</button>
+        </div>
+        <p class="note" id="move-note"></p>
+        <div class="btn-row"><button type="button" id="reset">Default plans</button></div>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="The set Q">
+      <div class="panel-head">
+        <h2 id="head"></h2>
+        <div class="seg seg-dim" role="group" aria-label="Figure">
+          <button type="button" data-dim="2d" aria-pressed="true">2D</button>
+          <button type="button" data-dim="3d" aria-pressed="false">3D</button>
+        </div>
+      </div>
+      <div class="btn-row cams" id="cams" role="group" aria-label="Camera" hidden>
+        <button type="button" data-cam="3d" aria-pressed="true">3D</button>
+        <button type="button" data-cam="side" aria-pressed="false">From the side</button>
+        <button type="button" data-cam="reset" aria-pressed="false">Reset view</button>
+      </div>
+      <div id="plot2d" class="plot plot-q"></div>
+      <div id="plot3d" class="plot plot-q3" hidden></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="The six properties" aria-live="polite">
+        <h2>The six properties, tested on <span class="tex" data-tex="q'"></span> and <span class="tex" data-tex="q''"></span></h2>
+        <ul class="checks" id="checks"></ul>
+      </section>
+      <section class="panel readouts" aria-label="For every plan">
+        <h2>For every plan of this technology</h2>
+        <ul class="checks" id="always"></ul>
+        <p class="caption" id="verdict"></p>
+      </section>
+    </div>
+  </main>
+
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../netput-aggregation/index.html"><span>Previous</span>Zoom Out: Netputs Add Up</a>
+    <a class="all" href="../index.html#l8">All tools</a>
+    <a class="next" href="../transformation-function/index.html"><span>Next</span>The Transformation Function</a>
+  </nav>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Properties and figure as in the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js?v=20"></script>
+  <script src="model.js?v=20"></script>
+  <script src="app.js?v=20"></script>
+  <script src="../shared/theme.js?v=20"></script>
+  <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
+</body>
+</html>
