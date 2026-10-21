@@ -16,20 +16,20 @@
   // ---------- the world: where towns and firms are (map units) ----------
 
   // countries: rectangles [x0, y0, x1, y1], with the zoom that shows the whole country
-  const COUNTRY_AT = { north: { box: [10, 45, 630, 325], k: 1 }, south: { box: [690, 45, 1110, 325], k: 1.3 } };
+  const COUNTRY_AT = { north: { box: [10, 45, 630, 325], k: 1 }, south: { box: [770, 45, 1190, 325], k: 1.3 } };
   const TOWN_AT = {
     riv: { c: [115, 190], r: 88 }, hil: { c: [320, 150], r: 80 }, mil: { c: [525, 205], r: 70 },
-    oak: { c: [800, 170], r: 85 }, bay: { c: [1005, 195], r: 80 }
+    oak: { c: [880, 170], r: 85 }, bay: { c: [1085, 195], r: 80 }
   };
   const FIRM_AT = {
     'riv-pot': [75, 165], 'riv-pig': [155, 165], 'riv-sf': [115, 235],
     'hil-pot': [285, 125], 'hil-pig1': [355, 125], 'hil-pig2': [320, 195],
-    'mil-sf1': [495, 210], 'mil-sf2': [555, 210],
-    'oak-pig1': [760, 140], 'oak-pig2': [840, 140], 'oak-pig3': [800, 210],
-    'bay-sf1': [965, 175], 'bay-sf2': [1045, 175], 'bay-sf3': [1005, 240]
+    'mil-sf1': [495, 185], 'mil-sf2': [555, 185], 'mil-sf3': [525, 240],
+    'oak-pig1': [840, 135], 'oak-pig2': [920, 135], 'oak-pig3': [840, 205], 'oak-pig4': [920, 205],
+    'bay-sf1': [1045, 175], 'bay-sf2': [1125, 175], 'bay-sf3': [1085, 240]
   };
-  const WORLD_W = 1120, VIEW_W = 640;   // the world's width; the width a view at zoom 1 shows
-  const LEVEL_K = { economy: 0.55, town: 2.55, firm: 6 };   // the zoom of each level's view (countries: COUNTRY_AT)
+  const WORLD_W = 1200, VIEW_W = 640;   // the world's width; the width a view at zoom 1 shows
+  const LEVEL_K = { economy: 0.52, town: 2.55, firm: 6 };   // the zoom of each level's view (countries: COUNTRY_AT)
   const K_MIN = 0.45, K_MAX = 9;
   const levelOf = k => (k < 0.8 ? 'economy' : k < 1.7 ? 'country' : k < 4.5 ? 'town' : 'firm');
   const LEVELS = ['economy', 'country', 'town', 'firm'];
@@ -73,7 +73,7 @@
   const currentTown = () => nearest(Object.entries(TOWN_AT).map(([id, T]) => [id, T.c]), [view.cx, view.cy])[0];
   const currentFirm = () => nearest(Object.entries(FIRM_AT), [view.cx, view.cy])[0];
   const target = (level, id) => {
-    if (level === 'economy') return { cx: 560, cy: 280, k: LEVEL_K.economy };
+    if (level === 'economy') return { cx: 600, cy: 285, k: LEVEL_K.economy };
     if (level === 'country') { const C = COUNTRY_AT[id], c = boxCentre(C.box); return { cx: c[0], cy: c[1] + 55, k: C.k }; }
     if (level === 'town') { const T = TOWN_AT[id]; return { cx: T.c[0], cy: T.c[1] + 5, k: LEVEL_K.town }; }
     const p = FIRM_AT[id]; return { cx: p[0], cy: p[1] + 12, k: LEVEL_K.firm };
@@ -232,7 +232,7 @@
     if (key === tableKey) return;
     tableKey = key;
     let cols, sumCol = null, tRow = false, head, formula, cap;
-    const words = ['', 'One', 'Two', 'Three'];
+    const words = ['', 'One', 'Two', 'Three', 'Four'];
     if (level === 'economy') {
       cols = M.COUNTRIES.map(C => ({ name: C.name, q: M.countryNet(C, state.scales) }));
       sumCol = { name: 'economy', q: M.economyNet(state.scales) };
@@ -299,6 +299,8 @@
     const F = M.flows(M.countryActors(state.scales)), q = M.economyNet(state.scales), parts = [];
     const pairs = F.map(f => `${countryName(f.from)} sends ${qty(f.good, f.amount)} to ${countryName(f.to)}`);
     if (pairs.length) parts.push(pairs.join('; ') + ": in the economy's total they cancel.");
+    // (a gross flow both ways of one good leaves no trace in the vectors)
+    if (pairs.length) parts.push(`Netputs record only net amounts: had the countries also shipped ${M.GOODS[F[0].good]} both ways, the vectors would be the same.`);
     for (const i of [1, 2]) {
       if (q[i] > 1e-9 && F.some(f => f.good === i)) parts.push(`What is left, ${qty(i, q[i])}, is the economy's net output.`);
       else if (q[i] < -1e-9) parts.push(`The economy as a whole uses ${qty(i, -q[i])} more than it makes: they must come from its endowment ${texStr('R')}.`);

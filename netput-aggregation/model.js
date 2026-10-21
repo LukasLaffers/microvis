@@ -16,12 +16,13 @@
   const GOODS = ['sausages', 'potatoes', 'pigs', 'labour hours', 'acres of land'];
   // The three firms of the notes (lecture 8, section 1.2).
   const TYPES = {
-    pot: { name: 'potato farmer', short: 'potato f.', sup: 'pot\\text{-}f', q: [0, 990, 0, -10, -1] },
-    pig: { name: 'pig farm', short: 'pig f.', sup: 'pig\\text{-}f', q: [0, -90, 20, -10, -1] },
-    sf: { name: 'sausage factory', short: 'sausage f.', sup: 's\\text{-}fact', q: [1000, 0, -20, -10, 0] }
+    pot: { name: 'potato farmer', short: 'pot-f', sup: 'pot\\text{-}f', q: [0, 990, 0, -10, -1] },
+    pig: { name: 'pig farm', short: 'pig-f', sup: 'pig\\text{-}f', q: [0, -90, 20, -10, -1] },
+    sf: { name: 'sausage factory', short: 's-fact', sup: 's\\text{-}fact', q: [1000, 0, -20, -10, 0] }
   };
-  // Riverton is the economy of the notes; Hillside has pigs to spare, Millbrook needs them. Northland grows more
-  // potatoes than it uses; Southland grows none, but its pig farms need them.
+  // Riverton is the economy of the notes; Hillside has pigs to spare, Millbrook needs them, and more than Hillside has.
+  // Northland grows more potatoes than it uses; Southland grows none, but its pig farms need them, and they raise more
+  // pigs than Bayport uses: potatoes go south, pigs go north.
   const COUNTRIES = [
     { id: 'north', name: 'Northland', towns: ['riv', 'hil', 'mil'] },
     { id: 'south', name: 'Southland', towns: ['oak', 'bay'] }
@@ -29,8 +30,8 @@
   const TOWNS = [
     { id: 'riv', name: 'Riverton', firms: [{ id: 'riv-pot', type: 'pot' }, { id: 'riv-pig', type: 'pig' }, { id: 'riv-sf', type: 'sf' }] },
     { id: 'hil', name: 'Hillside', firms: [{ id: 'hil-pot', type: 'pot' }, { id: 'hil-pig1', type: 'pig', n: 1 }, { id: 'hil-pig2', type: 'pig', n: 2 }] },
-    { id: 'mil', name: 'Millbrook', firms: [{ id: 'mil-sf1', type: 'sf', n: 1 }, { id: 'mil-sf2', type: 'sf', n: 2 }] },
-    { id: 'oak', name: 'Oakford', firms: [{ id: 'oak-pig1', type: 'pig', n: 1 }, { id: 'oak-pig2', type: 'pig', n: 2 }, { id: 'oak-pig3', type: 'pig', n: 3 }] },
+    { id: 'mil', name: 'Millbrook', firms: [{ id: 'mil-sf1', type: 'sf', n: 1 }, { id: 'mil-sf2', type: 'sf', n: 2 }, { id: 'mil-sf3', type: 'sf', n: 3 }] },
+    { id: 'oak', name: 'Oakford', firms: [{ id: 'oak-pig1', type: 'pig', n: 1 }, { id: 'oak-pig2', type: 'pig', n: 2 }, { id: 'oak-pig3', type: 'pig', n: 3 }, { id: 'oak-pig4', type: 'pig', n: 4 }] },
     { id: 'bay', name: 'Bayport', firms: [{ id: 'bay-sf1', type: 'sf', n: 1 }, { id: 'bay-sf2', type: 'sf', n: 2 }, { id: 'bay-sf3', type: 'sf', n: 3 }] }
   ];
   for (const C of COUNTRIES) for (const id of C.towns) TOWNS.find(T => T.id === id).country = C.id;
