@@ -115,6 +115,11 @@ G['cv-ev'] = svg(AX + F([[9, 29], ...fn(y => 400 / (55 - y) - 1, 29, 41, 20).map
 G['deadweight-loss'] = svg(AX + L([[9, 13], [57, 53]]) + A([[9, 25], [59, 25]], 1.6) + S([[9, 39], [59, 39]]) + F([[23.4, 25], [40.2, 39], [23.4, 39]], 0.35) + S([[23.4, 25], [23.4, 55]], DASH));
 
 // Lecture 8
+{ // the cone of the notes: rays from 0, the triangle 0, q', q'' and the free-disposal curtain hanging below
+  const O = [40, 30], q1 = [14, 12], q2 = [26, 8];
+  G['production-set'] = svg('<path d="M40 6V58M6 30H58" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>' +
+    F([O, q1, q2], 0.25) + L([O, q1]) + L([O, q2]) + A([O, [8, 7]], 1.8) + S([q1, [14, 56]]) + S([q2, [26, 56]]) + S([[20, 10.4], [20, 56]]) + D(q1[0], q1[1], false) + D(q2[0], q2[1], false));
+}
 { // axes crossing in the middle: the frontier of outputs (top right), the mirrored isoquant (bottom left), one tangent
   const ell = fn(t => 0, 0, Math.PI / 2, 30).map(([t]) => [32 + 22 * Math.cos(t), 32 - 22 * Math.sin(t)]);
   const iso = fn(x => 32 + 90 / (32 - x), 8, 27.9, 30).filter(p => p[1] <= 58);
