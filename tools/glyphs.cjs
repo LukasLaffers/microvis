@@ -139,6 +139,10 @@ G['deadweight-loss'] = svg(AX + L([[9, 13], [57, 53]]) + A([[9, 25], [59, 25]], 
 }
 
 // Lecture 9
+{ // a budget line turning around R, and the offer curve bending back from R
+  const R0 = [48, 46], oc = fn(t => 0, 0, 1, 30).map(([t]) => [48 - 30 * t + 26 * t * t * t, 46 - 6 * t - 30 * t * t]);
+  G['offer-curve'] = svg(AX + S([[9, 41], [58, 47.6]]) + S([[26, 10], [52, 55]]) + A(oc, 2.2, DASH) + D(R0[0], R0[1], false, 3.2));
+}
 { // the box, an indifference curve from each corner, the contract curve and a price line
   const L0 = 7, T = 57, W = 50, H = 50, X = x => L0 + x * W / 10, Y = y => T - y * H / 10;
   const ua = Array.from({ length: 50 }, (_, i) => { const x = 1.2 + 8.6 * i / 49; return [X(x), Y(25 / x)]; }).filter(p => p[1] >= T - H && p[1] <= T);
