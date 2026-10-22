@@ -8,7 +8,8 @@
  *               choice is (y/(4r), 3y/4) or (3y/(4r), y/4), with utilities k y r^(-1/4) and k y r^(-3/4)
  *               (k = (1/4)^(1/4) (3/4)^(3/4)): the second is better when r < 1, the first when r > 1, both at r = 1.
  *               The better-than sets are unions of two convex sets, not convex, and the offer curve jumps at r = 1.
- * Both households own R = (8, 2); R is chosen without trade at r = 1/16 (convex) and r = 3/4 (non-convex).
+ * The convex household owns R = (8, 2), chosen without trade at r = 1/16; the non-convex one R = (5, 1.25) (closer to 0,
+ * so that both branches of its offer curve stay in the figure), chosen without trade at r = 3/4.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -16,9 +17,10 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const R = [8, 2];
+  const ENDOW = { convex: [8, 2], nonconvex: [5, 1.25] };
   const PREFS = ['convex', 'nonconvex'];
-  const income = r => r * R[0] + R[1];
+  const endowment = pref => ENDOW[pref];
+  const income = (pref, r) => r * ENDOW[pref][0] + ENDOW[pref][1];
 
   function utility(pref, x) {
     const [a, b] = x;
@@ -29,7 +31,7 @@
 
   // The choices at r: one bundle, or two at a jump (the non-convex household at r = 1).
   function choices(pref, r) {
-    const y = income(r);
+    const y = income(pref, r);
     if (pref === 'convex') { const s = Math.sqrt(r); return [[y / (r + s), y / (1 + s)]]; }
     const A = [y / (4 * r), 3 * y / 4], B = [3 * y / (4 * r), y / 4];
     if (Math.abs(r - 1) < 1e-12) return [B, A];
@@ -37,7 +39,7 @@
   }
   const choice = (pref, r) => choices(pref, r)[0];
   // the price ratio at which R itself is chosen (no trade)
-  const noTrade = pref => (pref === 'convex' ? (R[1] / R[0]) ** 2 : 0.75);
+  const noTrade = pref => { const R = ENDOW[pref]; return pref === 'convex' ? (R[1] / R[0]) ** 2 : 3 * R[1] / R[0]; };
   // the price ratio at which the offer curve jumps (null when it never does)
   const jump = pref => (pref === 'convex' ? null : 1);
 
@@ -47,5 +49,5 @@
     return Math.min(Math.pow(v / Math.pow(x1, 0.25), 4 / 3), Math.pow(v / Math.pow(x1, 0.75), 4));
   }
 
-  return { R, PREFS, income, utility, choices, choice, noTrade, jump, curveX2 };
+  return { PREFS, endowment, income, utility, choices, choice, noTrade, jump, curveX2 };
 });

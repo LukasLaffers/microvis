@@ -30,7 +30,7 @@
           <summary>How to read this</summary>
           <p>The household owns the bundle <span class="tex" data-tex="R"></span> and can trade at prices <span class="tex" data-tex="p"></span>, so its budget line always passes through <span class="tex" data-tex="R"></span>. For each price ratio it picks the best affordable bundle <span class="tex" data-tex="x(p)"></span>. The offer curve joins these bundles.</p>
           <ul>
-          <li>Click a point in the figure: the price moves from no trade, at <span class="tex" data-tex="R"></span>, to the price whose choice is nearest, and the offer curve is traced on the way.</li>
+          <li>Drag the blue point along the offer curve, or click a point in the figure: the price moves from no trade, at <span class="tex" data-tex="R"></span>, to the price whose choice is nearest, and the offer curve is traced on the way.</li>
           <li>Where does the offer curve turn back, and why?</li>
           <li>Non-convex preferences: trace past <span class="tex" data-tex="p_1/p_2=1"></span>. The choice jumps, and the offer curve has a gap.</li>
           </ul>
@@ -47,10 +47,6 @@
       <div class="group">
         <h2>Prices</h2>
         <div class="ctrl" data-key="r" data-label="p_1/p_2" data-hint="log scale" data-min="0.02" data-max="4" data-log="1"></div>
-        <div class="btn-row">
-          <button type="button" id="trace" aria-pressed="false">▶ Trace the offer curve</button>
-          <button type="button" id="clear">Clear the trace</button>
-        </div>
       </div>
       <div class="group">
         <h2>Show</h2>
@@ -60,7 +56,13 @@
     </section>
 
     <section class="panel main-panel" aria-label="The offer curve">
-      <div class="panel-head"><h2>One household, one price line through <span class="tex" data-tex="R"></span></h2></div>
+      <div class="panel-head">
+        <h2>One household, one price line through <span class="tex" data-tex="R"></span></h2>
+        <div class="btn-row">
+          <button type="button" id="trace" aria-pressed="false">▶ Trace the offer curve</button>
+          <button type="button" id="clear">Clear the trace</button>
+        </div>
+      </div>
       <div id="plot" class="plot plot-offer"></div>
       <p class="caption" id="cap"></p>
     </section>
