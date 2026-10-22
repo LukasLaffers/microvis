@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Offer Curve · Microvis</title>
+  <meta name="description" content="A household with endowment R trades at prices p: its budget line turns around R, and its choices trace the offer curve, which jumps when preferences are not convex. Lecture 9.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../shared/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../shared/style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=20">
+  <script>/* theme */try{var t=localStorage.getItem('microvis-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div>
+      <p class="eyebrow"><a href="../index.html#l9">Microvis</a> <span class="sep" aria-hidden="true">/</span> Lecture 9 · General equilibrium</p>
+      <h1>The Offer Curve</h1>
+      <p class="subtitle"><span class="tex" data-tex="\max_x U(x)\ \text{ s.t. }\ p^tx\le p^tR"></span></p>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="Controls">
+      <div class="group">
+        <details class="howto" open>
+          <summary>How to read this</summary>
+          <p>The household owns the bundle <span class="tex" data-tex="R"></span> and can trade at prices <span class="tex" data-tex="p"></span>, so its budget line always passes through <span class="tex" data-tex="R"></span>. For each price ratio it picks the best affordable bundle <span class="tex" data-tex="x(p)"></span>. The offer curve joins these bundles.</p>
+          <ul>
+          <li>Click a point in the figure: the price moves from no trade, at <span class="tex" data-tex="R"></span>, to the price whose choice is nearest, and the offer curve is traced on the way.</li>
+          <li>Where does the offer curve turn back, and why?</li>
+          <li>Non-convex preferences: trace past <span class="tex" data-tex="p_1/p_2=1"></span>. The choice jumps, and the offer curve has a gap.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="group">
+        <h2>Preferences</h2>
+        <div class="seg" role="group" aria-label="Preferences">
+          <button type="button" data-pref="convex" aria-pressed="true">Convex</button>
+          <button type="button" data-pref="nonconvex" aria-pressed="false">Non-convex</button>
+        </div>
+        <div class="formula" id="formula"></div>
+      </div>
+      <div class="group">
+        <h2>Prices</h2>
+        <div class="ctrl" data-key="r" data-label="p_1/p_2" data-hint="log scale" data-min="0.02" data-max="4" data-log="1"></div>
+        <div class="btn-row">
+          <button type="button" id="trace" aria-pressed="false">▶ Trace the offer curve</button>
+          <button type="button" id="clear">Clear the trace</button>
+        </div>
+      </div>
+      <div class="group">
+        <h2>Show</h2>
+        <label class="check"><input type="checkbox" id="show-r" checked> indifference curve through <span class="tex" data-tex="R"></span></label>
+        <label class="check"><input type="checkbox" id="show-whole"> the whole offer curve</label>
+      </div>
+    </section>
+
+    <section class="panel main-panel" aria-label="The offer curve">
+      <div class="panel-head"><h2>One household, one price line through <span class="tex" data-tex="R"></span></h2></div>
+      <div id="plot" class="plot plot-offer"></div>
+      <p class="caption" id="cap"></p>
+    </section>
+
+    <div class="side">
+      <section class="panel readouts" aria-label="At these prices" aria-live="polite">
+        <h2>At these prices</h2>
+        <ul class="checks" id="nums"></ul>
+      </section>
+      <section class="panel readouts" aria-label="Two properties" aria-live="polite">
+        <h2>Two properties of offer curves</h2>
+        <ul class="checks" id="props"></ul>
+      </section>
+    </div>
+  </main>
+
+  <nav class="pager" aria-label="Other tools">
+    <a class="prev" href="../robinson-crusoe/index.html"><span>Previous</span>Robinson Crusoe's Economy</a>
+    <a class="all" href="../index.html#l9">All tools</a>
+    <a class="next" href="../edgeworth-box/index.html"><span>Next</span>The Edgeworth Box</a>
+  </nav>
+
+  <footer class="site-footer">
+    Lukáš Lafférs · <a href="../index.html">Microvis</a> · Figure after the notes.
+  </footer>
+
+  <script src="../shared/vendor/katex/katex.min.js"></script>
+  <script src="../shared/vendor/plotly/plotly-2.35.2.min.js"></script>
+  <script src="../shared/ui.js?v=20"></script>
+  <script src="model.js?v=20"></script>
+  <script src="app.js?v=20"></script>
+  <script src="../shared/theme.js?v=20"></script>
+  <script>/* visitor count */if(location.hostname==='lukaslaffers.github.io'){new Image().src='https://microvis.goatcounter.com/count?p='+encodeURIComponent(location.pathname.replace(/index\.html$/,''))+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer)+'&rnd='+Math.random().toString(36).slice(2);var v=document.getElementById('visits');if(v&&window.fetch)fetch('https://microvis.goatcounter.com/counter/TOTAL.json').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.count){v.textContent=' · '+d.count+' visits';v.hidden=false}}).catch(function(){});}</script>
+</body>
+</html>
