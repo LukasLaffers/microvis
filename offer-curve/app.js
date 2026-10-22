@@ -22,8 +22,30 @@
   const schedule = U.scheduler(render);
   const logs = (a, b, n) => U.linspace(Math.log(a), Math.log(b), n).map(Math.exp);
 
-  // the price ratios at which the construction leaves a faint indifference curve: r0 3^k, k != 0, within the slider
-  const STEPS = () => { const r0 = M.noTrade(state.pref), out = []; for (let k = -8; k <= 8; k++) { const q = r0 * Math.pow(3, k); if (k && q >= R_MIN && q <= R_MAX) out.push(q); } return out; };
+  // The construction: indifference curves evenly spaced in utility, U(R) + k STEP (k = 1, 2, ...), each where the offer
+  // curve reaches it on either side of R. Along the offer curve U(x(p)) rises on both sides of the no-trade price (V(p, p'R)
+  // is quasi-convex in p), so each level is reached at most once on each side. Both utility functions are homogeneous of
+  // degree 1, so equal steps in utility give evenly spaced curves.
+  const STEP = { convex: 0.8, nonconvex: 0.5 };
+  const levelCache = {};
+  function levels(pref) {
+    if (levelCache[pref]) return levelCache[pref];
+    const r0 = M.noTrade(pref), u = r => M.utility(pref, M.choice(pref, r)), uR = M.utility(pref, M.endowment(pref)), out = [];
+    for (const [a, b] of [[r0, R_MAX], [r0, R_MIN]]) {   // each side of the no-trade price
+      const rs = logs(a, b, 1200);
+      let k = 1;
+      for (let i = 1; i < rs.length; i++) {
+        while (u(rs[i]) >= uR + k * STEP[pref]) {
+          // the level is crossed between rs[i-1] and rs[i]: bisection in log r
+          let lo = Math.log(rs[i - 1]), hi = Math.log(rs[i]);
+          for (let n = 0; n < 50; n++) { const m = (lo + hi) / 2; if (u(Math.exp(m)) >= uR + k * STEP[pref]) hi = m; else lo = m; }
+          out.push({ r: Math.exp(hi), v: uR + k * STEP[pref] });
+          k++;
+        }
+      }
+    }
+    return (levelCache[pref] = out);
+  }
   function resetTrace() { const r0 = M.noTrade(state.pref); state.lo = Math.min(r0, state.r); state.hi = Math.max(r0, state.r); }
 
   // The offer curve over the price ratios [a, b], with a break where it jumps.
@@ -51,10 +73,12 @@
     traces.push(U.line2([[0, y], [y / r, 0]], grey, 2.2, 'budget line through R'));
     traces.push(U.line2(some(state.showR ? curve(M.utility(state.pref, R)) : []), grey, 1.3, 'indifference curve through R', 'dot'));
     traces.push(U.line2(some(state.whole ? offerCurve(R_MIN, R_MAX, 400) : []), th.blue, 1.5, 'the whole offer curve', 'dot', { opacity: 0.45 }));
-    // the construction: at price ratios r0 3^k already visited, the choice and its indifference curve, faint grey
-    const steps = STEPS().filter(q => q >= state.lo * (1 - 1e-9) && q <= state.hi * (1 + 1e-9));
-    const ghost = [];
-    for (const q of steps) { if (ghost.length) ghost.push([null, null]); ghost.push(...curve(M.utility(state.pref, M.choice(state.pref, q)))); }
+    // the construction: the levels the trace has reached, each indifference curve once, with the choices on it
+    // (only where the offer curve reaches the level inside the figure: further out the curves would only crowd it)
+    const inView = x => x[0] <= L && x[1] <= L;
+    const reached = levels(state.pref).filter(g => g.r >= state.lo * (1 - 1e-9) && g.r <= state.hi * (1 + 1e-9) && inView(M.choice(state.pref, g.r)));
+    const steps = reached.map(g => g.r), ghost = [];
+    for (const v of [...new Set(reached.map(g => g.v))]) { if (ghost.length) ghost.push([null, null]); ghost.push(...curve(v)); }
     traces.push(U.line2(some(ghost), grey, 1, '', null, { opacity: 0.5 }));
     traces.push(U.dot2(some(steps.map(q => M.choice(state.pref, q))), grey, '', 7, { hoverinfo: 'skip', hovertemplate: null, marker: { color: grey, size: 7, line: { width: 0 } } }));
     traces.push(U.line2(offerCurve(state.lo, state.hi), th.blue, 3, 'offer curve (traced)', 'dash'));

@@ -39,8 +39,8 @@ for (const pref of M.PREFS) {
     checks++;
   }
 }
-// The convex household's offer curve is continuous; the non-convex one jumps at r = 1 from (4.6875, 1.5625) to
-// (1.5625, 4.6875) (income 6.25: 3/4 and 1/4 of it), where both bundles are optimal.
+// The convex household's offer curve is continuous; the non-convex one jumps at r = 1 from (6.75, 2.25) to
+// (2.25, 6.75) (income 9: 3/4 and 1/4 of it), where both bundles are optimal.
 {
   const e = 1e-7;
   for (let k = 0; k < 400; k++) {
@@ -48,11 +48,11 @@ for (const pref of M.PREFS) {
     assert.ok(Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-4); checks++;
   }
   const lo = M.choice('nonconvex', 1 - e), hi = M.choice('nonconvex', 1 + e), both = M.choices('nonconvex', 1);
-  close(lo[0], 4.6875, 1e-5); close(lo[1], 1.5625, 1e-5); close(hi[0], 1.5625, 1e-5); close(hi[1], 4.6875, 1e-5);
+  close(lo[0], 6.75, 1e-5); close(lo[1], 2.25, 1e-5); close(hi[0], 2.25, 1e-5); close(hi[1], 6.75, 1e-5);
   assert.equal(both.length, 2); close(M.utility('nonconvex', both[0]), M.utility('nonconvex', both[1]), 1e-12);
   checks += 6;
   // the better-than set is not convex: two bundles with U >= v whose midpoint has U < v
-  const v = M.utility('nonconvex', [4.6875, 1.5625]), mid = [3.125, 3.125];
-  assert.ok(M.utility('nonconvex', [1.5625, 4.6875]) >= v - 1e-12 && M.utility('nonconvex', mid) < v); checks++;
+  const v = M.utility('nonconvex', [6.75, 2.25]), mid = [4.5, 4.5];
+  assert.ok(M.utility('nonconvex', [2.25, 6.75]) >= v - 1e-12 && M.utility('nonconvex', mid) < v); checks++;
 }
 console.log(`All ${checks} offer-curve checks passed.`);

@@ -8,8 +8,8 @@
  *               choice is (y/(4r), 3y/4) or (3y/(4r), y/4), with utilities k y r^(-1/4) and k y r^(-3/4)
  *               (k = (1/4)^(1/4) (3/4)^(3/4)): the second is better when r < 1, the first when r > 1, both at r = 1.
  *               The better-than sets are unions of two convex sets, not convex, and the offer curve jumps at r = 1.
- * The convex household owns R = (8, 2), chosen without trade at r = 1/16; the non-convex one R = (5, 1.25) (closer to 0,
- * so that both branches of its offer curve stay in the figure), chosen without trade at r = 3/4.
+ * The convex household owns R = (8, 2), chosen without trade at r = 1/16; the non-convex one R = (8, 1), well away from
+ * the diagonal where its indifference curves have their kink, chosen without trade at r = 3/8.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -17,7 +17,7 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const ENDOW = { convex: [8, 2], nonconvex: [5, 1.25] };
+  const ENDOW = { convex: [8, 2], nonconvex: [8, 1] };
   const PREFS = ['convex', 'nonconvex'];
   const endowment = pref => ENDOW[pref];
   const income = (pref, r) => r * ENDOW[pref][0] + ENDOW[pref][1];
